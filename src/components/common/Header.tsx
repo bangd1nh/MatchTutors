@@ -152,18 +152,30 @@ const Header = ({ onMenuClick }: HeaderProps) => {
                 )}
 
                 {!isAuthenticated && (
-                    <Link
-                        to="/login"
-                        className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                    >
-                        {t("login")}
-                    </Link>
+                    <>
+                        <Link
+                            to="/login"
+                            className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                        >
+                            {t("login")}
+                        </Link>
+                        <Link
+                            to="/map"
+                            className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                        >
+                            {t("a")}
+                        </Link>
+                    </>
                 )}
 
                 {/* Language Toggle Dropdown */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="icon" className="h-8 w-8 sm:h-9 sm:w-9">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 sm:h-9 sm:w-9"
+                        >
                             {i18n.language.toUpperCase()}
                             <ChevronDown className="ml-1 h-4 w-4" />
                             <span className="sr-only">Change language</span>

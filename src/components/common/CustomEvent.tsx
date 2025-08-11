@@ -20,7 +20,7 @@ export function CustomEvent({ event }: CustomEventProps) {
             <PopoverTrigger asChild>
                 <div className="cursor-pointer p-1">{event.title}</div>
             </PopoverTrigger>
-            <PopoverContent className="w-60">
+            <PopoverContent className="w-96">
                 <div className="space-y-2">
                     <h4 className="font-medium leading-none">{event.title}</h4>
                     <p className="text-sm text-muted-foreground">

@@ -2,6 +2,7 @@ import EmployerLayout from "../layouts/EmployerLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import OverviewPage from "../pages/dashboard/OverviewPage";
 import JobManage from "@/pages/Employer/JobManage";
+import MapOverView from "@/pages/MapOverView";
 
 export const employerRoutes = {
     element: (
@@ -14,6 +15,10 @@ export const employerRoutes = {
         {
             path: "/employer/jobs",
             element: <JobManage />,
+        },
+        {
+            path: "/employer/map",
+            element: <MapOverView />,
         },
     ],
 };

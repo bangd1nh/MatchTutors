@@ -18,8 +18,24 @@ export interface ScheduleRule extends UpsertScheduleRule {
  * Fetches all schedule rules from the backend.
  */
 export const getScheduleRules = async (): Promise<ScheduleRule[]> => {
-    const response = await apiClient.get("/schedules");
-    return response.data;
+    return Promise.resolve([
+        {
+            _id: "1",
+            title: "Sample Rule",
+            daysOfWeek: [1, 3, 5],
+            startTime: "08:00",
+            endTime: "10:00",
+            repeatUntilDate: "2025-12-31T00:00:00.000Z",
+        },
+        {
+            _id: "1",
+            title: "Sample Rule",
+            daysOfWeek: [2, 4, 6],
+            startTime: "08:15",
+            endTime: "10:00",
+            repeatUntilDate: "2025-12-31T00:00:00.000Z",
+        },
+    ]);
 };
 
 /**
