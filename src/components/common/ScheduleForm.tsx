@@ -3,7 +3,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
     Popover,
@@ -15,41 +14,37 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const daysOfWeek = [
-    { id: 1, label: "Thứ 2" },
-    { id: 2, label: "Thứ 3" },
-    { id: 3, label: "Thứ 4" },
-    { id: 4, label: "Thứ 5" },
-    { id: 5, label: "Thứ 6" },
-    { id: 6, label: "Thứ 7" },
-    { id: 0, label: "Chủ Nhật" },
+const statusOptions = [
+    "scheduled",
+    "confirmed",
+    "rejected",
+    "completed",
+    "not_conducted",
 ];
 
-const scheduleSchema = z.object({
-    title: z.string().min(1, "Tên sự kiện không được để trống"),
-    days: z
-        .array(z.number())
-        .min(1, "Vui lòng chọn ít nhất một ngày trong tuần"),
-    startTime: z
-        .string()
-        .regex(
-            /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
-            "Sai định dạng giờ (HH:mm)"
-        ),
-    endTime: z
-        .string()
-        .regex(
-            /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
-            "Sai định dạng giờ (HH:mm)"
-        ),
-    repeatUntil: z.date(),
+const scheduleSessionSchema = z.object({
+    teachingRequestId: z.string().min(1, "ID yêu cầu học không được để trống"),
+    startTime: z.date(),
+    endTime: z.date(),
+    status: z.enum([
+        "scheduled",
+        "confirmed",
+        "rejected",
+        "completed",
+        "not_conducted",
+    ]),
+    isTrial: z.boolean(),
+    location: z.string().optional(),
+    notes: z.string().optional(),
+    materials: z.array(z.string()).optional(),
+    quizIds: z.array(z.string()).optional(),
 });
 
-export type ScheduleFormValues = z.infer<typeof scheduleSchema>;
+export type ScheduleSessionFormValues = z.infer<typeof scheduleSessionSchema>;
 
 interface ScheduleFormProps {
-    onSubmit: (data: ScheduleFormValues) => void;
-    initialValues?: Partial<ScheduleFormValues>;
+    onSubmit: (data: ScheduleSessionFormValues) => void;
+    initialValues?: Partial<ScheduleSessionFormValues>;
     isPending?: boolean;
 }
 
@@ -63,77 +58,61 @@ export function ScheduleForm({
         handleSubmit,
         control,
         formState: { errors },
-    } = useForm<ScheduleFormValues>({
-        resolver: zodResolver(scheduleSchema),
-        defaultValues: initialValues || {
-            days: [],
-        },
-        resetOptions: {
-            keepDirtyValues: true,
-        },
+    } = useForm<ScheduleSessionFormValues>({
+        resolver: zodResolver(scheduleSessionSchema),
+        defaultValues: initialValues,
+        resetOptions: { keepDirtyValues: true },
     });
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-                <Label htmlFor="title">Tên sự kiện</Label>
-                <Input id="title" {...register("title")} />
-                {errors.title && (
+                <Label htmlFor="teachingRequestId">ID Yêu cầu học</Label>
+                <Input
+                    id="teachingRequestId"
+                    {...register("teachingRequestId")}
+                />
+                {errors.teachingRequestId && (
                     <p className="text-red-500 text-sm">
-                        {errors.title.message}
+                        {errors.teachingRequestId.message}
                     </p>
                 )}
             </div>
-
-            <div>
-                <Label>Ngày trong tuần</Label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {daysOfWeek.map((day) => (
-                        <Controller
-                            key={day.id}
-                            name="days"
-                            control={control}
-                            render={({ field }) => (
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id={`day-${day.id}`}
-                                        checked={field.value?.includes(day.id)}
-                                        onCheckedChange={(checked) => {
-                                            return checked
-                                                ? field.onChange([
-                                                      ...(field.value || []),
-                                                      day.id,
-                                                  ])
-                                                : field.onChange(
-                                                      field.value?.filter(
-                                                          (value) =>
-                                                              value !== day.id
-                                                      )
-                                                  );
-                                        }}
-                                    />
-                                    <Label htmlFor={`day-${day.id}`}>
-                                        {day.label}
-                                    </Label>
-                                </div>
-                            )}
-                        />
-                    ))}
-                </div>
-                {errors.days && (
-                    <p className="text-red-500 text-sm">
-                        {errors.days.message}
-                    </p>
-                )}
-            </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="startTime">Giờ bắt đầu</Label>
-                    <Input
-                        id="startTime"
-                        type="time"
-                        {...register("startTime")}
+                    <Label>Thời gian bắt đầu</Label>
+                    <Controller
+                        name="startTime"
+                        control={control}
+                        render={({ field }) => (
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !field.value &&
+                                                "text-muted-foreground"
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {field.value ? (
+                                            format(field.value, "PPPp")
+                                        ) : (
+                                            <span>Chọn ngày giờ</span>
+                                        )}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                        mode="single"
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        )}
                     />
                     {errors.startTime && (
                         <p className="text-red-500 text-sm">
@@ -142,8 +121,40 @@ export function ScheduleForm({
                     )}
                 </div>
                 <div>
-                    <Label htmlFor="endTime">Giờ kết thúc</Label>
-                    <Input id="endTime" type="time" {...register("endTime")} />
+                    <Label>Thời gian kết thúc</Label>
+                    <Controller
+                        name="endTime"
+                        control={control}
+                        render={({ field }) => (
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !field.value &&
+                                                "text-muted-foreground"
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {field.value ? (
+                                            format(field.value, "PPPp")
+                                        ) : (
+                                            <span>Chọn ngày giờ</span>
+                                        )}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                        mode="single"
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        )}
+                    />
                     {errors.endTime && (
                         <p className="text-red-500 text-sm">
                             {errors.endTime.message}
@@ -151,48 +162,57 @@ export function ScheduleForm({
                     )}
                 </div>
             </div>
-
             <div>
-                <Label>Lặp lại cho đến</Label>
-                <Controller
-                    name="repeatUntil"
-                    control={control}
-                    render={({ field }) => (
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant={"outline"}
-                                    className={cn(
-                                        "w-full justify-start text-left font-normal",
-                                        !field.value && "text-muted-foreground"
-                                    )}
-                                >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {field.value ? (
-                                        format(field.value, "PPP")
-                                    ) : (
-                                        <span>Chọn một ngày</span>
-                                    )}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                                <Calendar
-                                    mode="single"
-                                    selected={field.value}
-                                    onSelect={field.onChange}
-                                    initialFocus
-                                />
-                            </PopoverContent>
-                        </Popover>
-                    )}
-                />
-                {errors.repeatUntil && (
+                <Label htmlFor="status">Trạng thái</Label>
+                <select
+                    id="status"
+                    {...register("status")}
+                    className="w-full border rounded px-2 py-1"
+                >
+                    {statusOptions.map((opt) => (
+                        <option key={opt} value={opt}>
+                            {opt}
+                        </option>
+                    ))}
+                </select>
+                {errors.status && (
                     <p className="text-red-500 text-sm">
-                        {errors.repeatUntil.message}
+                        {errors.status.message}
                     </p>
                 )}
             </div>
-
+            <div>
+                <Label>
+                    <input type="checkbox" {...register("isTrial")} />
+                    &nbsp;Buổi học thử
+                </Label>
+            </div>
+            <div>
+                <Label htmlFor="location">Địa điểm / Link học</Label>
+                <Input id="location" {...register("location")} />
+            </div>
+            <div>
+                <Label htmlFor="notes">Ghi chú</Label>
+                <Input id="notes" {...register("notes")} />
+            </div>
+            <div>
+                <Label htmlFor="materials">
+                    Tài liệu (IDs, cách nhau dấu phẩy)
+                </Label>
+                <Input
+                    id="materials"
+                    {...register("materials")}
+                    placeholder="mat1,mat2"
+                />
+            </div>
+            <div>
+                <Label htmlFor="quizIds">Quiz (IDs, cách nhau dấu phẩy)</Label>
+                <Input
+                    id="quizIds"
+                    {...register("quizIds")}
+                    placeholder="quiz1,quiz2"
+                />
+            </div>
             <Button type="submit" disabled={isPending}>
                 {isPending
                     ? "Đang lưu..."

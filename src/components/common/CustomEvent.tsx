@@ -1,20 +1,15 @@
-// src/components/common/CustomEvent.tsx
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
 import moment from "moment";
+import { Button } from "../ui/button";
+import { Pencil } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-interface CustomEventProps {
-    event: {
-        title: string;
-        start: Date;
-        end: Date;
-    };
-}
-
-export function CustomEvent({ event }: CustomEventProps) {
+export function CustomEvent({ event }: { event: any }) {
+    const navigate = useNavigate();
     return (
         <Popover>
             <PopoverTrigger asChild>
@@ -27,6 +22,42 @@ export function CustomEvent({ event }: CustomEventProps) {
                         Từ {moment(event.start).format("LT")} đến{" "}
                         {moment(event.end).format("LT")}
                     </p>
+                    <div>
+                        <strong>Status:</strong> {event.status}
+                    </div>
+                    <div>
+                        <strong>Trial:</strong> {event.isTrial ? "Có" : "Không"}
+                    </div>
+                    <div>
+                        <strong>Materials:</strong>{" "}
+                        {event.materials?.join(", ")}
+                    </div>
+                    <div>
+                        <strong>Quizzes:</strong> {event.quizIds?.join(", ")}
+                    </div>
+                    <div>
+                        <strong>Location:</strong> {event.location}
+                    </div>
+                    <div>
+                        <strong>Notes:</strong> {event.notes}
+                    </div>
+                    <div>
+                        <strong>Reminders:</strong>
+                        <ul className="list-disc ml-4">
+                            {event.reminders?.map((rem: any, idx: number) => (
+                                <li key={idx}>
+                                    {rem.minutesBefore} phút trước bằng{" "}
+                                    {rem.method.join(", ")} ({rem.notes})
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <Button
+                        variant={"default"}
+                        onClick={() => navigate("/editSession")}
+                    >
+                        <Pencil />
+                    </Button>
                 </div>
             </PopoverContent>
         </Popover>
