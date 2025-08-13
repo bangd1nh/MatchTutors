@@ -34,15 +34,72 @@ export interface ScheduleSession extends UpsertScheduleSession {
     createdBy: string; // ObjectId of the user who created it
 }
 
+export interface TeachingRequest {
+    _id: string;
+    studentId: string;
+    tutorId: string;
+    subject: string;
+    level?: string;
+    description?: string;
+    totalSessionsPlanned?: number;
+    trialDecision?: {
+        student: "pending" | "accepted" | "rejected";
+        tutor: "pending" | "accepted" | "rejected";
+    };
+    status?: string;
+    createdBy?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+// Định nghĩa lại type cho session có trường teachingRequest là object
+export interface PopulatedScheduleSession
+    extends Omit<ScheduleSession, "teachingRequestId"> {
+    teachingRequest: TeachingRequest;
+}
 /**
  * Fetches all schedule sessions from the backend.
  */
-export const getScheduleSessions = async (): Promise<ScheduleSession[]> => {
-    // Mock data cho các session
-    return Promise.resolve([
+export const getScheduleSessions = async (): Promise<
+    PopulatedScheduleSession[]
+> => {
+    const teachingRequests: TeachingRequest[] = [
+        {
+            _id: "req1",
+            studentId: "user1",
+            tutorId: "user2",
+            subject: "Toán",
+            level: "12",
+            description: "Ôn thi đại học",
+            totalSessionsPlanned: 10,
+            trialDecision: { student: "accepted", tutor: "accepted" },
+            status: "in_progress",
+            createdBy: "user1",
+            createdAt: new Date("2025-08-01T08:00:00.000Z"),
+            updatedAt: new Date("2025-08-10T08:00:00.000Z"),
+        },
+        {
+            _id: "req2",
+            studentId: "user2",
+            tutorId: "user1",
+            subject: "Văn",
+            level: "11",
+            description: "Nâng cao kỹ năng viết",
+            totalSessionsPlanned: 8,
+            trialDecision: { student: "pending", tutor: "accepted" },
+            status: "trial_pending",
+            createdBy: "user2",
+            createdAt: new Date("2025-08-02T08:00:00.000Z"),
+            updatedAt: new Date("2025-08-11T08:00:00.000Z"),
+        },
+    ];
+    const getTeachingRequest = (id: string) =>
+        teachingRequests.find((tr) => tr._id === id)!;
+
+    const sessions: PopulatedScheduleSession[] = [
         {
             _id: "sess1",
-            teachingRequestId: "req1",
+            teachingRequest: getTeachingRequest("req1"),
             startTime: new Date("2025-08-10T09:00:00.000Z"),
             endTime: new Date("2025-08-10T10:00:00.000Z"),
             status: "scheduled",
@@ -64,7 +121,7 @@ export const getScheduleSessions = async (): Promise<ScheduleSession[]> => {
         },
         {
             _id: "sess2",
-            teachingRequestId: "req2",
+            teachingRequest: getTeachingRequest("req2"),
             startTime: new Date("2025-08-11T14:00:00.000Z"),
             endTime: new Date("2025-08-11T15:30:00.000Z"),
             status: "confirmed",
@@ -84,8 +141,12 @@ export const getScheduleSessions = async (): Promise<ScheduleSession[]> => {
             location: "Phòng 101",
             notes: "Buổi học chính",
         },
-    ]);
+    ];
+    return Promise.resolve(sessions);
 };
+
+// // Helper để lấy teachingRequest từ id
+// const getTeachingRequest = (id: string) => teachingRequests.find(tr => tr._id === id)!;
 
 /**
  * Creates a new schedule session.

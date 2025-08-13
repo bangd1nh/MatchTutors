@@ -6,7 +6,8 @@ import {
     updateScheduleSession,
     deleteScheduleSession,
     ScheduleSession,
-    UpsertScheduleSession
+    UpsertScheduleSession,
+    PopulatedScheduleSession,
 } from "@/api/schedules";
 
 /**
@@ -20,13 +21,17 @@ export const useScheduleSessions = () => {
         data: sessions = [],
         isLoading,
         isError,
-    } = useQuery<ScheduleSession[], Error>({
-        queryKey: ["scheduleSessions"], // Cache key
-        queryFn: getScheduleSessions, // API function
+    } = useQuery<PopulatedScheduleSession[], Error>({
+        queryKey: ["scheduleSessions"],
+        queryFn: getScheduleSessions,
     });
 
     // Mutation to create a new session
-    const { mutate: createSession, isPending: isCreating } = useMutation<ScheduleSession, Error, UpsertScheduleSession>({
+    const { mutate: createSession, isPending: isCreating } = useMutation<
+        ScheduleSession,
+        Error,
+        UpsertScheduleSession
+    >({
         mutationFn: createScheduleSession,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["scheduleSessions"] });
@@ -34,7 +39,11 @@ export const useScheduleSessions = () => {
     });
 
     // Mutation to update a session
-    const { mutate: updateSession, isPending: isUpdating } = useMutation<ScheduleSession, Error, { id: string } & UpsertScheduleSession>({
+    const { mutate: updateSession, isPending: isUpdating } = useMutation<
+        ScheduleSession,
+        Error,
+        { id: string } & UpsertScheduleSession
+    >({
         mutationFn: updateScheduleSession,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["scheduleSessions"] });
@@ -42,7 +51,11 @@ export const useScheduleSessions = () => {
     });
 
     // Mutation to delete a session
-    const { mutate: deleteSession, isPending: isDeleting } = useMutation<void, Error, string>({
+    const { mutate: deleteSession, isPending: isDeleting } = useMutation<
+        void,
+        Error,
+        string
+    >({
         mutationFn: deleteScheduleSession,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["scheduleSessions"] });
