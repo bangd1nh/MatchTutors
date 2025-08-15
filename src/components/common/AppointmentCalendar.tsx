@@ -288,7 +288,7 @@ export function AppointmentCalendar() {
                 open={!!sessionToEdit}
                 onOpenChange={() => setSessionToEdit(null)}
             >
-                <DialogContent className="min-w-[350px]">
+                <DialogContent className="max-h-[95vh] overflow-x-auto">
                     <DialogHeader>
                         <DialogTitle>Cập nhật lịch học</DialogTitle>
                         <DialogDescription>
