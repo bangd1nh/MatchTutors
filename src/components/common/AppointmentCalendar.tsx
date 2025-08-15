@@ -135,6 +135,13 @@ export function AppointmentCalendar() {
     const handleEventDrop = useCallback((args: EventDropArg): void => {
         const { event, start, end } = args;
         const updatedEvent = { ...event, start, end };
+
+        // Cập nhật ngay trong state events để UI không bị lệch
+        setEvents((prev) =>
+            prev.map((e) => (e._id === event._id ? { ...e, start, end } : e))
+        );
+
+        // Mở dialog để chỉnh sửa nếu cần
         setSessionToEdit(updatedEvent);
     }, []);
 
@@ -245,6 +252,9 @@ export function AppointmentCalendar() {
                     localizer={localizer}
                     events={events}
                     onEventDrop={handleEventDrop}
+                    onSelectEvent={(ev) =>
+                        setSessionToEdit(ev as CalendarEvent)
+                    }
                     startAccessor="start"
                     endAccessor="end"
                     views={["month", "week", "day", "agenda"]}
