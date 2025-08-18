@@ -1,0 +1,539 @@
+[
+  {
+    "_id": "1",
+    "userId": "user1",
+    "fullName": "Dr. Sarah Johnson",
+    "avatarUrl": "/placeholder.svg?height=80&width=80",
+    "tagline": "Passionate STEM Educator",
+    "dateOfBirth": "1985-06-15T00:00:00.000Z",
+    "gender": "Female",
+    "address": {
+      "city": "San Francisco",
+      "state": "CA",
+      "district": "",
+      "ward": "",
+      "street": "",
+      "country": "USA"
+    },
+    "certifications": [
+      "TESOL Certification",
+      "Cambridge CELTA",
+      "IELTS Trainer Certificate"
+    ],
+    "experienceYears": 10,
+    "hourlyRate": 45,
+    "languages": ["English"],
+    "keyPoints": [
+      "STEM expertise",
+      "Engaging lessons",
+      "Goal-oriented teaching"
+    ],
+    "education": [
+      {
+        "degree": "Ph.D. in Physics",
+        "institution": "Stanford University",
+        "location": "Stanford, CA",
+        "dateRange": "2008 - 2012",
+        "description": "Doctorate focusing on applied physics and teaching"
+      }
+    ],
+    "subjects": [
+      {
+        "category": "Science",
+        "items": ["Mathematics", "Physics", "Chemistry", "Biology"]
+      }
+    ],
+    "availability": [
+      { "dayOfWeek": 1, "timeSlots": ["morning", "afternoon", "evening"] }
+    ],
+    "contact": {
+      "phone": "555-1234",
+      "email": "sarah.johnson@example.com",
+      "facebook": "https://facebook.com/sarahjohnson"
+    },
+    "isApproved": true,
+    "ratings": { "average": 4.9, "totalReviews": 127 },
+    "createdAt": "2025-08-14T00:00:00.000Z",
+    "updatedAt": "2025-08-14T00:00:00.000Z",
+    "teachingServices": ["Online", "Offline", "StudentPlace"],
+    "bio": "Experienced educator passionate about inspiring young minds in STEM."
+  },
+  {
+    "_id": "2",
+    "userId": "user2",
+    "fullName": "Michael Chen",
+    "avatarUrl": "/placeholder.svg?height=80&width=80",
+    "tagline": "Creative Writing Mentor",
+    "dateOfBirth": "1990-03-22T00:00:00.000Z",
+    "gender": "Male",
+    "address": {
+      "city": "New York",
+      "state": "NY",
+      "district": "",
+      "ward": "",
+      "street": "",
+      "country": "USA"
+    },
+    "certifications": [
+      "Certified Mathematics Instructor",
+      "Advanced Calculus Teaching Credential",
+      "Statistics Education Professional"
+    ],
+    "experienceYears": 8,
+    "hourlyRate": 40,
+    "languages": ["English", "Mandarin"],
+    "keyPoints": [
+      "Storytelling mastery",
+      "Publication experience",
+      "Personalized feedback"
+    ],
+    "education": [
+      {
+        "degree": "MFA in Creative Writing",
+        "institution": "Columbia University",
+        "location": "New York, NY",
+        "dateRange": "2012 - 2014",
+        "description": "Specialized in fiction and poetry"
+      }
+    ],
+    "subjects": [
+      {
+        "category": "Language Arts",
+        "items": [
+          "Creative Writing",
+          "Poetry",
+          "Editing",
+          "Literature",
+          "Essay Writing",
+          "Public Speaking",
+          "Storytelling"
+        ]
+      }
+    ],
+    "availability": [{ "dayOfWeek": 2, "timeSlots": ["afternoon", "evening"] }],
+    "contact": {
+      "phone": "555-5678",
+      "email": "michael.chen@example.com",
+      "facebook": "https://facebook.com/michaelchen"
+    },
+    "isApproved": true,
+    "ratings": { "average": 4.8, "totalReviews": 93 },
+    "createdAt": "2025-08-14T00:00:00.000Z",
+    "updatedAt": "2025-08-14T00:00:00.000Z",
+    "teachingServices": ["Online", "TutorPlace"],
+    "bio": "Helping aspiring writers bring their stories to life."
+  },
+  {
+    "_id": "3",
+    "userId": "user3",
+    "fullName": "Amira Hassan",
+    "avatarUrl": "/placeholder.svg?height=80&width=80",
+    "tagline": "Fluent Arabic & English Tutor",
+    "dateOfBirth": "1988-12-05T00:00:00.000Z",
+    "gender": "Female",
+    "address": {
+      "city": "Chicago",
+      "state": "IL",
+      "district": "",
+      "ward": "",
+      "street": "",
+      "country": "USA"
+    },
+    "certifications": [
+      "Google Certified Educator Level 1",
+      "Google Certified Educator Level 2",
+      "Microsoft Certified Trainer"
+    ],
+    "experienceYears": 12,
+    "hourlyRate": 50,
+    "languages": ["Arabic", "English"],
+    "keyPoints": [
+      "Bilingual teaching",
+      "Cultural immersion",
+      "Beginner to advanced"
+    ],
+    "education": [
+      {
+        "degree": "BA in Linguistics",
+        "institution": "University of Illinois",
+        "location": "Chicago, IL",
+        "dateRange": "2006 - 2010",
+        "description": "Focused on applied linguistics and language pedagogy"
+      }
+    ],
+    "subjects": [{ "category": "Languages", "items": ["Arabic", "English"] }],
+    "availability": [{ "dayOfWeek": 3, "timeSlots": ["morning", "afternoon"] }],
+    "contact": {
+      "phone": "555-9012",
+      "email": "amira.hassan@example.com",
+      "facebook": "https://facebook.com/amirahassan"
+    },
+    "isApproved": true,
+    "ratings": { "average": 4.7, "totalReviews": 88 },
+    "createdAt": "2025-08-14T00:00:00.000Z",
+    "updatedAt": "2025-08-14T00:00:00.000Z",
+    "teachingServices": ["Online", "Offline"],
+    "bio": "Helping students achieve fluency in Arabic and English."
+  },
+  {
+    "_id": "4",
+    "userId": "user4",
+    "fullName": "Carlos Martínez",
+    "avatarUrl": "/placeholder.svg?height=80&width=80",
+    "tagline": "Guitar & Music Theory Teacher",
+    "dateOfBirth": "1982-09-14T00:00:00.000Z",
+    "gender": "Male",
+    "address": {
+      "city": "Austin",
+      "state": "TX",
+      "district": "",
+      "ward": "",
+      "street": "",
+      "country": "USA"
+    },
+    "certifications": [
+      "Project Management Professional (PMP)",
+      "Certified ScrumMaster (CSM)",
+      "Agile Certified Practitioner (PMI-ACP)"
+    ],
+    "experienceYears": 15,
+    "hourlyRate": 60,
+    "languages": ["Spanish", "English"],
+    "keyPoints": ["Performance experience", "Music theory", "Songwriting"],
+    "education": [
+      {
+        "degree": "Bachelor of Music",
+        "institution": "Berklee College of Music",
+        "location": "Boston, MA",
+        "dateRange": "2000 - 2004",
+        "description": "Specialized in guitar performance and theory"
+      }
+    ],
+    "subjects": [
+      {
+        "category": "Music",
+        "items": ["Guitar", "Music Theory", "Songwriting"]
+      }
+    ],
+    "availability": [{ "dayOfWeek": 4, "timeSlots": ["afternoon", "evening"] }],
+    "contact": {
+      "phone": "555-3456",
+      "email": "carlos.martinez@example.com",
+      "facebook": "https://facebook.com/carlosmartinez"
+    },
+    "isApproved": true,
+    "ratings": { "average": 4.95, "totalReviews": 210 },
+    "createdAt": "2025-08-14T00:00:00.000Z",
+    "updatedAt": "2025-08-14T00:00:00.000Z",
+    "teachingServices": ["Offline", "TutorPlace"],
+    "bio": "Professional guitarist with over 15 years of teaching experience."
+  },
+  {
+    "_id": "5",
+    "userId": "user5",
+    "fullName": "Priya Kapoor",
+    "avatarUrl": "/placeholder.svg?height=80&width=80",
+    "tagline": "Math & SAT Prep Expert",
+    "dateOfBirth": "1995-07-18T00:00:00.000Z",
+    "gender": "Female",
+    "address": {
+      "city": "Seattle",
+      "state": "WA",
+      "district": "",
+      "ward": "",
+      "street": "",
+      "country": "USA"
+    },
+    "certifications": [
+      "Project Management Professional (PMP)",
+      "Certified ScrumMaster (CSM)",
+      "Agile Certified Practitioner (PMI-ACP)"
+    ],
+    "experienceYears": 7,
+    "hourlyRate": 55,
+    "languages": ["English", "Hindi"],
+    "keyPoints": ["SAT strategies", "Advanced math", "Customized lessons"],
+    "education": [
+      {
+        "degree": "BS in Mathematics",
+        "institution": "University of Washington",
+        "location": "Seattle, WA",
+        "dateRange": "2013 - 2017",
+        "description": "Focused on applied mathematics and test preparation"
+      }
+    ],
+    "subjects": [
+      { "category": "Math", "items": ["Algebra", "Calculus", "SAT Math"] }
+    ],
+    "availability": [{ "dayOfWeek": 5, "timeSlots": ["morning", "afternoon"] }],
+    "contact": {
+      "phone": "555-7890",
+      "email": "priya.kapoor@example.com",
+      "facebook": "https://facebook.com/priyakapoor"
+    },
+    "isApproved": true,
+    "ratings": { "average": 4.85, "totalReviews": 150 },
+    "createdAt": "2025-08-14T00:00:00.000Z",
+    "updatedAt": "2025-08-14T00:00:00.000Z",
+    "teachingServices": ["Online"],
+    "bio": "Dedicated to helping students excel in math and standardized tests."
+  },
+  {
+    "_id": "6",
+    "userId": "user6",
+    "fullName": "James O'Connor",
+    "avatarUrl": "/placeholder.svg?height=80&width=80",
+    "tagline": "History Buff & Educator",
+    "dateOfBirth": "1980-01-10T00:00:00.000Z",
+    "gender": "Male",
+    "address": {
+      "city": "Boston",
+      "state": "MA",
+      "district": "",
+      "ward": "",
+      "street": "",
+      "country": "USA"
+    },
+    "certifications": [
+      "Certified Science Teacher",
+      "Physics Teaching Excellence Award",
+      "Chemistry Education Specialist"
+    ],
+    "experienceYears": 18,
+    "hourlyRate": 50,
+    "languages": ["English"],
+    "keyPoints": [
+      "Engaging storytelling",
+      "Primary sources",
+      "Exam preparation"
+    ],
+    "education": [
+      {
+        "degree": "MA in History",
+        "institution": "Harvard University",
+        "location": "Cambridge, MA",
+        "dateRange": "2002 - 2004",
+        "description": "Specialized in American and European history"
+      }
+    ],
+    "subjects": [
+      { "category": "Social Studies", "items": ["World History", "US History"] }
+    ],
+    "availability": [{ "dayOfWeek": 1, "timeSlots": ["morning", "afternoon"] }],
+    "contact": {
+      "phone": "555-2222",
+      "email": "james.oconnor@example.com",
+      "facebook": "https://facebook.com/jamesoconnor"
+    },
+    "isApproved": true,
+    "ratings": { "average": 4.88, "totalReviews": 175 },
+    "createdAt": "2025-08-14T00:00:00.000Z",
+    "updatedAt": "2025-08-14T00:00:00.000Z",
+    "teachingServices": ["Offline", "TutorPlace"],
+    "bio": "Bringing history to life for students of all ages."
+  },
+  {
+    "_id": "7",
+    "userId": "user7",
+    "fullName": "Sophia Nguyen",
+    "avatarUrl": "/placeholder.svg?height=80&width=80",
+    "tagline": "Chemistry & Biology Specialist",
+    "dateOfBirth": "1992-04-30T00:00:00.000Z",
+    "gender": "Female",
+    "address": {
+      "city": "Los Angeles",
+      "state": "CA",
+      "district": "",
+      "ward": "",
+      "street": "",
+      "country": "USA"
+    },
+    "certifications": [
+      "International Baccalaureate (IB) Educator Certificate",
+      "IB Diploma Programme Coordinator Training",
+      "IB Middle Years Programme Training"
+    ],
+
+    "experienceYears": 9,
+    "hourlyRate": 48,
+    "languages": ["English", "Vietnamese"],
+    "keyPoints": ["Lab skills", "Exam prep", "Interactive learning"],
+    "education": [
+      {
+        "degree": "MS in Biochemistry",
+        "institution": "UCLA",
+        "location": "Los Angeles, CA",
+        "dateRange": "2014 - 2016",
+        "description": "Focused on molecular biology and teaching"
+      }
+    ],
+    "subjects": [{ "category": "Science", "items": ["Chemistry", "Biology"] }],
+    "availability": [{ "dayOfWeek": 2, "timeSlots": ["morning", "afternoon"] }],
+    "contact": {
+      "phone": "555-3333",
+      "email": "sophia.nguyen@example.com",
+      "facebook": "https://facebook.com/sophianguyen"
+    },
+    "isApproved": true,
+    "ratings": { "average": 4.82, "totalReviews": 120 },
+    "createdAt": "2025-08-14T00:00:00.000Z",
+    "updatedAt": "2025-08-14T00:00:00.000Z",
+    "teachingServices": ["Online", "Offline"],
+    "bio": "Passionate about making science fun and understandable."
+  },
+  {
+    "_id": "8",
+    "userId": "user8",
+    "fullName": "Liam Patel",
+    "avatarUrl": "/placeholder.svg?height=80&width=80",
+    "tagline": "Economics & Business Studies Coach",
+    "dateOfBirth": "1987-11-09T00:00:00.000Z",
+    "gender": "Male",
+    "address": {
+      "city": "San Diego",
+      "state": "CA",
+      "district": "",
+      "ward": "",
+      "street": "",
+      "country": "USA"
+    },
+    "certifications": [
+      "International Baccalaureate (IB) Educator Certificate",
+      "IB Diploma Programme Coordinator Training",
+      "IB Middle Years Programme Training"
+    ],
+
+    "experienceYears": 11,
+    "hourlyRate": 52,
+    "languages": ["English", "Gujarati"],
+    "keyPoints": ["Case studies", "Exam tips", "Real-world applications"],
+    "education": [
+      {
+        "degree": "MBA",
+        "institution": "UC San Diego",
+        "location": "San Diego, CA",
+        "dateRange": "2010 - 2012",
+        "description": "Specialized in finance and management"
+      }
+    ],
+    "subjects": [
+      { "category": "Business", "items": ["Economics", "Business Studies"] }
+    ],
+    "availability": [{ "dayOfWeek": 3, "timeSlots": ["afternoon", "evening"] }],
+    "contact": {
+      "phone": "555-4444",
+      "email": "liam.patel@example.com",
+      "facebook": "https://facebook.com/liampatel"
+    },
+    "isApproved": true,
+    "ratings": { "average": 4.9, "totalReviews": 142 },
+    "createdAt": "2025-08-14T00:00:00.000Z",
+    "updatedAt": "2025-08-14T00:00:00.000Z",
+    "teachingServices": ["Online", "TutorPlace"],
+    "bio": "Helping students excel in business and economics."
+  },
+  {
+    "_id": "9",
+    "userId": "user9",
+    "fullName": "Olivia Rossi",
+    "avatarUrl": "/placeholder.svg?height=80&width=80",
+    "tagline": "Italian Language & Culture Guide",
+    "dateOfBirth": "1993-02-25T00:00:00.000Z",
+    "gender": "Female",
+    "address": {
+      "city": "Miami",
+      "state": "FL",
+      "district": "",
+      "ward": "",
+      "street": "",
+      "country": "USA"
+    },
+    "certifications": [
+      "International Baccalaureate (IB) Educator Certificate",
+      "IB Diploma Programme Coordinator Training",
+      "IB Middle Years Programme Training"
+    ],
+
+    "experienceYears": 6,
+    "hourlyRate": 47,
+    "languages": ["Italian", "English"],
+    "keyPoints": [
+      "Immersive lessons",
+      "Cultural insights",
+      "Travel preparation"
+    ],
+    "education": [
+      {
+        "degree": "BA in Italian Studies",
+        "institution": "University of Miami",
+        "location": "Miami, FL",
+        "dateRange": "2011 - 2015",
+        "description": "Focused on Italian language, history, and culture"
+      }
+    ],
+    "subjects": [{ "category": "Languages", "items": ["Italian"] }],
+    "availability": [{ "dayOfWeek": 4, "timeSlots": ["morning", "afternoon"] }],
+    "contact": {
+      "phone": "555-5555",
+      "email": "olivia.rossi@example.com",
+      "facebook": "https://facebook.com/oliviarossi"
+    },
+    "isApproved": true,
+    "ratings": { "average": 4.84, "totalReviews": 101 },
+    "createdAt": "2025-08-14T00:00:00.000Z",
+    "updatedAt": "2025-08-14T00:00:00.000Z",
+    "teachingServices": ["Online", "Offline"],
+    "bio": "Making Italian language learning engaging and cultural."
+  },
+  {
+    "_id": "10",
+    "userId": "user10",
+    "fullName": "Sophia Kim",
+    "avatarUrl": "/placeholder.svg?height=80&width=80",
+    "tagline": "Economics & Business Studies Coach",
+    "dateOfBirth": "1987-11-09T00:00:00.000Z",
+    "gender": "Female",
+    "address": {
+      "city": "San Diego",
+      "state": "CA",
+      "district": "",
+      "ward": "",
+      "street": "",
+      "country": "USA"
+    },
+    "certifications": [
+      "Certified Business Educator",
+      "Certified Economics Teacher",
+      "Certified Online Instructor"
+    ],
+    "experienceYears": 11,
+    "hourlyRate": 52,
+    "languages": ["English", "Gujarati", "Spanish", "French"],
+    "keyPoints": ["Case studies", "Exam tips", "Real-world applications"],
+    "education": [
+      {
+        "degree": "MBA",
+        "institution": "UC San Diego",
+        "location": "San Diego, CA",
+        "dateRange": "2010 - 2012",
+        "description": "Specialized in finance and management"
+      }
+    ],
+    "subjects": [
+      { "category": "Business", "items": ["Economics", "Business Studies"] }
+    ],
+    "availability": [{ "dayOfWeek": 3, "timeSlots": ["afternoon", "evening"] }],
+    "contact": {
+      "phone": "555-4444",
+      "email": "liam.patel@example.com",
+      "facebook": "https://facebook.com/liampatel",
+      "linkedin": "https://linkedin.com/in/liampatel"
+    },
+    "isApproved": true,
+    "ratings": { "average": 4.9, "totalReviews": 142 },
+    "createdAt": "2025-08-14T00:00:00.000Z",
+    "updatedAt": "2025-08-14T00:00:00.000Z",
+    "teachingServices": ["Online", "StudentPlace"],
+    "bio": "Helping students excel in business and economics."
+  }
+]
