@@ -4,6 +4,8 @@ import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/auth/LoginPage";
 import EditSession from "@/pages/EditSession";
 import ViewQuiz from "@/pages/Quiz/ViewQuiz";
+import TutorDetail from "@/pages/Tutor/TutorDetail";
+import TutorList from "@/pages/Tutor/TutorList";
 
 export const guestRoutes = {
     element: <GuestLayout />,
@@ -13,5 +15,7 @@ export const guestRoutes = {
         { path: "/map", element: <MapOverView /> },
         { path: "/editSession", element: <EditSession /> },
         { path: "/viewQuizz", element: <ViewQuiz /> },
+        { path: "/tutorDetail/:id", element: <TutorDetail /> },
+        { path: "/tutorList", element: <TutorList /> },
     ],
 };
