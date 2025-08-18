@@ -3,8 +3,7 @@ import GuestLayout from "../layouts/GuestLayout";
 import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/auth/LoginPage";
 import EditSession from "@/pages/EditSession";
-import TutorList from "@/pages/Tutor/TutorList";
-import TutorDetail from "@/pages/Tutor/TutorDetail";
+import ViewQuiz from "@/pages/Quiz/ViewQuiz";
 
 export const guestRoutes = {
     element: <GuestLayout />,
@@ -13,7 +12,6 @@ export const guestRoutes = {
         { path: "/login", element: <LoginPage /> },
         { path: "/map", element: <MapOverView /> },
         { path: "/editSession", element: <EditSession /> },
-        { path: "/tutor-list", element: <TutorList /> },
-        { path: "/tutor-detail/:id", element: <TutorDetail /> }
+        { path: "/viewQuizz", element: <ViewQuiz /> },
     ],
 };

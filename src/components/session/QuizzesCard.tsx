@@ -3,6 +3,7 @@ import { BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit3 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function QuizzesCard({ quizData, canManageQuizzes }: any) {
     return (
@@ -39,6 +40,12 @@ export default function QuizzesCard({ quizData, canManageQuizzes }: any) {
                                         {quiz.quizMode === "study" && "Học tập"}
                                         {quiz.quizMode === "exam" && "Kiểm tra"}
                                     </Badge>
+
+                                    {/* Nút Xem: dẫn tới /quiz/:id */}
+                                    <Link to={`/viewQuizz`}>
+                                        <Button size="sm">Xem</Button>
+                                    </Link>
+
                                     {canManageQuizzes && (
                                         <Button variant="ghost" size="sm">
                                             <Edit3 className="h-4 w-4" />
