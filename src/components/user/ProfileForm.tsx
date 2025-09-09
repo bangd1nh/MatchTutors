@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserProfile, useUpdateUserProfile } from "@/hooks/useUserProfile";
 import {
@@ -20,6 +20,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
 
+// React Quill
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
 export default function ProfileForm() {
    const { data: user, isLoading: isLoadingUser } = useUserProfile();
    const { mutate: updateUser, isPending: isUpdating } = useUpdateUserProfile();
@@ -27,6 +31,7 @@ export default function ProfileForm() {
 
    const {
       register,
+      control,
       handleSubmit,
       reset,
       formState: { errors, isDirty },
@@ -125,16 +130,35 @@ export default function ProfileForm() {
                   <Input id="email" type="email" value={user?.email} disabled />
                </div>
 
+               {/* NAME field replaced with React Quill */}
                <div className="grid gap-2">
-                  <Label htmlFor="name">Họ và tên</Label>
-                  <Input
-                     id="name"
-                     {...register("name")}
-                     defaultValue={user?.name}
+                  <Label>Họ và tên</Label>
+                  <Controller
+                     name="name"
+                     control={control}
+                     defaultValue={user?.name ?? ""}
+                     render={({ field }) => (
+                        <div>
+                           <ReactQuill
+                              value={field.value || ""}
+                              onChange={(val) => field.onChange(val)}
+                              theme="snow"
+                              className="bg-white border rounded-md"
+                              modules={{
+                                 toolbar: [
+                                    [{ header: [1, 2, false] }],
+                                    ["bold", "italic", "underline"],
+                                    [{ list: "ordered" }, { list: "bullet" }],
+                                    ["clean"],
+                                 ],
+                              }}
+                           />
+                        </div>
+                     )}
                   />
                   {errors.name && (
                      <p className="text-sm text-red-500">
-                        {errors.name.message}
+                        {errors.name.message as any}
                      </p>
                   )}
                </div>
