@@ -1,13 +1,13 @@
 import { adminRoutes } from "./adminRoutes";
-import { employerRoutes } from "./employerRoutes";
-import { jobSeekerRoutes } from "./jobSeekerRoutes";
+import { studentRoutes } from "./studentRoutes";
 import { guestRoutes } from "./guestRoutes";
 import { fallbackRoutes } from "./fallbackRoutes";
+import { tutorRoutes } from "./tutorRoutes";
 
 export const routes = [
-    guestRoutes,
-    adminRoutes,
-    employerRoutes,
-    jobSeekerRoutes,
-    ...fallbackRoutes,
+   guestRoutes,
+   adminRoutes,
+   tutorRoutes,
+   studentRoutes,
+   ...fallbackRoutes,
 ];
