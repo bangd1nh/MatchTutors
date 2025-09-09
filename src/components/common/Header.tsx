@@ -1,221 +1,353 @@
-// src/components/common/Header.tsx
-import { Link } from "react-router-dom";
-import { useAuthStore } from "@/store/useAuthStore";
+import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "@/hooks/useUser";
+import { useAuth } from "@/hooks/useAuth";
 import NotificationBell from "./NotificationBell";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/useTheme";
 import { useTranslation } from "react-i18next";
-import { Menu, ChevronDown, MoreVertical } from "lucide-react"; // Import MoreVertical
-import { useMediaQuery } from "@/hooks/useMediaQuery"; // Import useMediaQuery
+import { Menu, ChevronDown } from "lucide-react";
+
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+   DropdownMenu,
+   DropdownMenuContent,
+   DropdownMenuItem,
+   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import React, { useState } from "react";
+import {
+   Sheet,
+   SheetContent,
+   SheetHeader,
+   SheetTitle,
+   SheetTrigger,
+} from "@/components/ui/sheet";
 
 interface HeaderProps {
-    onMenuClick?: () => void;
+   onMenuClick?: () => void;
 }
 
-const Header = ({ onMenuClick }: HeaderProps) => {
-    const { isAuthenticated, logout, user } = useAuthStore();
-    const { theme, toggleTheme } = useTheme();
-    const { t, i18n } = useTranslation(); // Destructure i18n here
-    const isMobile = useMediaQuery("(max-width: 767px)"); // Define mobile breakpoint
+const NavLinks = ({
+   isMobile = false,
+   onLinkClick,
+}: {
+   isMobile?: boolean;
+   onLinkClick?: () => void;
+}) => {
+   const links = [
+      { to: "/tutor-list", label: "Danh sách gia sư " },
+      { to: "/features", label: "Tính năng" },
+      { to: "/pricing", label: "Bảng giá" },
+      { to: "/knowledge", label: "Blog" },
+   ];
 
-    const getDashboardPath = () => {
-        if (!user) return "/";
-        switch (user.role) {
-            case "ADMIN":
-                return "/admin/dashboard";
-            case "EMPLOYER":
-                return "/employer/dashboard";
-            case "JOBSEEKER":
-                return "/jobseeker/dashboard";
-            default:
-                return "/";
-        }
-    };
+   const linkClass = isMobile
+      ? "text-lg font-medium text-slate-800 dark:text-slate-200 hover:text-sky-600 dark:hover:text-sky-400 py-2 block"
+      : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap";
 
-    const changeLanguage = (lng: string) => {
-        i18n.changeLanguage(lng);
-    };
+   return (
+      <>
+         {links.map((link) => (
+            <Link
+               key={link.to}
+               to={link.to}
+               className={linkClass}
+               onClick={onLinkClick}
+            >
+               {link.label}
+            </Link>
+         ))}
+      </>
+   );
+};
 
-    const renderRoleNavItems = () => {
-        if (!user) return null;
+const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+   const { user: userData, isAuthenticated } = useUser();
+   const { logout } = useAuth();
+   const user = userData;
 
-        const navLinks: { to: string; label: string }[] = [];
+   const navigate = useNavigate();
+   const { theme, toggleTheme } = useTheme();
+   const { t, i18n } = useTranslation();
 
-        switch (user.role) {
-            case "ADMIN":
-                navLinks.push(
-                    { to: "/admin/users", label: t("manage_users") },
-                    { to: "/admin/reports", label: t("view_reports") }
-                );
-                break;
-            case "EMPLOYER":
-                navLinks.push(
-                    { to: "/employer/jobs/new", label: t("post_a_job") },
-                    { to: "/employer/jobs", label: t("my_jobs") }
-                );
-                break;
-            case "JOBSEEKER":
-                navLinks.push(
-                    { to: "/jobs", label: t("find_jobs") },
-                    {
-                        to: "/jobseeker/applications",
-                        label: t("my_applications"),
-                    }
-                );
-                break;
-            default:
-                return null;
-        }
+   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-        if (isMobile) {
-            // Render DropdownMenu for mobile
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-5 w-5" />
-                            <span className="sr-only">More navigation</span>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {navLinks.map((link) => (
-                            <DropdownMenuItem key={link.to} asChild>
-                                <Link to={link.to} className="w-full">
-                                    {link.label}
-                                </Link>
-                            </DropdownMenuItem>
-                        ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        } else {
-            // Render direct links for desktop
-            return (
-                <div className="flex gap-6 items-center">
-                    {navLinks.map((link) => (
-                        <Link key={link.to} to={link.to} className="nav-link">
-                            {link.label}
-                        </Link>
-                    ))}
-                </div>
-            );
-        }
-    };
+   const changeLanguage = (lng: string) => i18n.changeLanguage(lng);
 
-    return (
-        <header className="bg-white dark:bg-gray-800 shadow-md px-4 sm:px-6 py-4 flex justify-between items-center z-10 w-full">
-            <div className="flex items-center">
-                {onMenuClick && (
-                    <Button
+   type Role = "ADMIN" | "TUTOR" | "STUDENT" | "PARENT";
+
+   const getDashboardPath = () => {
+      if (!user) return "/";
+      switch (user.role as unknown as Role) {
+         case "ADMIN":
+            return "/admin/dashboard";
+         case "TUTOR":
+            return "/tutor/dashboard";
+         case "STUDENT":
+            return "/student/dashboard";
+         case "PARENT":
+            return "/parent/dashboard";
+         default:
+            return "/";
+      }
+   };
+
+   return (
+      <header className="w-full sticky top-0 z-50 bg-sky-50/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+               {/* Left: logo + admin mobile menu */}
+               <div className="flex items-center gap-3 min-w-0">
+                  {onMenuClick && (
+                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={onMenuClick}
-                        className="md:hidden mr-2"
-                    >
-                        <Menu className="h-6 w-6" />
-                    </Button>
-                )}
-                <Link
-                    to="/"
-                    className="text-xl sm:text-2xl font-bold text-primary"
-                >
-                    {t("job_board")}
-                </Link>
-            </div>
+                        className="md:hidden"
+                     >
+                        <Menu className="h-5 w-5 text-sky-800 dark:text-sky-200" />
+                     </Button>
+                  )}
 
-            <nav className="flex-1 ml-6 sm:ml-10 flex justify-end md:justify-start">
-                {" "}
-                {/* Adjust justify for mobile dropdown */}
-                {renderRoleNavItems()}
-            </nav>
+                  <Link to="/" className="flex items-center gap-3 min-w-0">
+                     <div className="h-10 w-10 rounded-lg bg-white flex items-center justify-center shadow-sm flex-shrink-0 overflow-hidden p-1">
+                        <img
+                           src="/tutor.png"
+                           alt="TutorMatch"
+                           className="h-full w-full object-contain"
+                        />
+                     </div>
+                     <div className="hidden sm:flex flex-col leading-none whitespace-nowrap">
+                        <span className="text-sky-900 dark:text-white font-semibold text-lg">
+                           TutorMatch
+                        </span>
+                        <span className="text-xs text-slate-600 dark:text-slate-400 -mt-0.5">
+                           Kết nối gia sư & học sinh
+                        </span>
+                     </div>
+                  </Link>
+               </div>
 
-            <div className="flex items-center gap-2 sm:gap-4">
-                {isAuthenticated && (
-                    <>
-                        <Link
-                            to={getDashboardPath()}
-                            className="hidden sm:block text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                        >
-                            {t("dashboard")}
-                        </Link>
+               {/* Center: nav (desktop) */}
+               <nav className="hidden md:flex items-center justify-center flex-1 gap-8 px-6">
+                  <NavLinks />
+               </nav>
+
+               {/* Right: actions */}
+               <div className="flex items-center justify-end gap-2">
+                  {isAuthenticated && user && (
+                     <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                           <button
+                              className="hidden sm:inline-flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mr-2"
+                              aria-label="Open user menu"
+                           >
+                              <span className="truncate">
+                                 Welcome, {user.email}
+                              </span>
+                              <ChevronDown className="h-4 w-4 text-slate-600 dark:text-slate-300" />
+                           </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                           <DropdownMenuItem
+                              onClick={() => {
+                                 navigate(getDashboardPath());
+                              }}
+                           >
+                              {t("dashboard") || "Dashboard"}
+                           </DropdownMenuItem>
+                        </DropdownMenuContent>
+                     </DropdownMenu>
+                  )}
+                  {/* Desktop explicit logout button (visible when authenticated) */}
+                  {isAuthenticated && (
+                     <Button
+                        variant="ghost"
+                        className="hidden md:inline-flex px-4 py-2"
+                        onClick={logout}
+                     >
+                        {t("logout") || "Đăng xuất"}
+                     </Button>
+                  )}
+                  {isAuthenticated ? (
+                     <>
                         <NotificationBell />
-                        <Button onClick={logout} variant="ghost" size="sm">
-                            {t("logout")}
-                        </Button>
-                    </>
-                )}
+                        {/* Xóa bỏ DropdownMenu của user */}
+                     </>
+                  ) : (
+                     <>
+                        <div className="hidden md:flex items-center gap-2">
+                           <Link to="/login">
+                              <Button
+                                 variant="ghost"
+                                 className="px-5 py-2 rounded-full text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-800 transition"
+                              >
+                                 {t("login") || "Login"}
+                              </Button>
+                           </Link>
+                           <Link to="/register">
+                              <Button className="px-5 py-2 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md hover:opacity-95 transition">
+                                 Đăng ký
+                              </Button>
+                           </Link>
+                        </div>
+                     </>
+                  )}
 
-                {!isAuthenticated && (
-                    <>
-                        <Link
-                            to="/login"
-                            className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                        >
-                            {t("login")}
-                        </Link>
-                        <Link
-                            to="/map"
-                            className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                        >
-                            {t("a")}
-                        </Link>
-                        <Link
-                            to="/tutor-list"
-                            className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                        >
-                            {t("tutor list")}
-                        </Link>
-                        <Link
-                            to="/tutor-detail/1"
-                            className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                        >
-                            {t("tutor detail")}
-                        </Link>
+                  {/* Language & Theme Toggle */}
+                  <div className="hidden md:flex items-center">
+                     <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                           <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-9 w-9"
+                           >
+                              <span className="text-xs font-semibold">
+                                 {i18n.language?.toUpperCase?.() || "EN"}
+                              </span>
+                           </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                           <DropdownMenuItem
+                              onClick={() => changeLanguage("en")}
+                           >
+                              English
+                           </DropdownMenuItem>
+                           <DropdownMenuItem
+                              onClick={() => changeLanguage("vi")}
+                           >
+                              Tiếng Việt
+                           </DropdownMenuItem>
+                        </DropdownMenuContent>
+                     </DropdownMenu>
+                     <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={toggleTheme}
+                        className="h-9 w-9"
+                     >
+                        {theme === "light" ? "🌙" : "☀️"}
+                        <span className="sr-only">Toggle theme</span>
+                     </Button>
+                  </div>
 
-                    </>
-                )}
-
-                {/* Language Toggle Dropdown */}
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 sm:h-9 sm:w-9"
+                  {/* Mobile Menu Trigger */}
+                  <div className="md:hidden">
+                     <Sheet
+                        open={isMobileMenuOpen}
+                        onOpenChange={setIsMobileMenuOpen}
+                     >
+                        <SheetTrigger asChild>
+                           <Button variant="ghost" size="icon">
+                              <Menu className="h-5 w-5" />
+                           </Button>
+                        </SheetTrigger>
+                        <SheetContent
+                           side="right"
+                           className="w-full sm:w-[320px] bg-white dark:bg-slate-950"
                         >
-                            {i18n.language.toUpperCase()}
-                            <ChevronDown className="ml-1 h-4 w-4" />
-                            <span className="sr-only">Change language</span>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => changeLanguage("en")}>
-                            English
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => changeLanguage("vi")}>
-                            Tiếng Việt
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-
-                <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={toggleTheme}
-                    className="h-8 w-8 sm:h-9 sm:w-9"
-                >
-                    {theme === "light" ? "🌙" : "☀️"}
-                    <span className="sr-only">Toggle theme</span>
-                </Button>
+                           <SheetHeader>
+                              <SheetTitle>Menu</SheetTitle>
+                           </SheetHeader>
+                           <div className="py-4 flex flex-col h-full">
+                              <nav className="flex flex-col gap-2">
+                                 <NavLinks
+                                    isMobile
+                                    onLinkClick={() =>
+                                       setIsMobileMenuOpen(false)
+                                    }
+                                 />
+                              </nav>
+                              <div className="mt-auto space-y-4">
+                                 <hr className="dark:border-slate-800" />
+                                 {isAuthenticated ? (
+                                    <Button
+                                       className="w-full"
+                                       onClick={() => {
+                                          logout();
+                                          setIsMobileMenuOpen(false);
+                                       }}
+                                    >
+                                       {t("logout") || "Đăng xuất"}
+                                    </Button>
+                                 ) : (
+                                    !isAuthenticated && (
+                                       <div className="flex flex-col gap-3">
+                                          <Link
+                                             to="/login"
+                                             onClick={() =>
+                                                setIsMobileMenuOpen(false)
+                                             }
+                                          >
+                                             <Button
+                                                variant="outline"
+                                                className="w-full"
+                                             >
+                                                {t("login") || "Login"}
+                                             </Button>
+                                          </Link>
+                                          <Link
+                                             to="/register"
+                                             onClick={() =>
+                                                setIsMobileMenuOpen(false)
+                                             }
+                                          >
+                                             <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
+                                                Bắt đầu miễn phí
+                                             </Button>
+                                          </Link>
+                                       </div>
+                                    )
+                                 )}
+                                 <div className="flex justify-center items-center gap-2">
+                                    <p className="text-sm text-slate-500">
+                                       Ngôn ngữ:
+                                    </p>
+                                    <Button
+                                       variant={
+                                          i18n.language === "vi"
+                                             ? "secondary"
+                                             : "ghost"
+                                       }
+                                       size="sm"
+                                       onClick={() => changeLanguage("vi")}
+                                    >
+                                       VI
+                                    </Button>
+                                    <Button
+                                       variant={
+                                          i18n.language === "en"
+                                             ? "secondary"
+                                             : "ghost"
+                                       }
+                                       size="sm"
+                                       onClick={() => changeLanguage("en")}
+                                    >
+                                       EN
+                                    </Button>
+                                 </div>
+                                 <div className="flex justify-center items-center gap-2">
+                                    <p className="text-sm text-slate-500">
+                                       Giao diện:
+                                    </p>
+                                    <Button
+                                       variant="ghost"
+                                       size="icon"
+                                       onClick={toggleTheme}
+                                    >
+                                       {theme === "light" ? "🌙" : "☀️"}
+                                    </Button>
+                                 </div>
+                              </div>
+                           </div>
+                        </SheetContent>
+                     </Sheet>
+                  </div>
+               </div>
             </div>
-        </header>
-    );
+         </div>
+      </header>
+   );
 };
 
 export default Header;

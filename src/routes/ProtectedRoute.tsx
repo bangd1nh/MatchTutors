@@ -1,24 +1,38 @@
-import { Navigate } from "react-router-dom";
-import { useAuthStore } from "@/store/useAuthStore";
-import React from "react";
+import { useUser } from "@/hooks/useUser";
+import { Navigate, useLocation } from "react-router-dom";
+import { Loader2 } from "lucide-react";
+import { Role } from "@/types/user";
 
 interface ProtectedRouteProps {
-    allowedRoles: string[];
-    children: React.ReactNode;
+   children: React.ReactNode;
+   allowedRoles?: (Role | string)[];
 }
 
-const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) => {
-    const { isAuthenticated, user } = useAuthStore();
+const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
+   const { isAuthenticated, isLoading, user } = useUser();
+   const location = useLocation();
 
-    if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
-    }
+   if (isLoading) {
+      return (
+         <div className="flex h-screen w-full items-center justify-center">
+            <Loader2 className="h-10 w-10 animate-spin text-sky-600" />
+         </div>
+      );
+   }
 
-    if (user && !allowedRoles.includes(user.role)) {
-        return <Navigate to="/unauthorized" replace />;
-    }
+   if (!isAuthenticated) {
+      return <Navigate to="/login" state={{ from: location }} replace />;
+   }
 
-    return <>{children}</>;
+   // Nếu có allowedRoles, kiểm tra role của user
+   if (allowedRoles && allowedRoles.length > 0) {
+      const userRole = (user as any)?.role;
+      if (!userRole || !allowedRoles.includes(userRole)) {
+         return <Navigate to="/unauthorized" replace />;
+      }
+   }
+
+   return <>{children}</>;
 };
 
 export default ProtectedRoute;
