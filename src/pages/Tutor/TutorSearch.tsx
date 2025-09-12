@@ -26,6 +26,7 @@ export default function TutorSearch() {
         selectedGenders: [] as string[],
         selectedTeachingServices: [] as string[],
         selectedClassTypes: [] as string[],
+        selectedLevels: [] as string[],
     })
     const [appliedFilters, setAppliedFilters] = useState(currentFilters)
 
@@ -40,7 +41,7 @@ export default function TutorSearch() {
             const matchesName = tutor.fullName?.toLowerCase().includes(query)
             const matchesBio = tutor.bio.toLowerCase().includes(query)
             const matchesSubjects = tutor.subjects.some((subject) =>
-                subject.items.some((item) => item.toLowerCase().includes(query)),
+                subject.toLowerCase().includes(query)
             )
             if (!matchesName && !matchesBio && !matchesSubjects) return false
         }
@@ -53,22 +54,16 @@ export default function TutorSearch() {
         // Price filter
         if (tutor.hourlyRate < appliedFilters.priceRange[0] || tutor.hourlyRate > appliedFilters.priceRange[1]) return false
 
-        // Online/Offline filter
-        if (appliedFilters.isOnline !== null) {
-            const isOnlineTutor = tutor.teachingServices.includes("Online")
-            if (appliedFilters.isOnline && !isOnlineTutor) return false
-            if (!appliedFilters.isOnline && isOnlineTutor) return false
-        }
 
         // Subject filter
         if (appliedFilters.selectedSubjects.length > 0) {
-            const tutorSubjects = tutor.subjects.flatMap((subject) => subject.items)
+            const tutorSubjects = tutor.subjects
             if (!appliedFilters.selectedSubjects.some((subject) => tutorSubjects.includes(subject))) return false
         }
 
         // Location filter
         if (appliedFilters.selectedLocation) {
-            const locationMatch = `${tutor.address.city}, ${tutor.address.state}`.toLowerCase()
+            const locationMatch = `${tutor.address.city}`.toLowerCase()
             if (!locationMatch.includes(appliedFilters.selectedLocation.toLowerCase())) return false
         }
 
@@ -82,12 +77,6 @@ export default function TutorSearch() {
         // Gender filter
         if (appliedFilters.selectedGenders.length > 0) {
             if (!tutor.gender || !appliedFilters.selectedGenders.includes(tutor.gender)) return false
-        }
-
-        // Teaching services filter
-        if (appliedFilters.selectedTeachingServices.length > 0) {
-            if (!appliedFilters.selectedTeachingServices.some((service) => tutor.teachingServices.includes(service as any)))
-                return false
         }
 
         //Time slots filter
@@ -121,6 +110,11 @@ export default function TutorSearch() {
             if (!appliedFilters.selectedClassTypes.some((classType) => tutor.classType === classType)) return false
         }
 
+        //Levels filter
+        if (appliedFilters.selectedLevels.length > 0) {
+            if (!appliedFilters.selectedLevels.some((level) => tutor.levels.includes(level))) return false
+        }
+
         return true
     })
 
@@ -152,6 +146,7 @@ export default function TutorSearch() {
             selectedGenders: [],
             selectedTeachingServices: [],
             selectedClassTypes: [],
+            selectedLevels: [],
         }
         setCurrentFilters(resetFilters)
         setAppliedFilters(resetFilters)

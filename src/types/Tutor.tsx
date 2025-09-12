@@ -3,39 +3,32 @@ export interface Tutor {
     userId: string
     fullName?: string
     avatarUrl?: string
-    tagline?: string
-    dateOfBirth?: string
     gender?: string
     address: {
         city?: string
-        state?: string
-        district?: string
-        ward?: string
         street?: string
-        country?: string
+        lat?: number
+        lng?: number
     }
     certifications: {
         name: string
+        description?: string
         imageUrl?: string
     }[]
     experienceYears: number
     hourlyRate: number
     languages: string[]
-    keyPoints?: string[]
     education: {
         degree: string
         institution: string
-        location: string
+        fieldOfStudy?: string
         dateRange: {
             startDate: string
             endDate: string
         }
         description: string
     }[]
-    subjects: {
-        category: string
-        items: string[]
-    }[]
+    subjects: string[]
     availability: {
         dayOfWeek: number // 0-6 (Sun-Sat)
         timeSlots: ("morning" | "afternoon" | "evening")[]
@@ -43,7 +36,6 @@ export interface Tutor {
     contact: {
         phone: string
         email: string
-        facebook?: string
     }
     isApproved: boolean
     ratings: {
@@ -52,7 +44,7 @@ export interface Tutor {
     }
     createdAt: string
     updatedAt: string
-    teachingServices: ("Online" | "Offline" | "StudentPlace" | "TutorPlace")[]
     bio: string
-    classType: "OneToOne" | "Group"
+    classType: "Online" | "In_Person"
+    levels: string[]
 }

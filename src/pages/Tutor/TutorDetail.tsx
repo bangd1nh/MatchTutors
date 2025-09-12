@@ -9,13 +9,11 @@ const TutorDetail: React.FC = () => {
     const navigate = useNavigate();
     const rawTutor = tutorsData.find((t) => t._id === id);
     const validTimeSlots = ["morning", "afternoon", "evening"] as const;
-    const validTeachingServices = [
-        "Online",
-        "Offline",
-        "StudentPlace",
-        "TutorPlace",
-    ] as const;
-    const validClassTypes = ["OneToOne", "Group"] as const;
+    const mapClassType = (type: string): "Online" | "In_Person" => {
+        if (type === "Online") return "Online";
+        if (type === "In_Person") return "In_Person";
+        return "Online"; // fallback
+    };
     const tutor: Tutor | undefined = rawTutor
         ? {
             ...rawTutor,
@@ -29,19 +27,7 @@ const TutorDetail: React.FC = () => {
                     )
                     : [],
             })),
-            teachingServices: Array.isArray(rawTutor.teachingServices)
-                ? rawTutor.teachingServices.filter(
-                    (
-                        service: string
-                    ): service is (typeof validTeachingServices)[number] =>
-                        validTeachingServices.includes(
-                            service as (typeof validTeachingServices)[number]
-                        )
-                )
-                : [],
-            classType: validClassTypes.includes(rawTutor.classType as (typeof validClassTypes)[number])
-                ? (rawTutor.classType as (typeof validClassTypes)[number])
-                : "OneToOne", // fallback or handle as needed
+            classType: mapClassType(rawTutor.classType),
             education: Array.isArray(rawTutor.education)
                 ? rawTutor.education.map((e: any) => ({
                     ...e,
@@ -62,19 +48,15 @@ const TutorDetail: React.FC = () => {
     }
 
     const getRelatedTutors = () => {
-        const currentTutorSubjects = tutor.subjects.flatMap(
-            (subject) => subject.items
-        );
-        const currentTutorLocation = `${tutor.address.city}, ${tutor.address.state}`;
+        const currentTutorSubjects = tutor.subjects
+        const currentTutorLocation = `${tutor.address.city}`;
 
         return tutorsData
             .filter((t) => t._id !== tutor._id) // Exclude current tutor
             .map((t) => {
                 let score = 0;
-                const tutorSubjects = t.subjects.flatMap(
-                    (subject) => subject.items
-                );
-                const tutorLocation = `${t.address.city}, ${t.address.state}`;
+                const tutorSubjects = t.subjects
+                const tutorLocation = `${t.address.city}`;
 
                 // Score based on shared subjects
                 const sharedSubjects = currentTutorSubjects.filter((subject) =>
@@ -109,12 +91,6 @@ const TutorDetail: React.FC = () => {
                             )
                             : [],
                     })),
-                    teachingServices: Array.isArray(t.teachingServices)
-                        ? t.teachingServices.filter(
-                            (service: string): service is (typeof validTeachingServices)[number] =>
-                                validTeachingServices.includes(service as (typeof validTeachingServices)[number])
-                        )
-                        : [],
                     certifications: Array.isArray(t.certifications)
                         ? t.certifications.map((c: any) =>
                             typeof c === "string"
@@ -134,6 +110,8 @@ const TutorDetail: React.FC = () => {
                                     : e.dateRange,
                         }))
                         : [],
+                    // Ensure 'levels' property is present for type compatibility
+                    levels: Array.isArray((t as any).levels) ? (t as any).levels : [],
                 };
             }) as Tutor[];
     };

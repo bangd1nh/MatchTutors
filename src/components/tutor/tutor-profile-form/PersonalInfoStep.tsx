@@ -1,29 +1,22 @@
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
-    Plus,
-    Trash2,
-    Upload,
     User,
 } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Controller, UseFormReturn } from "react-hook-form"
 import { TutorFormData } from "./types"
+import ReactQuill from "react-quill"
 
 interface PersonalInfoStepProps {
     form: UseFormReturn<TutorFormData>
-    appendKeyPoint: (value: string) => void
-    removeKeyPoint: (index: number) => void
 }
 
 
-export function PersonalInfoStep({ form,
-    appendKeyPoint,
-    removeKeyPoint, }: PersonalInfoStepProps) {
+export function PersonalInfoStep({ form, }: PersonalInfoStepProps) {
     const fileList = form.watch("avatarUrl") as unknown as FileList
     const file = fileList?.[0]
     // console.log(form.getValues())
@@ -84,25 +77,6 @@ export function PersonalInfoStep({ form,
                         )}
                     </div>
 
-                    <div className="space-y-3">
-                        <Label htmlFor="dateOfBirth" className="text-base font-semibold text-slate-700">
-                            Date of Birth
-                        </Label>
-                        <Input id="dateOfBirth" type="date" className="h-12 text-base" {...form.register("dateOfBirth")} />
-                    </div>
-                </div>
-
-                <div className="space-y-3">
-                    <Label htmlFor="tagline" className="text-base font-semibold text-slate-700">
-                        Professional Tagline
-                    </Label>
-                    <Input
-                        id="tagline"
-                        placeholder="e.g., Experienced Math Tutor with 5+ Years of Success"
-                        className="h-12 text-base"
-                        {...form.register("tagline")}
-                    />
-                    <p className="text-sm text-slate-500">A catchy one-liner that describes your expertise</p>
                 </div>
 
                 <div className="space-y-4">
@@ -129,48 +103,31 @@ export function PersonalInfoStep({ form,
                     <Label htmlFor="bio" className="text-base font-semibold text-slate-700">
                         About You *
                     </Label>
-                    <Textarea
-                        id="bio"
-                        placeholder="Tell us about yourself, your teaching philosophy, and what makes you unique as a tutor..."
-                        rows={5}
-                        className="text-base resize-none"
-                        {...form.register("bio")}
+
+                    <Controller
+                        name="bio"
+                        control={form.control}
+                        render={({ field }) => (
+                            <ReactQuill
+                                theme="snow"
+                                value={field.value}
+                                onChange={field.onChange}
+                                placeholder="Tell us about yourself, your teaching philosophy, and what makes you unique as a tutor..."
+                                className="bg-white rounded-lg border border-slate-300"
+                            />
+                        )}
                     />
-                    <p className="text-sm text-slate-500">Share your passion for teaching and what students can expect</p>
+
+                    <p className="text-sm text-slate-500">
+                        Share your passion for teaching and what students can expect
+                    </p>
+
                     {form.formState.errors.bio && (
                         <p className="text-sm text-red-500 flex items-center gap-1">
                             <span className="w-1 h-1 bg-red-500 rounded-full"></span>
                             {form.formState.errors.bio.message}
                         </p>
                     )}
-                </div>
-                <div className="space-y-2">
-                    <Label>Key Points</Label>
-                    {(form.watch("keyPoints") || []).map((value, index) => (
-                        <div key={index} className="flex gap-2">
-                            <Input
-                                placeholder="e.g., Patient with beginners"
-                                value={value}
-                                onChange={(e) => {
-                                    const arr = [...(form.getValues("keyPoints") || [])]
-                                    arr[index] = e.target.value
-                                    form.setValue("keyPoints", arr)
-                                }}
-                            />
-                            <Button type="button" variant="outline" size="icon" onClick={() => removeKeyPoint(index)}>
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    ))}
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => appendKeyPoint("")}
-                        className="w-full"
-                    >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Key Point
-                    </Button>
                 </div>
 
                 <div className="space-y-6 p-6 bg-slate-50/50 rounded-2xl border border-slate-100">
@@ -181,11 +138,7 @@ export function PersonalInfoStep({ form,
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[
                             { key: "street", label: "Street Address", placeholder: "Enter street address" },
-                            { key: "ward", label: "Ward", placeholder: "Enter ward" },
-                            { key: "district", label: "District", placeholder: "Enter district" },
                             { key: "city", label: "City", placeholder: "Enter city" },
-                            { key: "state", label: "State", placeholder: "Enter state" },
-                            { key: "country", label: "Country", placeholder: "Enter country" },
                         ].map(({ key, label, placeholder }) => (
                             <div key={key} className="space-y-2">
                                 <Label htmlFor={key} className="text-sm font-medium text-slate-600">

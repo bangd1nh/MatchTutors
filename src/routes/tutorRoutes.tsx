@@ -3,6 +3,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import OverviewPage from "../pages/dashboard/OverviewPage";
 import JobManage from "@/pages/Employer/JobManage";
 import ProfilePage from "@/pages/Profilepage";
+import TutorProfile from "@/pages/TutorProfile/TutorProfile";
 
 export const tutorRoutes = {
    element: (
@@ -13,6 +14,7 @@ export const tutorRoutes = {
    children: [
       { path: "/tutor/dashboard", element: <OverviewPage /> },
       { path: "/tutor/profile", element: <ProfilePage /> },
+      { path: "/tutor/profile-page", element: <TutorProfile /> },
       {
          path: "/tutor/jobs",
          element: <JobManage />,

@@ -14,24 +14,20 @@ export const tutorSchema = z.object({
     bio: z.string().min(10, "Bio must be at least 10 characters"),
     address: z.object({
         street: z.string().optional(),
-        ward: z.string().optional(),
-        district: z.string().optional(),
         city: z.string().optional(),
-        state: z.string().optional(),
-        country: z.string().optional(),
+        lat: z.number().optional(),
+        lng: z.number().optional(),
     }),
     hourlyRate: z.number().min(1, "Hourly rate is required"),
     experienceYears: z.number().min(0, "Experience years is required"),
     certifications: z.array(certificationSchema),
-    languages: z.array(z.string()),
-    keyPoints: z.array(z.string()),
-    classType: z.enum(["OneToOne", "Group"]),
-    teachingServices: z.array(z.enum(["Online", "Offline", "StudentPlace", "TutorPlace"])),
+    languages: z.array(z.string()).optional(),
+    classType: z.enum(["Online", "In_Person"]),
     education: z.array(
         z.object({
             degree: z.string().min(1, "Degree is required"),
             institution: z.string().min(1, "Institution is required"),
-            location: z.string().min(1, "Location is required"),
+            fieldOfStudy: z.string().min(1, "Field of study is required"),
             dateRange: z.object({
                 startDate: z.string().min(1, "Start date is required"),
                 endDate: z.string().min(1, "End date is required"),
@@ -39,12 +35,7 @@ export const tutorSchema = z.object({
             description: z.string().optional(),
         }),
     ),
-    subjects: z.array(
-        z.object({
-            category: z.string().min(1, "Category is required"),
-            items: z.array(z.string()),
-        }),
-    ),
+    subjects: z.array(z.string()).optional(),
     availability: z.array(
         z.object({
             dayOfWeek: z.number().min(0).max(6),

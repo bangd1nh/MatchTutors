@@ -30,40 +30,33 @@ const steps = [
 export default function TutorProfileForm({ initialData }: TutorProfileFormProps) {
     const [currentStep, setCurrentStep] = useState(1)
     const [uploadingImages, setUploadingImages] = useState<{ [key: string]: boolean }>({})
-    const [languagesOpen, setLanguagesOpen] = useState(false)
+    const [newSubject, setNewSubject] = useState("")
 
     const form = useForm<TutorFormData>({
         resolver: zodResolver(tutorSchema),
         defaultValues: {
             fullName: initialData?.fullName || "",
             avatarUrl: initialData?.avatarUrl || "",
-            tagline: initialData?.tagline || "",
             dateOfBirth: initialData?.dateOfBirth || "",
             gender: initialData?.gender || undefined,
             bio: initialData?.bio || "",
             address: {
                 street: initialData?.address?.street || "",
-                ward: initialData?.address?.ward || "",
-                district: initialData?.address?.district || "",
                 city: initialData?.address?.city || "",
-                state: initialData?.address?.state || "",
-                country: initialData?.address?.country || "",
             },
             hourlyRate: initialData?.hourlyRate || 0,
             experienceYears: initialData?.experienceYears || 0,
             certifications: initialData?.certifications || [],
             languages: initialData?.languages || [],
-            keyPoints: initialData?.keyPoints || [],
-            classType: initialData?.classType || "OneToOne",
-            teachingServices: initialData?.teachingServices || [],
+            classType: initialData?.classType || "Online",
             education: initialData?.education || [
                 {
-                    degree: "", institution: "", location: "",
+                    degree: "", institution: "", fieldOfStudy: "",
                     dateRange: { startDate: "", endDate: "" },
                     description: ""
                 },
             ],
-            subjects: initialData?.subjects || [{ category: "", items: [""] }],
+            subjects: initialData?.subjects || [],
             availability:
                 initialData?.availability ||
                 DAY_NAMES.map((_, index) => ({
@@ -73,7 +66,6 @@ export default function TutorProfileForm({ initialData }: TutorProfileFormProps)
             contact: {
                 phone: initialData?.contact?.phone || "",
                 email: initialData?.contact?.email || "",
-                facebook: initialData?.contact?.facebook || "",
             },
         },
     })
@@ -87,15 +79,6 @@ export default function TutorProfileForm({ initialData }: TutorProfileFormProps)
         name: "certifications",
     })
 
-    const appendKeyPoint = (value: string) => {
-        const current = form.getValues("keyPoints") || []
-        form.setValue("keyPoints", [...current, value])
-    }
-
-    const removeKeyPoint = (index: number) => {
-        const current = form.getValues("keyPoints") || []
-        form.setValue("keyPoints", current.filter((_, i) => i !== index))
-    }
 
     const {
         fields: educationFields,
@@ -106,14 +89,21 @@ export default function TutorProfileForm({ initialData }: TutorProfileFormProps)
         name: "education",
     })
 
-    const {
-        fields: subjectFields,
-        append: appendSubject,
-        remove: removeSubject,
-    } = useFieldArray({
-        control: form.control,
-        name: "subjects",
-    })
+    // For subjects, we'll handle them differently since they're just strings
+    const subjects = form.watch("subjects") || []
+
+    const addSubject = () => {
+        if (newSubject.trim() && !subjects.includes(newSubject.trim())) {
+            form.setValue("subjects", [...subjects, newSubject.trim()])
+            setNewSubject("")
+        }
+    }
+
+    const removeSubject = (index: number) => {
+        const updatedSubjects = [...subjects]
+        updatedSubjects.splice(index, 1)
+        form.setValue("subjects", updatedSubjects)
+    }
 
     const getFieldsForStep = (step: number): (keyof TutorFormData)[] => {
         switch (step) {
@@ -125,9 +115,7 @@ export default function TutorProfileForm({ initialData }: TutorProfileFormProps)
                     "experienceYears",
                     "certifications",
                     "languages",
-                    "keyPoints",
                     "classType",
-                    "teachingServices",
                 ]
             case 3:
                 return ["education", "subjects"]
@@ -252,7 +240,7 @@ export default function TutorProfileForm({ initialData }: TutorProfileFormProps)
 
                 <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
                     {/* Step 1: Personal Information */}
-                    {currentStep === 1 && <PersonalInfoStep form={form} appendKeyPoint={appendKeyPoint} removeKeyPoint={removeKeyPoint} />}
+                    {currentStep === 1 && <PersonalInfoStep form={form} />}
 
                     {/* Step 2: Professional Details */}
                     {currentStep === 2 && (
@@ -263,8 +251,6 @@ export default function TutorProfileForm({ initialData }: TutorProfileFormProps)
                             removeCertification={removeCertification}
                             uploadingImages={uploadingImages}
                             handleImageUpload={handleImageUpload}
-                            languagesOpen={languagesOpen}
-                            setLanguagesOpen={setLanguagesOpen}
                         />
                     )}
 
@@ -275,8 +261,8 @@ export default function TutorProfileForm({ initialData }: TutorProfileFormProps)
                             educationFields={educationFields}
                             appendEducation={appendEducation}
                             removeEducation={removeEducation}
-                            subjectFields={subjectFields}
-                            appendSubject={appendSubject}
+                            subjectFields={subjects}
+                            appendSubject={addSubject}
                             removeSubject={removeSubject}
                         />
                     )}

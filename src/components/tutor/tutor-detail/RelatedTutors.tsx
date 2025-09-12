@@ -51,7 +51,6 @@ export function RelatedTutors({ relatedTutors, onViewProfile }: RelatedTutorsPro
                                     </h4>
                                     <p className="text-xs text-muted-foreground">
                                         {tutor.address.city},{" "}
-                                        {tutor.address.state}
                                     </p>
                                 </div>
                             </div>
@@ -99,21 +98,6 @@ export function RelatedTutors({ relatedTutors, onViewProfile }: RelatedTutorsPro
                                 </div>
                             </div>
 
-                            {/* Teaching Methods - Compact */}
-                            <div className="mt-2 flex flex-wrap gap-1">
-                                {tutor.teachingServices
-                                    ?.slice(0, 2)
-                                    .map((method, i) => (
-                                        <Badge
-                                            key={i}
-                                            variant="outline"
-                                            className="text-xs px-1.5 py-0.5"
-                                        >
-                                            {method}
-                                        </Badge>
-                                    ))}
-                            </div>
-
                             {/* Subjects - Compact */}
                             <div className="mt-3">
                                 <p className="text-xs text-muted-foreground mb-1">
@@ -121,9 +105,6 @@ export function RelatedTutors({ relatedTutors, onViewProfile }: RelatedTutorsPro
                                 </p>
                                 <div className="flex flex-wrap gap-1">
                                     {tutor.subjects
-                                        ?.flatMap(
-                                            (s) => s.items
-                                        )
                                         .slice(0, 2)
                                         .map((subject, i) => (
                                             <Badge
@@ -134,66 +115,53 @@ export function RelatedTutors({ relatedTutors, onViewProfile }: RelatedTutorsPro
                                                 {subject}
                                             </Badge>
                                         ))}
-                                    {tutor.subjects?.flatMap(
-                                        (s) => s.items
-                                    ).length > 2 && (
-                                            <Popover>
-                                                <PopoverTrigger
-                                                    asChild
+                                    {tutor.subjects.length > 2 && (
+                                        <Popover>
+                                            <PopoverTrigger
+                                                asChild
+                                            >
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-6 px-1.5 text-xs rounded-md"
                                                 >
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-6 px-1.5 text-xs rounded-md"
-                                                    >
-                                                        +
-                                                        {tutor.subjects.flatMap(
-                                                            (s) =>
-                                                                s.items
-                                                        ).length -
-                                                            2}
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent
-                                                    className="w-64 p-2"
-                                                    align="start"
-                                                    sideOffset={4}
-                                                >
-                                                    <div className="grid gap-2">
-                                                        <div className="flex flex-wrap gap-1">
-                                                            {tutor.subjects
-                                                                ?.flatMap(
-                                                                    (
-                                                                        s
-                                                                    ) =>
-                                                                        s.items
+                                                    +{tutor.subjects.length - 2}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent
+                                                className="w-64 p-2"
+                                                align="start"
+                                                sideOffset={4}
+                                            >
+                                                <div className="grid gap-2">
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {tutor.subjects
+                                                            .slice(
+                                                                2
+                                                            )
+                                                            .map(
+                                                                (
+                                                                    subject,
+                                                                    i
+                                                                ) => (
+                                                                    <Badge
+                                                                        key={
+                                                                            i
+                                                                        }
+                                                                        variant="secondary"
+                                                                        className="text-xs px-1.5 py-0.5"
+                                                                    >
+                                                                        {
+                                                                            subject
+                                                                        }
+                                                                    </Badge>
                                                                 )
-                                                                .slice(
-                                                                    2
-                                                                )
-                                                                .map(
-                                                                    (
-                                                                        subject,
-                                                                        i
-                                                                    ) => (
-                                                                        <Badge
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                            variant="secondary"
-                                                                            className="text-xs px-1.5 py-0.5"
-                                                                        >
-                                                                            {
-                                                                                subject
-                                                                            }
-                                                                        </Badge>
-                                                                    )
-                                                                )}
-                                                        </div>
+                                                            )}
                                                     </div>
-                                                </PopoverContent>
-                                            </Popover>
-                                        )}
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    )}
                                 </div>
                             </div>
 

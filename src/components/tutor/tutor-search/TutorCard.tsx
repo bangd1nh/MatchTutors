@@ -19,21 +19,6 @@ export function TutorCard({ tutor }: TutorCardProps) {
     const availableDays = tutor.availability.map((a) => a.dayOfWeek)
     const navigate = useNavigate()
 
-    const getMethodBadgeColor = (method: string) => {
-        switch (method) {
-            case "Online":
-                return "bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200"
-            case "Offline":
-                return "bg-green-100 text-green-800 hover:bg-green-200 border-green-200"
-            case "StudentPlace":
-                return "bg-purple-100 text-purple-800 hover:bg-purple-200 border-purple-200"
-            case "TutorPlace":
-                return "bg-orange-100 text-orange-800 hover:bg-orange-200 border-orange-200"
-            default:
-                return "bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-200"
-        }
-    }
-
     function onViewProfile(_id: string): void {
         navigate(`/tutor-detail/${_id}`)
     }
@@ -60,7 +45,7 @@ export function TutorCard({ tutor }: TutorCardProps) {
                                 </h3>
                                 <div className="flex items-center text-muted-foreground text-sm mt-1">
                                     <MapPin className="h-3.5 w-3.5 mr-1" />
-                                    <span>{tutor.address.city}, {tutor.address.state}</span>
+                                    <span>{tutor.address.city}</span>
                                 </div>
                             </div>
                         </div>
@@ -93,7 +78,7 @@ export function TutorCard({ tutor }: TutorCardProps) {
                         <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-full">
                             <Users className="h-3.5 w-3.5 text-primary" />
                             <span className="text-xs font-medium text-primary">
-                                {tutor.classType === "OneToOne" ? "One-on-One" : "Group"}
+                                {tutor.classType === "Online" ? "Online" : "In Person"}
                             </span>
                         </div>
                     </div>
@@ -135,30 +120,6 @@ export function TutorCard({ tutor }: TutorCardProps) {
                         </div>
                     </div>
 
-                    {/* Teaching Methods */}
-                    <div>
-                        <div className="flex items-center gap-2 mb-2">
-                            <BookOpen className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Teaching Methods</span>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {tutor.teachingServices.slice(0, 3).map((method) => (
-                                <Badge
-                                    key={method}
-                                    variant="outline"
-                                    className={cn("text-xs py-1 px-2 rounded-md", getMethodBadgeColor(method))}
-                                >
-                                    {method === "StudentPlace" ? "Student Place" : method === "TutorPlace" ? "Tutor Place" : method}
-                                </Badge>
-                            ))}
-                            {tutor.teachingServices.length > 3 && (
-                                <Badge variant="outline" className="text-xs py-1 px-2 rounded-md bg-muted text-muted-foreground">
-                                    +{tutor.teachingServices.length - 3} more
-                                </Badge>
-                            )}
-                        </div>
-                    </div>
-
                     {/* Subjects */}
                     <div>
                         <div className="flex items-center gap-2 mb-2">
@@ -167,33 +128,31 @@ export function TutorCard({ tutor }: TutorCardProps) {
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {tutor.subjects
-                                .flatMap((subject) => subject.items)
                                 .slice(0, 3)
-                                .map((item) => (
-                                    <Badge key={item} variant="secondary" className="text-xs py-1 rounded-md">
-                                        {item}
+                                .map((subject) => (
+                                    <Badge key={subject} variant="secondary" className="text-xs py-1 rounded-md">
+                                        {subject}
                                     </Badge>
                                 ))}
 
-                            {tutor.subjects.flatMap((subject) => subject.items).length > 3 && (
+                            {tutor.subjects.length > 3 && (
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <Badge
                                             variant="outline"
                                             className="text-xs py-1 rounded-md bg-muted text-muted-foreground cursor-pointer"
                                         >
-                                            +{tutor.subjects.flatMap((subject) => subject.items).length - 3} more
+                                            +{tutor.subjects.length - 3} more
                                         </Badge>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-60 p-3" align="start">
                                         <h4 className="text-sm font-medium mb-2">All Subjects</h4>
                                         <div className="flex flex-wrap gap-2">
                                             {tutor.subjects
-                                                .flatMap((subject) => subject.items)
                                                 .slice(3)
-                                                .map((item) => (
-                                                    <Badge key={item} variant="outline" className="text-xs">
-                                                        {item}
+                                                .map((subject) => (
+                                                    <Badge key={subject} variant="outline" className="text-xs">
+                                                        {subject}
                                                     </Badge>
                                                 ))}
                                         </div>
@@ -202,7 +161,6 @@ export function TutorCard({ tutor }: TutorCardProps) {
                             )}
                         </div>
                     </div>
-
                     {/* Bio */}
                     <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{tutor.bio}</p>
                 </div>

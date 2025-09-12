@@ -122,15 +122,6 @@ export default function AvailabilityContactStep({ form }: AvailabilityContactSte
                             )}
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="facebook">Facebook Profile</Label>
-                            <Input
-                                id="facebook"
-                                type="url"
-                                placeholder="https://facebook.com/username"
-                                {...form.register("contact.facebook")}
-                            />
-                        </div>
                     </div>
                 </div>
             </CardContent>

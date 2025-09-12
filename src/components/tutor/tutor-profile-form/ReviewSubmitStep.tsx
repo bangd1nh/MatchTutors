@@ -63,7 +63,7 @@ export default function ReviewSubmitStep({ form, goToStep }: ReviewSubmitStepPro
                                 <div className="space-y-2">
                                     <span className="font-semibold text-slate-700">Location:</span>
                                     <p className="text-slate-900">
-                                        {form.watch("address.city")}, {form.watch("address.state")}
+                                        {form.watch("address.city")}, {form.watch("address.street")}
                                     </p>
                                 </div>
 
@@ -71,22 +71,6 @@ export default function ReviewSubmitStep({ form, goToStep }: ReviewSubmitStepPro
                             <div className="mt-6 space-y-2">
                                 <span className="font-semibold text-slate-700">Bio:</span>
                                 <p className="text-slate-900 leading-relaxed">{form.watch("bio")}</p>
-                            </div>
-                            <div className="mt-6">
-                                <span className="font-semibold text-slate-700">Tagline:</span>
-                                <blockquote className="mt-2 border-l-4 border-blue-500 pl-3 italic text-slate-600">
-                                    {form.watch("tagline") || "Not specified"}
-                                </blockquote>
-                            </div>
-                            <div className="mt-6">
-                                <span className="font-semibold text-slate-700">Key Points:</span>
-                                <ul className="mt-2 list-disc list-inside">
-                                    {(form.watch("keyPoints") || []).map((point, index) => (
-                                        <li key={index} className="text-slate-900">
-                                            {point}
-                                        </li>
-                                    ))}
-                                </ul>
                             </div>
                         </CardContent>
                     </Card>
@@ -130,26 +114,7 @@ export default function ReviewSubmitStep({ form, goToStep }: ReviewSubmitStepPro
                             </div>
 
                             <div className="space-y-4">
-                                <div>
-                                    <span className="font-semibold text-slate-700 block mb-2">Teaching Services:</span>
-                                    <div className="flex flex-wrap gap-2">
-                                        {form.watch("teachingServices")?.map((service) => (
-                                            <Badge
-                                                key={service}
-                                                variant="secondary"
-                                                className="bg-green-100 text-green-800 hover:bg-green-200"
-                                            >
-                                                {service === "StudentPlace"
-                                                    ? "Student's Place"
-                                                    : service === "TutorPlace"
-                                                        ? "Tutor's Place"
-                                                        : service}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {form.watch("languages")?.length > 0 && (
+                                {(form.watch("languages")?.length ?? 0) > 0 && (
                                     <div>
                                         <span className="font-semibold text-slate-700 block mb-2">Languages:</span>
                                         <div className="flex flex-wrap gap-2">
@@ -269,34 +234,42 @@ export default function ReviewSubmitStep({ form, goToStep }: ReviewSubmitStepPro
                                                     {edu.degree} - {edu.institution}
                                                 </div>
                                                 <div className="text-slate-600 mt-1">
-                                                    {edu.location} {edu.dateRange.startDate} - {edu.dateRange.endDate}
+                                                    {edu.fieldOfStudy} • {edu.dateRange.startDate} - {edu.dateRange.endDate}
                                                 </div>
+                                                {edu.description && (
+                                                    <div className="text-slate-500 mt-2 text-sm">
+                                                        {edu.description}
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
                                 </div>
-
                                 <div>
                                     <span className="font-semibold text-slate-700 block mb-3">Subjects:</span>
                                     <div className="space-y-4">
-                                        {form.watch("subjects")?.map((subject, index) => (
-                                            <div key={index} className="bg-white p-4 rounded-lg border border-purple-200">
-                                                <div className="font-semibold text-purple-700 mb-2">{subject.category}</div>
+                                        {(form.watch("subjects") ?? []).length > 0 ? (
+                                            <div className="bg-white p-4 rounded-lg border border-purple-200">
+                                                <div className="font-semibold mb-2">Selected Subjects</div>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {subject.items
-                                                        ?.filter((item) => item)
-                                                        .map((item) => (
+                                                    {(form.watch("subjects") ?? [])
+                                                        .filter((subject) => subject)
+                                                        .map((subject, index) => (
                                                             <Badge
-                                                                key={item}
+                                                                key={index}
                                                                 variant="outline"
                                                                 className="bg-purple-100 border-purple-300 text-purple-700"
                                                             >
-                                                                {item}
+                                                                {subject}
                                                             </Badge>
                                                         ))}
                                                 </div>
                                             </div>
-                                        ))}
+                                        ) : (
+                                            <div className="text-muted-foreground text-sm p-4 text-center">
+                                                No subjects selected yet
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -382,7 +355,7 @@ export default function ReviewSubmitStep({ form, goToStep }: ReviewSubmitStepPro
                                 {/* Contact Information */}
                                 <div>
                                     <span className="font-semibold text-slate-700 block mb-3">Contact Information:</span>
-                                    <div className={`grid grid-cols-1 ${form.watch("contact.facebook") ? "md:grid-cols-2" : "md:grid-cols-1"} gap-4`}>
+                                    <div className={`grid grid-cols-1 md:grid-cols-1 gap-4`}>
                                         <div className="bg-white p-4 rounded-lg border border-orange-200">
                                             <div className="flex items-center gap-2 mb-2">
                                                 <Phone className="h-4 w-4 text-orange-600" />
@@ -397,15 +370,6 @@ export default function ReviewSubmitStep({ form, goToStep }: ReviewSubmitStepPro
                                             </div>
                                             <p className="text-slate-900">{form.watch("contact.email")}</p>
                                         </div>
-                                        {form.watch("contact.facebook") && (
-                                            <div className="bg-white p-4 rounded-lg border border-orange-200">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <Facebook className="h-4 w-4 text-orange-600" />
-                                                    <span className="font-semibold text-slate-700">Facebook:</span>
-                                                </div>
-                                                <p className="text-slate-900">{form.watch("contact.facebook")}</p>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>

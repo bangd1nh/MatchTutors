@@ -5,8 +5,28 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Badge } from "@/components/ui/badge"
-import { Star, MapPin, Clock, GraduationCap, Users, DollarSign, ChevronDown, X, Search, BookOpen } from "lucide-react"
+import { Star, MapPin, Clock, GraduationCap, Users, DollarSign, ChevronDown, X, Search, BookOpen, Layers } from "lucide-react"
 import type { Tutor } from "@/types/Tutor"
+import { Level, LEVEL_VALUES } from "@/enums/level.enum"
+
+const getLevelDisplayName = (level: Level): string => {
+    const levelMap: Record<Level, string> = {
+        [Level.GRADE_1]: "Grade 1",
+        [Level.GRADE_2]: "Grade 2",
+        [Level.GRADE_3]: "Grade 3",
+        [Level.GRADE_4]: "Grade 4",
+        [Level.GRADE_5]: "Grade 5",
+        [Level.GRADE_6]: "Grade 6",
+        [Level.GRADE_7]: "Grade 7",
+        [Level.GRADE_8]: "Grade 8",
+        [Level.GRADE_9]: "Grade 9",
+        [Level.GRADE_10]: "Grade 10",
+        [Level.GRADE_11]: "Grade 11",
+        [Level.GRADE_12]: "Grade 12",
+        [Level.UNIVERSITY]: "University",
+    };
+    return levelMap[level];
+};
 
 interface TutorFilterBarProps {
     currentFilters: {
@@ -20,8 +40,8 @@ interface TutorFilterBarProps {
         selectedLocation: string
         experienceYears: [number, number]
         selectedGenders: string[]
-        selectedTeachingServices: string[]
-        selectedClassTypes: string[] // Added class type filter
+        selectedClassTypes: string[]
+        selectedLevels: string[]
     }
     onFilterChange: (newFilters: Partial<TutorFilterBarProps["currentFilters"]>) => void
     onApplyFilters: () => void
@@ -37,7 +57,7 @@ export function TutorFilterBar({
     tutors,
 }: TutorFilterBarProps) {
     const allSubjects = Array.from(
-        new Set(tutors.flatMap((tutor) => tutor.subjects.flatMap((subject) => subject.items))),
+        new Set(tutors.flatMap((tutor) => tutor.subjects)),
     ).slice(0, 10)
 
     const handleRatingChange = (rating: number, checked: boolean) => {
@@ -54,10 +74,10 @@ export function TutorFilterBar({
         if (currentFilters.selectedSubjects.length > 0) count++
         if (currentFilters.selectedLocation) count++
         if (currentFilters.selectedGenders.length > 0) count++
-        if (currentFilters.selectedTeachingServices.length > 0) count++
         if (currentFilters.selectedTimeSlots.length > 0) count++
         if (currentFilters.selectedDays.length > 0) count++
-        if (currentFilters.selectedClassTypes.length > 0) count++ // Added class type count
+        if (currentFilters.selectedClassTypes.length > 0) count++
+        if (currentFilters.selectedLevels.length > 0) count++
         if (currentFilters.priceRange[0] > 0 || currentFilters.priceRange[1] < 200) count++
         if (currentFilters.experienceYears[0] > 0 || currentFilters.experienceYears[1] < 20) count++
         return count
@@ -87,6 +107,47 @@ export function TutorFilterBar({
 
                     {/* Filter Buttons with Popovers */}
                     <div className="flex items-center gap-2">
+                        {/* Levels Filter */}
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" className="h-10 gap-2 bg-transparent">
+                                    <Layers className="h-4 w-4" />
+                                    Levels
+                                    {currentFilters.selectedLevels.length > 0 && (
+                                        <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                                            {currentFilters.selectedLevels.length}
+                                        </Badge>
+                                    )}
+                                    <ChevronDown className="h-4 w-4" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-60 max-h-80 overflow-y-auto" align="start">
+                                <div className="space-y-4">
+                                    <h4 className="font-medium text-sm">Education Levels</h4>
+                                    <div className="space-y-2">
+                                        {LEVEL_VALUES.map((level) => (
+                                            <div key={level} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={`level-${level}`}
+                                                    checked={currentFilters.selectedLevels.includes(level)}
+                                                    onCheckedChange={(checked) => {
+                                                        onFilterChange({
+                                                            selectedLevels: checked
+                                                                ? [...currentFilters.selectedLevels, level]
+                                                                : currentFilters.selectedLevels.filter((l) => l !== level),
+                                                        })
+                                                    }}
+                                                />
+                                                <Label htmlFor={`level-${level}`} className="text-sm">
+                                                    {getLevelDisplayName(level)}
+                                                </Label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+
                         {/* Class Type Filter */}
                         <Popover>
                             <PopoverTrigger asChild>
@@ -271,46 +332,12 @@ export function TutorFilterBar({
                             <PopoverTrigger asChild>
                                 <Button variant="outline" className="h-10 gap-2 bg-transparent">
                                     <Users className="h-4 w-4" />
-                                    Services & Gender
-                                    {(currentFilters.selectedTeachingServices.length > 0 ||
-                                        currentFilters.selectedGenders.length > 0) && (
-                                            <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
-                                                {currentFilters.selectedTeachingServices.length + currentFilters.selectedGenders.length}
-                                            </Badge>
-                                        )}
+                                    Gender
                                     <ChevronDown className="h-4 w-4" />
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-80" align="start">
                                 <div className="space-y-6">
-                                    <div>
-                                        <Label className="text-sm font-medium mb-3 block">Teaching Services</Label>
-                                        <div className="space-y-2">
-                                            {[
-                                                { value: "Online", label: "Online" },
-                                                { value: "Offline", label: "Offline" },
-                                                { value: "StudentPlace", label: "Student's Place" },
-                                                { value: "TutorPlace", label: "Tutor's Place" },
-                                            ].map((service) => (
-                                                <div key={service.value} className="flex items-center space-x-2">
-                                                    <Checkbox
-                                                        id={`service-${service.value.toLowerCase()}`}
-                                                        checked={currentFilters.selectedTeachingServices.includes(service.value)}
-                                                        onCheckedChange={(checked) => {
-                                                            onFilterChange({
-                                                                selectedTeachingServices: checked
-                                                                    ? [...currentFilters.selectedTeachingServices, service.value]
-                                                                    : currentFilters.selectedTeachingServices.filter((s) => s !== service.value),
-                                                            })
-                                                        }}
-                                                    />
-                                                    <Label htmlFor={`service-${service.value.toLowerCase()}`} className="text-sm">
-                                                        {service.label}
-                                                    </Label>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
                                     <div>
                                         <Label className="text-sm font-medium mb-3 block">Gender</Label>
                                         <div className="space-y-2">

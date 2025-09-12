@@ -5,7 +5,7 @@ import LoginPage from "../pages/auth/LoginPage";
 import EditSession from "@/pages/EditSession";
 import TutorSearch from "@/pages/Tutor/TutorSearch";
 import TutorDetail from "@/pages/Tutor/TutorDetail";
-import TutorProfileForm from "@/pages/Tutor/TutorProfileForm";
+import TutorProfileForm from "@/pages/TutorProfile/TutorProfileForm";
 import ViewQuiz from "@/pages/Quiz/ViewQuiz";
 import RegisterPage from "@/pages/auth/RegisterPage";
 import VerifyEmailPage from "@/pages/auth/VerifyEmailPage";
@@ -28,7 +28,5 @@ export const guestRoutes = {
                 { path: "/tutor-list", element: <TutorSearch /> },
                 { path: "/tutor-detail/:id", element: <TutorDetail /> },
                 { path: "/viewQuizz", element: <ViewQuiz /> },
-                { path: "/tutor-profile/create", element: <TutorProfileForm /> }
-
         ],
 };
