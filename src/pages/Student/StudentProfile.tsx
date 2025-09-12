@@ -37,19 +37,19 @@ import { City } from "@/enums/city.enum";
 const studentProfileSchema = z.object({
    name: z.string().min(1, "Vui lòng nhập tên"),
    email: z.string().email(),
-   phone: z.string().optional(),
-   gender: z.enum(["MALE", "FEMALE", "OTHER", ""]).optional(),
-   address: z
-      .object({
-         city: z.string().optional(),
-         street: z.string().optional(),
-      })
-      .optional(),
-   avatar: z.any(),
-   gradeLevel: z.string().optional(),
-   subjectsInterested: z.array(z.string()).optional(),
-   bio: z.string().optional(),
-   learningGoals: z.string().optional(),
+   phone: z.string().min(1, "Vui lòng nhập số điện thoại"),
+   gender: z.enum(["MALE", "FEMALE", "OTHER"], "Vui lòng chọn giới tính"),
+   address: z.object({
+      city: z.string().min(1, "Vui lòng chọn thành phố"),
+      street: z.string().min(1, "Vui lòng nhập địa chỉ"),
+   }),
+   avatar: z.any().optional(), // Avatar can be optional
+   gradeLevel: z.string().min(1, "Vui lòng chọn lớp"),
+   subjectsInterested: z
+      .array(z.string())
+      .min(1, "Vui lòng chọn ít nhất một môn học"),
+   bio: z.string().min(1, "Vui lòng nhập giới thiệu bản thân"),
+   learningGoals: z.string().min(1, "Vui lòng nhập mục tiêu học tập"),
    availability: z
       .array(
          z.object({
@@ -57,7 +57,7 @@ const studentProfileSchema = z.object({
             slots: z.array(z.string()),
          })
       )
-      .optional(),
+      .min(1, "Vui lòng chọn ít nhất một lịch rảnh"),
 });
 
 const DAYS_OF_WEEK = [
@@ -113,8 +113,10 @@ const StudentProfile = () => {
    const watchedAddress = useWatch({
       control,
       name: "address",
-      defaultValue: { city: "", street: "" },
    });
+
+   const watchedBio = useWatch({ control, name: "bio" });
+   const watchedLearningGoals = useWatch({ control, name: "learningGoals" });
 
    const getInitialData = (): StudentProfileFormValues => {
       const address = studentProfile?.userId.address;
@@ -122,20 +124,17 @@ const StudentProfile = () => {
          studentProfile?.userId.gender === "MALE" ||
          studentProfile?.userId.gender === "FEMALE" ||
          studentProfile?.userId.gender === "OTHER"
-            ? (studentProfile?.userId.gender as
-                 | ""
-                 | "MALE"
-                 | "FEMALE"
-                 | "OTHER")
-            : "";
+            ? studentProfile?.userId.gender
+            : "OTHER";
       return {
          name: studentProfile?.userId.name ?? "",
          email: studentProfile?.userId.email ?? "",
          phone: studentProfile?.userId.phone ?? "",
          gender: genderValue,
          address: {
-            city: typeof address === "object" ? address.city : address ?? "",
-            street: typeof address === "object" ? address.street : "",
+            city:
+               typeof address === "object" ? address.city ?? "" : address ?? "",
+            street: typeof address === "object" ? address.street ?? "" : "",
          },
          gradeLevel: studentProfile?.gradeLevel ?? "",
          subjectsInterested: studentProfile?.subjectsInterested ?? [],
@@ -337,6 +336,11 @@ const StudentProfile = () => {
                            {...register("phone")}
                            disabled={!isEditMode}
                         />
+                        {errors.phone && (
+                           <p className="text-sm text-red-500">
+                              {errors.phone.message}
+                           </p>
+                        )}
                      </div>
                      <div className="grid gap-2">
                         <Label htmlFor="gender">Giới tính</Label>
@@ -360,6 +364,11 @@ const StudentProfile = () => {
                               </Select>
                            )}
                         />
+                        {errors.gender && (
+                           <p className="text-sm text-red-500">
+                              {errors.gender.message}
+                           </p>
+                        )}
                      </div>
                      <div className="grid gap-2">
                         <Label>Địa chỉ</Label>
@@ -409,6 +418,12 @@ const StudentProfile = () => {
                               disabled
                            />
                         )}
+                        {errors.address && (
+                           <p className="text-sm text-red-500">
+                              {errors.address.city?.message ||
+                                 errors.address.street?.message}
+                           </p>
+                        )}
                      </div>
                   </CardContent>
                </Card>
@@ -445,6 +460,11 @@ const StudentProfile = () => {
                               </Select>
                            )}
                         />
+                        {errors.gradeLevel && (
+                           <p className="text-sm text-red-500">
+                              {errors.gradeLevel.message}
+                           </p>
+                        )}
                      </div>
                      <div className="grid gap-2">
                         <Label>Môn quan tâm</Label>
@@ -508,30 +528,75 @@ const StudentProfile = () => {
                               )}
                            </div>
                         )}
+                        {errors.subjectsInterested && (
+                           <p className="text-sm text-red-500">
+                              {errors.subjectsInterested.message}
+                           </p>
+                        )}
                      </div>
                      <div className="grid gap-2">
                         <Label htmlFor="bio">Giới thiệu bản thân</Label>
-                        <Controller
-                           name="bio"
-                           control={control}
-                           render={({ field }) => (
-                              <ReactQuill
-                                 theme="snow"
-                                 value={field.value || ""}
-                                 onChange={field.onChange}
-                                 readOnly={!isEditMode}
-                                 className={!isEditMode ? "ql-read-only" : ""}
-                              />
-                           )}
-                        />
+                        {isEditMode ? (
+                           <Controller
+                              name="bio"
+                              control={control}
+                              render={({ field }) => (
+                                 <ReactQuill
+                                    theme="snow"
+                                    value={field.value || ""}
+                                    onChange={field.onChange}
+                                    readOnly={!isEditMode}
+                                    className={
+                                       !isEditMode ? "ql-read-only" : ""
+                                    }
+                                 />
+                              )}
+                           />
+                        ) : (
+                           <div
+                              className="p-3 rounded-md border bg-muted min-h-[100px]"
+                              dangerouslySetInnerHTML={{
+                                 __html: watchedBio || "",
+                              }}
+                           />
+                        )}
+                        {errors.bio && (
+                           <p className="text-sm text-red-500">
+                              {errors.bio.message}
+                           </p>
+                        )}
                      </div>
                      <div className="grid gap-2">
                         <Label htmlFor="learningGoals">Mục tiêu học tập</Label>
-                        <Input
-                           id="learningGoals"
-                           {...register("learningGoals")}
-                           disabled={!isEditMode}
-                        />
+                        {isEditMode ? (
+                           <Controller
+                              name="learningGoals"
+                              control={control}
+                              render={({ field }) => (
+                                 <ReactQuill
+                                    theme="snow"
+                                    value={field.value || ""}
+                                    onChange={field.onChange}
+                                    readOnly={!isEditMode}
+                                    className={
+                                       !isEditMode ? "ql-read-only" : ""
+                                    }
+                                 />
+                              )}
+                           />
+                        ) : (
+                           <div
+                              className="p-3 rounded-md border bg-muted min-h-[100px]"
+                              dangerouslySetInnerHTML={{
+                                 __html: watchedLearningGoals || "",
+                              }}
+                           />
+                        )}
+                        {errors.learningGoals && (
+                           <p className="text-sm text-red-500">
+                              {errors.learningGoals.message}
+                           </p>
+                        )}
                      </div>
                   </CardContent>
                </Card>
@@ -663,6 +728,11 @@ const StudentProfile = () => {
                            );
                         }}
                      />
+                     {errors.availability && (
+                        <p className="text-sm text-red-500 mt-2">
+                           {errors.availability.message}
+                        </p>
+                     )}
                   </CardContent>
                </Card>
             </div>
