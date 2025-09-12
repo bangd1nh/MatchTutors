@@ -31,7 +31,7 @@ export function TutorEducation({ tutor }: TutorEducationProps) {
                             <div className="flex items-center gap-2">
                                 <Check className="w-4 h-4 text-green-600" />
                                 <span className="text-sm">
-                                    {edu.location}
+                                    {edu.fieldOfStudy}
                                 </span>
                             </div>
                             <div className="flex items-center gap-2">
