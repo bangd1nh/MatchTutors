@@ -4,536 +4,647 @@
     "userId": "user1",
     "fullName": "Dr. Sarah Johnson",
     "avatarUrl": "/placeholder.svg?height=80&width=80",
-    "tagline": "Passionate STEM Educator",
     "dateOfBirth": "1985-06-15T00:00:00.000Z",
     "gender": "Female",
     "address": {
       "city": "San Francisco",
-      "state": "CA",
-      "district": "",
-      "ward": "",
       "street": "",
-      "country": "USA"
+      "lat": 37.7749,
+      "lng": -122.4194
     },
     "certifications": [
-      "TESOL Certification",
-      "Cambridge CELTA",
-      "IELTS Trainer Certificate"
+      {
+        "name": "TESOL Certification",
+        "description": "Teaching English to Speakers of Other Languages",
+        "imageUrl": "/certifications/tesol.jpg"
+      },
+      {
+        "name": "Cambridge CELTA",
+        "description": "Certificate in English Language Teaching to Adults",
+        "imageUrl": "/certifications/celta.jpg"
+      },
+      {
+        "name": "IELTS Trainer Certificate",
+        "description": "Certified IELTS exam preparation instructor",
+        "imageUrl": "/certifications/ielts.jpg"
+      }
     ],
     "experienceYears": 10,
     "hourlyRate": 45,
     "languages": ["English"],
-    "keyPoints": [
-      "STEM expertise",
-      "Engaging lessons",
-      "Goal-oriented teaching"
-    ],
     "education": [
       {
         "degree": "Ph.D. in Physics",
         "institution": "Stanford University",
         "location": "Stanford, CA",
-        "dateRange": "2008 - 2012",
-        "description": "Doctorate focusing on applied physics and teaching"
+        "fieldOfStudy": "Applied Physics",
+        "dateRange": { "startDate": "2010-09", "endDate": "2014-06" },
+        "description": "Doctorate focusing on applied physics and teaching",
+        "notes": "Graduated with distinction"
       }
     ],
-    "subjects": [
-      {
-        "category": "Science",
-        "items": ["Mathematics", "Physics", "Chemistry", "Biology"]
-      }
-    ],
+    "subjects": ["Mathematics", "Physics", "Chemistry", "Biology"],
     "availability": [
       { "dayOfWeek": 1, "timeSlots": ["morning", "afternoon", "evening"] }
     ],
     "contact": {
       "phone": "555-1234",
-      "email": "sarah.johnson@example.com",
-      "facebook": "https://facebook.com/sarahjohnson"
+      "email": "sarah.johnson@example.com"
     },
     "isApproved": true,
     "ratings": { "average": 4.9, "totalReviews": 127 },
     "createdAt": "2025-08-14T00:00:00.000Z",
     "updatedAt": "2025-08-14T00:00:00.000Z",
-    "teachingServices": ["Online", "Offline", "StudentPlace"],
-    "bio": "Experienced educator passionate about inspiring young minds in STEM."
+    "bio": "Experienced educator passionate about inspiring young minds in STEM.",
+    "classType": "In_Person",
+    "levels": ["High School", "College", "Graduate"]
   },
   {
     "_id": "2",
     "userId": "user2",
     "fullName": "Michael Chen",
     "avatarUrl": "/placeholder.svg?height=80&width=80",
-    "tagline": "Creative Writing Mentor",
     "dateOfBirth": "1990-03-22T00:00:00.000Z",
     "gender": "Male",
     "address": {
       "city": "New York",
-      "state": "NY",
-      "district": "",
-      "ward": "",
       "street": "",
-      "country": "USA"
+      "lat": 40.7128,
+      "lng": -74.006
     },
     "certifications": [
-      "Certified Mathematics Instructor",
-      "Advanced Calculus Teaching Credential",
-      "Statistics Education Professional"
+      {
+        "name": "Certified Writing Instructor",
+        "description": "Professional writing instruction certification",
+        "imageUrl": "/certifications/writing.jpg"
+      },
+      {
+        "name": "Creative Writing Specialist",
+        "description": "Specialized in creative writing pedagogy",
+        "imageUrl": "/certifications/creative-writing.jpg"
+      },
+      {
+        "name": "Literature Teaching Credential",
+        "description": "Certified literature educator",
+        "imageUrl": "/certifications/literature.jpg"
+      }
     ],
     "experienceYears": 8,
     "hourlyRate": 40,
     "languages": ["English", "Mandarin"],
-    "keyPoints": [
-      "Storytelling mastery",
-      "Publication experience",
-      "Personalized feedback"
-    ],
     "education": [
       {
         "degree": "MFA in Creative Writing",
         "institution": "Columbia University",
         "location": "New York, NY",
-        "dateRange": "2012 - 2014",
-        "description": "Specialized in fiction and poetry"
+        "fieldOfStudy": "Fiction and Poetry",
+        "dateRange": { "startDate": "2011-09", "endDate": "2015-05" },
+        "description": "Specialized in fiction and poetry",
+        "notes": "Thesis published in literary journal"
       }
     ],
     "subjects": [
-      {
-        "category": "Language Arts",
-        "items": [
-          "Creative Writing",
-          "Poetry",
-          "Editing",
-          "Literature",
-          "Essay Writing",
-          "Public Speaking",
-          "Storytelling"
-        ]
-      }
+      "Creative Writing",
+      "Poetry",
+      "Editing",
+      "Literature",
+      "Essay Writing",
+      "Public Speaking",
+      "Storytelling"
     ],
     "availability": [{ "dayOfWeek": 2, "timeSlots": ["afternoon", "evening"] }],
     "contact": {
       "phone": "555-5678",
-      "email": "michael.chen@example.com",
-      "facebook": "https://facebook.com/michaelchen"
+      "email": "michael.chen@example.com"
     },
     "isApproved": true,
     "ratings": { "average": 4.8, "totalReviews": 93 },
     "createdAt": "2025-08-14T00:00:00.000Z",
     "updatedAt": "2025-08-14T00:00:00.000Z",
-    "teachingServices": ["Online", "TutorPlace"],
-    "bio": "Helping aspiring writers bring their stories to life."
+    "bio": "Helping aspiring writers bring their stories to life.",
+    "classType": "Online",
+    "levels": ["Middle School", "High School", "College", "Adult"]
   },
   {
     "_id": "3",
     "userId": "user3",
     "fullName": "Amira Hassan",
     "avatarUrl": "/placeholder.svg?height=80&width=80",
-    "tagline": "Fluent Arabic & English Tutor",
     "dateOfBirth": "1988-12-05T00:00:00.000Z",
     "gender": "Female",
     "address": {
       "city": "Chicago",
-      "state": "IL",
-      "district": "",
-      "ward": "",
       "street": "",
-      "country": "USA"
+      "lat": 41.8781,
+      "lng": -87.6298
     },
     "certifications": [
-      "Google Certified Educator Level 1",
-      "Google Certified Educator Level 2",
-      "Microsoft Certified Trainer"
+      {
+        "name": "Arabic Language Teaching Certificate",
+        "description": "Certified Arabic language instructor",
+        "imageUrl": "/certifications/arabic.jpg"
+      },
+      {
+        "name": "English as a Foreign Language (EFL)",
+        "description": "Teaching English to non-native speakers",
+        "imageUrl": "/certifications/efl.jpg"
+      },
+      {
+        "name": "Bilingual Education Specialist",
+        "description": "Specialized in bilingual teaching methods",
+        "imageUrl": "/certifications/bilingual.jpg"
+      }
     ],
     "experienceYears": 12,
     "hourlyRate": 50,
     "languages": ["Arabic", "English"],
-    "keyPoints": [
-      "Bilingual teaching",
-      "Cultural immersion",
-      "Beginner to advanced"
-    ],
     "education": [
       {
         "degree": "BA in Linguistics",
         "institution": "University of Illinois",
         "location": "Chicago, IL",
-        "dateRange": "2006 - 2010",
-        "description": "Focused on applied linguistics and language pedagogy"
+        "fieldOfStudy": "Applied Linguistics",
+        "dateRange": { "startDate": "2010-09", "endDate": "2014-06" },
+        "description": "Focused on applied linguistics and language pedagogy",
+        "notes": "Graduated summa cum laude"
       }
     ],
-    "subjects": [{ "category": "Languages", "items": ["Arabic", "English"] }],
+    "subjects": ["Arabic", "English"],
     "availability": [{ "dayOfWeek": 3, "timeSlots": ["morning", "afternoon"] }],
     "contact": {
       "phone": "555-9012",
-      "email": "amira.hassan@example.com",
-      "facebook": "https://facebook.com/amirahassan"
+      "email": "amira.hassan@example.com"
     },
     "isApproved": true,
     "ratings": { "average": 4.7, "totalReviews": 88 },
     "createdAt": "2025-08-14T00:00:00.000Z",
     "updatedAt": "2025-08-14T00:00:00.000Z",
-    "teachingServices": ["Online", "Offline"],
-    "bio": "Helping students achieve fluency in Arabic and English."
+    "bio": "Helping students achieve fluency in Arabic and English.",
+    "classType": "In_Person",
+    "levels": ["Beginner", "Intermediate", "Advanced", "All Levels"]
   },
   {
     "_id": "4",
     "userId": "user4",
-    "fullName": "Carlos Martínez",
+    "fullName": "Daniel Kim",
     "avatarUrl": "/placeholder.svg?height=80&width=80",
-    "tagline": "Guitar & Music Theory Teacher",
-    "dateOfBirth": "1982-09-14T00:00:00.000Z",
+    "dateOfBirth": "1990-03-21T00:00:00.000Z",
     "gender": "Male",
     "address": {
-      "city": "Austin",
-      "state": "TX",
-      "district": "",
-      "ward": "",
+      "city": "Los Angeles",
       "street": "",
-      "country": "USA"
+      "lat": 34.0522,
+      "lng": -118.2437
     },
     "certifications": [
-      "Project Management Professional (PMP)",
-      "Certified ScrumMaster (CSM)",
-      "Agile Certified Practitioner (PMI-ACP)"
+      {
+        "name": "TESOL Certificate",
+        "description": "Teaching English to Speakers of Other Languages",
+        "imageUrl": "/certifications/tesol.jpg"
+      }
     ],
-    "experienceYears": 15,
-    "hourlyRate": 60,
-    "languages": ["Spanish", "English"],
-    "keyPoints": ["Performance experience", "Music theory", "Songwriting"],
+    "experienceYears": 8,
+    "hourlyRate": 40,
+    "languages": ["English", "Korean"],
     "education": [
       {
-        "degree": "Bachelor of Music",
-        "institution": "Berklee College of Music",
-        "location": "Boston, MA",
-        "dateRange": "2000 - 2004",
-        "description": "Specialized in guitar performance and theory"
+        "degree": "MA in Education",
+        "institution": "University of Southern California",
+        "location": "Los Angeles, CA",
+        "fieldOfStudy": "Educational Technology",
+        "dateRange": { "startDate": "2012-09", "endDate": "2014-06" },
+        "description": "Specialized in language learning using technology",
+        "notes": "Research on digital learning tools"
       }
     ],
-    "subjects": [
-      {
-        "category": "Music",
-        "items": ["Guitar", "Music Theory", "Songwriting"]
-      }
+    "subjects": ["English", "Korean"],
+    "availability": [
+      { "dayOfWeek": 1, "timeSlots": ["evening"] },
+      { "dayOfWeek": 4, "timeSlots": ["morning", "afternoon"] }
     ],
-    "availability": [{ "dayOfWeek": 4, "timeSlots": ["afternoon", "evening"] }],
     "contact": {
-      "phone": "555-3456",
-      "email": "carlos.martinez@example.com",
-      "facebook": "https://facebook.com/carlosmartinez"
+      "phone": "555-3412",
+      "email": "daniel.kim@example.com"
     },
     "isApproved": true,
-    "ratings": { "average": 4.95, "totalReviews": 210 },
-    "createdAt": "2025-08-14T00:00:00.000Z",
-    "updatedAt": "2025-08-14T00:00:00.000Z",
-    "teachingServices": ["Offline", "TutorPlace"],
-    "bio": "Professional guitarist with over 15 years of teaching experience."
+    "ratings": { "average": 4.5, "totalReviews": 67 },
+    "createdAt": "2025-08-20T00:00:00.000Z",
+    "updatedAt": "2025-08-20T00:00:00.000Z",
+    "bio": "Passionate about helping students master English and Korean with engaging methods.",
+    "classType": "Online",
+    "levels": ["Beginner", "Intermediate", "Advanced"]
   },
   {
     "_id": "5",
     "userId": "user5",
-    "fullName": "Priya Kapoor",
+    "fullName": "Sophia Martinez",
     "avatarUrl": "/placeholder.svg?height=80&width=80",
-    "tagline": "Math & SAT Prep Expert",
-    "dateOfBirth": "1995-07-18T00:00:00.000Z",
+    "dateOfBirth": "1993-11-02T00:00:00.000Z",
     "gender": "Female",
     "address": {
-      "city": "Seattle",
-      "state": "WA",
-      "district": "",
-      "ward": "",
+      "city": "Miami",
       "street": "",
-      "country": "USA"
+      "lat": 25.7617,
+      "lng": -80.1918
     },
     "certifications": [
-      "Project Management Professional (PMP)",
-      "Certified ScrumMaster (CSM)",
-      "Agile Certified Practitioner (PMI-ACP)"
-    ],
-    "experienceYears": 7,
-    "hourlyRate": 55,
-    "languages": ["English", "Hindi"],
-    "keyPoints": ["SAT strategies", "Advanced math", "Customized lessons"],
-    "education": [
       {
-        "degree": "BS in Mathematics",
-        "institution": "University of Washington",
-        "location": "Seattle, WA",
-        "dateRange": "2013 - 2017",
-        "description": "Focused on applied mathematics and test preparation"
+        "name": "Spanish Language Teaching Certificate",
+        "description": "Certified to teach Spanish as a second language",
+        "imageUrl": "/certifications/spanish.jpg"
       }
     ],
-    "subjects": [
-      { "category": "Math", "items": ["Algebra", "Calculus", "SAT Math"] }
+    "experienceYears": 6,
+    "hourlyRate": 35,
+    "languages": ["Spanish", "English"],
+    "education": [
+      {
+        "degree": "BA in Spanish",
+        "institution": "Florida International University",
+        "location": "Miami, FL",
+        "fieldOfStudy": "Spanish Literature",
+        "dateRange": { "startDate": "2011-09", "endDate": "2015-06" },
+        "description": "Focused on Spanish literature and teaching methodology",
+        "notes": "Dean’s List"
+      }
     ],
-    "availability": [{ "dayOfWeek": 5, "timeSlots": ["morning", "afternoon"] }],
+    "subjects": ["Spanish"],
+    "availability": [
+      { "dayOfWeek": 2, "timeSlots": ["afternoon", "evening"] },
+      { "dayOfWeek": 6, "timeSlots": ["morning"] }
+    ],
     "contact": {
-      "phone": "555-7890",
-      "email": "priya.kapoor@example.com",
-      "facebook": "https://facebook.com/priyakapoor"
+      "phone": "555-6721",
+      "email": "sophia.martinez@example.com"
     },
     "isApproved": true,
-    "ratings": { "average": 4.85, "totalReviews": 150 },
-    "createdAt": "2025-08-14T00:00:00.000Z",
-    "updatedAt": "2025-08-14T00:00:00.000Z",
-    "teachingServices": ["Online"],
-    "bio": "Dedicated to helping students excel in math and standardized tests."
+    "ratings": { "average": 4.8, "totalReviews": 95 },
+    "createdAt": "2025-08-22T00:00:00.000Z",
+    "updatedAt": "2025-08-22T00:00:00.000Z",
+    "bio": "Dedicated to making Spanish learning fun and interactive.",
+    "classType": "In_Person",
+    "levels": ["Beginner", "Intermediate", "Advanced"]
   },
   {
     "_id": "6",
     "userId": "user6",
-    "fullName": "James O'Connor",
+    "fullName": "Omar Al-Fayed",
     "avatarUrl": "/placeholder.svg?height=80&width=80",
-    "tagline": "History Buff & Educator",
-    "dateOfBirth": "1980-01-10T00:00:00.000Z",
+    "dateOfBirth": "1985-07-19T00:00:00.000Z",
     "gender": "Male",
     "address": {
-      "city": "Boston",
-      "state": "MA",
-      "district": "",
-      "ward": "",
+      "city": "New York",
       "street": "",
-      "country": "USA"
+      "lat": 40.7128,
+      "lng": -74.006
     },
     "certifications": [
-      "Certified Science Teacher",
-      "Physics Teaching Excellence Award",
-      "Chemistry Education Specialist"
-    ],
-    "experienceYears": 18,
-    "hourlyRate": 50,
-    "languages": ["English"],
-    "keyPoints": [
-      "Engaging storytelling",
-      "Primary sources",
-      "Exam preparation"
-    ],
-    "education": [
       {
-        "degree": "MA in History",
-        "institution": "Harvard University",
-        "location": "Cambridge, MA",
-        "dateRange": "2002 - 2004",
-        "description": "Specialized in American and European history"
+        "name": "French Teaching Diploma",
+        "description": "Certified French language instructor",
+        "imageUrl": "/certifications/french.jpg"
+      },
+      {
+        "name": "DELF Examiner Certification",
+        "description": "Qualified DELF exam preparation instructor",
+        "imageUrl": "/certifications/delf.jpg"
       }
     ],
-    "subjects": [
-      { "category": "Social Studies", "items": ["World History", "US History"] }
+    "experienceYears": 15,
+    "hourlyRate": 60,
+    "languages": ["French", "Arabic", "English"],
+    "education": [
+      {
+        "degree": "MA in French Literature",
+        "institution": "Sorbonne University",
+        "location": "Paris, France",
+        "fieldOfStudy": "French Literature",
+        "dateRange": { "startDate": "2005-09", "endDate": "2008-06" },
+        "description": "Specialized in 18th-century French literature",
+        "notes": "Graduated with distinction"
+      }
     ],
-    "availability": [{ "dayOfWeek": 1, "timeSlots": ["morning", "afternoon"] }],
+    "subjects": ["French"],
+    "availability": [
+      { "dayOfWeek": 0, "timeSlots": ["morning"] },
+      { "dayOfWeek": 5, "timeSlots": ["afternoon", "evening"] }
+    ],
     "contact": {
-      "phone": "555-2222",
-      "email": "james.oconnor@example.com",
-      "facebook": "https://facebook.com/jamesoconnor"
+      "phone": "555-9823",
+      "email": "omar.alfayed@example.com"
     },
     "isApproved": true,
-    "ratings": { "average": 4.88, "totalReviews": 175 },
-    "createdAt": "2025-08-14T00:00:00.000Z",
-    "updatedAt": "2025-08-14T00:00:00.000Z",
-    "teachingServices": ["Offline", "TutorPlace"],
-    "bio": "Bringing history to life for students of all ages."
+    "ratings": { "average": 4.9, "totalReviews": 120 },
+    "createdAt": "2025-08-25T00:00:00.000Z",
+    "updatedAt": "2025-08-25T00:00:00.000Z",
+    "bio": "Experienced French tutor helping students achieve fluency and confidence.",
+    "classType": "Online",
+    "levels": ["Intermediate", "Advanced", "Exam Prep"]
   },
   {
     "_id": "7",
     "userId": "user7",
-    "fullName": "Sophia Nguyen",
+    "fullName": "Emily Johnson",
     "avatarUrl": "/placeholder.svg?height=80&width=80",
-    "tagline": "Chemistry & Biology Specialist",
-    "dateOfBirth": "1992-04-30T00:00:00.000Z",
+    "dateOfBirth": "1995-04-10T00:00:00.000Z",
     "gender": "Female",
     "address": {
-      "city": "Los Angeles",
-      "state": "CA",
-      "district": "",
-      "ward": "",
+      "city": "Toronto",
       "street": "",
-      "country": "USA"
+      "lat": 43.65107,
+      "lng": -79.347015
     },
     "certifications": [
-      "International Baccalaureate (IB) Educator Certificate",
-      "IB Diploma Programme Coordinator Training",
-      "IB Middle Years Programme Training"
-    ],
-
-    "experienceYears": 9,
-    "hourlyRate": 48,
-    "languages": ["English", "Vietnamese"],
-    "keyPoints": ["Lab skills", "Exam prep", "Interactive learning"],
-    "education": [
       {
-        "degree": "MS in Biochemistry",
-        "institution": "UCLA",
-        "location": "Los Angeles, CA",
-        "dateRange": "2014 - 2016",
-        "description": "Focused on molecular biology and teaching"
+        "name": "Math Education Certificate",
+        "description": "Specialized in teaching mathematics",
+        "imageUrl": "/certifications/math.jpg"
       }
     ],
-    "subjects": [{ "category": "Science", "items": ["Chemistry", "Biology"] }],
-    "availability": [{ "dayOfWeek": 2, "timeSlots": ["morning", "afternoon"] }],
+    "experienceYears": 5,
+    "hourlyRate": 45,
+    "languages": ["English"],
+    "education": [
+      {
+        "degree": "BSc in Mathematics",
+        "institution": "University of Toronto",
+        "location": "Toronto, Canada",
+        "fieldOfStudy": "Pure Mathematics",
+        "dateRange": { "startDate": "2013-09", "endDate": "2017-06" },
+        "description": "Focused on algebra, calculus, and statistics",
+        "notes": "Graduated with honors"
+      }
+    ],
+    "subjects": ["Mathematics", "Statistics"],
+    "availability": [
+      { "dayOfWeek": 1, "timeSlots": ["morning", "afternoon"] },
+      { "dayOfWeek": 3, "timeSlots": ["evening"] }
+    ],
     "contact": {
-      "phone": "555-3333",
-      "email": "sophia.nguyen@example.com",
-      "facebook": "https://facebook.com/sophianguyen"
+      "phone": "555-7812",
+      "email": "emily.johnson@example.com"
     },
     "isApproved": true,
-    "ratings": { "average": 4.82, "totalReviews": 120 },
-    "createdAt": "2025-08-14T00:00:00.000Z",
-    "updatedAt": "2025-08-14T00:00:00.000Z",
-    "teachingServices": ["Online", "Offline"],
-    "bio": "Passionate about making science fun and understandable."
+    "ratings": { "average": 4.6, "totalReviews": 76 },
+    "createdAt": "2025-08-28T00:00:00.000Z",
+    "updatedAt": "2025-08-28T00:00:00.000Z",
+    "bio": "Math tutor making complex concepts simple and clear for all levels.",
+    "classType": "In_Person",
+    "levels": ["High School", "College", "Exam Prep"]
   },
   {
     "_id": "8",
     "userId": "user8",
-    "fullName": "Liam Patel",
+    "fullName": "Liam O'Connor",
     "avatarUrl": "/placeholder.svg?height=80&width=80",
-    "tagline": "Economics & Business Studies Coach",
-    "dateOfBirth": "1987-11-09T00:00:00.000Z",
+    "dateOfBirth": "1987-09-14T00:00:00.000Z",
     "gender": "Male",
     "address": {
-      "city": "San Diego",
-      "state": "CA",
-      "district": "",
-      "ward": "",
+      "city": "Dublin",
       "street": "",
-      "country": "USA"
+      "lat": 53.3331,
+      "lng": -6.2489
     },
     "certifications": [
-      "International Baccalaureate (IB) Educator Certificate",
-      "IB Diploma Programme Coordinator Training",
-      "IB Middle Years Programme Training"
-    ],
-
-    "experienceYears": 11,
-    "hourlyRate": 52,
-    "languages": ["English", "Gujarati"],
-    "keyPoints": ["Case studies", "Exam tips", "Real-world applications"],
-    "education": [
       {
-        "degree": "MBA",
-        "institution": "UC San Diego",
-        "location": "San Diego, CA",
-        "dateRange": "2010 - 2012",
-        "description": "Specialized in finance and management"
+        "name": "CELTA",
+        "description": "Certificate in Teaching English to Speakers of Other Languages",
+        "imageUrl": "/certifications/celta.jpg"
       }
     ],
-    "subjects": [
-      { "category": "Business", "items": ["Economics", "Business Studies"] }
+    "experienceYears": 10,
+    "hourlyRate": 55,
+    "languages": ["English", "Irish"],
+    "education": [
+      {
+        "degree": "BA in English Literature",
+        "institution": "Trinity College Dublin",
+        "location": "Dublin, Ireland",
+        "fieldOfStudy": "English Literature",
+        "dateRange": { "startDate": "2006-09", "endDate": "2010-06" },
+        "description": "Focus on British and Irish literature",
+        "notes": "Graduated with first-class honors"
+      }
     ],
-    "availability": [{ "dayOfWeek": 3, "timeSlots": ["afternoon", "evening"] }],
+    "subjects": ["English Literature", "Creative Writing"],
+    "availability": [
+      { "dayOfWeek": 2, "timeSlots": ["morning"] },
+      { "dayOfWeek": 4, "timeSlots": ["afternoon", "evening"] }
+    ],
     "contact": {
-      "phone": "555-4444",
-      "email": "liam.patel@example.com",
-      "facebook": "https://facebook.com/liampatel"
+      "phone": "555-1289",
+      "email": "liam.oconnor@example.com"
     },
     "isApproved": true,
-    "ratings": { "average": 4.9, "totalReviews": 142 },
-    "createdAt": "2025-08-14T00:00:00.000Z",
-    "updatedAt": "2025-08-14T00:00:00.000Z",
-    "teachingServices": ["Online", "TutorPlace"],
-    "bio": "Helping students excel in business and economics."
+    "ratings": { "average": 4.9, "totalReviews": 134 },
+    "createdAt": "2025-08-30T00:00:00.000Z",
+    "updatedAt": "2025-08-30T00:00:00.000Z",
+    "bio": "Helping students develop a love for English literature and writing.",
+    "classType": "Online",
+    "levels": ["High School", "College", "Adult Learners"]
   },
   {
     "_id": "9",
     "userId": "user9",
-    "fullName": "Olivia Rossi",
+    "fullName": "Haruka Tanaka",
     "avatarUrl": "/placeholder.svg?height=80&width=80",
-    "tagline": "Italian Language & Culture Guide",
-    "dateOfBirth": "1993-02-25T00:00:00.000Z",
+    "dateOfBirth": "1992-02-08T00:00:00.000Z",
     "gender": "Female",
     "address": {
-      "city": "Miami",
-      "state": "FL",
-      "district": "",
-      "ward": "",
+      "city": "Tokyo",
       "street": "",
-      "country": "USA"
+      "lat": 35.6762,
+      "lng": 139.6503
     },
     "certifications": [
-      "International Baccalaureate (IB) Educator Certificate",
-      "IB Diploma Programme Coordinator Training",
-      "IB Middle Years Programme Training"
-    ],
-
-    "experienceYears": 6,
-    "hourlyRate": 47,
-    "languages": ["Italian", "English"],
-    "keyPoints": [
-      "Immersive lessons",
-      "Cultural insights",
-      "Travel preparation"
-    ],
-    "education": [
       {
-        "degree": "BA in Italian Studies",
-        "institution": "University of Miami",
-        "location": "Miami, FL",
-        "dateRange": "2011 - 2015",
-        "description": "Focused on Italian language, history, and culture"
+        "name": "Japanese Language Teaching Certificate",
+        "description": "Qualified Japanese as a Second Language instructor",
+        "imageUrl": "/certifications/japanese.jpg"
       }
     ],
-    "subjects": [{ "category": "Languages", "items": ["Italian"] }],
-    "availability": [{ "dayOfWeek": 4, "timeSlots": ["morning", "afternoon"] }],
+    "experienceYears": 7,
+    "hourlyRate": 50,
+    "languages": ["Japanese", "English"],
+    "education": [
+      {
+        "degree": "MA in Japanese Language Education",
+        "institution": "Waseda University",
+        "location": "Tokyo, Japan",
+        "fieldOfStudy": "Language Pedagogy",
+        "dateRange": { "startDate": "2013-09", "endDate": "2015-06" },
+        "description": "Specialized in second language acquisition",
+        "notes": "Published research on JSL teaching methods"
+      }
+    ],
+    "subjects": ["Japanese"],
+    "availability": [
+      { "dayOfWeek": 1, "timeSlots": ["afternoon"] },
+      { "dayOfWeek": 5, "timeSlots": ["morning", "evening"] }
+    ],
     "contact": {
-      "phone": "555-5555",
-      "email": "olivia.rossi@example.com",
-      "facebook": "https://facebook.com/oliviarossi"
+      "phone": "555-9321",
+      "email": "haruka.tanaka@example.com"
     },
     "isApproved": true,
-    "ratings": { "average": 4.84, "totalReviews": 101 },
-    "createdAt": "2025-08-14T00:00:00.000Z",
-    "updatedAt": "2025-08-14T00:00:00.000Z",
-    "teachingServices": ["Online", "Offline"],
-    "bio": "Making Italian language learning engaging and cultural."
+    "ratings": { "average": 4.8, "totalReviews": 102 },
+    "createdAt": "2025-09-01T00:00:00.000Z",
+    "updatedAt": "2025-09-01T00:00:00.000Z",
+    "bio": "Dedicated Japanese tutor with a passion for cultural exchange.",
+    "classType": "In_Person",
+    "levels": ["Beginner", "Intermediate", "Advanced", "JLPT Prep"]
   },
   {
     "_id": "10",
     "userId": "user10",
-    "fullName": "Sophia Kim",
+    "fullName": "Rajesh Patel",
     "avatarUrl": "/placeholder.svg?height=80&width=80",
-    "tagline": "Economics & Business Studies Coach",
-    "dateOfBirth": "1987-11-09T00:00:00.000Z",
-    "gender": "Female",
+    "dateOfBirth": "1984-06-11T00:00:00.000Z",
+    "gender": "Male",
     "address": {
-      "city": "San Diego",
-      "state": "CA",
-      "district": "",
-      "ward": "",
+      "city": "Mumbai",
       "street": "",
-      "country": "USA"
+      "lat": 19.076,
+      "lng": 72.8777
     },
     "certifications": [
-      "Certified Business Educator",
-      "Certified Economics Teacher",
-      "Certified Online Instructor"
-    ],
-    "experienceYears": 11,
-    "hourlyRate": 52,
-    "languages": ["English", "Gujarati", "Spanish", "French"],
-    "keyPoints": ["Case studies", "Exam tips", "Real-world applications"],
-    "education": [
       {
-        "degree": "MBA",
-        "institution": "UC San Diego",
-        "location": "San Diego, CA",
-        "dateRange": "2010 - 2012",
-        "description": "Specialized in finance and management"
+        "name": "Chartered Accountant",
+        "description": "Certified professional accountant and tutor",
+        "imageUrl": "/certifications/ca.jpg"
       }
     ],
-    "subjects": [
-      { "category": "Business", "items": ["Economics", "Business Studies"] }
+    "experienceYears": 18,
+    "hourlyRate": 70,
+    "languages": ["English", "Hindi", "Gujarati"],
+    "education": [
+      {
+        "degree": "MBA in Finance",
+        "institution": "Indian Institute of Management",
+        "location": "Ahmedabad, India",
+        "fieldOfStudy": "Finance",
+        "dateRange": { "startDate": "2005-06", "endDate": "2007-05" },
+        "description": "Focused on corporate finance and accounting",
+        "notes": "Gold medalist"
+      }
     ],
-    "availability": [{ "dayOfWeek": 3, "timeSlots": ["afternoon", "evening"] }],
+    "subjects": ["Accounting", "Finance", "Economics"],
+    "availability": [
+      { "dayOfWeek": 0, "timeSlots": ["afternoon"] },
+      { "dayOfWeek": 3, "timeSlots": ["evening"] }
+    ],
     "contact": {
-      "phone": "555-4444",
-      "email": "liam.patel@example.com",
-      "facebook": "https://facebook.com/liampatel",
-      "linkedin": "https://linkedin.com/in/liampatel"
+      "phone": "555-4021",
+      "email": "rajesh.patel@example.com"
     },
     "isApproved": true,
-    "ratings": { "average": 4.9, "totalReviews": 142 },
-    "createdAt": "2025-08-14T00:00:00.000Z",
-    "updatedAt": "2025-08-14T00:00:00.000Z",
-    "teachingServices": ["Online", "StudentPlace"],
-    "bio": "Helping students excel in business and economics."
+    "ratings": { "average": 5.0, "totalReviews": 150 },
+    "createdAt": "2025-09-03T00:00:00.000Z",
+    "updatedAt": "2025-09-03T00:00:00.000Z",
+    "bio": "Finance expert with nearly two decades of teaching and industry experience.",
+    "classType": "Online",
+    "levels": ["College", "Graduate", "Professional"]
+  },
+  {
+    "_id": "11",
+    "userId": "user11",
+    "fullName": "Chloe Williams",
+    "avatarUrl": "/placeholder.svg?height=80&width=80",
+    "dateOfBirth": "1997-01-30T00:00:00.000Z",
+    "gender": "Female",
+    "address": {
+      "city": "London",
+      "street": "",
+      "lat": 51.5074,
+      "lng": -0.1278
+    },
+    "certifications": [
+      {
+        "name": "TESL Certificate",
+        "description": "Teaching English as a Second Language",
+        "imageUrl": "/certifications/tesl.jpg"
+      }
+    ],
+    "experienceYears": 4,
+    "hourlyRate": 30,
+    "languages": ["English", "French"],
+    "education": [
+      {
+        "degree": "BA in Education",
+        "institution": "University College London",
+        "location": "London, UK",
+        "fieldOfStudy": "Primary Education",
+        "dateRange": { "startDate": "2015-09", "endDate": "2018-06" },
+        "description": "Specialized in early childhood and language teaching",
+        "notes": "Graduated with honors"
+      }
+    ],
+    "subjects": ["English", "ESL"],
+    "availability": [
+      { "dayOfWeek": 2, "timeSlots": ["afternoon"] },
+      { "dayOfWeek": 6, "timeSlots": ["morning", "afternoon"] }
+    ],
+    "contact": {
+      "phone": "555-6218",
+      "email": "chloe.williams@example.com"
+    },
+    "isApproved": true,
+    "ratings": { "average": 4.5, "totalReviews": 48 },
+    "createdAt": "2025-09-06T00:00:00.000Z",
+    "updatedAt": "2025-09-06T00:00:00.000Z",
+    "bio": "Young and enthusiastic tutor making English learning engaging for kids and adults.",
+    "classType": "In_Person",
+    "levels": ["Beginner", "Intermediate"]
+  },
+  {
+    "_id": "12",
+    "userId": "user12",
+    "fullName": "Mateo González",
+    "avatarUrl": "/placeholder.svg?height=80&width=80",
+    "dateOfBirth": "1989-05-17T00:00:00.000Z",
+    "gender": "Male",
+    "address": {
+      "city": "Madrid",
+      "street": "",
+      "lat": 40.4168,
+      "lng": -3.7038
+    },
+    "certifications": [
+      {
+        "name": "Spanish Language Teaching Diploma",
+        "description": "Certified to teach Spanish as a foreign language",
+        "imageUrl": "/certifications/spanish-diploma.jpg"
+      }
+    ],
+    "experienceYears": 11,
+    "hourlyRate": 45,
+    "languages": ["Spanish", "English"],
+    "education": [
+      {
+        "degree": "MA in Spanish Linguistics",
+        "institution": "Complutense University of Madrid",
+        "location": "Madrid, Spain",
+        "fieldOfStudy": "Linguistics",
+        "dateRange": { "startDate": "2007-09", "endDate": "2011-06" },
+        "description": "Specialized in syntax and semantics",
+        "notes": "Research assistant in linguistics lab"
+      }
+    ],
+    "subjects": ["Spanish"],
+    "availability": [
+      { "dayOfWeek": 1, "timeSlots": ["morning"] },
+      { "dayOfWeek": 4, "timeSlots": ["afternoon", "evening"] }
+    ],
+    "contact": {
+      "phone": "555-8721",
+      "email": "mateo.gonzalez@example.com"
+    },
+    "isApproved": true,
+    "ratings": { "average": 4.7, "totalReviews": 89 },
+    "createdAt": "2025-09-09T00:00:00.000Z",
+    "updatedAt": "2025-09-09T00:00:00.000Z",
+    "bio": "Experienced Spanish tutor helping learners improve fluency and cultural understanding.",
+    "classType": "Online",
+    "levels": ["Beginner", "Intermediate", "Advanced"]
   }
 ]

@@ -1,23 +1,21 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Filter } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { Tutor } from "@/types/Tutor"
-import tutorsData from "@/data/tutors.json"
 import { TutorCard } from "@/components/tutor/tutor-search/TutorCard"
 import { TutorFilterBar } from "@/components/tutor/tutor-search/TutorFilterSidebar"
-import { Search } from "lucide-react"
 import { Pagination } from "@/components/common/Pagination"
+import { useTutors } from "@/hooks/useTutor"
+import { TimeSlot } from "@/enums/timeSlot.enum"
 
 export default function TutorSearch() {
     const [showFilters, setShowFilters] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
+    const { data: tutors, isLoading } = useTutors();
 
-    const [tutors, setTutors] = useState<Tutor[]>([])
     const [currentFilters, setCurrentFilters] = useState({
         searchQuery: "",
-        priceRange: [0, 100] as [number, number],
+        priceRange: [0, 200] as [number, number],
         selectedRatings: [] as number[],
         selectedTimeSlots: [] as string[],
         selectedDays: [] as string[],
@@ -27,21 +25,19 @@ export default function TutorSearch() {
         experienceYears: [0, 20] as [number, number],
         selectedGenders: [] as string[],
         selectedTeachingServices: [] as string[],
+        selectedClassTypes: [] as string[],
+        selectedLevels: [] as string[],
     })
     const [appliedFilters, setAppliedFilters] = useState(currentFilters)
 
-    useEffect(() => {
-        setTutors(tutorsData as Tutor[])
-    }, [])
-
-    const filteredTutors = tutors.filter((tutor) => {
+    const filteredTutors = (tutors ?? []).filter((tutor) => {
         // Search query filter
         if (appliedFilters.searchQuery) {
             const query = appliedFilters.searchQuery.toLowerCase()
             const matchesName = tutor.fullName?.toLowerCase().includes(query)
             const matchesBio = tutor.bio.toLowerCase().includes(query)
             const matchesSubjects = tutor.subjects.some((subject) =>
-                subject.items.some((item) => item.toLowerCase().includes(query)),
+                subject.toLowerCase().includes(query)
             )
             if (!matchesName && !matchesBio && !matchesSubjects) return false
         }
@@ -54,22 +50,16 @@ export default function TutorSearch() {
         // Price filter
         if (tutor.hourlyRate < appliedFilters.priceRange[0] || tutor.hourlyRate > appliedFilters.priceRange[1]) return false
 
-        // Online/Offline filter
-        if (appliedFilters.isOnline !== null) {
-            const isOnlineTutor = tutor.teachingServices.includes("Online")
-            if (appliedFilters.isOnline && !isOnlineTutor) return false
-            if (!appliedFilters.isOnline && isOnlineTutor) return false
-        }
 
         // Subject filter
         if (appliedFilters.selectedSubjects.length > 0) {
-            const tutorSubjects = tutor.subjects.flatMap((subject) => subject.items)
+            const tutorSubjects = tutor.subjects
             if (!appliedFilters.selectedSubjects.some((subject) => tutorSubjects.includes(subject))) return false
         }
 
         // Location filter
         if (appliedFilters.selectedLocation) {
-            const locationMatch = `${tutor.address.city}, ${tutor.address.state}`.toLowerCase()
+            const locationMatch = `${tutor.address.city}`.toLowerCase()
             if (!locationMatch.includes(appliedFilters.selectedLocation.toLowerCase())) return false
         }
 
@@ -85,19 +75,12 @@ export default function TutorSearch() {
             if (!tutor.gender || !appliedFilters.selectedGenders.includes(tutor.gender)) return false
         }
 
-        // Teaching services filter
-        if (appliedFilters.selectedTeachingServices.length > 0) {
-            if (!appliedFilters.selectedTeachingServices.some((service) => tutor.teachingServices.includes(service as any)))
-                return false
-        }
-
         //Time slots filter
         if (appliedFilters.selectedTimeSlots.length > 0) {
-            const availableSlots = tutor.availability.flatMap((a) => a.timeSlots)
+            const availableSlots = tutor.availability.flatMap((a) => a.slots).flat()
             if (
                 !appliedFilters.selectedTimeSlots
-                    .map((slot) => slot.toLowerCase())
-                    .some((slot) => availableSlots.includes(slot as "morning" | "afternoon" | "evening"))
+                    .some((slot) => availableSlots.includes(slot as TimeSlot))
             )
                 return false
         }
@@ -117,10 +100,20 @@ export default function TutorSearch() {
             if (!appliedFilters.selectedDays.some((day) => availableDays.includes(dayNameToIndex[day]))) return false
         }
 
+        //Class filter
+        if (appliedFilters.selectedClassTypes.length > 0) {
+            if (!appliedFilters.selectedClassTypes.some((classType) => tutor.classType === classType)) return false
+        }
+
+        //Levels filter
+        if (appliedFilters.selectedLevels.length > 0) {
+            if (!appliedFilters.selectedLevels.some((level) => tutor.levels.includes(level))) return false
+        }
+
         return true
     })
 
-    const tutorsPerPage = 4
+    const tutorsPerPage = 6
     const totalPages = Math.ceil(filteredTutors.length / tutorsPerPage)
     const startIndex = (currentPage - 1) * tutorsPerPage
     const paginatedTutors = filteredTutors.slice(startIndex, startIndex + tutorsPerPage)
@@ -137,7 +130,7 @@ export default function TutorSearch() {
     const clearAllFilters = () => {
         const resetFilters: typeof currentFilters = {
             searchQuery: "",
-            priceRange: [0, 100],
+            priceRange: [0, 200],
             selectedRatings: [],
             selectedTimeSlots: [],
             selectedDays: [],
@@ -147,16 +140,20 @@ export default function TutorSearch() {
             experienceYears: [0, 20],
             selectedGenders: [],
             selectedTeachingServices: [],
+            selectedClassTypes: [],
+            selectedLevels: [],
         }
         setCurrentFilters(resetFilters)
         setAppliedFilters(resetFilters)
         setCurrentPage(1)
     }
 
+    if (isLoading) return <div>Loading tutors...</div>
+
     return (
         <div className="min-h-screen bg-background">
             <div className="container mx-auto px-4 py-6">
-                <div className="flex flex-col lg:flex-row gap-6">
+                <div className="mb-6">
                     {/* Mobile Filter Toggle */}
                     <div className="lg:hidden">
                         <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="w-full mb-4">
@@ -165,49 +162,26 @@ export default function TutorSearch() {
                         </Button>
                     </div>
 
-                    {/* Filters Sidebar */}
-                    <div className={cn("lg:w-80 lg:block", showFilters ? "block" : "hidden")}>
+                    {/* Filters Topbar */}
+                    <div className={cn(showFilters ? "block" : "hidden", "lg:block")}>
                         <TutorFilterBar
                             currentFilters={currentFilters}
                             onFilterChange={(newFilters) => setCurrentFilters(prev => ({ ...prev, ...newFilters }))}
                             onApplyFilters={applyFilters}
                             onClearFilters={clearAllFilters}
-                            tutors={tutors}
+                            tutors={tutors ?? []}
                         />
                     </div>
 
                     {/* Search Results */}
                     <div className="flex-1">
                         {/* Search Header */}
-                        <div className="mb-6">
+                        <div className="mb-6 mt-4">
                             <h1 className="text-2xl font-bold mb-2">{filteredTutors.length} search results found</h1>
-                            <div className="flex gap-2">
-                                <div className="relative flex-1">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                                    <Input
-                                        placeholder="Search by name, subject, or bio..."
-                                        value={currentFilters.searchQuery}
-                                        onChange={(e) => setCurrentFilters(prev => ({ ...prev, searchQuery: e.target.value }))}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                applyFilters()
-                                            }
-                                        }}
-                                        className="pl-10"
-                                    />
-                                </div>
-                                <Button
-                                    onClick={applyFilters}
-                                    className="shrink-0"
-                                >
-                                    <Search className="h-4 w-4 mr-2" />
-                                    Search
-                                </Button>
-                            </div>
                         </div>
 
                         {/* Tutor Cards */}
-                        <div className="space-y-6">
+                        <div className="grid grid-cols-3 gap-6">
                             {paginatedTutors.map((tutor) => (
                                 <TutorCard key={tutor._id} tutor={tutor} />
                             ))}

@@ -92,7 +92,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     };
 
     return (
-        <header className="w-full sticky top-0 z-40 bg-sky-50/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
+        <header className="w-full sticky top-0 z-50 bg-sky-50/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Left: logo + admin mobile menu */}
@@ -108,10 +108,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                             </Button>
                         )}
 
-                        <Link
-                            to="/"
-                            className="flex items-center gap-3 min-w-0"
-                        >
+                        <Link to="/" className="flex items-center gap-3 min-w-0">
                             <div className="h-10 w-10 rounded-lg bg-white flex items-center justify-center shadow-sm flex-shrink-0 overflow-hidden p-1">
                                 <img
                                     src="/tutor.png"
@@ -206,8 +203,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                                         className="h-9 w-9"
                                     >
                                         <span className="text-xs font-semibold">
-                                            {i18n.language?.toUpperCase?.() ||
-                                                "EN"}
+                                            {i18n.language?.toUpperCase?.() || "EN"}
                                         </span>
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -269,9 +265,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                                                     className="w-full"
                                                     onClick={() => {
                                                         logout();
-                                                        setIsMobileMenuOpen(
-                                                            false
-                                                        );
+                                                        setIsMobileMenuOpen(false);
                                                     }}
                                                 >
                                                     {t("logout") || "Đăng xuất"}
@@ -282,25 +276,20 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                                                         <Link
                                                             to="/login"
                                                             onClick={() =>
-                                                                setIsMobileMenuOpen(
-                                                                    false
-                                                                )
+                                                                setIsMobileMenuOpen(false)
                                                             }
                                                         >
                                                             <Button
                                                                 variant="outline"
                                                                 className="w-full"
                                                             >
-                                                                {t("login") ||
-                                                                    "Login"}
+                                                                {t("login") || "Login"}
                                                             </Button>
                                                         </Link>
                                                         <Link
                                                             to="/register"
                                                             onClick={() =>
-                                                                setIsMobileMenuOpen(
-                                                                    false
-                                                                )
+                                                                setIsMobileMenuOpen(false)
                                                             }
                                                         >
                                                             <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
@@ -321,9 +310,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                                                             : "ghost"
                                                     }
                                                     size="sm"
-                                                    onClick={() =>
-                                                        changeLanguage("vi")
-                                                    }
+                                                    onClick={() => changeLanguage("vi")}
                                                 >
                                                     VI
                                                 </Button>
@@ -334,9 +321,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                                                             : "ghost"
                                                     }
                                                     size="sm"
-                                                    onClick={() =>
-                                                        changeLanguage("en")
-                                                    }
+                                                    onClick={() => changeLanguage("en")}
                                                 >
                                                     EN
                                                 </Button>
@@ -350,9 +335,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                                                     size="icon"
                                                     onClick={toggleTheme}
                                                 >
-                                                    {theme === "light"
-                                                        ? "🌙"
-                                                        : "☀️"}
+                                                    {theme === "light" ? "🌙" : "☀️"}
                                                 </Button>
                                             </div>
                                         </div>

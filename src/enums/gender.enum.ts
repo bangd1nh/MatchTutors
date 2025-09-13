@@ -5,3 +5,9 @@ export enum Gender {
 }
 
 export const GENDER_VALUES = Object.values(Gender);
+
+export const GENDER_LABELS = {
+   MALE: "Male",
+   FEMALE: "Female",
+   OTHER: "Other",
+};

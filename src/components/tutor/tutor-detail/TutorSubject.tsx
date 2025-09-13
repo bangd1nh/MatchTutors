@@ -24,60 +24,11 @@ export function TutorSubject({ tutor }: TutorSubjectProps) {
             <CardHeader>
                 <CardTitle>Subjects I Can Teach</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-wrap gap-2">
                 {tutor.subjects.map((subject, index) => (
-                    <div key={index}>
-                        <Collapsible
-                            open={expandedSubjects.includes(
-                                subject.category
-                            )}
-                            onOpenChange={() =>
-                                toggleSubjectCategory(
-                                    subject.category
-                                )
-                            }
-                        >
-                            <CollapsibleTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    className="w-full justify-between p-0 h-auto"
-                                >
-                                    <span className="font-medium">
-                                        {subject.category}
-                                    </span>
-                                    {expandedSubjects.includes(
-                                        subject.category
-                                    ) ? (
-                                        <ChevronUp className="w-4 h-4" />
-                                    ) : (
-                                        <ChevronDown className="w-4 h-4" />
-                                    )}
-                                </Button>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="mt-3">
-                                <div className="flex flex-wrap gap-2">
-                                    {subject.items
-                                        .slice(0, 8)
-                                        .map((item, itemIndex) => (
-                                            <Badge
-                                                key={itemIndex}
-                                                variant="outline"
-                                            >
-                                                {item}
-                                            </Badge>
-                                        ))}
-                                    {subject.items.length > 8 && (
-                                        <Badge variant="secondary">
-                                            +
-                                            {subject.items.length -
-                                                8}{" "}
-                                            more
-                                        </Badge>
-                                    )}
-                                </div>
-                            </CollapsibleContent>
-                        </Collapsible>
-                    </div>
+                    <Badge key={index} variant="outline">
+                        {subject}
+                    </Badge>
                 ))}
             </CardContent>
         </Card>

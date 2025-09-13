@@ -110,7 +110,7 @@ export default function ProfileForm() {
                   <div className="grid gap-2">
                      <Label htmlFor="avatar">Thay đổi ảnh đại diện</Label>
                      <Input
-                        id="avatar"
+                        id="avatarUrl"
                         type="file"
                         accept="image/*"
                         {...register("avatar")}

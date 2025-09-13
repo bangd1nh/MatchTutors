@@ -63,8 +63,7 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                         <div className="flex items-center gap-2 mb-3">
                             <MapPin className="w-4 h-4 text-muted-foreground" />
                             <span className="text-sm">
-                                {tutor.address.city},{" "}
-                                {tutor.address.state}
+                                {tutor.address.city}
                             </span>
                         </div>
 
@@ -85,66 +84,6 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                                         {tutor.gender}
                                     </span>
                                 </div>
-                            )}
-                        </div>
-
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            <div className="flex items-center gap-2">
-                                <Globe className="w-4 h-4 text-muted-foreground" />
-                                <span className="text-sm">
-                                    Languages I know:
-                                </span>
-                            </div>
-                            {tutor.languages
-                                .slice(0, 3)
-                                .map((lang, index) => (
-                                    <Badge
-                                        key={index}
-                                        variant="secondary"
-                                    >
-                                        {lang}
-                                    </Badge>
-                                ))}
-                            {tutor.languages.length > 3 && (
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            className="h-6 px-2 text-xs rounded-full border-dashed"
-                                        >
-                                            +
-                                            {tutor.languages
-                                                .length - 3}{" "}
-                                            more
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent
-                                        className="w-48 p-3"
-                                        align="start"
-                                    >
-                                        <div className="space-y-2">
-                                            {tutor.languages
-                                                .slice(3)
-                                                .map(
-                                                    (
-                                                        lang,
-                                                        index
-                                                    ) => (
-                                                        <Badge
-                                                            key={
-                                                                index
-                                                            }
-                                                            variant="secondary"
-                                                            className="text-xs"
-                                                        >
-                                                            {lang}
-                                                        </Badge>
-                                                    )
-                                                )}
-                                        </div>
-                                    </PopoverContent>
-                                </Popover>
                             )}
                         </div>
 

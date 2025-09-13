@@ -16,6 +16,7 @@ export const tutorSidebarConfig: SidebarItem[] = [
    { to: "/tutor/dashboard", label: "Dashboard" },
    { to: "/tutor/jobs", label: "My Profile" },
    { to: "/tutor/profile", label: "My profile" },
+   { to: "/tutor-profile/page", label: "Profile page" },
 
    // ví dụ: { to: "/tutor/new", label: "New Feature", icon: <YourIcon /> }
 ];
@@ -46,10 +47,9 @@ const TutorSidebarItems: React.FC<{
                to="/"
                onClick={() => onLinkClick?.()}
                className={`flex items-center gap-2 p-2 rounded-md text-sm font-medium transition-colors duration-200
-                  ${
-                     homeActive
-                        ? "bg-green-500/20 text-gray-900 dark:text-white border-l-4 border-green-500"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  ${homeActive
+                     ? "bg-green-500/20 text-gray-900 dark:text-white border-l-4 border-green-500"
+                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                   }
                `}
                title="Trang chủ"
@@ -68,10 +68,9 @@ const TutorSidebarItems: React.FC<{
                      to={item.to}
                      onClick={() => onLinkClick?.()}
                      className={`flex items-center gap-2 p-2 rounded-md text-sm font-medium transition-colors duration-200
-                        ${
-                           active
-                              ? "bg-green-500/20 text-gray-900 dark:text-white border-l-4 border-green-500"
-                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                        ${active
+                           ? "bg-green-500/20 text-gray-900 dark:text-white border-l-4 border-green-500"
+                           : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                         }
                      `}
                      title={label}

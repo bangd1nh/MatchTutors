@@ -25,7 +25,7 @@ export function TutorCertification({ tutor }: TutorCertification) {
                             >
                                 <Award className="w-5 h-5 text-primary flex-shrink-0" />
                                 <span className="text-sm font-medium">
-                                    {cert}
+                                    {cert.name}
                                 </span>
                             </div>
                         )
