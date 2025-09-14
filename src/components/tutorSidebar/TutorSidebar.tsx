@@ -1,30 +1,43 @@
 import React from "react";
 import TutorSidebarItems from "./TutorSidebarItem";
 import { useUser } from "@/hooks/useUser";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const TutorSidebar: React.FC = () => {
    const { user } = useUser();
 
-   const email = user?.email ?? "—";
-   const role = user?.role ?? "—";
+   const name = user?.name ?? "Tutor";
+   const email = user?.email ?? "student@example.com";
+   const avatarUrl = (user as any)?.avatarUrl; // Giả sử user object có avatarUrl
 
    return (
-      <aside className="w-64 bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 flex flex-col shadow-sm">
-         <div className="mb-6">
-            <h3 className="text-sm font-medium text-sky-700">Xin chào</h3>
-            <p className="mt-1 text-sm text-slate-900 dark:text-slate-100 font-semibold break-words">
-               {email}
-            </p>
-            <div className="mt-3">
-               <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
-                  {role}
-               </span>
+      <aside className="w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-gray-800 flex flex-col shadow-sm h-screen">
+         <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+            <div className="flex items-center gap-3">
+               <Avatar className="h-10 w-10">
+                  <AvatarImage src={avatarUrl} alt={name} />
+                  <AvatarFallback>
+                     {name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+               </Avatar>
+               <div>
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 break-words">
+                     {name}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 break-all">
+                     {email}
+                  </p>
+               </div>
             </div>
          </div>
 
-         <nav className="flex-1 space-y-1">
+         <nav className="flex-1 p-2 space-y-1">
             <TutorSidebarItems />
          </nav>
+
+         <div className="p-2">
+            {/* Có thể thêm các mục footer ở đây nếu cần */}
+         </div>
       </aside>
    );
 };

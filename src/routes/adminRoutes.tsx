@@ -1,14 +1,15 @@
 import ProtectedRoute from "./ProtectedRoute";
 import OverviewPage from "../pages/dashboard/OverviewPage";
-import TutorLayout from "@/layouts/AdminLayout";
+
 import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
 import BanUser from "@/pages/admin/BanUnBanUser";
 import ProfilePage from "@/pages/Profilepage";
+import AdminLayout from "@/layouts/AdminLayout";
 
 export const adminRoutes = {
    element: (
       <ProtectedRoute allowedRoles={["ADMIN"]}>
-         <TutorLayout />
+         <AdminLayout />
       </ProtectedRoute>
    ),
    children: [

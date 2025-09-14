@@ -1,7 +1,7 @@
 import AdminSidebar from "@/components/adminSidebar/adminSidebar";
 import { Outlet, useLocation } from "react-router-dom";
 
-const TutorLayout = () => {
+const AdminLayout = () => {
    const location = useLocation();
    const showSidebar = location.pathname !== "/";
 
@@ -17,4 +17,4 @@ const TutorLayout = () => {
    );
 };
 
-export default TutorLayout;
+export default AdminLayout;
