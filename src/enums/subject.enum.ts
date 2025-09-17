@@ -30,13 +30,12 @@ export enum Subject {
 
 export const SUBJECT_VALUES = Object.values(Subject) as Subject[];
 
-
 export const SUBJECT_LABELS: Record<string, string> = Object.fromEntries(
    SUBJECT_VALUES.map((s) => [
       s,
       s
          .toLowerCase()
-         .replace(/_/g, " ")           // replace underscores with spaces
+         .replace(/_/g, " ") // replace underscores with spaces
          .replace(/\b\w/g, (c) => c.toUpperCase()), // capitalize each word
    ])
-)
+);
