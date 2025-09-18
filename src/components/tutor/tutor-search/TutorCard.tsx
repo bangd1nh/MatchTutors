@@ -22,20 +22,38 @@ import {
    PopoverContent,
 } from "@/components/ui/popover";
 import { useAddFav, useFetchFav, useRemoveFav } from "@/hooks/useFavTutor";
+import { useUser } from "@/hooks/useUser";
+import { useToast } from "@/hooks/useToast";
 
 interface TutorCardProps {
    tutor: Tutor;
 }
 
 export function TutorCard({ tutor }: TutorCardProps) {
-   const { data: isFav, isLoading, isError } = useFetchFav(tutor._id);
-   const addFav = useAddFav();
-   const deleteFav = useRemoveFav();
+   const { isAuthenticated } = useUser();
+   const toast = useToast();
+   const {
+      data: isFav,
+      isLoading,
+      isError,
+   } = isAuthenticated
+      ? useFetchFav(tutor._id)
+      : { data: undefined, isLoading: false, isError: false };
+
+   // Chỉ gọi các hook fav khi đã đăng nhập
+   const addFav = isAuthenticated ? useAddFav() : undefined;
+   const deleteFav = isAuthenticated ? useRemoveFav() : undefined;
+
    const handleFav = (tutorId: string) => {
+      if (!isAuthenticated) {
+         // Có thể chuyển hướng sang login hoặc show toast
+         toast("warning", "Please login to favorite this tutor");
+         return;
+      }
       if (isFav?.isFav) {
-         deleteFav.mutate(tutorId);
+         deleteFav?.mutate(tutorId);
       } else {
-         addFav.mutate(tutorId);
+         addFav?.mutate(tutorId);
       }
    };
 

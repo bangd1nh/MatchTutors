@@ -8,6 +8,8 @@ import {
    PopoverTrigger,
 } from "@/components/ui/popover";
 import { useAddFav, useFetchFav, useRemoveFav } from "@/hooks/useFavTutor";
+import { useToast } from "@/hooks/useToast";
+import { useUser } from "@/hooks/useUser";
 import type { Tutor } from "@/types/tutorListandDetail";
 import {
    Calendar,
@@ -19,20 +21,36 @@ import {
    MessageCircle,
    Star,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface TutorHeaderProps {
    tutor: Tutor;
 }
 
 export function TutorHeader({ tutor }: TutorHeaderProps) {
-   const fav = useAddFav();
-   const removeFav = useRemoveFav();
-   const { data: isFav, isLoading, isError } = useFetchFav(tutor._id);
+   const toast = useToast();
+
+   const { isAuthenticated } = useUser();
+   const {
+      data: isFav,
+      isLoading,
+      isError,
+   } = isAuthenticated
+      ? useFetchFav(tutor._id)
+      : { data: undefined, isLoading: false, isError: false };
+
+   const fav = isAuthenticated ? useAddFav() : undefined;
+   const removeFav = isAuthenticated ? useRemoveFav() : undefined;
+
    const handleSave = () => {
+      if (!isAuthenticated) {
+         toast("warning", "Please login to favorite this tutor");
+         return;
+      }
       if (isFav?.isFav) {
-         removeFav.mutate(tutor._id);
+         removeFav?.mutate(tutor._id);
       } else {
-         fav.mutate(tutor._id);
+         fav?.mutate(tutor._id);
       }
    };
 
@@ -160,7 +178,7 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                         variant="outline"
                         size="sm"
                         onClick={handleSave}
-                        disabled={fav.isPending || removeFav.isPending}
+                        disabled={fav?.isPending || removeFav?.isPending}
                      >
                         <Heart
                            className={`w-4 h-4 mr-2 ${
