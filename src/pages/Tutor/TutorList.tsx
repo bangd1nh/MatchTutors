@@ -16,8 +16,17 @@ export default function TutorListPage() {
       isError,
    } = useTutors({ page: currentPage, limit: tutorsPerPage });
 
-   const tutors: Tutor[] = tutorData?.data || [];
-   const totalPages = Math.max(1, tutorData?.pagination?.totalPages || 1); // ensure >= 1
+   // tutorData may be either an array of tutors or an object containing { data, pagination }.
+   // Use a runtime check and a narrow assertion to handle both shapes without type errors.
+   const tutors: Tutor[] = Array.isArray(tutorData)
+      ? tutorData
+      : (tutorData as any)?.data || [];
+   const totalPages = Math.max(
+      1,
+      (Array.isArray(tutorData)
+         ? 1
+         : (tutorData as any)?.pagination?.totalPages) || 1
+   ); // ensure >= 1
 
    const handlePageChange = (page: number) => {
       setCurrentPage(page);

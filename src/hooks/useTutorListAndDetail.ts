@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getTutors, getTutorById } from "@/api/tutorListAndDetail";
-import type { TutorsApiResponse, Tutor } from "@/types/Tutor";
+import type { TutorsApiResponse, Tutor } from "@/types/tutorListandDetail";
 
 interface UseTutorsOptions {
    page?: number;

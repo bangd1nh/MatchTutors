@@ -7,7 +7,7 @@ import {
    PopoverContent,
    PopoverTrigger,
 } from "@/components/ui/popover";
-import { Tutor } from "@/types/Tutor";
+import type { Tutor } from "@/types/tutorListandDetail";
 import {
    Calendar,
    Clock,

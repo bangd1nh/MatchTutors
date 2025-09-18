@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Tutor } from "../../../types/Tutor";
+import type { Tutor } from "@/types/tutorListandDetail";
 import { Badge } from "@/components/ui/badge";
 
 interface TutorSubjectProps {

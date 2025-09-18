@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TableRow, TableCell } from "@/components/ui/table";
-import { Tutor } from "@/types/Tutor";
+import type { Tutor } from "@/types/tutorListandDetail";
 import { Check, Minus } from "lucide-react";
 
 interface TutorAvailabilityProps {

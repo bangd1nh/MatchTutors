@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star, MapPin, Clock, Heart, User, Users, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Tutor } from "@/types/tutorListandDetail";
+import type { Tutor } from "@/types/tutorListandDetail";
 import { useNavigate } from "react-router-dom";
 import {
    Popover,

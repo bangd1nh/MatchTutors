@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Tutor, Education } from "@/types/tutorListandDetail";
+import type { Tutor } from "@/types/tutorListandDetail";
 import { Check, GraduationCap } from "lucide-react";
 
 interface TutorEducationProps {
