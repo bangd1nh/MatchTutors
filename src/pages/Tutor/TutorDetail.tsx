@@ -12,7 +12,7 @@ import {
    TutorIntroduction,
    TutorSubject,
 } from "@/components/tutor/tutor-detail";
-import { useTutorDetail } from "@/hooks/useTutorListAndDetail";
+import { useTutorDetail, useTutors } from "@/hooks/useTutorListAndDetail";
 import tutorsData from "@/data/tutors.json";
 
 const TutorDetail: React.FC = () => {
@@ -20,6 +20,8 @@ const TutorDetail: React.FC = () => {
    const navigate = useNavigate();
 
    const { data: rawTutor, isLoading, isError } = useTutorDetail(id ?? null);
+   const { data: tutorsData } = useTutors();
+   const tutorsArray = Array.isArray(tutorsData) ? tutorsData : [];
 
    if (isLoading) {
       return (
@@ -78,42 +80,42 @@ const TutorDetail: React.FC = () => {
       // normalize availability: ensure slots AND timeSlots exist, dayOfWeek present
       availability: Array.isArray(source.availability)
          ? source.availability.map((a: any) => {
-              const slots = Array.isArray(a.slots)
-                 ? a.slots
-                 : Array.isArray(a.timeSlots)
-                 ? a.timeSlots
-                 : [];
-              const timeSlots = Array.isArray(a.timeSlots)
-                 ? a.timeSlots
-                 : Array.isArray(a.slots)
-                 ? a.slots
-                 : [];
-              return {
-                 dayOfWeek:
-                    typeof a.dayOfWeek === "number"
-                       ? a.dayOfWeek
-                       : Number(a.dayOfWeek) || 0,
-                 slots,
-                 timeSlots,
-              };
-           })
+            const slots = Array.isArray(a.slots)
+               ? a.slots
+               : Array.isArray(a.timeSlots)
+                  ? a.timeSlots
+                  : [];
+            const timeSlots = Array.isArray(a.timeSlots)
+               ? a.timeSlots
+               : Array.isArray(a.slots)
+                  ? a.slots
+                  : [];
+            return {
+               dayOfWeek:
+                  typeof a.dayOfWeek === "number"
+                     ? a.dayOfWeek
+                     : Number(a.dayOfWeek) || 0,
+               slots,
+               timeSlots,
+            };
+         })
          : [],
       // normalize education: ensure dateRange with startDate/endDate
       education: Array.isArray(source.education)
          ? source.education.map((edu: any) => ({
-              institution: edu.institution ?? edu.school ?? "",
-              degree: edu.degree ?? edu.degreeTitle ?? "",
-              fieldOfStudy: edu.fieldOfStudy ?? edu.major ?? "",
-              dateRange:
-                 edu.dateRange ??
-                 (edu.startDate || edu.endDate
-                    ? {
-                         startDate: edu.startDate ?? "",
-                         endDate: edu.endDate ?? "",
-                      }
-                    : { startDate: "", endDate: "" }),
-              description: edu.description ?? "",
-           }))
+            institution: edu.institution ?? edu.school ?? "",
+            degree: edu.degree ?? edu.degreeTitle ?? "",
+            fieldOfStudy: edu.fieldOfStudy ?? edu.major ?? "",
+            dateRange:
+               edu.dateRange ??
+               (edu.startDate || edu.endDate
+                  ? {
+                     startDate: edu.startDate ?? "",
+                     endDate: edu.endDate ?? "",
+                  }
+                  : { startDate: "", endDate: "" }),
+            description: edu.description ?? "",
+         }))
          : [],
       // ratings default
       ratings: source.ratings ?? { average: 0, totalReviews: 0 },
@@ -124,8 +126,8 @@ const TutorDetail: React.FC = () => {
       classType: Array.isArray(source.classType)
          ? source.classType
          : source.classType
-         ? [source.classType]
-         : [],
+            ? [source.classType]
+            : [],
    };
 
    // Related tutors: reuse local dataset to compute recommendations (safe access)
@@ -135,8 +137,7 @@ const TutorDetail: React.FC = () => {
          (normalizedTutor.address && normalizedTutor.address.city) ||
          (normalizedTutor.userId as any)?.address?.city ||
          "";
-
-      return tutorsData
+      return tutorsArray
          .filter((t) => t._id !== normalizedTutor._id)
          .map((t) => {
             let score = 0;
@@ -149,7 +150,7 @@ const TutorDetail: React.FC = () => {
             if (tCity && tCity === currentCity) score += 2;
             const rDiff = Math.abs(
                (normalizedTutor.ratings?.average ?? 0) -
-                  (t.ratings?.average ?? 0)
+               (t.ratings?.average ?? 0)
             );
             if (rDiff <= 0.5) score += 1;
             return { ...t, score };

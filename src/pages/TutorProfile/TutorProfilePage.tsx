@@ -22,58 +22,8 @@ const TIME_SLOTS = [
     { value: TimeSlot.AFTER_17, label: "After 5 PM" },
 ]
 
-// Mock data for demonstration
-const mockTutor: Tutor = {
-    _id: "1",
-    userId: "user1",
-    name: "Dinh Van Thai Son",
-    avatarUrl: "/professional-tutor-avatar.jpg",
-    gender: "Male",
-    address: {
-        city: "Ho Chi Minh City",
-        street: "District 1",
-    },
-    certifications: [
-        {
-            name: "TESOL Certificate",
-            description: "Teaching English to Speakers of Other Languages",
-        },
-    ],
-    experienceYears: 5,
-    hourlyRate: 25,
-    languages: ["English", "Vietnamese"],
-    education: [
-        {
-            degree: "Bachelor of Education",
-            institution: "University of Education",
-            fieldOfStudy: "English Literature",
-            startDate: "2018",
-            endDate: "2022",
-            description: "Specialized in English language teaching methodologies",
-        },
-    ],
-    subjects: ["ENGLISH", "PHONICS_ENGLISH", "FREE_CONSULTATION"],
-    availability: [
-        { dayOfWeek: 1, timeSlots: ["PRE_12", "MID_12_17"] },
-        { dayOfWeek: 2, timeSlots: ["MID_12_17", "AFTER_17"] },
-        { dayOfWeek: 3, timeSlots: ["PRE_12"] },
-    ],
-    phone: "0865807077",
-    email: "cuimaithayme@gmail.com",
-    isApproved: true,
-    ratings: {
-        average: 4.8,
-        totalReviews: 24,
-    },
-    createdAt: "2024-01-01",
-    updatedAt: "2024-01-15",
-    bio: "Experienced English tutor with 5 years of teaching experience. Passionate about helping students achieve their language learning goals.",
-    classType: "ONLINE",
-    levels: ["Primary", "Secondary"],
-}
-
 export default function TutorProfile() {
-    const [tutor, setTutor] = useState<Tutor | null>(mockTutor) // Set to null to show create form
+    const [tutor, setTutor] = useState<Tutor | null>(null) // Set to null to show create form
     const [isEditing, setIsEditing] = useState(false)
     const [formData, setFormData] = useState<Partial<Tutor>>(
         tutor || {

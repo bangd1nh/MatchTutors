@@ -20,7 +20,7 @@ interface TutorCardProps {
 export function TutorCard({ tutor }: TutorCardProps) {
    const [isSaved, setIsSaved] = useState(false);
    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-   const availableDays = tutor.availability.map((a) => a.dayOfWeek);
+   const availableDays = (tutor.availability?.map((a) => a.dayOfWeek)) ?? [];
    const navigate = useNavigate();
 
    function onViewProfile(_id: string): void {
@@ -36,8 +36,8 @@ export function TutorCard({ tutor }: TutorCardProps) {
                   <div className="flex items-center gap-3">
                      <Avatar className="h-14 w-14 border-2 border-primary/10">
                         <AvatarImage
-                           src={tutor.userId.avatarUrl || "/placeholder.svg"}
-                           alt={tutor.userId.name}
+                           src={typeof tutor.userId === "object" && tutor.userId.avatarUrl ? tutor.userId.avatarUrl : "/placeholder.svg"}
+                           alt={typeof tutor.userId === "object" ? tutor.userId.name : ""}
                         />
                         <AvatarFallback className="bg-primary/10">
                            <User className="h-6 w-6 text-primary" />
@@ -48,11 +48,15 @@ export function TutorCard({ tutor }: TutorCardProps) {
                            className="text-lg font-semibold cursor-pointer hover:text-primary transition-colors"
                            onClick={() => onViewProfile(tutor._id)}
                         >
-                           {tutor.userId.name}
+                           {typeof tutor.userId === "object" ? tutor.userId.name : ""}
                         </h3>
                         <div className="flex items-center text-muted-foreground text-sm mt-1">
                            <MapPin className="h-3.5 w-3.5 mr-1" />
-                           <span>{tutor.userId.address?.city || "N/A"}</span>
+                           <span>
+                              {typeof tutor.userId === "object" && tutor.userId.address?.city
+                                 ? tutor.userId.address.city
+                                 : "N/A"}
+                           </span>
                         </div>
                      </div>
                   </div>
@@ -80,21 +84,21 @@ export function TutorCard({ tutor }: TutorCardProps) {
                            key={i}
                            className={cn(
                               "h-4 w-4",
-                              i < Math.floor(tutor.ratings.average)
+                              tutor.ratings && i < Math.floor(tutor.ratings.average)
                                  ? "fill-yellow-400 text-yellow-400"
                                  : "text-gray-300"
                            )}
                         />
                      ))}
                      <span className="text-sm text-muted-foreground ml-1">
-                        ({tutor.ratings.totalReviews})
+                        ({tutor.ratings ? tutor.ratings.totalReviews : 0})
                      </span>
                   </div>
 
                   <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-full">
                      <Users className="h-3.5 w-3.5 text-primary" />
                      <span className="text-xs font-medium text-primary">
-                        {tutor.classType.join(", ")}
+                        {(tutor.classType?.join(", ")) || "N/A"}
                      </span>
                   </div>
                </div>
@@ -151,7 +155,7 @@ export function TutorCard({ tutor }: TutorCardProps) {
                      <span className="text-sm font-medium">Subjects</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                     {tutor.subjects.slice(0, 3).map((subject) => (
+                     {(tutor.subjects ?? []).slice(0, 3).map((subject) => (
                         <Badge
                            key={subject}
                            variant="secondary"
@@ -161,7 +165,7 @@ export function TutorCard({ tutor }: TutorCardProps) {
                         </Badge>
                      ))}
 
-                     {tutor.subjects.length > 3 && (
+                     {tutor.subjects && tutor.subjects.length > 3 && (
                         <Popover>
                            <PopoverTrigger asChild>
                               <Badge

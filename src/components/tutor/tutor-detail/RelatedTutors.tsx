@@ -59,15 +59,14 @@ export function RelatedTutors({
                         {[...Array(5)].map((_, i) => (
                            <Star
                               key={i}
-                              className={`w-3 h-3 ${
-                                 i < Math.floor(tutor.ratings.average)
-                                    ? "text-yellow-400 fill-yellow-400"
-                                    : "text-gray-300"
-                              }`}
+                              className={`w-3 h-3 ${i < Math.floor(tutor.ratings?.average)
+                                 ? "text-yellow-400 fill-yellow-400"
+                                 : "text-gray-300"
+                                 }`}
                            />
                         ))}
                         <span className="text-xs text-muted-foreground ml-1">
-                           ({tutor.ratings.totalReviews})
+                           ({tutor.ratings?.totalReviews ?? 0})
                         </span>
                      </div>
 
@@ -91,16 +90,17 @@ export function RelatedTutors({
                            Teaches:
                         </p>
                         <div className="flex flex-wrap gap-1">
-                           {tutor.subjects.slice(0, 2).map((subject, i) => (
-                              <Badge
-                                 key={i}
-                                 variant="secondary"
-                                 className="text-xs px-1.5 py-0.5"
-                              >
-                                 {subject}
-                              </Badge>
-                           ))}
-                           {tutor.subjects.length > 2 && (
+                           {Array.isArray(tutor.subjects) &&
+                              tutor.subjects.slice(0, 2).map((subject, i) => (
+                                 <Badge
+                                    key={i}
+                                    variant="secondary"
+                                    className="text-xs px-1.5 py-0.5"
+                                 >
+                                    {subject}
+                                 </Badge>
+                              ))}
+                           {Array.isArray(tutor.subjects) && tutor.subjects.length > 2 && (
                               <Popover>
                                  <PopoverTrigger asChild>
                                     <Button

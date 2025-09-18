@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import type { Tutor } from "@/types/tutorListandDetail";
+import type { Education, Tutor } from "@/types/tutorListandDetail";
 import { Check, GraduationCap } from "lucide-react";
 
 interface TutorEducationProps {
@@ -77,8 +77,8 @@ export function TutorEducation({ tutor }: TutorEducationProps) {
                      (edu.dateRange && typeof edu.dateRange === "object"
                         ? edu.dateRange.startDate
                         : typeof edu.dateRange === "string"
-                        ? edu.dateRange
-                        : undefined);
+                           ? edu.dateRange
+                           : undefined);
 
                   const endSource =
                      edu.endDate ??

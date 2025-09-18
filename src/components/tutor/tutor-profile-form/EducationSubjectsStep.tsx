@@ -110,7 +110,8 @@ export default function EducationSubjectsStep({ form, educationFields, subjectFi
                                 degree: "",
                                 institution: "",
                                 fieldOfStudy: "",
-                                dateRange: { startDate: "", endDate: "" },
+                                startDate: "",
+                                endDate: "",
                                 description: ""
                             })
                         }
