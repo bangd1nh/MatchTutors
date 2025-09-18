@@ -7,6 +7,7 @@ import ProfileForm from "@/components/user/ProfileForm";
 import StudentProfile from "@/pages/Student/StudentProfile";
 import CreateStudentProfile from "@/pages/Student/CreateStudentProfile";
 import IsCreatedProfileRoute from "./isCreatedProfileRoute";
+import FavoriteTutor from "@/pages/Student/FavoriteTutor";
 
 export const studentRoutes = {
    element: (
@@ -53,6 +54,14 @@ export const studentRoutes = {
          element: (
             <IsCreatedProfileRoute>
                <StudentProfile />
+            </IsCreatedProfileRoute>
+         ),
+      },
+      {
+         path: "/student/favorite",
+         element: (
+            <IsCreatedProfileRoute>
+               <FavoriteTutor />
             </IsCreatedProfileRoute>
          ),
       },

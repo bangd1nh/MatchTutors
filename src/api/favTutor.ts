@@ -24,3 +24,8 @@ export const deleteFavoriteTutor = async (tutorId: string) => {
    });
    return response.data;
 };
+
+export const fetchAllFavoriteTutor = async () => {
+   const response = await apiClient.get("/favorite/getMyFavoriteTutor");
+   return response.data;
+};

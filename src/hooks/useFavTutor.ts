@@ -1,6 +1,7 @@
 import {
    deleteFavoriteTutor,
    favoriteTutor,
+   fetchAllFavoriteTutor,
    fetchFavoriteTutor,
 } from "@/api/favTutor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -52,5 +53,12 @@ export const useRemoveFav = () => {
             "Đã xảy ra lỗi";
          toats("error", errMsg);
       },
+   });
+};
+
+export const useFetchAllFav = () => {
+   return useQuery({
+      queryKey: ["MYFAV"],
+      queryFn: () => fetchAllFavoriteTutor(),
    });
 };
