@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home, User, LayoutDashboard, BookOpen } from "lucide-react";
+import { LogOut, Home, User, LayoutDashboard, BookOpen, GraduationCap } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export type SidebarItem = {
@@ -23,9 +23,14 @@ export const adminSidebarConfig: SidebarItem[] = [
       icon: <User className="h-4 w-4" />,
    },
    {
-      to: "/ban-user",
-      label: "Ban users",
+      to: "/admin/tutors",
+      label: "Gia sư",
       icon: <BookOpen className="h-4 w-4" />,
+   },
+   {
+      to: "/admin/students",
+      label: "Học sinh",
+      icon: <GraduationCap className="h-4 w-4" />,
    },
    {
       to: "/profile/change-password",

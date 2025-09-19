@@ -3,14 +3,18 @@ import { Outlet } from "react-router-dom";
 
 const AdminLayout = () => {
    return (
-      <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
-         <div className="fixed top-0 left-0 h-full">
+      <div className="h-screen flex bg-gray-50 dark:bg-gray-950 overflow-hidden">
+         {/* Sidebar */}
+         <div className="w-64 flex-shrink-0">
             <AdminSidebar />
          </div>
-         <div className="flex-grow flex flex-col ml-64">
-            {/* Thêm ml-64 để tạo khoảng trống cho sidebar */}
-            <main className="flex-grow p-6">
-               <Outlet />
+         
+         {/* Main Content */}
+         <div className="flex-1 flex flex-col min-w-0">
+            <main className="flex-1 overflow-auto p-4 md:p-6">
+               <div className="max-w-full">
+                  <Outlet />
+               </div>
             </main>
          </div>
       </div>
