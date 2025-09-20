@@ -37,7 +37,7 @@ export function RelatedTutors({
                            <AvatarFallback className="text-sm">
                               {(tutor.fullName ?? "")
                                  .split(" ")
-                                 .map((n) => n[0])
+                                 .map((n: string) => n[0])
                                  .join("")}
                            </AvatarFallback>
                         </Avatar>
@@ -59,7 +59,7 @@ export function RelatedTutors({
                         {[...Array(5)].map((_, i) => (
                            <Star
                               key={i}
-                              className={`w-3 h-3 ${i < Math.floor(tutor.ratings?.average)
+                              className={`w-3 h-3 ${i < Math.floor(tutor.ratings?.average ?? 0)
                                  ? "text-yellow-400 fill-yellow-400"
                                  : "text-gray-300"
                                  }`}

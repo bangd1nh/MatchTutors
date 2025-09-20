@@ -1,5 +1,3 @@
-import { TimeSlot } from "./student"
-
 export interface Tutor {
     _id: string
     userId: string

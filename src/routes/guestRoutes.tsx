@@ -5,7 +5,6 @@ import LoginPage from "../pages/auth/LoginPage";
 import EditSession from "@/pages/EditSession";
 import TutorSearch from "@/pages/Tutor/TutorSearch";
 import TutorDetail from "@/pages/Tutor/TutorDetail";
-import TutorProfileForm from "@/pages/TutorProfile/TutorProfileForm";
 import ViewQuiz from "@/pages/Quiz/ViewQuiz";
 import RegisterPage from "@/pages/auth/RegisterPage";
 import VerifyEmailPage from "@/pages/auth/VerifyEmailPage";

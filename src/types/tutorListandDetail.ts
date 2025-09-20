@@ -27,6 +27,8 @@ export interface Certification {
    name?: string;
    description?: string;
    imageUrls?: string[];
+   newFiles?: File[];
+   tempId?: string;
 }
 
 export type TimeSlot = "PRE_12" | "MID_12_17" | "AFTER_17" | string;

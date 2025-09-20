@@ -13,7 +13,6 @@ import {
    TutorSubject,
 } from "@/components/tutor/tutor-detail";
 import { useTutorDetail, useTutors } from "@/hooks/useTutorListAndDetail";
-import tutorsData from "@/data/tutors.json";
 
 const TutorDetail: React.FC = () => {
    const { id } = useParams<{ id: string }>();
@@ -33,7 +32,7 @@ const TutorDetail: React.FC = () => {
 
    // fallback local
    const fallback =
-      !rawTutor && isError ? tutorsData.find((t) => t._id === id) : undefined;
+      !rawTutor && isError ? tutorsArray.find((t) => t._id === id) : undefined;
    if (!rawTutor && !fallback) {
       return (
          <div className="text-center text-red-500">
