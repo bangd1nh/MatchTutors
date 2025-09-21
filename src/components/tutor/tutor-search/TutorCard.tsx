@@ -1,9 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, MapPin, Clock, Heart, User, Users, Award } from "lucide-react";
+import {
+   Star,
+   MapPin,
+   Clock,
+   Heart,
+   User,
+   Users,
+   Award,
+   Loader2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Tutor } from "@/types/tutorListandDetail";
 import { useNavigate } from "react-router-dom";
@@ -12,16 +21,62 @@ import {
    PopoverTrigger,
    PopoverContent,
 } from "@/components/ui/popover";
+import { useAddFav, useFetchFav, useRemoveFav } from "@/hooks/useFavTutor";
+import { useUser } from "@/hooks/useUser";
+import { useToast } from "@/hooks/useToast";
 
 interface TutorCardProps {
    tutor: Tutor;
 }
 
 export function TutorCard({ tutor }: TutorCardProps) {
-   const [isSaved, setIsSaved] = useState(false);
+   const { isAuthenticated } = useUser();
+   const toast = useToast();
+   const {
+      data: isFav,
+      isLoading,
+      isError,
+   } = isAuthenticated
+      ? useFetchFav(tutor._id)
+      : { data: undefined, isLoading: false, isError: false };
+
+   // Chỉ gọi các hook fav khi đã đăng nhập
+   const addFav = isAuthenticated ? useAddFav() : undefined;
+   const deleteFav = isAuthenticated ? useRemoveFav() : undefined;
+
+   const handleFav = (tutorId: string) => {
+      if (!isAuthenticated) {
+         // Có thể chuyển hướng sang login hoặc show toast
+         toast("warning", "Please login to favorite this tutor");
+         return;
+      }
+      if (isFav?.isFav) {
+         deleteFav?.mutate(tutorId);
+      } else {
+         addFav?.mutate(tutorId);
+      }
+   };
+
+   const [isSaved, setIsSaved] = useState(isFav?.isFav);
    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
    const availableDays = (tutor.availability?.map((a) => a.dayOfWeek)) ?? [];
    const navigate = useNavigate();
+
+   if (isLoading) {
+      return (
+         <div className="flex justify-center items-center p-10">
+            <Loader2 className="h-8 w-8 animate-spin text-sky-600" />
+         </div>
+      );
+   }
+
+   if (isError) {
+      return (
+         <div className="text-center text-red-500 p-10">
+            Không thể tải hồ sơ học sinh.
+         </div>
+      );
+   }
 
    function onViewProfile(_id: string): void {
       navigate(`/tutor-detail/${_id}`);
@@ -64,13 +119,15 @@ export function TutorCard({ tutor }: TutorCardProps) {
                   <Button
                      variant="ghost"
                      size="icon"
-                     onClick={() => setIsSaved(!isSaved)}
+                     onClick={() => handleFav(tutor._id)}
                      className="h-8 w-8 rounded-full"
                   >
                      <Heart
                         className={cn(
                            "h-4 w-4",
-                           isSaved && "fill-red-500 text-red-500"
+                           isFav?.isFav === true && isFav?.tutorId === tutor._id
+                              ? "fill-red-500 text-red-500"
+                              : ""
                         )}
                      />
                   </Button>
