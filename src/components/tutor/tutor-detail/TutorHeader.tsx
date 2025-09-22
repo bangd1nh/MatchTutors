@@ -31,21 +31,29 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                   <Avatar className="w-32 h-32 mb-4">
                      <AvatarImage
                         src={tutor.avatarUrl || "/placeholder.svg"}
-                        alt={tutor.fullName}
+                        alt={
+                           typeof tutor.userId === "object"
+                              ? tutor.userId.name
+                              : tutor.fullName || "N/A"
+                        }
                      />
                      <AvatarFallback className="text-2xl">
-                        {(tutor.fullName ?? "N/A")
+                        {(typeof tutor.userId === "object"
+                           ? tutor.userId.name
+                           : tutor.fullName || "N/A"
+                        )
                            .split(" ")
-                           .map((n) => n[0])
+                           .map((n: string) => n[0])
                            .join("")}
                      </AvatarFallback>
                   </Avatar>
                   <div className="text-center md:text-left">
                      <div className="flex items-center gap-1 mb-2">
-                        {[...Array(5)].map((_, i) => (
+                        {[...Array(5)].map((_, i: number) => (
                            <Star
                               key={i}
                               className={`w-4 h-4 ${
+                                 tutor.ratings &&
                                  i < Math.floor(tutor.ratings.average)
                                     ? "fill-yellow-400 text-yellow-400"
                                     : "text-gray-300"
@@ -53,8 +61,8 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                            />
                         ))}
                         <span className="ml-2 text-sm text-muted-foreground">
-                           {tutor.ratings.average} ({tutor.ratings.totalReviews}{" "}
-                           reviews)
+                           {tutor.ratings?.average ?? "-"} (
+                           {tutor.ratings?.totalReviews ?? 0} reviews)
                         </span>
                      </div>
                   </div>
@@ -90,11 +98,13 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                         <Globe className="w-4 h-4 text-muted-foreground" />
                         <span className="text-sm">Languages I know:</span>
                      </div>
-                     {tutor.languages.slice(0, 3).map((lang, index) => (
-                        <Badge key={index} variant="secondary">
-                           {lang}
-                        </Badge>
-                     ))}
+                     {tutor.languages
+                        .slice(0, 3)
+                        .map((lang: string, index: number) => (
+                           <Badge key={index} variant="secondary">
+                              {lang}
+                           </Badge>
+                        ))}
                      {tutor.languages.length > 3 && (
                         <Popover>
                            <PopoverTrigger asChild>
@@ -110,7 +120,7 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                               <div className="space-y-2">
                                  {tutor.languages
                                     .slice(3)
-                                    .map((lang, index) => (
+                                    .map((lang: string, index: number) => (
                                        <Badge
                                           key={index}
                                           variant="secondary"

@@ -1,9 +1,8 @@
 import type React from "react";
 import type { Tutor } from "@/types/tutorListandDetail";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import {
-   RelatedTutors,
    TutorAvailability,
    TutorCertification,
    TutorContactCard,
@@ -13,13 +12,11 @@ import {
    TutorSubject,
 } from "@/components/tutor/tutor-detail";
 import { useTutorDetail } from "@/hooks/useTutorListAndDetail";
-import tutorsData from "@/data/tutors.json";
 
 const TutorDetail: React.FC = () => {
    const { id } = useParams<{ id: string }>();
-   const navigate = useNavigate();
 
-   const { data: rawTutor, isLoading, isError } = useTutorDetail(id ?? null);
+   const { data: rawTutor, isLoading } = useTutorDetail(id ?? null);
 
    if (isLoading) {
       return (
@@ -29,10 +26,7 @@ const TutorDetail: React.FC = () => {
       );
    }
 
-   // fallback local
-   const fallback =
-      !rawTutor && isError ? tutorsData.find((t) => t._id === id) : undefined;
-   if (!rawTutor && !fallback) {
+   if (!rawTutor) {
       return (
          <div className="text-center text-red-500">
             Không thể tải thông tin gia sư.
@@ -40,7 +34,7 @@ const TutorDetail: React.FC = () => {
       );
    }
 
-   const source: any = rawTutor ?? fallback;
+   const source: any = rawTutor;
 
    // helper
    const userObj =
@@ -128,43 +122,6 @@ const TutorDetail: React.FC = () => {
          : [],
    };
 
-   // Related tutors: reuse local dataset to compute recommendations (safe access)
-   const getRelatedTutors = () => {
-      const currentSubjects = normalizedTutor.subjects || [];
-      const currentCity =
-         (normalizedTutor.address && normalizedTutor.address.city) ||
-         (normalizedTutor.userId as any)?.address?.city ||
-         "";
-
-      return tutorsData
-         .filter((t) => t._id !== normalizedTutor._id)
-         .map((t) => {
-            let score = 0;
-            const tSubjects = t.subjects || [];
-            const shared = currentSubjects.filter((s) =>
-               tSubjects.includes(s)
-            ).length;
-            score += shared * 3;
-            const tCity = (t.address && t.address.city) || "";
-            if (tCity && tCity === currentCity) score += 2;
-            const rDiff = Math.abs(
-               (normalizedTutor.ratings?.average ?? 0) -
-                  (t.ratings?.average ?? 0)
-            );
-            if (rDiff <= 0.5) score += 1;
-            return { ...t, score };
-         })
-         .filter((x) => x.score > 0)
-         .sort((a, b) => b.score - a.score)
-         .slice(0, 3) as Tutor[];
-   };
-
-   const relatedTutors = getRelatedTutors();
-
-   function onViewProfile(_id: string): void {
-      navigate(`/tutor-detail/${_id}`);
-   }
-
    return (
       <div className="max-w-7xl mx-auto p-6 space-y-6">
          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -175,12 +132,6 @@ const TutorDetail: React.FC = () => {
                <TutorEducation tutor={normalizedTutor} />
                <TutorSubject tutor={normalizedTutor} />
                <TutorAvailability tutor={normalizedTutor} />
-               {relatedTutors.length > 0 && (
-                  <RelatedTutors
-                     relatedTutors={relatedTutors}
-                     onViewProfile={onViewProfile}
-                  />
-               )}
             </div>
 
             <div className="lg:col-span-4 space-y-6">

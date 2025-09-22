@@ -160,7 +160,7 @@ export function Pagination({
          </div>
 
          {/* Quick jump only (no textual "Trang X / Y") */}
-         <div className="flex items-center gap-3 text-sm text-muted-foreground">
+         {/* <div className="flex items-center gap-3 text-sm text-muted-foreground">
             {showQuickJump && totalPages > 1 && (
                <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
                   <PopoverTrigger asChild>
@@ -194,7 +194,7 @@ export function Pagination({
                   </PopoverContent>
                </Popover>
             )}
-         </div>
+         </div> */}
       </nav>
    );
 }
