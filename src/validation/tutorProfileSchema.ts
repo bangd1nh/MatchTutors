@@ -20,15 +20,15 @@ const addressSchema = z.object({
 const educationSchema = z.object({
     institution: z.string().min(1, "Institution is required").max(70, "Institution name too long"),
     degree: z.string().min(1, "Degree is required").max(50, "Degree name too long"),
-    fieldOfStudy: z.string().max(50, "Field of study too long").optional(),
+    fieldOfStudy: z.string().max(50, "Field of study too long").min(1, "Field of study is required"),
     startDate: z.string().min(1, "Start date is required"),
     endDate: z.string().optional(),
-    description: z.string().max(500, "Description too long").optional(),
+    description: z.string().max(500, "Description too long").min(10, "Description must be at least 10 characters"),
 });
 
 const certificationSchema = z.object({
     name: z.string().min(1, "Certification name is required").max(100, "Name too long"),
-    description: z.string().max(300, "Description too long").optional(),
+    description: z.string().max(300, "Description too long").min(10, "Description must be at least 10 characters"),
     imageUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
 });
 
@@ -68,7 +68,7 @@ export const tutorProfileFormSchema = z.object({
         .default(0),
     hourlyRate: z.number()
         .min(0, "Hourly rate cannot be negative")
-        .max(1000, "Hourly rate seems too high")
+        .max(2000000, "Hourly rate seems too high")
         .default(0),
     bio: z.string()
         .min(50, "Bio must be at least 50 characters")

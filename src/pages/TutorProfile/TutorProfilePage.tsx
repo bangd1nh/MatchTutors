@@ -429,8 +429,8 @@ export default function TutorProfile() {
 
     if (showForm) {
         return (
-            <div className="min-h-screen bg-gray-50 p-4">
-                <div className="max-w-5xl mx-auto">
+            <div className="w-full h-screen bg-gray-50">
+                <div className="w-full h-full">
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h1 className="text-2xl font-bold text-gray-900">{tutor ? "Edit Profile" : "Create Tutor Profile"}</h1>
@@ -459,7 +459,7 @@ export default function TutorProfile() {
                         {/* Personal Information */}
                         <Card className="lg:col-span-2">
                             <CardHeader>
-                                <CardTitle>Personal Information</CardTitle>
+                                <CardTitle>Personal Information *</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <PersonalInfoForm
@@ -556,7 +556,7 @@ export default function TutorProfile() {
                         <Card className="lg:col-span-3">
                             <CardHeader>
                                 <CardTitle className="flex items-center justify-between">
-                                    Certifications
+                                    Certifications *
                                     <Button onClick={addCertification} size="sm" variant="outline">
                                         <Plus className="w-4 h-4 mr-2" />
                                         Add Certification
@@ -586,7 +586,7 @@ export default function TutorProfile() {
                                                 <ValidationError message={getError(`certifications.${index}.name`)} />
                                             </div>
                                             <div>
-                                                <Label htmlFor={`certifications.${index}.description`}>Description</Label>
+                                                <Label htmlFor={`certifications.${index}.description`}>Description *</Label>
                                                 <Textarea
                                                     id={`certifications.${index}.description`}
                                                     name={`certifications.${index}.description`}
@@ -699,7 +699,7 @@ export default function TutorProfile() {
                         {/* Address */}
                         <Card className="lg:col-span-3">
                             <CardHeader>
-                                <CardTitle>Address</CardTitle>
+                                <CardTitle>Address *</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

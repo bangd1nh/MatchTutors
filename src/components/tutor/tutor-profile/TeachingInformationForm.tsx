@@ -24,7 +24,7 @@ export const TeachingInformationForm: React.FC<TeachingInformationFormProps> = (
     return (
         <Card className="lg:col-span-3">
             <CardHeader>
-                <CardTitle>Teaching Information</CardTitle>
+                <CardTitle>Teaching Information *</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -48,7 +48,7 @@ export const TeachingInformationForm: React.FC<TeachingInformationFormProps> = (
 
                     {/* Hourly Rate */}
                     <div>
-                        <Label htmlFor="hourlyRate">Hourly Rate ($) *</Label>
+                        <Label htmlFor="hourlyRate">Hourly Rate (vnd) *</Label>
                         <Input
                             id="hourlyRate"
                             name="hourlyRate"

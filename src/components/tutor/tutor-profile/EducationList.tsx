@@ -14,7 +14,7 @@ export function EducationList({ education }: EducationListProps) {
                     <p className="text-gray-600">{edu.institution}</p>
                     {edu.fieldOfStudy && <p className="text-sm text-gray-500">{edu.fieldOfStudy}</p>}
                     <p className="text-sm text-gray-500">
-                        {edu.startDate} - {edu.endDate}
+                        {edu.startDate.substring(0, 7)} - {edu.endDate.substring(0, 7)}
                     </p>
                     <p className="text-sm mt-2">{edu.description}</p>
                 </div>

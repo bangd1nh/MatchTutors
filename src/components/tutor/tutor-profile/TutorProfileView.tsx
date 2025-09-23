@@ -17,8 +17,8 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4">
-            <div className="max-w-4xl mx-auto">
+        <div className="min-h-screen bg-gray-50">
+            <div className="w-full h-full mx-auto">
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">Tutor Profile</h1>
