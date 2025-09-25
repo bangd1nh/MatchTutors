@@ -1,7 +1,15 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home, User, LayoutDashboard, BookOpen } from "lucide-react";
+import {
+   LogOut,
+   Home,
+   User,
+   LayoutDashboard,
+   BookOpen,
+   BookPlus,
+   BookCopy,
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export type SidebarItem = {
@@ -26,6 +34,16 @@ export const tutorSidebarConfig: SidebarItem[] = [
       to: "/student/applications",
       label: "Lớp học của tôi",
       icon: <BookOpen className="h-4 w-4" />,
+   },
+   {
+      to: "/tutor/createFlashcardQuiz",
+      label: "Tạo bộ câu hỏi Flashcard",
+      icon: <BookPlus className="h-4 w-4" />,
+   },
+   {
+      to: "/tutor/flashcardList",
+      label: "Xem bộ câu hỏi Flashcard",
+      icon: <BookCopy className="h-4 w-4" />,
    },
 
    // Thêm các mục khác ở đây

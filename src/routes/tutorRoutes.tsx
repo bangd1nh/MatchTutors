@@ -4,6 +4,9 @@ import JobManage from "@/pages/Employer/JobManage";
 import ProfilePage from "@/pages/Profilepage";
 import TutorProfile from "@/pages/TutorProfile/TutorProfile";
 import TutorLayout from "@/layouts/TutorLayout";
+import CreateFlashcardQuiz from "@/pages/Flashcard/CreateFlashcardQuiz";
+import FlashcardQuizList from "@/pages/Flashcard/FlashcardQuizList";
+import ViewFlashcardQuizQuestion from "@/pages/Flashcard/ViewFlashcardQuizQuestion";
 
 export const tutorRoutes = {
    element: (
@@ -18,6 +21,18 @@ export const tutorRoutes = {
       {
          path: "/tutor/jobs",
          element: <JobManage />,
+      },
+      {
+         path: "/tutor/createFlashcardQuiz",
+         element: <CreateFlashcardQuiz />,
+      },
+      {
+         path: "/tutor/flashcardList",
+         element: <FlashcardQuizList />,
+      },
+      {
+         path: "/tutor/flashcard",
+         element: <ViewFlashcardQuizQuestion />,
       },
    ],
 };
