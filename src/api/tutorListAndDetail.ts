@@ -1,6 +1,48 @@
 import apiClient from "@/lib/api";
 import type { TutorsApiResponse, Tutor } from "@/types/tutorListandDetail";
 
+interface SearchTutorsParams {
+   keyword?: string;
+   subjects?: string[];
+   levels?: string[];
+   city?: string;
+   minRate?: number;
+   maxRate?: number;
+   minExperience?: number;
+   maxExperience?: number;
+   classType?: string[];
+   availability?: {
+      dayOfWeek?: number;
+      slots?: string[];
+   };
+   minRating?: number;
+   maxRating?: number;
+   page?: number;
+   limit?: number;
+}
+
+/**
+ * Search tutors with filters & pagination
+ */
+export const searchTutors = async (
+   params: SearchTutorsParams = {}
+): Promise<TutorsApiResponse> => {
+   const response = await apiClient.get("/tutor/search", {
+      params: {
+         ...params,
+         subjects: params.subjects?.join(","),
+         levels: params.levels?.join(","),
+         classType: params.classType?.join(","),
+         availability: params.availability
+            ? JSON.stringify(params.availability)
+            : undefined,
+      },
+   });
+
+   const payload = response.data?.data ?? response.data;
+   return payload?.data ? payload : payload;
+};
+
 interface GetTutorsParams {
    page?: number;
    limit?: number;

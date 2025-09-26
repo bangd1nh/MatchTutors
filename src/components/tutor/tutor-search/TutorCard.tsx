@@ -37,8 +37,8 @@ export function TutorCard({ tutor }: TutorCardProps) {
       isLoading,
       isError,
    } = isAuthenticated
-      ? useFetchFav(tutor._id)
-      : { data: undefined, isLoading: false, isError: false };
+         ? useFetchFav(tutor._id)
+         : { data: undefined, isLoading: false, isError: false };
 
    // Chỉ gọi các hook fav khi đã đăng nhập
    const addFav = isAuthenticated ? useAddFav() : undefined;
@@ -59,7 +59,9 @@ export function TutorCard({ tutor }: TutorCardProps) {
 
    const [isSaved, setIsSaved] = useState(isFav?.isFav);
    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-   const availableDays = (tutor.availability ?? []).map((a) => a.dayOfWeek);
+   const availableDays = (tutor.availability ?? [])
+      .filter((a) => a.slots && a.slots.length > 0) // only days with slots
+      .map((a) => a.dayOfWeek);
    const navigate = useNavigate();
 
    const tutorUser: TutorUser =
@@ -243,9 +245,13 @@ export function TutorCard({ tutor }: TutorCardProps) {
                   </div>
                </div>
                {/* Bio */}
-               <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                  {tutor.bio}
-               </p>
+               <div className="h-20 overflow-y-auto pr-2 border rounded-md p-2 bg-gray-50">
+                  <div
+                     className=" text-gray-700 max-w-full break-words"
+                     style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+                     dangerouslySetInnerHTML={{ __html: tutor.bio || "" }}
+                  />
+               </div>
             </div>
          </CardContent>
 

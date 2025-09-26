@@ -1,6 +1,34 @@
 import { useQuery } from "@tanstack/react-query";
-import { getTutors, getTutorById } from "@/api/tutorListAndDetail";
+import { getTutors, getTutorById, searchTutors } from "@/api/tutorListAndDetail";
 import type { TutorsApiResponse, Tutor } from "@/types/tutorListandDetail";
+
+interface UseSearchTutorsOptions {
+   keyword?: string;
+   subjects?: string[];
+   levels?: string[];
+   city?: string;
+   minRate?: number;
+   maxRate?: number;
+   minExperience?: number;
+   maxExperience?: number;
+   classType?: string[];
+   availability?: {
+      dayOfWeek?: number;
+      slots?: string[];
+   };
+   minRating?: number;
+   maxRating?: number;
+   page?: number;
+   limit?: number;
+}
+
+export const useSearchTutors = (filters: UseSearchTutorsOptions = {}) => {
+   return useQuery<TutorsApiResponse>({
+      queryKey: ["searchTutors", filters],
+      queryFn: () => searchTutors(filters),
+      staleTime: 1000 * 60 * 5,
+   });
+};
 
 interface UseTutorsOptions {
    page?: number;
