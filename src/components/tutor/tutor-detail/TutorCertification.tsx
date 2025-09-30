@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/dialog";
 import { Tutor, Certification } from "@/types/tutorListandDetail";
 import { Award, Image as ImageIcon, ZoomIn } from "lucide-react";
-import { useState } from "react";
 
 interface TutorCertificationProps {
    tutor: Tutor;
@@ -16,8 +15,6 @@ interface TutorCertificationProps {
 
 // Component con để hiển thị một chứng chỉ
 const CertificationCard = ({ cert }: { cert: Certification }) => {
-   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
    const imageUrls = cert.imageUrls || [];
 
    return (

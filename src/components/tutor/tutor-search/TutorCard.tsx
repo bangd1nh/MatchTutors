@@ -1,18 +1,8 @@
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-   Star,
-   MapPin,
-   Clock,
-   Heart,
-   User,
-   Users,
-   Award,
-   Loader2,
-} from "lucide-react";
+import { Star, MapPin, Clock, Heart, User, Users, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Tutor, TutorUser } from "@/types/tutorListandDetail";
 import { useNavigate } from "react-router-dom";
@@ -32,13 +22,9 @@ interface TutorCardProps {
 export function TutorCard({ tutor }: TutorCardProps) {
    const { isAuthenticated } = useUser();
    const toast = useToast();
-   const {
-      data: isFav,
-      isLoading,
-      isError,
-   } = isAuthenticated
+   const { data: isFav } = isAuthenticated
       ? useFetchFav(tutor._id)
-      : { data: undefined, isLoading: false, isError: false };
+      : { data: undefined };
 
    // Chỉ gọi các hook fav khi đã đăng nhập
    const addFav = isAuthenticated ? useAddFav() : undefined;
@@ -57,7 +43,7 @@ export function TutorCard({ tutor }: TutorCardProps) {
       }
    };
 
-   const [isSaved, setIsSaved] = useState(isFav?.isFav);
+   // const [isSaved, setIsSaved] = useState(isFav?.isFav);
    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
    const availableDays = (tutor.availability ?? []).map((a) => a.dayOfWeek);
    const navigate = useNavigate();

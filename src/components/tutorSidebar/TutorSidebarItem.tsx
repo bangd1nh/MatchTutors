@@ -1,7 +1,14 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home, User, LayoutDashboard, BookOpen } from "lucide-react";
+import {
+   LogOut,
+   Home,
+   User,
+   LayoutDashboard,
+   Calendar, // Thêm icon Calendar
+   BookHeart, // Thêm icon BookHeart
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export type SidebarItem = {
@@ -13,7 +20,7 @@ export type SidebarItem = {
 
 export const tutorSidebarConfig: SidebarItem[] = [
    {
-      to: "/student/dashboard",
+      to: "/tutor/dashboard",
       label: "Bảng điều khiển",
       icon: <LayoutDashboard className="h-4 w-4" />,
    },
@@ -23,12 +30,15 @@ export const tutorSidebarConfig: SidebarItem[] = [
       icon: <User className="h-4 w-4" />,
    },
    {
-      to: "/student/applications",
-      label: "Lớp học của tôi",
-      icon: <BookOpen className="h-4 w-4" />,
+      to: "/tutor/teaching-requests",
+      label: "Yêu cầu dạy học",
+      icon: <BookHeart className="h-4 w-4" />,
    },
-
-   // Thêm các mục khác ở đây
+   {
+      to: "/tutor/schedule",
+      label: "Lịch dạy",
+      icon: <Calendar className="h-4 w-4" />,
+   },
 ];
 
 const TutorSidebarItems: React.FC<{

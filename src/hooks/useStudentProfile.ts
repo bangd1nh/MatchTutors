@@ -43,7 +43,7 @@ export const useCreateStudentProfile = () => {
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: ["studentProfile"] });
          addToast("success", "Tạo hồ sơ thành công!");
-         navigate("/student/profile");
+         navigate("/student/student-profile");
       },
       onError: (error: any) => {
          addToast("error", error.data.message || "Tạo hồ sơ thất bại!");

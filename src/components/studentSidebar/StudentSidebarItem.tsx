@@ -8,6 +8,7 @@ import {
    LayoutDashboard,
    BookOpen,
    Heart,
+   Calendar, // Thêm icon Calendar
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -35,16 +36,15 @@ export const studentSidebarConfig: SidebarItem[] = [
       icon: <BookOpen className="h-4 w-4" />,
    },
    {
-      to: "/student/applications",
-      label: "Lớp học của họ ",
-      icon: <BookOpen className="h-4 w-4" />,
+      to: "/student/schedule",
+      label: "Lịch học",
+      icon: <Calendar className="h-4 w-4" />,
    },
    {
       to: "/student/favorite",
-      label: "Danh sách yêu thích ",
+      label: "Gia sư yêu thích",
       icon: <Heart className="h-4 w-4" />,
    },
-   // Thêm các mục khác ở đây
 ];
 
 const StudentSidebarItems: React.FC<{

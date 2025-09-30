@@ -1,13 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-   Popover,
-   PopoverContent,
-   PopoverTrigger,
-} from "@/components/ui/popover";
-import { useState, KeyboardEvent } from "react";
 
 interface PaginationProps {
    currentPage: number;
@@ -15,7 +7,6 @@ interface PaginationProps {
    onPageChange: (page: number) => void;
    maxVisiblePages?: number;
    className?: string;
-   showQuickJump?: boolean;
 }
 
 export function Pagination({
@@ -24,11 +15,7 @@ export function Pagination({
    onPageChange,
    maxVisiblePages = 5,
    className = "",
-   showQuickJump = true,
 }: PaginationProps) {
-   const [quickJumpPage, setQuickJumpPage] = useState("");
-   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-
    const clamp = (n: number) => Math.max(1, Math.min(totalPages, n));
 
    const prev = () => onPageChange(clamp(currentPage - 1));
@@ -53,20 +40,6 @@ export function Pagination({
    };
 
    const pageRange = getPageRange();
-
-   const handleQuickJump = () => {
-      const pageNum = parseInt(quickJumpPage);
-      if (!Number.isNaN(pageNum)) {
-         const p = clamp(pageNum);
-         onPageChange(p);
-         setIsPopoverOpen(false);
-      }
-      setQuickJumpPage("");
-   };
-
-   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter") handleQuickJump();
-   };
 
    return (
       <nav
@@ -158,43 +131,6 @@ export function Pagination({
                <ChevronRight className="h-5 w-5" />
             </Button>
          </div>
-
-         {/* Quick jump only (no textual "Trang X / Y") */}
-         {/* <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            {showQuickJump && totalPages > 1 && (
-               <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-                  <PopoverTrigger asChild>
-                     <button className="px-3 py-1 rounded-full border text-primary hover:bg-primary/10">
-                        Nhảy tới...
-                     </button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-64 p-4">
-                     <Label htmlFor="quickJump" className="text-sm font-medium">
-                        Đến trang (1-{totalPages})
-                     </Label>
-                     <div className="mt-2 flex items-center gap-2">
-                        <Input
-                           id="quickJump"
-                           type="number"
-                           min={1}
-                           max={totalPages}
-                           value={quickJumpPage}
-                           onChange={(e) => setQuickJumpPage(e.target.value)}
-                           onKeyDown={handleKeyDown}
-                           placeholder={`1-${totalPages}`}
-                           className="w-24"
-                        />
-                        <Button
-                           onClick={handleQuickJump}
-                           className="rounded-full"
-                        >
-                           Đi
-                        </Button>
-                     </div>
-                  </PopoverContent>
-               </Popover>
-            )}
-         </div> */}
       </nav>
    );
 }
