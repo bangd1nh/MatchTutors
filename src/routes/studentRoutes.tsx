@@ -7,6 +7,7 @@ import ProfileForm from "@/components/user/ProfileForm";
 import StudentProfile from "@/pages/Student/StudentProfile";
 import CreateStudentProfile from "@/pages/Student/CreateStudentProfile";
 import IsCreatedProfileRoute from "./isCreatedProfileRoute";
+import ViewFlashcardQuizQuestion from "@/pages/Flashcard/ViewFlashcardQuizQuestion";
 import FavoriteTutor from "@/pages/Student/FavoriteTutor";
 
 export const studentRoutes = {
@@ -54,6 +55,14 @@ export const studentRoutes = {
          element: (
             <IsCreatedProfileRoute>
                <StudentProfile />
+            </IsCreatedProfileRoute>
+         ),
+      },
+      {
+         path: "/student/viewQuiz",
+         element: (
+            <IsCreatedProfileRoute>
+               <ViewFlashcardQuizQuestion />
             </IsCreatedProfileRoute>
          ),
       },
