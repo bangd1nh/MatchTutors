@@ -109,7 +109,7 @@ export function EducationForm({
 
                             {/* Field of Study */}
                             <div>
-                                <Label>Field of Study</Label>
+                                <Label>Field of Study *</Label>
                                 <Input
                                     placeholder="Field of Study"
                                     id={`education.${index}.fieldOfStudy`}
@@ -171,7 +171,7 @@ export function EducationForm({
 
                         {/* Description */}
                         <div>
-                            <Label>Description</Label>
+                            <Label>Description *</Label>
                             <Textarea
                                 placeholder="Description"
                                 id={`education.${index}.description`}

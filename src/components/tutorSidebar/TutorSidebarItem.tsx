@@ -8,6 +8,8 @@ import {
    LayoutDashboard,
    Calendar, // Thêm icon Calendar
    BookHeart, // Thêm icon BookHeart
+   BookPlus,
+   BookCopy,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -39,6 +41,18 @@ export const tutorSidebarConfig: SidebarItem[] = [
       label: "Lịch dạy",
       icon: <Calendar className="h-4 w-4" />,
    },
+   {
+      to: "/tutor/createFlashcardQuiz",
+      label: "Tạo bộ câu hỏi Flashcard",
+      icon: <BookPlus className="h-4 w-4" />,
+   },
+   {
+      to: "/tutor/flashcardList",
+      label: "Xem bộ câu hỏi Flashcard",
+      icon: <BookCopy className="h-4 w-4" />,
+   },
+
+   // Thêm các mục khác ở đây
 ];
 
 const TutorSidebarItems: React.FC<{
