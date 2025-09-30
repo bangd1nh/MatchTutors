@@ -1,27 +1,71 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, MapPin, Clock, Heart, User, Users, Award } from "lucide-react";
+import {
+   Star,
+   MapPin,
+   Clock,
+   Heart,
+   User,
+   Users,
+   Award,
+   Loader2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Tutor } from "@/types/tutorListandDetail";
+import type { Tutor, TutorUser } from "@/types/tutorListandDetail";
 import { useNavigate } from "react-router-dom";
 import {
    Popover,
    PopoverTrigger,
    PopoverContent,
 } from "@/components/ui/popover";
+import { useAddFav, useFetchFav, useRemoveFav } from "@/hooks/useFavTutor";
+import { useUser } from "@/hooks/useUser";
+import { useToast } from "@/hooks/useToast";
 
 interface TutorCardProps {
    tutor: Tutor;
 }
 
 export function TutorCard({ tutor }: TutorCardProps) {
-   const [isSaved, setIsSaved] = useState(false);
+   const { isAuthenticated } = useUser();
+   const toast = useToast();
+   const {
+      data: isFav,
+      isLoading,
+      isError,
+   } = isAuthenticated
+      ? useFetchFav(tutor._id)
+      : { data: undefined, isLoading: false, isError: false };
+
+   // Chỉ gọi các hook fav khi đã đăng nhập
+   const addFav = isAuthenticated ? useAddFav() : undefined;
+   const deleteFav = isAuthenticated ? useRemoveFav() : undefined;
+
+   const handleFav = (tutorId: string) => {
+      if (!isAuthenticated) {
+         // Có thể chuyển hướng sang login hoặc show toast
+         toast("warning", "Please login to favorite this tutor");
+         return;
+      }
+      if (isFav?.isFav) {
+         deleteFav?.mutate(tutorId);
+      } else {
+         addFav?.mutate(tutorId);
+      }
+   };
+
+   const [isSaved, setIsSaved] = useState(isFav?.isFav);
    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-   const availableDays = tutor.availability.map((a) => a.dayOfWeek);
+   const availableDays = (tutor.availability ?? []).map((a) => a.dayOfWeek);
    const navigate = useNavigate();
+
+   const tutorUser: TutorUser =
+      typeof tutor.userId === "string"
+         ? { _id: tutor.userId, name: "Unknown Tutor" }
+         : tutor.userId;
 
    function onViewProfile(_id: string): void {
       navigate(`/tutor-detail/${_id}`);
@@ -36,8 +80,8 @@ export function TutorCard({ tutor }: TutorCardProps) {
                   <div className="flex items-center gap-3">
                      <Avatar className="h-14 w-14 border-2 border-primary/10">
                         <AvatarImage
-                           src={tutor.userId.avatarUrl || "/placeholder.svg"}
-                           alt={tutor.userId.name}
+                           src={tutorUser.avatarUrl || "/placeholder.svg"}
+                           alt={tutorUser.name}
                         />
                         <AvatarFallback className="bg-primary/10">
                            <User className="h-6 w-6 text-primary" />
@@ -48,11 +92,11 @@ export function TutorCard({ tutor }: TutorCardProps) {
                            className="text-lg font-semibold cursor-pointer hover:text-primary transition-colors"
                            onClick={() => onViewProfile(tutor._id)}
                         >
-                           {tutor.userId.name}
+                           {tutorUser.name}
                         </h3>
                         <div className="flex items-center text-muted-foreground text-sm mt-1">
                            <MapPin className="h-3.5 w-3.5 mr-1" />
-                           <span>{tutor.userId.address?.city || "N/A"}</span>
+                           <span>{tutorUser.address?.city || "N/A"}</span>
                         </div>
                      </div>
                   </div>
@@ -60,13 +104,15 @@ export function TutorCard({ tutor }: TutorCardProps) {
                   <Button
                      variant="ghost"
                      size="icon"
-                     onClick={() => setIsSaved(!isSaved)}
+                     onClick={() => handleFav(tutor._id)}
                      className="h-8 w-8 rounded-full"
                   >
                      <Heart
                         className={cn(
                            "h-4 w-4",
-                           isSaved && "fill-red-500 text-red-500"
+                           isFav?.isFav === true && isFav?.tutorId === tutor._id
+                              ? "fill-red-500 text-red-500"
+                              : ""
                         )}
                      />
                   </Button>
@@ -80,21 +126,24 @@ export function TutorCard({ tutor }: TutorCardProps) {
                            key={i}
                            className={cn(
                               "h-4 w-4",
-                              i < Math.floor(tutor.ratings.average)
+                              tutor.ratings &&
+                                 i < Math.floor(tutor.ratings.average)
                                  ? "fill-yellow-400 text-yellow-400"
                                  : "text-gray-300"
                            )}
                         />
                      ))}
                      <span className="text-sm text-muted-foreground ml-1">
-                        ({tutor.ratings.totalReviews})
+                        ({tutor.ratings?.totalReviews ?? 0})
                      </span>
                   </div>
 
                   <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-full">
                      <Users className="h-3.5 w-3.5 text-primary" />
                      <span className="text-xs font-medium text-primary">
-                        {tutor.classType.join(", ")}
+                        {Array.isArray(tutor.classType)
+                           ? tutor.classType.join(", ")
+                           : tutor.classType ?? ""}
                      </span>
                   </div>
                </div>
@@ -151,7 +200,7 @@ export function TutorCard({ tutor }: TutorCardProps) {
                      <span className="text-sm font-medium">Subjects</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                     {tutor.subjects.slice(0, 3).map((subject) => (
+                     {(tutor.subjects ?? []).slice(0, 3).map((subject) => (
                         <Badge
                            key={subject}
                            variant="secondary"
@@ -161,14 +210,14 @@ export function TutorCard({ tutor }: TutorCardProps) {
                         </Badge>
                      ))}
 
-                     {tutor.subjects.length > 3 && (
+                     {(tutor.subjects?.length ?? 0) > 3 && (
                         <Popover>
                            <PopoverTrigger asChild>
                               <Badge
                                  variant="outline"
                                  className="text-xs py-1 rounded-md bg-muted text-muted-foreground cursor-pointer"
                               >
-                                 +{tutor.subjects.length - 3} more
+                                 +{(tutor.subjects?.length ?? 0) - 3} more
                               </Badge>
                            </PopoverTrigger>
                            <PopoverContent className="w-60 p-3" align="start">
@@ -176,15 +225,17 @@ export function TutorCard({ tutor }: TutorCardProps) {
                                  All Subjects
                               </h4>
                               <div className="flex flex-wrap gap-2">
-                                 {tutor.subjects.slice(3).map((subject) => (
-                                    <Badge
-                                       key={subject}
-                                       variant="outline"
-                                       className="text-xs"
-                                    >
-                                       {subject}
-                                    </Badge>
-                                 ))}
+                                 {(tutor.subjects ?? [])
+                                    .slice(3)
+                                    .map((subject) => (
+                                       <Badge
+                                          key={subject}
+                                          variant="outline"
+                                          className="text-xs"
+                                       >
+                                          {subject}
+                                       </Badge>
+                                    ))}
                               </div>
                            </PopoverContent>
                         </Popover>

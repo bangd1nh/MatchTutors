@@ -37,7 +37,7 @@ export function RelatedTutors({
                            <AvatarFallback className="text-sm">
                               {(tutor.fullName ?? "")
                                  .split(" ")
-                                 .map((n) => n[0])
+                                 .map((n: string) => n[0])
                                  .join("")}
                            </AvatarFallback>
                         </Avatar>
@@ -49,7 +49,7 @@ export function RelatedTutors({
                               {tutor.fullName}
                            </h4>
                            <p className="text-xs text-muted-foreground">
-                              {tutor.address.city},{" "}
+                              {tutor.address?.city ?? "N/A"}
                            </p>
                         </div>
                      </div>
@@ -60,14 +60,14 @@ export function RelatedTutors({
                            <Star
                               key={i}
                               className={`w-3 h-3 ${
-                                 i < Math.floor(tutor.ratings.average)
+                                 i < Math.floor(tutor.ratings?.average ?? 0)
                                     ? "text-yellow-400 fill-yellow-400"
                                     : "text-gray-300"
                               }`}
                            />
                         ))}
                         <span className="text-xs text-muted-foreground ml-1">
-                           ({tutor.ratings.totalReviews})
+                           ({tutor.ratings?.totalReviews ?? 0})
                         </span>
                      </div>
 
@@ -91,49 +91,51 @@ export function RelatedTutors({
                            Teaches:
                         </p>
                         <div className="flex flex-wrap gap-1">
-                           {tutor.subjects.slice(0, 2).map((subject, i) => (
-                              <Badge
-                                 key={i}
-                                 variant="secondary"
-                                 className="text-xs px-1.5 py-0.5"
-                              >
-                                 {subject}
-                              </Badge>
-                           ))}
-                           {tutor.subjects.length > 2 && (
-                              <Popover>
-                                 <PopoverTrigger asChild>
-                                    <Button
-                                       variant="ghost"
-                                       size="sm"
-                                       className="h-6 px-1.5 text-xs rounded-md"
-                                    >
-                                       +{tutor.subjects.length - 2}
-                                    </Button>
-                                 </PopoverTrigger>
-                                 <PopoverContent
-                                    className="w-64 p-2"
-                                    align="start"
-                                    sideOffset={4}
+                           {Array.isArray(tutor.subjects) &&
+                              tutor.subjects.slice(0, 2).map((subject, i) => (
+                                 <Badge
+                                    key={i}
+                                    variant="secondary"
+                                    className="text-xs px-1.5 py-0.5"
                                  >
-                                    <div className="grid gap-2">
-                                       <div className="flex flex-wrap gap-1">
-                                          {tutor.subjects
-                                             .slice(2)
-                                             .map((subject, i) => (
-                                                <Badge
-                                                   key={i}
-                                                   variant="secondary"
-                                                   className="text-xs px-1.5 py-0.5"
-                                                >
-                                                   {subject}
-                                                </Badge>
-                                             ))}
+                                    {subject}
+                                 </Badge>
+                              ))}
+                           {Array.isArray(tutor.subjects) &&
+                              tutor.subjects.length > 2 && (
+                                 <Popover>
+                                    <PopoverTrigger asChild>
+                                       <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-6 px-1.5 text-xs rounded-md"
+                                       >
+                                          +{(tutor.subjects?.length ?? 0) - 2}
+                                       </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent
+                                       className="w-64 p-2"
+                                       align="start"
+                                       sideOffset={4}
+                                    >
+                                       <div className="grid gap-2">
+                                          <div className="flex flex-wrap gap-1">
+                                             {(tutor.subjects ?? [])
+                                                .slice(2)
+                                                .map((subject, i) => (
+                                                   <Badge
+                                                      key={i}
+                                                      variant="secondary"
+                                                      className="text-xs px-1.5 py-0.5"
+                                                   >
+                                                      {subject}
+                                                   </Badge>
+                                                ))}
+                                          </div>
                                        </div>
-                                    </div>
-                                 </PopoverContent>
-                              </Popover>
-                           )}
+                                    </PopoverContent>
+                                 </Popover>
+                              )}
                         </div>
                      </div>
 

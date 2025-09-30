@@ -8,6 +8,7 @@ import CreateFlashcardQuiz from "@/pages/Flashcard/CreateFlashcardQuiz";
 import FlashcardQuizList from "@/pages/Flashcard/FlashcardQuizList";
 import ViewFlashcardQuizQuestion from "@/pages/Flashcard/ViewFlashcardQuizQuestion";
 import EditFlashcardQuiz from "@/pages/Flashcard/EditFlashcardQuiz";
+import TutorProfilePage from "@/pages/TutorProfile/TutorProfilePage";
 
 export const tutorRoutes = {
    element: (
@@ -19,6 +20,7 @@ export const tutorRoutes = {
       { path: "/tutor/dashboard", element: <OverviewPage /> },
       { path: "/tutor/profile", element: <ProfilePage /> },
       { path: "/tutor/profile-page", element: <TutorProfile /> },
+      { path: "/tutor/create-profile", element: <TutorProfilePage /> },
       {
          path: "/tutor/jobs",
          element: <JobManage />,

@@ -15,3 +15,12 @@ export enum Level {
 }
 
 export const LEVEL_VALUES = Object.values(Level) as Level[];
+
+export const LEVEL_LABELS: Record<string, string> = Object.fromEntries(
+   LEVEL_VALUES.map((l) => [
+      l,
+      l
+         .replace("GRADE_", "Grade ") // convert GRADE_1 → Grade 1
+         .replace("UNIVERSITY", "University"),
+   ])
+);

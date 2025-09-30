@@ -7,22 +7,69 @@ import {
    PopoverContent,
    PopoverTrigger,
 } from "@/components/ui/popover";
+import { useAddFav, useFetchFav, useRemoveFav } from "@/hooks/useFavTutor";
+import { useToast } from "@/hooks/useToast";
+import { useUser } from "@/hooks/useUser";
 import type { Tutor } from "@/types/tutorListandDetail";
 import {
    Calendar,
    Clock,
    Globe,
    Heart,
+   Loader2,
    MapPin,
    MessageCircle,
    Star,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface TutorHeaderProps {
    tutor: Tutor;
 }
 
 export function TutorHeader({ tutor }: TutorHeaderProps) {
+   const toast = useToast();
+
+   const { isAuthenticated } = useUser();
+   const {
+      data: isFav,
+      isLoading,
+      isError,
+   } = isAuthenticated
+      ? useFetchFav(tutor._id)
+      : { data: undefined, isLoading: false, isError: false };
+
+   const fav = isAuthenticated ? useAddFav() : undefined;
+   const removeFav = isAuthenticated ? useRemoveFav() : undefined;
+
+   const handleSave = () => {
+      if (!isAuthenticated) {
+         toast("warning", "Please login to favorite this tutor");
+         return;
+      }
+      if (isFav?.isFav) {
+         removeFav?.mutate(tutor._id);
+      } else {
+         fav?.mutate(tutor._id);
+      }
+   };
+
+   if (isLoading) {
+      return (
+         <div className="flex justify-center items-center p-10">
+            <Loader2 className="h-8 w-8 animate-spin text-sky-600" />
+         </div>
+      );
+   }
+
+   if (isError) {
+      return (
+         <div className="text-center text-red-500 p-10">
+            Không thể tải hồ sơ học gia sư.
+         </div>
+      );
+   }
+
    return (
       <Card>
          <CardContent className="p-6">
@@ -31,21 +78,29 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                   <Avatar className="w-32 h-32 mb-4">
                      <AvatarImage
                         src={tutor.avatarUrl || "/placeholder.svg"}
-                        alt={tutor.fullName}
+                        alt={
+                           typeof tutor.userId === "object"
+                              ? tutor.userId.name
+                              : tutor.fullName || "N/A"
+                        }
                      />
                      <AvatarFallback className="text-2xl">
-                        {(tutor.fullName ?? "N/A")
+                        {(typeof tutor.userId === "object"
+                           ? tutor.userId.name
+                           : tutor.fullName || "N/A"
+                        )
                            .split(" ")
-                           .map((n) => n[0])
+                           .map((n: string) => n[0])
                            .join("")}
                      </AvatarFallback>
                   </Avatar>
                   <div className="text-center md:text-left">
                      <div className="flex items-center gap-1 mb-2">
-                        {[...Array(5)].map((_, i) => (
+                        {[...Array(5)].map((_, i: number) => (
                            <Star
                               key={i}
                               className={`w-4 h-4 ${
+                                 tutor.ratings &&
                                  i < Math.floor(tutor.ratings.average)
                                     ? "fill-yellow-400 text-yellow-400"
                                     : "text-gray-300"
@@ -53,8 +108,8 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                            />
                         ))}
                         <span className="ml-2 text-sm text-muted-foreground">
-                           {tutor.ratings.average} ({tutor.ratings.totalReviews}{" "}
-                           reviews)
+                           {tutor.ratings?.average ?? "-"} (
+                           {tutor.ratings?.totalReviews ?? 0} reviews)
                         </span>
                      </div>
                   </div>
@@ -90,11 +145,13 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                         <Globe className="w-4 h-4 text-muted-foreground" />
                         <span className="text-sm">Languages I know:</span>
                      </div>
-                     {tutor.languages.slice(0, 3).map((lang, index) => (
-                        <Badge key={index} variant="secondary">
-                           {lang}
-                        </Badge>
-                     ))}
+                     {tutor.languages
+                        .slice(0, 3)
+                        .map((lang: string, index: number) => (
+                           <Badge key={index} variant="secondary">
+                              {lang}
+                           </Badge>
+                        ))}
                      {tutor.languages.length > 3 && (
                         <Popover>
                            <PopoverTrigger asChild>
@@ -110,7 +167,7 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                               <div className="space-y-2">
                                  {tutor.languages
                                     .slice(3)
-                                    .map((lang, index) => (
+                                    .map((lang: string, index: number) => (
                                        <Badge
                                           key={index}
                                           variant="secondary"
@@ -127,9 +184,18 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
 
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-3">
-                     <Button variant="outline" size="sm">
-                        <Heart className="w-4 h-4 mr-2" />
-                        Save
+                     <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSave}
+                        disabled={fav?.isPending || removeFav?.isPending}
+                     >
+                        <Heart
+                           className={`w-4 h-4 mr-2 ${
+                              isFav?.isFav ? "text-red-500 fill-red-500" : ""
+                           }`}
+                        />
+                        {isFav?.isFav ? "Unsave" : "Save"}
                      </Button>
                      <Button size="sm">
                         <MessageCircle className="w-4 h-4 mr-2" />

@@ -2,7 +2,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import OverviewPage from "../pages/dashboard/OverviewPage";
 
 import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
-import BanUser from "@/pages/admin/BanUnBanUser";
+import TutorManagement from "@/pages/admin/TutorManagement";
+import StudentManagement from "@/pages/admin/StudentManagement";
 import ProfilePage from "@/pages/Profilepage";
 import AdminLayout from "@/layouts/AdminLayout";
 
@@ -14,7 +15,8 @@ export const adminRoutes = {
    ),
    children: [
       { path: "/admin/dashboard", element: <OverviewPage /> },
-      { path: "/ban-user", element: <BanUser /> },
+      { path: "/admin/tutors", element: <TutorManagement /> },
+      { path: "/admin/students", element: <StudentManagement /> },
       { path: "/admin/profile", element: <ProfilePage /> },
       { path: "/profile/change-password", element: <ChangePasswordPage /> },
    ],

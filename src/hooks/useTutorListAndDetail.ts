@@ -13,8 +13,7 @@ export const useTutors = (options: UseTutorsOptions = {}) => {
    return useQuery<TutorsApiResponse>({
       queryKey: ["tutors", { page, limit }],
       queryFn: () => getTutors({ page, limit }),
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      keepPreviousData: true, // Giữ lại dữ liệu cũ khi fetching trang mới để UI không bị giật
+      staleTime: 1000 * 60 * 5,
    });
 };
 

@@ -8,6 +8,7 @@ import StudentProfile from "@/pages/Student/StudentProfile";
 import CreateStudentProfile from "@/pages/Student/CreateStudentProfile";
 import IsCreatedProfileRoute from "./isCreatedProfileRoute";
 import ViewFlashcardQuizQuestion from "@/pages/Flashcard/ViewFlashcardQuizQuestion";
+import FavoriteTutor from "@/pages/Student/FavoriteTutor";
 
 export const studentRoutes = {
    element: (
@@ -62,6 +63,14 @@ export const studentRoutes = {
          element: (
             <IsCreatedProfileRoute>
                <ViewFlashcardQuizQuestion />
+            </IsCreatedProfileRoute>
+         ),
+      },
+      {
+         path: "/student/favorite",
+         element: (
+            <IsCreatedProfileRoute>
+               <FavoriteTutor />
             </IsCreatedProfileRoute>
          ),
       },

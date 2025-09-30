@@ -1,7 +1,14 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home, User, LayoutDashboard, BookOpen } from "lucide-react";
+import {
+   LogOut,
+   Home,
+   User,
+   LayoutDashboard,
+   BookOpen,
+   Heart,
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export type SidebarItem = {
@@ -31,6 +38,11 @@ export const studentSidebarConfig: SidebarItem[] = [
       to: "/student/applications",
       label: "Lớp học của họ ",
       icon: <BookOpen className="h-4 w-4" />,
+   },
+   {
+      to: "/student/favorite",
+      label: "Danh sách yêu thích ",
+      icon: <Heart className="h-4 w-4" />,
    },
    // Thêm các mục khác ở đây
 ];
