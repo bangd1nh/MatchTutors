@@ -1,0 +1,94 @@
+import { QuizModeEnum } from "@/enums/quiz.enum";
+import { IQuizQuestion } from "./quizQuestion";
+import { BaseAPIResponse } from "./response";
+
+export type QuizInfoValues = {
+   title: string;
+   description?: string;
+   quizMode: string;
+   settings: {
+      shuffleQuestions: boolean;
+      showCorrectAnswersAfterSubmit: boolean;
+      timeLimitMinutes: number | null;
+   };
+   tags: string[];
+   totalQuestions?: number;
+};
+
+export type FlashcardQuestion = {
+   // mirror subset of server IQuizQuestion for flashcard usage
+   _id: string; // client id
+   order?: number;
+   frontText: string;
+   backText: string;
+   explanation?: string;
+   points?: number;
+};
+
+export interface QuizSettings {
+   shuffleQuestions?: boolean;
+   showCorrectAnswersAfterSubmit?: boolean;
+   timeLimitMinutes?: number | null;
+}
+
+export interface IQuizResponse extends BaseAPIResponse {
+   data: {
+      _id?: string;
+      title: string;
+      description?: string;
+      quizMode?: QuizModeEnum;
+      settings?: QuizSettings;
+      createdBy?: string;
+      tags?: string[];
+      totalQuestions?: number;
+      createdAt?: Date;
+      updatedAt?: Date;
+      questionArr?: IQuizQuestion[];
+   };
+}
+
+export interface IQuizBody {
+   title: string;
+   description?: string;
+   quizMode?: QuizModeEnum;
+   settings?: QuizSettings;
+   createdBy?: string;
+   tags?: string[];
+   totalQuestions?: number;
+   createdAt?: Date;
+   updatedAt?: Date;
+   questionArr: IQuizQuestion[];
+}
+
+export interface IQuizInfo {
+   _id: string;
+   title: string;
+   description?: string;
+   quizMode: QuizModeEnum;
+   settings?: QuizSettings;
+   createdBy: {
+      role: string;
+      name: string;
+   };
+   tags: string[];
+   totalQuestions: number;
+   createdAt?: Date;
+   updatedAt?: Date;
+}
+
+export interface IQUizUpdate {
+   _id?: string;
+   title: string;
+   description: string;
+   quizMode?: QuizModeEnum;
+   settings?: QuizSettings;
+   createdBy: {
+      role: string;
+      name: string;
+   };
+   tags: string[];
+   totalQuestions: number;
+   newQuestionArr: IQuizQuestion[];
+   deleteQuestionArr: { _id: string }[];
+   editQuestionArr: IQuizQuestion[];
+}

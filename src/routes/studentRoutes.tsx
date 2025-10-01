@@ -1,13 +1,18 @@
 import ProtectedRoute from "./ProtectedRoute";
 import OverviewPage from "../pages/dashboard/OverviewPage";
-import Application from "@/pages/Jobseeker/Application";
+
 import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
 import StudentLayout from "@/layouts/StudentLayout";
 import ProfileForm from "@/components/user/ProfileForm";
 import StudentProfile from "@/pages/Student/StudentProfile";
 import CreateStudentProfile from "@/pages/Student/CreateStudentProfile";
 import IsCreatedProfileRoute from "./isCreatedProfileRoute";
+import ViewFlashcardQuizQuestion from "@/pages/Flashcard/ViewFlashcardQuizQuestion";
 import FavoriteTutor from "@/pages/Student/FavoriteTutor";
+import MyApplicationsPage from "@/pages/Student/MyApplicationsPage";
+import SchedulePage from "@/pages/SchedulePage"; // Import trang mới
+import TeachingRequestDetail from "@/pages/Tutor/TeachingRequestDetail"; // Import component detail
+// import SessionDetailPage from "@/pages/SessionDetailPage"; // Moved to sharedRoutes
 
 export const studentRoutes = {
    element: (
@@ -27,11 +32,25 @@ export const studentRoutes = {
       },
       {
          path: "/student/applications",
+         element: <MyApplicationsPage />,
+      },
+      // Thêm route detail để student xem chi tiết và ra quyết định
+      {
+         path: "/student/applications/:id",
+         element: <TeachingRequestDetail />, // tái sử dụng component detail
+      },
+      {
+         path: "/student/schedule", // Thêm route mới
          element: (
             <IsCreatedProfileRoute>
-               <Application />
+               <SchedulePage />
             </IsCreatedProfileRoute>
          ),
+      },
+      {
+         // Session detail route moved to sharedRoutes (accessible by both roles)
+         // path: "/session/:id",
+         // element: <SessionDetailPage />,
       },
       {
          path: "/profile/change-password",
@@ -54,6 +73,14 @@ export const studentRoutes = {
          element: (
             <IsCreatedProfileRoute>
                <StudentProfile />
+            </IsCreatedProfileRoute>
+         ),
+      },
+      {
+         path: "/student/viewQuiz",
+         element: (
+            <IsCreatedProfileRoute>
+               <ViewFlashcardQuizQuestion />
             </IsCreatedProfileRoute>
          ),
       },

@@ -8,7 +8,7 @@ const AdminLayout = () => {
          <div className="w-64 flex-shrink-0">
             <AdminSidebar />
          </div>
-         
+
          {/* Main Content */}
          <div className="flex-1 flex flex-col min-w-0">
             <main className="flex-1 overflow-auto p-4 md:p-6">

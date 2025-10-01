@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Tutor } from "@/types/tutorListandDetail";
-import { Check } from "lucide-react";
 
 interface TutorIntroductionProps {
    tutor: Tutor;

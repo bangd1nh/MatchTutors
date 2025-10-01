@@ -21,7 +21,6 @@ import {
    MessageCircle,
    Star,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 interface TutorHeaderProps {
    tutor: Tutor;
