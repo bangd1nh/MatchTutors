@@ -27,7 +27,7 @@ export default function TutorListPage({ filters }: TutorListPageProps) {
       keyword: filters.searchQuery || undefined,
       subjects: filters.selectedSubjects.length ? filters.selectedSubjects : undefined,
       levels: filters.selectedLevels.length ? filters.selectedLevels : undefined,
-      city: filters.selectedLocation || undefined,
+      cities: filters.selectedCities.length ? filters.selectedCities : undefined,
       minRate: filters.priceRange?.[0] > 0 ? filters.priceRange[0] : undefined,
       maxRate: filters.priceRange?.[1] < 2000000 ? filters.priceRange[1] : undefined,
       minExperience: filters.experienceYears?.[0] > 0 ? filters.experienceYears[0] : undefined,
