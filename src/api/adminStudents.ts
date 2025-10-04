@@ -104,8 +104,6 @@ export const banStudent = async (
 ): Promise<{ success: boolean; message: string }> => {
   // Đảm bảo token được gửi
   const token = localStorage.getItem("token");
-  console.log('Ban request - Token exists:', !!token);
-  console.log('Ban request - Token preview:', token?.substring(0, 20) + '...');
   
   if (!token) {
     throw new Error("Không có token xác thực");
@@ -120,7 +118,6 @@ export const banStudent = async (
     }
   });
   
-  console.log('Ban response:', response.data);
   return response.data;
 };
 
@@ -132,8 +129,6 @@ export const unbanStudent = async (
 ): Promise<{ success: boolean; message: string }> => {
   // Đảm bảo token được gửi
   const token = localStorage.getItem("token");
-  console.log('Unban request - Token exists:', !!token);
-  console.log('Unban request - Token preview:', token?.substring(0, 20) + '...');
   
   if (!token) {
     throw new Error("Không có token xác thực");
@@ -147,7 +142,6 @@ export const unbanStudent = async (
     }
   });
   
-  console.log('Unban response:', response.data);
   return response.data;
 };
 

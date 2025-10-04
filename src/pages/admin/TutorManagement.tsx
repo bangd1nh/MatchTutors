@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -6,6 +7,7 @@ import {
    useGetAllTutors, 
    useBanTutor,
    useUnbanTutor,
+   useGetTutorMapping,
    AdminTutor 
 } from "@/hooks/useAdminTutors";
 import { Search, ShieldOff, Shield, MoreVertical, Eye } from "lucide-react";
@@ -21,20 +23,38 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 const TutorManagement = () => {
+   const navigate = useNavigate();
    const [searchTerm, setSearchTerm] = useState("");
    const [selectedTutor, setSelectedTutor] = useState<AdminTutor | null>(null);
    const [banReason, setBanReason] = useState("");
    const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
    const [isUnbanDialogOpen, setIsUnbanDialogOpen] = useState(false);
    const [activeTab, setActiveTab] = useState<'all' | 'active' | 'banned'>('all');
+   const [userIdToTutorId, setUserIdToTutorId] = useState<Record<string, string>>({});
 
    // API calls
    const { data: allTutors, isLoading: isLoadingAll } = useGetAllTutors({ 
       search: searchTerm || undefined 
    });
    
+   // Get tutor mapping to convert userId to tutorId
+   const { data: tutorMappingData } = useGetTutorMapping({ page: 1, limit: 1000 });
+   
    const banTutorMutation = useBanTutor();
    const unbanTutorMutation = useUnbanTutor();
+
+   // Update mapping when tutor mapping data changes
+   useEffect(() => {
+      if (tutorMappingData?.data?.tutors) {
+         const mapping: Record<string, string> = {};
+         tutorMappingData.data.tutors.forEach((tutor: any) => {
+            if (tutor.tutorId) {
+               mapping[tutor.userId] = tutor.tutorId;
+            }
+         });
+         setUserIdToTutorId(mapping);
+      }
+   }, [tutorMappingData]);
 
    const handleBanTutor = () => {
       if (selectedTutor && banReason.trim()) {
@@ -67,17 +87,29 @@ const TutorManagement = () => {
       }
    };
 
+   const handleViewTutor = (tutor: AdminTutor) => {
+      // Get tutorId from mapping - only tutors with profiles will have mapping
+      const tutorId = userIdToTutorId[tutor._id];
+      if (tutorId) {
+         // Navigate to tutor profile page with tutorId
+         navigate(`/admin/tutors/${tutorId}`);
+      }
+   };
+
+   // Check if tutor has created profile
+   const hasTutorProfile = (tutor: AdminTutor) => {
+      return !!userIdToTutorId[tutor._id];
+   };
+
    const getStatusColor = (tutor: AdminTutor) => {
       if (tutor.isBanned) return 'bg-red-100 text-red-800';
-      if (tutor.isVerifiedEmail && tutor.isVerifiedPhoneNumber) return 'bg-green-100 text-green-800';
-      if (tutor.isVerifiedEmail || tutor.isVerifiedPhoneNumber) return 'bg-yellow-100 text-yellow-800';
-      return 'bg-red-100 text-red-800';
+      if (tutor.isVerifiedEmail) return 'bg-green-100 text-green-800';
+      return 'bg-yellow-100 text-yellow-800';
    };
 
    const getStatus = (tutor: AdminTutor) => {
       if (tutor.isBanned) return 'Tài khoản bị khóa';
-      if (tutor.isVerifiedEmail && tutor.isVerifiedPhoneNumber) return 'Đã xác thực';
-      if (tutor.isVerifiedEmail || tutor.isVerifiedPhoneNumber) return 'Đang chờ';
+      if (tutor.isVerifiedEmail) return 'Đã xác thực';
       return 'Cần xác minh';
    };
 
@@ -245,22 +277,12 @@ const TutorManagement = () => {
                                  )}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                 <div className="flex flex-col space-y-1">
-                                    <Badge 
-                                       variant={tutor.isVerifiedEmail ? "default" : "secondary"}
-                                       className="text-xs w-fit"
-                                    >
-                                       {tutor.isVerifiedEmail ? "Email ✓" : "Email ✗"}
-                                    </Badge>
-                                    {tutor.phone && (
-                                       <Badge 
-                                          variant={tutor.isVerifiedPhoneNumber ? "default" : "secondary"}
-                                          className="text-xs w-fit"
-                                       >
-                                          {tutor.isVerifiedPhoneNumber ? "Phone ✓" : "Phone ✗"}
-                                       </Badge>
-                                    )}
-                                 </div>
+                                 <Badge 
+                                    variant={tutor.isVerifiedEmail ? "default" : "secondary"}
+                                    className="text-xs w-fit"
+                                 >
+                                    {tutor.isVerifiedEmail ? "Email ✓" : "Email ✗"}
+                                 </Badge>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                  <div className="flex items-center space-x-3">
@@ -320,13 +342,24 @@ const TutorManagement = () => {
                                        )}
                                        {tutor.isBanned ? 'Mở khóa' : 'Khóa'}
                                     </button>
-                                    <button 
-                                       className="flex items-center px-3 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 hover:shadow-md transition-all duration-200"
-                                       title="Xem chi tiết"
-                                    >
-                                       <Eye className="h-4 w-4 mr-1.5" />
-                                       <span className="text-sm font-medium">Xem</span>
-                                    </button>
+                                    {hasTutorProfile(tutor) ? (
+                                       <button 
+                                          onClick={() => handleViewTutor(tutor)}
+                                          className="flex items-center px-3 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 hover:shadow-md transition-all duration-200"
+                                          title="Xem chi tiết profile"
+                                       >
+                                          <Eye className="h-4 w-4 mr-1.5" />
+                                          <span className="text-sm font-medium">Xem</span>
+                                       </button>
+                                    ) : (
+                                       <div 
+                                          className="flex items-center px-3 py-2 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
+                                          title="Tutor chưa tạo profile"
+                                       >
+                                          <Eye className="h-4 w-4 mr-1.5" />
+                                          <span className="text-sm font-medium">Chưa có profile</span>
+                                       </div>
+                                    )}
                                     <button className="flex items-center p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-md transition-all duration-200">
                                        <MoreVertical className="h-4 w-4" />
                                     </button>
@@ -419,6 +452,7 @@ const TutorManagement = () => {
                </DialogFooter>
             </DialogContent>
          </Dialog>
+
       </div>
    );
 };

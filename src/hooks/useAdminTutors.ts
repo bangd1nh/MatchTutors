@@ -6,8 +6,17 @@ import {
   banTutor,
   unbanTutor,
   getTutorDetail,
+  getTutorById,
+  acceptTutor,
+  rejectTutor,
+  getTutorMapping,
   AdminTutor,
   BanHistory,
+  TutorProfile,
+  TutorActionResponse,
+  TutorMapping,
+  TutorMappingResponse,
+  GetTutorByIdResponse,
 } from "@/api/adminTutors";
 import { useToast } from "@/hooks/useToast";
 
@@ -19,6 +28,8 @@ export const adminTutorKeys = {
   active: () => [...adminTutorKeys.all, "active"] as const,
   banned: () => [...adminTutorKeys.all, "banned"] as const,
   detail: (id: string) => [...adminTutorKeys.all, "detail", id] as const,
+  tutorById: (id: string) => [...adminTutorKeys.all, "tutor", id] as const,
+  mapping: (params?: Record<string, any>) => [...adminTutorKeys.all, "mapping", params] as const,
 };
 
 /**
@@ -126,5 +137,89 @@ export const useUnbanTutor = () => {
   });
 };
 
+/**
+ * Hook để lấy thông tin chi tiết gia sư theo tutorId
+ */
+export const useGetTutorById = (tutorId: string) => {
+  return useQuery({
+    queryKey: adminTutorKeys.tutorById(tutorId),
+    queryFn: () => getTutorById(tutorId),
+    enabled: !!tutorId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+/**
+ * Hook để chấp nhận gia sư
+ */
+export const useAcceptTutor = () => {
+  const queryClient = useQueryClient();
+  const toast = useToast();
+
+  return useMutation({
+    mutationFn: (tutorId: string) => acceptTutor(tutorId),
+    onSuccess: (data, tutorId) => {
+      // Invalidate và refetch các queries liên quan
+      queryClient.invalidateQueries({ queryKey: adminTutorKeys.all });
+      queryClient.invalidateQueries({ 
+        queryKey: adminTutorKeys.tutorById(tutorId) 
+      });
+      
+      toast("success", data.message || "Đã chấp nhận gia sư thành công");
+    },
+    onError: (error: any) => {
+      toast("error", error.response?.data?.message || "Có lỗi xảy ra khi chấp nhận gia sư");
+    },
+  });
+};
+
+/**
+ * Hook để từ chối gia sư
+ */
+export const useRejectTutor = () => {
+  const queryClient = useQueryClient();
+  const toast = useToast();
+
+  return useMutation({
+    mutationFn: ({ tutorId, reason }: { tutorId: string; reason: string }) =>
+      rejectTutor(tutorId, reason),
+    onSuccess: (data, variables) => {
+      // Invalidate và refetch các queries liên quan
+      queryClient.invalidateQueries({ queryKey: adminTutorKeys.all });
+      queryClient.invalidateQueries({ 
+        queryKey: adminTutorKeys.tutorById(variables.tutorId) 
+      });
+      
+      toast("success", data.message || "Đã từ chối gia sư thành công");
+    },
+    onError: (error: any) => {
+      toast("error", error.response?.data?.message || "Có lỗi xảy ra khi từ chối gia sư");
+    },
+  });
+};
+
+/**
+ * Hook để lấy danh sách tutors với userId và tutorId mapping
+ */
+export const useGetTutorMapping = (params?: {
+  page?: number;
+  limit?: number;
+}) => {
+  return useQuery({
+    queryKey: adminTutorKeys.mapping(params),
+    queryFn: () => getTutorMapping(params),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+
 // Export các types
-export type { AdminTutor, BanHistory };
+export type { 
+  AdminTutor, 
+  BanHistory, 
+  TutorProfile, 
+  TutorActionResponse,
+  TutorMapping,
+  TutorMappingResponse,
+  GetTutorByIdResponse,
+};

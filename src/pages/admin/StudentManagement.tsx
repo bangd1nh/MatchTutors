@@ -50,13 +50,15 @@ const StudentManagement = () => {
 
    // Helper functions
    const getStatus = (student: AdminStudent) => {
-      return student.isBanned ? "Đã khóa" : "Hoạt động";
+      if (student.isBanned) return "Đã khóa";
+      if (student.isVerifiedEmail) return "Đã xác thực";
+      return "Cần xác minh";
    };
 
    const getStatusColor = (student: AdminStudent) => {
-      return student.isBanned 
-         ? "bg-red-100 text-red-800" 
-         : "bg-green-100 text-green-800";
+      if (student.isBanned) return "bg-red-100 text-red-800";
+      if (student.isVerifiedEmail) return "bg-green-100 text-green-800";
+      return "bg-yellow-100 text-yellow-800";
    };
 
    // Event handlers
@@ -242,22 +244,12 @@ const StudentManagement = () => {
                                  )}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                 <div className="flex flex-col space-y-1">
-                                    <Badge 
-                                       variant={student.isVerifiedEmail ? "default" : "secondary"}
-                                       className="text-xs w-fit"
-                                    >
-                                       {student.isVerifiedEmail ? "Email ✓" : "Email ✗"}
-                                    </Badge>
-                                    {student.phone && (
-                                       <Badge 
-                                          variant={student.isVerifiedPhoneNumber ? "default" : "secondary"}
-                                          className="text-xs w-fit"
-                                       >
-                                          {student.isVerifiedPhoneNumber ? "Phone ✓" : "Phone ✗"}
-                                       </Badge>
-                                    )}
-                                 </div>
+                                 <Badge 
+                                    variant={student.isVerifiedEmail ? "default" : "secondary"}
+                                    className="text-xs w-fit"
+                                 >
+                                    {student.isVerifiedEmail ? "Email ✓" : "Email ✗"}
+                                 </Badge>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                  <div className="flex items-center space-x-3">

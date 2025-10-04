@@ -34,6 +34,116 @@ export interface BanHistory {
   unbannedBy?: string;
 }
 
+// Interface cho tutor profile chi tiết
+export interface TutorProfile {
+  _id: string;
+  userId: string;
+  subjects: string[];
+  levels: string[];
+  education: {
+    institution: string;
+    degree: string;
+    fieldOfStudy: string;
+    startDate: string;
+    endDate: string;
+    description: string;
+  }[];
+  certifications: {
+    _id: string;
+    name: string;
+    description: string;
+    imageUrls: string[];
+  }[];
+  experienceYears: number;
+  hourlyRate: number;
+  bio: string;
+  classType: string[];
+  availability: {
+    dayOfWeek: number;
+    slots: string[];
+  }[];
+  isApproved: boolean;
+  isBanned: boolean;
+  ratings: {
+    average: number;
+    totalReviews: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+// Interface cho response accept/reject
+export interface TutorActionResponse {
+  success: boolean;
+  message: string;
+}
+
+// Interface cho tutor mapping
+export interface TutorMapping {
+  userId: string;
+  tutorId: string | null;
+  hasProfile: boolean;
+  user: {
+    name: string;
+    email: string;
+    avatarUrl?: string;
+    phone?: string;
+    gender?: string;
+    address?: {
+      city: string;
+      street: string;
+    };
+    role: string;
+    isBanned: boolean;
+    createdAt: string;
+  };
+  tutor: any | null; // Tutor profile data if hasProfile is true
+}
+
+// Interface cho response mapping
+export interface TutorMappingResponse {
+  status: string;
+  message: string;
+  code: number;
+  data: {
+    tutors: TutorMapping[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      pages: number;
+    };
+  };
+}
+
+// Interface cho response getTutorById
+export interface GetTutorByIdResponse {
+  status: string;
+  message: string;
+  code: number;
+  data: {
+    tutor: TutorProfile & {
+      userId: {
+        _id: string;
+        role: string;
+        name: string;
+        email: string;
+        isBanned: boolean;
+        address?: {
+          city: string;
+          street: string;
+        };
+        avatarUrl?: string;
+        gender?: string;
+        phone?: string;
+      };
+    };
+    hasProfile: boolean;
+    message: string;
+  };
+}
+
 // Interface cho response của getAllTutors (dựa trên response thực tế)
 export interface GetAllTutorsResponse {
   status: string;
@@ -124,8 +234,6 @@ export const unbanTutor = async (
 ): Promise<{ success: boolean; message: string }> => {
   // Đảm bảo token được gửi
   const token = localStorage.getItem("token");
-  console.log('Unban request - Token exists:', !!token);
-  console.log('Unban request - Token preview:', token?.substring(0, 20) + '...');
   
   if (!token) {
     throw new Error("Không có token xác thực");
@@ -139,7 +247,6 @@ export const unbanTutor = async (
     }
   });
   
-  console.log('Unban response:', response.data);
   return response.data;
 };
 
@@ -156,6 +263,56 @@ export const getTutorDetail = async (
   return response.data;
 };
 
+/**
+ * Lấy thông tin chi tiết gia sư theo tutorId
+ */
+export const getTutorById = async (
+  tutorId: string
+): Promise<GetTutorByIdResponse> => {
+  const response = await apiClient.get(`/admin/tutor/${tutorId}`);
+  return response.data;
+};
+
+/**
+ * Chấp nhận gia sư
+ */
+export const acceptTutor = async (
+  tutorId: string
+): Promise<TutorActionResponse> => {
+  const response = await apiClient.post(`/admin/tutor/${tutorId}/accept`);
+  return response.data;
+};
+
+/**
+ * Từ chối gia sư
+ */
+export const rejectTutor = async (
+  tutorId: string,
+  reason: string
+): Promise<TutorActionResponse> => {
+  const response = await apiClient.post(`/admin/tutor/${tutorId}/reject`, {
+    reason,
+  });
+  return response.data;
+};
+
+/**
+ * Lấy danh sách tutors với userId và tutorId mapping
+ */
+export const getTutorMapping = async (params?: {
+  page?: number;
+  limit?: number;
+}): Promise<TutorMappingResponse> => {
+  const response = await apiClient.get('/admin/tutors/mapping', {
+    params: {
+      page: params?.page || 1,
+      limit: params?.limit || 50,
+    },
+  });
+  return response.data;
+};
+
+
 // Export default object chứa tất cả functions
 export default {
   getAllTutors,
@@ -164,4 +321,8 @@ export default {
   banTutor,
   unbanTutor,
   getTutorDetail,
+  getTutorById,
+  acceptTutor,
+  rejectTutor,
+  getTutorMapping,
 };
