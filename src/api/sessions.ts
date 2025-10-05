@@ -83,3 +83,68 @@ export const getSessionsByTeachingRequest = async (
    );
    return response.data.metadata ?? response.data ?? [];
 };
+
+/**
+ * Học sinh xác nhận tham gia buổi học
+ */
+export const confirmParticipation = async (
+   sessionId: string,
+   decision: "ACCEPTED" | "REJECTED"
+): Promise<Session> => {
+   const response = await apiClient.patch(
+      `/session/${sessionId}/confirm-participation`,
+      { decision }
+   );
+   return response.data.metadata;
+};
+
+/**
+ * Xác nhận điểm danh sau buổi học (cả gia sư và học sinh)
+ */
+export const confirmAttendance = async (
+   sessionId: string
+): Promise<Session> => {
+   const response = await apiClient.patch(
+      `/session/${sessionId}/confirm-attendance`
+   );
+   return response.data.metadata;
+};
+
+/**
+ * Lấy danh sách các session bị rejected và soft-deleted cho user hiện tại
+ */
+export const getMyRejectedSessions = async (): Promise<Session[]> => {
+   const response = await apiClient.get("/session/me/deleted");
+   return response.data.metadata ?? response.data.data ?? [];
+};
+
+/**
+ * Lấy chi tiết một session bị rejected và soft-deleted
+ */
+export const getRejectedSessionById = async (
+   sessionId: string
+): Promise<Session> => {
+   const response = await apiClient.get(`/session/deleted/${sessionId}`);
+   return response.data.metadata ?? response.data.data;
+};
+
+/**
+ * Lấy danh sách các session bị cancelled cho user hiện tại
+ */
+export const getMyCancelledSessions = async (): Promise<Session[]> => {
+   const response = await apiClient.get("/session/me/cancelled");
+   return response.data.metadata ?? response.data.data ?? [];
+};
+
+/**
+ * Hủy buổi học đã confirm với lý do
+ */
+export const cancelSession = async (
+   sessionId: string,
+   reason: string
+): Promise<Session> => {
+   const response = await apiClient.patch(`/session/${sessionId}/cancel`, {
+      reason,
+   });
+   return response.data.metadata;
+};

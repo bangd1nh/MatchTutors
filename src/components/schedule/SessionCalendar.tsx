@@ -17,6 +17,7 @@ import { useMySessions, useUpdateSession } from "@/hooks/useSessions";
 import { useUser } from "@/hooks/useUser";
 import { Session } from "@/types/session";
 import { Role } from "@/types/user";
+import { SessionStatus } from "@/enums/session.enum"; // THÊM DÒNG NÀY
 
 import { SessionFormDialog } from "./SessionFormDialog";
 import { SessionDetailDialog } from "./SessionDetailDialog";
@@ -51,11 +52,31 @@ export function SessionCalendar() {
          const studentName = tr?.studentId?.userId?.name ?? "Học sinh";
          const subject = tr?.subject ?? "Môn học";
 
+         // Tùy chỉnh màu sắc theo trạng thái
+         let style = {};
+         switch (session.status) {
+            case SessionStatus.SCHEDULED:
+               style = { backgroundColor: "#fbbf24", borderColor: "#f59e0b" }; // Vàng - chờ xác nhận
+               break;
+            case SessionStatus.CONFIRMED:
+               style = { backgroundColor: "#10b981", borderColor: "#059669" }; // Xanh lá - đã xác nhận
+               break;
+            case SessionStatus.REJECTED:
+               style = { backgroundColor: "#ef4444", borderColor: "#dc2626" }; // Đỏ - từ chối
+               break;
+            case SessionStatus.COMPLETED:
+               style = { backgroundColor: "#6b7280", borderColor: "#4b5563" }; // Xám - hoàn thành
+               break;
+            default:
+               style = { backgroundColor: "#3b82f6", borderColor: "#2563eb" }; // Xanh dương - mặc định
+         }
+
          return {
             title: `${subject} — ${studentName}`,
             start: new Date(session.startTime),
             end: new Date(session.endTime),
             resource: session,
+            style,
          };
       });
    }, [sessions]);

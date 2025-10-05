@@ -5,6 +5,9 @@ import {
    updateSession,
    deleteSession,
    getSessionById,
+   confirmParticipation,
+   confirmAttendance,
+   cancelSession,
 } from "@/api/sessions";
 import { useToast } from "@/hooks/useToast";
 import { UpsertSessionPayload } from "@/types/session";
@@ -53,17 +56,22 @@ export const useCreateSession = () => {
    return useMutation({
       mutationFn: (payload: UpsertSessionPayload) => createSession(payload),
       onSuccess: (data) => {
-         queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
-         // Also invalidate the specific teaching request to update its status
-         if (data.teachingRequestId) {
+         // Luôn vô hiệu hóa toàn bộ danh sách sessions để cập nhật lịch
+         queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+
+         // Nếu có teachingRequestId, thì cũng vô hiệu hóa query chi tiết của request đó
+         if (data?.teachingRequestId) {
             const requestId =
                typeof data.teachingRequestId === "string"
                   ? data.teachingRequestId
                   : (data.teachingRequestId as any)._id;
-            queryClient.invalidateQueries({
-               queryKey: teachingRequestKeys.detail(requestId),
-            });
+            if (requestId) {
+               queryClient.invalidateQueries({
+                  queryKey: teachingRequestKeys.detail(requestId),
+               });
+            }
          }
+         // Luôn hiển thị toast thành công vì API đã trả về 2xx
          toast("success", "Tạo buổi học thành công!");
       },
       onError: (error: any) => {
@@ -120,6 +128,84 @@ export const useDeleteSession = () => {
          toast(
             "error",
             error.response?.data?.message || "Xóa buổi học thất bại."
+         );
+      },
+   });
+};
+
+/**
+ * Hook để học sinh xác nhận tham gia buổi học
+ */
+export const useConfirmParticipation = () => {
+   const queryClient = useQueryClient();
+   const toast = useToast();
+
+   return useMutation({
+      mutationFn: ({
+         sessionId,
+         decision,
+      }: {
+         sessionId: string;
+         decision: "ACCEPTED" | "REJECTED";
+      }) => confirmParticipation(sessionId, decision),
+      onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+         toast("success", "Phản hồi thành công");
+      },
+      onError: (error: any) => {
+         toast(
+            "error",
+            error.response?.data?.message || "Xác nhận tham gia thất bại."
+         );
+      },
+   });
+};
+
+/**
+ * Hook để xác nhận điểm danh
+ */
+export const useConfirmAttendance = () => {
+   const queryClient = useQueryClient();
+   const toast = useToast();
+
+   return useMutation({
+      mutationFn: (sessionId: string) => confirmAttendance(sessionId),
+      onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+         toast("success", "Đã xác nhận điểm danh!");
+      },
+      onError: (error: any) => {
+         toast(
+            "error",
+            error.response?.data?.message || "Xác nhận điểm danh thất bại."
+         );
+      },
+   });
+};
+
+/**
+ * Hook để hủy buổi học đã confirm
+ */
+export const useCancelSession = () => {
+   const queryClient = useQueryClient();
+   const toast = useToast();
+
+   return useMutation({
+      mutationFn: ({
+         sessionId,
+         reason,
+      }: {
+         sessionId: string;
+         reason: string;
+      }) => cancelSession(sessionId, reason),
+      onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+         toast("success", "Đã hủy buổi học thành công!");
+      },
+      onError: (error: any) => {
+         toast(
+            "error",
+            error.response?.data?.message || "Hủy buổi học thất bại."
          );
       },
    });

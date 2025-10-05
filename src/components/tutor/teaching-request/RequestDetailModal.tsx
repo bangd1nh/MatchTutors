@@ -44,16 +44,64 @@ const renderActions = (
    const {
       respond,
       makeDecision,
-      // requestCancel,
-      // requestComplete,
-      // confirmAction,
+      requestCancel,
+      requestComplete,
+      confirmAction,
    } = mutations;
 
    const handleMutation = (mutation: any, params: any) => {
+      // Dùng mutate (không await) và cung cấp onSuccess/onError cục bộ.
+      // Hook bên trong (useTeachingRequest) sẽ hiển thị toast; chúng ta chỉ đóng modal khi thành công.
       mutation.mutate(params, {
-         onSuccess: onClose,
+         onSuccess: () => {
+            onClose();
+         },
+         onError: (err: any) => {
+            console.error("Mutation failed", err);
+            // Không cần hiển thị toast ở đây — hook sẽ xử lý onError và hiển thị toast.
+         },
       });
    };
+
+   // 3. Khi đang trong quá trình học (IN_PROGRESS): cho phép yêu cầu hoàn thành / hủy
+   if (req.status === TeachingRequestStatus.IN_PROGRESS) {
+      return (
+         <>
+            <Button
+               onClick={() => {
+                  const reason = prompt(
+                     "Nhập lý do muốn hoàn thành khóa học (không bắt buộc):"
+                  );
+                  // null = user bấm Cancel, empty string là chấp nhận rỗng
+                  if (reason !== null) {
+                     handleMutation(requestComplete, {
+                        requestId: req._id,
+                        reason,
+                     });
+                  }
+               }}
+               disabled={requestComplete.isPending}
+            >
+               Yêu cầu hoàn thành
+            </Button>
+            <Button
+               variant="destructive"
+               onClick={() => {
+                  const reason = prompt("Nhập lý do muốn hủy khóa học:");
+                  if (reason) {
+                     handleMutation(requestCancel, {
+                        requestId: req._id,
+                        reason,
+                     });
+                  }
+               }}
+               disabled={requestCancel.isPending}
+            >
+               Yêu cầu hủy
+            </Button>
+         </>
+      );
+   }
 
    // 1. Tutor phản hồi yêu cầu ban đầu
    if (req.status === TeachingRequestStatus.PENDING && user.role === "TUTOR") {
@@ -162,6 +210,74 @@ const renderActions = (
       );
    }
 
+   // 4. Nếu có yêu cầu hủy đang chờ xác nhận từ bên kia
+   if (
+      req.status === TeachingRequestStatus.CANCELLATION_PENDING &&
+      req.cancellationDecision?.requestedBy !== user.role?.toLowerCase()
+   ) {
+      return (
+         <>
+            <Button
+               onClick={() =>
+                  handleMutation(confirmAction, {
+                     requestId: req._id,
+                     action: "cancellation",
+                     decision: "ACCEPTED",
+                  })
+               }
+            >
+               Đồng ý hủy
+            </Button>
+            <Button
+               variant="destructive"
+               onClick={() =>
+                  handleMutation(confirmAction, {
+                     requestId: req._id,
+                     action: "cancellation",
+                     decision: "REJECTED",
+                  })
+               }
+            >
+               Từ chối
+            </Button>
+         </>
+      );
+   }
+
+   // 5. Nếu có yêu cầu hoàn thành đang chờ xác nhận từ bên kia
+   if (
+      req.status === TeachingRequestStatus.COMPLETE_PENDING &&
+      req.complete_pending?.requestedBy !== user.role?.toLowerCase()
+   ) {
+      return (
+         <>
+            <Button
+               onClick={() =>
+                  handleMutation(confirmAction, {
+                     requestId: req._id,
+                     action: "completion",
+                     decision: "ACCEPTED",
+                  })
+               }
+            >
+               Đồng ý hoàn thành
+            </Button>
+            <Button
+               variant="destructive"
+               onClick={() =>
+                  handleMutation(confirmAction, {
+                     requestId: req._id,
+                     action: "completion",
+                     decision: "REJECTED",
+                  })
+               }
+            >
+               Từ chối (Cần Admin xử lý)
+            </Button>
+         </>
+      );
+   }
+
    // Các logic hành động khác có thể thêm vào đây...
 
    return null; // Không có hành động nào
@@ -214,7 +330,11 @@ export const RequestDetailModal = ({
                </div>
                <div>
                   <h4 className="font-semibold mb-2">Nội dung yêu cầu:</h4>
-                  <p className="text-sm text-muted-foreground p-3 bg-secondary rounded-md">
+                  <p
+                     className="text-sm text-muted-foreground p-3 bg-secondary rounded-md
+                                break-words whitespace-pre-wrap max-w-full overflow-auto"
+                     style={{ wordBreak: "break-word" }}
+                  >
                      {request.description}
                   </p>
                </div>

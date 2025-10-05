@@ -12,6 +12,7 @@ import FavoriteTutor from "@/pages/Student/FavoriteTutor";
 import MyApplicationsPage from "@/pages/Student/MyApplicationsPage";
 import SchedulePage from "@/pages/SchedulePage"; // Import trang mới
 import TeachingRequestDetail from "@/pages/Tutor/TeachingRequestDetail"; // Import component detail
+import RejectedSessionsPage from "@/pages/RejectedSessionsPage"; // Import trang rejected sessions
 // import SessionDetailPage from "@/pages/SessionDetailPage"; // Moved to sharedRoutes
 
 export const studentRoutes = {
@@ -89,6 +90,14 @@ export const studentRoutes = {
          element: (
             <IsCreatedProfileRoute>
                <FavoriteTutor />
+            </IsCreatedProfileRoute>
+         ),
+      },
+      {
+         path: "/student/rejected-sessions",
+         element: (
+            <IsCreatedProfileRoute>
+               <RejectedSessionsPage />
             </IsCreatedProfileRoute>
          ),
       },

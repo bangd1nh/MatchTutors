@@ -1,4 +1,5 @@
 import { useForm, Controller } from "react-hook-form";
+import type { Resolver } from "react-hook-form"; // <--- thêm import type
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -25,33 +26,27 @@ import { useCreateSession, useUpdateSession } from "@/hooks/useSessions";
 import { useTutorTeachingRequests } from "@/hooks/useTeachingRequest";
 import { Session } from "@/types/session";
 import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
+import { SessionStatus } from "@/enums/session.enum"; // THÊM DÒNG NÀY
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
 const sessionFormSchema = z
    .object({
       teachingRequestId: z.string().min(1, "Vui lòng chọn một yêu cầu dạy."),
-
-      startTime: z
-         .date()
-         .refine((date) => date instanceof Date && !isNaN(date.getTime()), {
-            message: "Vui lòng chọn thời gian bắt đầu hợp lệ.",
-         }),
-      endTime: z
-         .date()
-         .refine((date) => date instanceof Date && !isNaN(date.getTime()), {
-            message: "Vui lòng chọn thời gian kết thúc hợp lệ.",
-         }),
+      startTime: z.date({ error: "Thời gian bắt đầu không hợp lệ." }),
+      endTime: z.date({ error: "Thời gian kết thúc không hợp lệ." }),
       location: z.string().min(1, "Vui lòng nhập địa điểm."),
       description: z.string().optional(),
-      isTrial: z.boolean(),
+      isTrial: z.boolean().default(false),
    })
    .refine((data) => data.endTime > data.startTime, {
       message: "Thời gian kết thúc phải sau thời gian bắt đầu.",
       path: ["endTime"],
    });
 
-type SessionFormValues = z.infer<typeof sessionFormSchema>;
+type SessionFormValues = z.infer<typeof sessionFormSchema> & {
+   isTrial: boolean;
+}; // <-- bắt buộc isTrial boolean
 
 interface SessionFormDialogProps {
    isOpen: boolean;
@@ -83,7 +78,9 @@ export const SessionFormDialog = ({
    );
 
    const form = useForm<SessionFormValues>({
-      resolver: zodResolver(sessionFormSchema),
+      resolver: zodResolver(
+         sessionFormSchema
+      ) as unknown as Resolver<SessionFormValues>, // <-- ép kiểu resolver
       defaultValues: {
          description: "",
          isTrial: false,
@@ -120,20 +117,36 @@ export const SessionFormDialog = ({
       }
    }, [initialData, defaultDate, form]);
 
-   const onSubmit = (values: SessionFormValues) => {
-      const payload = {
-         ...values,
-         startTime: values.startTime.toISOString(),
-         endTime: values.endTime.toISOString(),
-      };
+   const onSubmit = async (values: SessionFormValues) => {
+      try {
+         console.log("Form values:", values); // Debug log
 
-      if (isEditMode && initialData?._id) {
-         updateSessionMutation.mutate(
-            { sessionId: initialData._id, payload },
-            { onSuccess: onClose }
-         );
-      } else {
-         createSessionMutation.mutate(payload, { onSuccess: onClose });
+         const payload = {
+            teachingRequestId: values.teachingRequestId,
+            startTime: values.startTime.toISOString(),
+            endTime: values.endTime.toISOString(),
+            location: values.location,
+            description: values.description || "",
+            isTrial: values.isTrial,
+            status: SessionStatus.SCHEDULED,
+         };
+
+         console.log("Payload:", payload); // Debug log
+
+         if (isEditMode && initialData?._id) {
+            await updateSessionMutation.mutateAsync({
+               sessionId: initialData._id,
+               payload,
+            });
+         } else {
+            await createSessionMutation.mutateAsync(payload);
+         }
+
+         // Đóng dialog sau khi thành công
+         onClose();
+      } catch (error) {
+         console.error("Form submission error:", error);
+         // Error sẽ được handle bởi hooks
       }
    };
 
@@ -197,59 +210,73 @@ export const SessionFormDialog = ({
                      <Controller
                         name="startTime"
                         control={form.control}
-                        render={({ field }) => (
-                           <Input
-                              type="datetime-local"
-                              value={
-                                 field.value
-                                    ? new Date(
-                                         field.value.getTime() -
-                                            field.value.getTimezoneOffset() *
-                                               60000
-                                      )
-                                         .toISOString()
-                                         .slice(0, 16)
-                                    : ""
-                              }
-                              onChange={(e) =>
-                                 field.onChange(new Date(e.target.value))
-                              }
-                           />
-                        )}
+                        render={({ field }) => {
+                           const formatDateForInput = (date: Date) => {
+                              if (!date || isNaN(date.getTime())) return "";
+                              // Tạo date object với timezone local
+                              const localDate = new Date(
+                                 date.getTime() -
+                                    date.getTimezoneOffset() * 60000
+                              );
+                              return localDate.toISOString().slice(0, 16);
+                           };
+
+                           return (
+                              <Input
+                                 type="datetime-local"
+                                 value={formatDateForInput(field.value)}
+                                 onChange={(e) => {
+                                    const newDate = new Date(e.target.value);
+                                    if (!isNaN(newDate.getTime())) {
+                                       field.onChange(newDate);
+                                    }
+                                 }}
+                              />
+                           );
+                        }}
                      />
+                     {form.formState.errors.startTime && (
+                        <p className="text-sm text-red-500">
+                           {form.formState.errors.startTime.message}
+                        </p>
+                     )}
                   </div>
                   <div className="space-y-2">
                      <Label htmlFor="endTime">Thời gian kết thúc</Label>
                      <Controller
                         name="endTime"
                         control={form.control}
-                        render={({ field }) => (
-                           <Input
-                              type="datetime-local"
-                              value={
-                                 field.value
-                                    ? new Date(
-                                         field.value.getTime() -
-                                            field.value.getTimezoneOffset() *
-                                               60000
-                                      )
-                                         .toISOString()
-                                         .slice(0, 16)
-                                    : ""
-                              }
-                              onChange={(e) =>
-                                 field.onChange(new Date(e.target.value))
-                              }
-                           />
-                        )}
+                        render={({ field }) => {
+                           const formatDateForInput = (date: Date) => {
+                              if (!date || isNaN(date.getTime())) return "";
+                              const localDate = new Date(
+                                 date.getTime() -
+                                    date.getTimezoneOffset() * 60000
+                              );
+                              return localDate.toISOString().slice(0, 16);
+                           };
+
+                           return (
+                              <Input
+                                 type="datetime-local"
+                                 value={formatDateForInput(field.value)}
+                                 onChange={(e) => {
+                                    const newDate = new Date(e.target.value);
+                                    if (!isNaN(newDate.getTime())) {
+                                       field.onChange(newDate);
+                                    }
+                                 }}
+                              />
+                           );
+                        }}
                      />
+                     {form.formState.errors.endTime && (
+                        <p className="text-sm text-red-500">
+                           {form.formState.errors.endTime.message}
+                        </p>
+                     )}
                   </div>
                </div>
-               {form.formState.errors.endTime && (
-                  <p className="text-sm text-red-500">
-                     {form.formState.errors.endTime.message}
-                  </p>
-               )}
 
                <div className="space-y-2">
                   <Label htmlFor="location">Địa điểm</Label>
@@ -293,7 +320,15 @@ export const SessionFormDialog = ({
                   >
                      Hủy
                   </Button>
-                  <Button type="submit" disabled={isLoading}>
+                  <Button
+                     type="submit"
+                     disabled={isLoading || !form.formState.isValid}
+                     onClick={() => {
+                        console.log("Button clicked");
+                        console.log("Form errors:", form.formState.errors);
+                        console.log("Form values:", form.getValues());
+                     }}
+                  >
                      {isLoading && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                      )}
