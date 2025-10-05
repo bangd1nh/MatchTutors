@@ -84,14 +84,28 @@ export const useMakeTrialDecision = () => {
          requestId: string;
          decision: "ACCEPTED" | "REJECTED";
       }) => makeTrialDecision(requestId, decision),
-      onSuccess: (data) => {
-         queryClient.invalidateQueries({
-            queryKey: teachingRequestKeys.lists(),
-         });
-         queryClient.invalidateQueries({
-            queryKey: teachingRequestKeys.detail(data._id),
-         });
-         addToast("success", "Đã gửi quyết định của bạn.");
+      onSuccess: (data: any) => {
+         try {
+            queryClient.invalidateQueries({
+               queryKey: teachingRequestKeys.lists(),
+            });
+
+            // Lấy id một cách an toàn: backend có thể trả `_id`, `id`, `data._id` hoặc `metadata._id`
+            const id =
+               data?._id ?? data?.id ?? data?.data?._id ?? data?.metadata?._id;
+
+            if (id) {
+               queryClient.invalidateQueries({
+                  queryKey: teachingRequestKeys.detail(String(id)),
+               });
+            }
+
+            addToast("success", "Đã gửi quyết định của bạn.");
+         } catch (err) {
+            console.error("useMakeTrialDecision onSuccess handler error:", err);
+            // Vẫn hiển thị toast thành công để không gây nhầm lẫn với người dùng
+            addToast("success", "Đã gửi không rõ");
+         }
       },
       onError: (error: any) => {
          addToast("error", error.response?.data?.message || "Có lỗi xảy ra.");
@@ -113,11 +127,26 @@ export const useRequestCancellation = () => {
          requestId: string;
          reason: string;
       }) => requestCancellation(requestId, reason),
-      onSuccess: (data) => {
-         queryClient.invalidateQueries({
-            queryKey: teachingRequestKeys.detail(data._id),
-         });
-         addToast("success", "Yêu cầu hủy đã được gửi.");
+      onSuccess: (data: any) => {
+         try {
+            const id =
+               data?._id ?? data?.id ?? data?.metadata?._id ?? data?.data?._id;
+            if (id) {
+               queryClient.invalidateQueries({
+                  queryKey: teachingRequestKeys.detail(String(id)),
+               });
+            } else {
+               // fallback: invalidate list to refresh UI
+               queryClient.invalidateQueries({
+                  queryKey: teachingRequestKeys.lists(),
+               });
+            }
+            addToast("success", "Yêu cầu hủy đã được gửi.");
+         } catch (err) {
+            console.error("useRequestCancellation onSuccess error:", err);
+            // Vẫn hiện toast thành công để không gây nhầm lẫn với người dùng
+            addToast("success", "Yêu cầu hủy đã được gửi.");
+         }
       },
       onError: (error: any) => {
          addToast("error", error.response?.data?.message || "Có lỗi xảy ra.");
@@ -139,11 +168,24 @@ export const useRequestCompletion = () => {
          requestId: string;
          reason?: string;
       }) => requestCompletion(requestId, reason),
-      onSuccess: (data) => {
-         queryClient.invalidateQueries({
-            queryKey: teachingRequestKeys.detail(data._id),
-         });
-         addToast("success", "Yêu cầu hoàn thành đã được gửi.");
+      onSuccess: (data: any) => {
+         try {
+            const id =
+               data?._id ?? data?.id ?? data?.metadata?._id ?? data?.data?._id;
+            if (id) {
+               queryClient.invalidateQueries({
+                  queryKey: teachingRequestKeys.detail(String(id)),
+               });
+            } else {
+               queryClient.invalidateQueries({
+                  queryKey: teachingRequestKeys.lists(),
+               });
+            }
+            addToast("success", "Yêu cầu hoàn thành đã được gửi.");
+         } catch (err) {
+            console.error("useRequestCompletion onSuccess error:", err);
+            addToast("success", "Yêu cầu hoàn thành đã được gửi.");
+         }
       },
       onError: (error: any) => {
          addToast("error", error.response?.data?.message || "Có lỗi xảy ra.");
@@ -170,11 +212,24 @@ export const useConfirmAction = () => {
          action === "cancellation"
             ? confirmCancellation(requestId, decision)
             : confirmCompletion(requestId, decision),
-      onSuccess: (data) => {
-         queryClient.invalidateQueries({
-            queryKey: teachingRequestKeys.detail(data._id),
-         });
-         addToast("success", "Hành động của bạn đã được ghi nhận.");
+      onSuccess: (data: any) => {
+         try {
+            const id =
+               data?._id ?? data?.id ?? data?.metadata?._id ?? data?.data?._id;
+            if (id) {
+               queryClient.invalidateQueries({
+                  queryKey: teachingRequestKeys.detail(String(id)),
+               });
+            } else {
+               queryClient.invalidateQueries({
+                  queryKey: teachingRequestKeys.lists(),
+               });
+            }
+            addToast("success", "Hành động của bạn đã được ghi nhận.");
+         } catch (err) {
+            console.error("useConfirmAction onSuccess error:", err);
+            addToast("success", "Hành động của bạn đã được ghi nhận.");
+         }
       },
       onError: (error: any) => {
          addToast("error", error.response?.data?.message || "Có lỗi xảy ra.");
@@ -203,12 +258,28 @@ export const useRespondToRequest = () => {
          requestId: string;
          decision: "ACCEPTED" | "REJECTED";
       }) => respondToTeachingRequest(requestId, decision),
-      onSuccess: (data) => {
-         qc.invalidateQueries({ queryKey: teachingRequestKeys.tutorLists() });
-         qc.invalidateQueries({
-            queryKey: teachingRequestKeys.detail(data._id),
-         });
-         toast("success", "Đã phản hồi yêu cầu.");
+      // Nhận `data` dưới dạng `any` để tránh TS error nếu API trả về shape khác
+      onSuccess: (data: any) => {
+         try {
+            // Luôn invalidate list
+            qc.invalidateQueries({
+               queryKey: teachingRequestKeys.tutorLists(),
+            });
+
+            // Lấy id một cách an toàn: backend có thể trả `_id` hoặc `id`
+            const resp = data as any;
+            const id = resp?._id ?? resp?.id;
+            if (id) {
+               qc.invalidateQueries({
+                  queryKey: teachingRequestKeys.detail(String(id)),
+               });
+            }
+
+            toast("success", "Đã phản hồi yêu cầu.");
+         } catch (err) {
+            console.error("useRespondToRequest onSuccess handler error:", err);
+            toast("success", "Đã phản hồi yêu cầu.");
+         }
       },
       onError: (err: any) => {
          toast("error", err.response?.data?.message || "Phản hồi thất bại.");

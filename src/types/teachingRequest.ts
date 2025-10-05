@@ -9,7 +9,7 @@ import { IUser } from "@/types/user";
 // Đại diện cho thông tin user được populate lồng nhau
 interface PopulatedUser {
    _id: string;
-   userId: Pick<IUser, "_id" | "name" | "avatarUrl">;
+   userId: Pick<IUser, "_id" | "name" | "avatarUrl" | "email">;
 }
 
 // Type cho các quyết định, dựa theo backend

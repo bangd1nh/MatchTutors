@@ -1,14 +1,38 @@
-import { TeachingRequest } from "./teachingRequest";
+import { TeachingRequest } from "@/types/teachingRequest";
 import { SessionStatus } from "@/enums/session.enum";
+import { IUser } from "@/types/user";
 
-// Interface cho Reminder, dựa theo backend
+// Reminder used in sessions
 export interface Reminder {
    userId: string;
    minutesBefore: number;
-   methods?: string[]; // e.g., "email", "in_app"
+   methods?: string[]; // e.g. ["email","in_app"]
 }
 
-// Dữ liệu để tạo hoặc cập nhật session
+// Student confirmation (frontend-friendly)
+export type StudentConfirmationStatus = "PENDING" | "ACCEPTED" | "REJECTED";
+export interface StudentConfirmation {
+   status: StudentConfirmationStatus;
+   confirmedAt?: string;
+}
+
+// Attendance confirmation
+export interface AttendanceConfirmation {
+   tutorConfirmed: boolean;
+   studentConfirmed: boolean;
+   tutorConfirmedAt?: string;
+   studentConfirmedAt?: string;
+   isAttended: boolean;
+}
+
+// Cancellation info (can be user id or populated user)
+export interface CancellationInfo {
+   cancelledBy: string | IUser;
+   reason: string;
+   cancelledAt: string;
+}
+
+// Payload used to create/update session
 export interface UpsertSessionPayload {
    teachingRequestId: string;
    startTime: string;
@@ -16,23 +40,36 @@ export interface UpsertSessionPayload {
    isTrial: boolean;
    location?: string;
    notes?: string;
-   status?: SessionStatus;
-   // Thêm các trường mới
-   materials?: string[]; // Mảng các ID của material
-   quizIds?: string[]; // Mảng các ID của quiz
+   status?: SessionStatus | string;
+   materials?: string[];
+   quizIds?: string[];
    reminders?: Reminder[];
 }
 
-// Dữ liệu session nhận về từ API
+// Session returned from API
 export interface Session
    extends Omit<UpsertSessionPayload, "teachingRequestId"> {
    _id: string;
    teachingRequestId: TeachingRequest;
-   createdBy: string;
-   createdAt: string;
-   updatedAt: string;
-   // Thêm các trường đã có ở backend
-   materials?: any[]; // Hoặc định nghĩa type Material cụ thể
-   quizIds?: any[]; // Hoặc định nghĩa type Quiz cụ thể
+   startTime: string;
+   endTime: string;
+   status: SessionStatus | string;
+   isTrial: boolean;
+   createdBy?: string | IUser;
+   createdAt?: string;
+   updatedAt?: string;
+
+   studentConfirmation?: StudentConfirmation;
+   attendanceConfirmation?: AttendanceConfirmation;
+   cancellation?: CancellationInfo;
+
+   // soft-delete fields
+   isDeleted?: boolean;
+   deletedAt?: string;
+   deletedBy?: string;
+
+   // flexible fields
+   materials?: any[];
+   quizIds?: any[];
    reminders?: Reminder[];
 }

@@ -12,6 +12,7 @@ import TutorProfilePage from "@/pages/TutorProfile/TutorProfilePage";
 import TeachingRequestsList from "@/pages/Tutor/TeachingRequestsList";
 import TeachingRequestDetail from "@/pages/Tutor/TeachingRequestDetail";
 import SchedulePage from "@/pages/SchedulePage"; // Import trang mới
+import RejectedSessionsPage from "@/pages/RejectedSessionsPage"; // Import trang rejected sessions
 // import SessionDetailPage from "@/pages/SessionDetailPage"; // Moved to sharedRoutes
 
 export const tutorRoutes = {
@@ -58,6 +59,10 @@ export const tutorRoutes = {
       {
          path: "/tutor/editFlashcard",
          element: <EditFlashcardQuiz />,
+      },
+      {
+         path: "/tutor/rejected-sessions",
+         element: <RejectedSessionsPage />,
       },
    ],
 };

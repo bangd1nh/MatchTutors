@@ -10,6 +10,7 @@ import {
    BookHeart, // Thêm icon BookHeart
    BookPlus,
    BookCopy,
+   XCircle, // Thêm icon cho rejected sessions
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -50,6 +51,11 @@ export const tutorSidebarConfig: SidebarItem[] = [
       to: "/tutor/flashcardList",
       label: "Xem bộ câu hỏi Flashcard",
       icon: <BookCopy className="h-4 w-4" />,
+   },
+   {
+      to: "/tutor/rejected-sessions",
+      label: "Buổi học bị từ chối",
+      icon: <XCircle className="h-4 w-4" />,
    },
 
    // Thêm các mục khác ở đây

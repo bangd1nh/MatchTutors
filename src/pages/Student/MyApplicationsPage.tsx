@@ -14,16 +14,28 @@ import { Loader2, AlertCircle, ArrowRight } from "lucide-react";
 import { TeachingRequestStatusBadge } from "@/components/common/TeachingRequestStatusBadge";
 import { Link } from "react-router-dom";
 import moment from "moment";
+import { useState } from "react";
+import { RequestDetailModal } from "@/components/tutor/teaching-request/RequestDetailModal";
 
 const MyApplicationsPage = () => {
    const { data: requests, isLoading, isError } = useMyTeachingRequests();
+   const [selectedRequest, setSelectedRequest] =
+      useState<TeachingRequest | null>(null);
+
+   const handleViewRequest = (request: TeachingRequest) => {
+      setSelectedRequest(request);
+   };
+
+   const handleCloseModal = () => {
+      setSelectedRequest(null);
+   };
 
    if (isLoading) {
       return (
          <div className="flex items-center justify-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="ml-4 text-muted-foreground">
-               Đang tải danh sách yêu cầu...
+               Đang tải các lớp học của bạn...
             </p>
          </div>
       );
@@ -31,12 +43,12 @@ const MyApplicationsPage = () => {
 
    if (isError) {
       return (
-         <div className="flex flex-col items-center justify-center h-64 bg-red-50 border border-red-200 rounded-lg p-8">
-            <AlertCircle className="h-12 w-12 text-red-500" />
-            <h3 className="mt-4 text-xl font-semibold text-red-700">Lỗi!</h3>
-            <p className="mt-2 text-red-600">
-               Không thể tải danh sách yêu cầu. Vui lòng thử lại sau.
+         <div className="flex flex-col items-center justify-center h-64 bg-red-50 border border-red-200 rounded-lg p-6">
+            <AlertCircle className="h-8 w-8 text-red-500" />
+            <p className="mt-4 text-red-700 font-semibold">
+               Đã xảy ra lỗi khi tải dữ liệu.
             </p>
+            <p className="mt-1 text-sm text-red-600">Vui lòng thử lại sau.</p>
          </div>
       );
    }
@@ -44,7 +56,7 @@ const MyApplicationsPage = () => {
    if (!requests || requests.length === 0) {
       return (
          <div className="text-center py-16">
-            <h2 className="text-2xl font-semibold">Chưa có yêu cầu nào</h2>
+            <h2 className="text-2xl font-semibold">Chưa có lớp học nào</h2>
             <p className="mt-2 text-muted-foreground">
                Bạn chưa gửi yêu cầu học cho gia sư nào.
             </p>
@@ -67,14 +79,29 @@ const MyApplicationsPage = () => {
          </div>
          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {requests.map((request) => (
-               <ApplicationCard key={request._id} request={request} />
+               <ApplicationCard
+                  key={request._id}
+                  request={request}
+                  onViewDetail={handleViewRequest}
+               />
             ))}
          </div>
+         <RequestDetailModal
+            isOpen={!!selectedRequest}
+            onClose={handleCloseModal}
+            request={selectedRequest}
+         />
       </div>
    );
 };
 
-const ApplicationCard = ({ request }: { request: TeachingRequest }) => {
+const ApplicationCard = ({
+   request,
+   onViewDetail,
+}: {
+   request: TeachingRequest;
+   onViewDetail: (request: TeachingRequest) => void;
+}) => {
    const tutor = request.tutorId?.userId;
    return (
       <Card className="flex flex-col h-full transition-all hover:shadow-md">
@@ -103,10 +130,12 @@ const ApplicationCard = ({ request }: { request: TeachingRequest }) => {
             </div>
          </CardContent>
          <CardFooter>
-            <Button asChild variant="outline" className="w-full">
-               <Link to={`/student/applications/${request._id}`}>
-                  Xem chi tiết <ArrowRight className="ml-2 h-4 w-4" />
-               </Link>
+            <Button
+               variant="outline"
+               className="w-full"
+               onClick={() => onViewDetail(request)}
+            >
+               Xem chi tiết <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
          </CardFooter>
       </Card>

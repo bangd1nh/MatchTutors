@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import {
    Select,
    SelectTrigger,
@@ -9,7 +10,8 @@ import {
    SelectContent,
    SelectItem,
 } from "@/components/ui/select";
-import { Video, MapPin, FileText } from "lucide-react";
+import { Video, MapPin, FileText, XCircle } from "lucide-react";
+import moment from "moment";
 
 export default function SessionDetails({
    session,
@@ -200,6 +202,84 @@ export default function SessionDetails({
                </div>
             </CardContent>
          </Card>
+
+         {/* Cancellation Information */}
+         {session.cancellation && (
+            <Card>
+               <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-red-600">
+                     <XCircle className="h-5 w-5" />
+                     Thông tin hủy buổi học
+                  </CardTitle>
+               </CardHeader>
+               <CardContent>
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                     {/* Cancelled By User Info */}
+                     <div className="mb-4">
+                        <Label className="text-red-600 font-medium block mb-2">
+                           Người hủy:
+                        </Label>
+                        {typeof session.cancellation.cancelledBy === "object" &&
+                        session.cancellation.cancelledBy ? (
+                           <div className="p-3 bg-white rounded-lg border border-red-100">
+                              <div className="space-y-1">
+                                 <div className="text-sm font-semibold text-red-800">
+                                    {session.cancellation.cancelledBy.name ||
+                                       "Người dùng"}
+                                 </div>
+                                 <div className="text-xs text-red-600">
+                                    {session.cancellation.cancelledBy.email ||
+                                       "N/A"}
+                                 </div>
+                              </div>
+                           </div>
+                        ) : (
+                           <div className="p-3 bg-white rounded-lg border border-red-100">
+                              <span className="text-sm text-red-800">
+                                 Người dùng (ID:{" "}
+                                 {session.cancellation.cancelledBy})
+                              </span>
+                           </div>
+                        )}
+                     </div>
+
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                           <Label className="text-red-600 font-medium">
+                              Thời gian hủy:
+                           </Label>
+                           <p className="text-sm text-red-800">
+                              {moment(session.cancellation.cancelledAt).format(
+                                 "HH:mm DD/MM/YYYY"
+                              )}
+                           </p>
+                        </div>
+                        <div>
+                           <Label className="text-red-600 font-medium">
+                              Thời gian hủy (chi tiết):
+                           </Label>
+                           <p className="text-sm text-red-800">
+                              {moment(session.cancellation.cancelledAt).format(
+                                 "dddd, DD/MM/YYYY [lúc] HH:mm"
+                              )}
+                           </p>
+                        </div>
+                     </div>
+
+                     <div>
+                        <Label className="text-red-600 font-medium">
+                           Lý do hủy:
+                        </Label>
+                        <div className="mt-2 p-3 bg-white rounded-lg border border-red-100">
+                           <p className="text-sm text-red-800">
+                              {session.cancellation.reason}
+                           </p>
+                        </div>
+                     </div>
+                  </div>
+               </CardContent>
+            </Card>
+         )}
       </div>
    );
 }
