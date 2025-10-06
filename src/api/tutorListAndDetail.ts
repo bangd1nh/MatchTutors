@@ -6,6 +6,7 @@ interface SearchTutorsParams {
    subjects?: string[];
    levels?: string[];
    city?: string;
+   cities?: string[];
    minRate?: number;
    maxRate?: number;
    minExperience?: number;
@@ -33,6 +34,7 @@ export const searchTutors = async (
          subjects: params.subjects?.join(","),
          levels: params.levels?.join(","),
          classType: params.classType?.join(","),
+         cities: params.cities?.join(","),
          availability: params.availability
             ? JSON.stringify(params.availability)
             : undefined,
