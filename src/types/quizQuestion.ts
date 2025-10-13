@@ -17,8 +17,8 @@ export interface IQuizQuestion {
    caseSensitive?: boolean;
 
    // Flashcard
-   frontText: string;
-   backText: string;
+   frontText?: string;
+   backText?: string;
 
    // Common
    explanation?: string;

@@ -48,6 +48,11 @@ export const tutorSidebarConfig: SidebarItem[] = [
       icon: <BookPlus className="h-4 w-4" />,
    },
    {
+      to: "/tutor/createMultipleChoiceQuiz",
+      label: "Tạo bộ câu hỏi Trắc nghiệm",
+      icon: <BookPlus className="h-4 w-4" />,
+   },
+   {
       to: "/tutor/flashcardList",
       label: "Xem bộ câu hỏi Flashcard",
       icon: <BookCopy className="h-4 w-4" />,

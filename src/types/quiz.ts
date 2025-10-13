@@ -1,4 +1,4 @@
-import { QuizModeEnum } from "@/enums/quiz.enum";
+import { QuestionTypeEnum, QuizModeEnum } from "@/enums/quiz.enum";
 import { IQuizQuestion } from "./quizQuestion";
 import { BaseAPIResponse } from "./response";
 
@@ -21,6 +21,18 @@ export type FlashcardQuestion = {
    order?: number;
    frontText: string;
    backText: string;
+   explanation?: string;
+   points?: number;
+};
+
+export type MultipleChoiceQuestions = {
+   // mirror subset of server IQuizQuestion for multiple choice usage
+   _id?: string; // client id
+   order?: number;
+   questionType: QuestionTypeEnum.MULTIPLE_CHOICE;
+   questionText: string;
+   options: string[];
+   correctAnswer?: string;
    explanation?: string;
    points?: number;
 };
@@ -91,4 +103,20 @@ export interface IQUizUpdate {
    newQuestionArr: IQuizQuestion[];
    deleteQuestionArr: { _id: string }[];
    editQuestionArr: IQuizQuestion[];
+}
+
+export interface MCQResponse extends BaseAPIResponse {
+   data: {
+      _id?: string;
+      title: string;
+      description?: string;
+      quizMode?: QuizModeEnum;
+      settings?: QuizSettings;
+      createdBy?: string;
+      tags?: string[];
+      totalQuestions?: number;
+      createdAt?: Date;
+      updatedAt?: Date;
+      questionArr?: IQuizQuestion[];
+   };
 }

@@ -13,6 +13,7 @@ import TeachingRequestsList from "@/pages/Tutor/TeachingRequestsList";
 import TeachingRequestDetail from "@/pages/Tutor/TeachingRequestDetail";
 import SchedulePage from "@/pages/SchedulePage"; // Import trang mới
 import RejectedSessionsPage from "@/pages/RejectedSessionsPage"; // Import trang rejected sessions
+import CreateMultipleChoiceQuiz from "@/pages/MultipleChoice/CreateMultipleChoiceQuiz";
 // import SessionDetailPage from "@/pages/SessionDetailPage"; // Moved to sharedRoutes
 
 export const tutorRoutes = {
@@ -36,9 +37,9 @@ export const tutorRoutes = {
          element: <SchedulePage />,
       },
       {
-        // Session detail route moved to sharedRoutes (accessible by both roles)
-        // path: "/session/:id",
-        // element: <SessionDetailPage />,
+         // Session detail route moved to sharedRoutes (accessible by both roles)
+         // path: "/session/:id",
+         // element: <SessionDetailPage />,
       },
       {
          path: "/tutor/jobs",
@@ -47,6 +48,10 @@ export const tutorRoutes = {
       {
          path: "/tutor/createFlashcardQuiz",
          element: <CreateFlashcardQuiz />,
+      },
+      {
+         path: "/tutor/createMultipleChoiceQuiz",
+         element: <CreateMultipleChoiceQuiz />,
       },
       {
          path: "/tutor/flashcardList",
