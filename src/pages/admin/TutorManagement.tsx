@@ -10,7 +10,7 @@ import {
    useGetTutorMapping,
    AdminTutor 
 } from "@/hooks/useAdminTutors";
-import { Search, ShieldOff, Shield, MoreVertical, Eye, CheckCircle, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ShieldOff, Shield, MoreVertical, Clock, ChevronLeft, ChevronRight, UserCheck } from "lucide-react";
 import {
    Dialog,
    DialogContent,
@@ -30,13 +30,6 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 type TabType = 'all' | 'active' | 'banned';
 
-// Helper functions
-const getApprovalStatusColor = (isApproved: boolean | null) => {
-   if (isApproved === null) return 'bg-gray-100 text-gray-600';
-   return isApproved 
-      ? 'bg-green-100 text-green-700 border-green-200' 
-      : 'bg-yellow-100 text-yellow-700 border-yellow-200';
-};
 
 const TutorManagement = () => {
    const navigate = useNavigate();
@@ -71,16 +64,14 @@ const TutorManagement = () => {
    }, [searchTerm]);
 
    // Memoized mappings
-   const { userIdToTutorId, tutorProfileData } = useMemo(() => {
+   const { userIdToTutorId } = useMemo(() => {
       const mapping: Record<string, string> = {};
-      const profileData: Record<string, any> = {};
       
       tutorMappingData?.data?.tutors?.forEach((item: any) => {
          if (item.tutorId) mapping[item.userId] = item.tutorId;
-         if (item.tutor) profileData[item.userId] = item.tutor;
       });
       
-      return { userIdToTutorId: mapping, tutorProfileData: profileData };
+      return { userIdToTutorId: mapping };
    }, [tutorMappingData]);
 
    // Memoized filtered tutors
@@ -158,27 +149,14 @@ const TutorManagement = () => {
       }
    }, []);
 
-   const handleViewTutor = useCallback((tutor: AdminTutor) => {
-      const tutorId = userIdToTutorId[tutor._id];
-      if (tutorId) {
-         navigate(`/admin/tutors/${tutorId}`);
-      }
-   }, [userIdToTutorId, navigate]);
+   const handleViewTutorProfiles = useCallback(() => {
+      navigate('/admin/tutor-profile');
+   }, [navigate]);
 
    const hasTutorProfile = useCallback((tutor: AdminTutor) => {
       return !!userIdToTutorId[tutor._id];
    }, [userIdToTutorId]);
 
-   const getTutorApprovalStatus = useCallback((tutor: AdminTutor) => {
-      const profile = tutorProfileData[tutor._id];
-      return profile ? profile.isApproved : null;
-   }, [tutorProfileData]);
-
-   const getApprovalColor = useCallback((tutor: AdminTutor) => {
-      const profile = tutorProfileData[tutor._id];
-      if (!profile) return 'bg-gray-100 text-gray-600';
-      return getApprovalStatusColor(profile.isApproved);
-   }, [tutorProfileData]);
 
    // Validation
    const isBanReasonValid = banReason.length >= MIN_BAN_REASON_LENGTH && 
@@ -188,8 +166,19 @@ const TutorManagement = () => {
       <div className="w-full">
          {/* Header */}
          <div className="mb-6">
-            <h1 className="text-2xl font-bold mb-2">Quản lý Gia sư</h1>
-            <p className="text-gray-600">Quản lý trạng thái và thông tin của các gia sư trong hệ thống</p>
+            <div className="flex items-center justify-between">
+               <div>
+                  <h1 className="text-2xl font-bold mb-2">Quản lý Tài khoản Gia sư</h1>
+                  <p className="text-gray-600">Quản lý trạng thái tài khoản và khóa/mở khóa gia sư</p>
+               </div>
+               <Button
+                  onClick={handleViewTutorProfiles}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+               >
+                  <UserCheck className="h-4 w-4 mr-2" />
+                  Xem Hồ sơ Gia sư
+               </Button>
+            </div>
          </div>
 
          {/* Search */}
@@ -233,7 +222,7 @@ const TutorManagement = () => {
             <table className="w-full divide-y divide-gray-100">
                <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                   <tr>
-                     {['Gia sư', 'Liên hệ', 'Địa chỉ', 'Xác thực', 'Trạng thái', 'Hành động'].map((header) => (
+                     {['Gia sư', 'Liên hệ', 'Địa chỉ', 'Xác thực', 'Trạng thái tài khoản', 'Hành động'].map((header) => (
                         <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                            {header}
                         </th>
@@ -328,31 +317,11 @@ const TutorManagement = () => {
                               </Badge>
                            </td>
 
-                           {/* Approval Status */}
+                           {/* Account Status */}
                            <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center gap-2">
-                                 {hasTutorProfile(tutor) ? (
-                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border ${getApprovalColor(tutor)}`}>
-                                       {getTutorApprovalStatus(tutor) ? (
-                                          <>
-                                             <CheckCircle className="h-3.5 w-3.5" />
-                                             Đã duyệt
-                                          </>
-                                       ) : (
-                                          <>
-                                             <Clock className="h-3.5 w-3.5" />
-                                             Chờ duyệt
-                                          </>
-                                       )}
-                                    </span>
-                                 ) : (
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">
-                                       Chưa có profile
-                                    </span>
-                                 )}
-                                 
-                                 {/* Ban Tooltip */}
-                                 {tutor.isBanned && (
+                                 {/* Ban Status */}
+                                 {tutor.isBanned ? (
                                     <div className="relative group">
                                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full bg-red-100 text-red-700 border border-red-200 cursor-help">
                                           <ShieldOff className="h-3.5 w-3.5" />
@@ -413,7 +382,21 @@ const TutorManagement = () => {
                                           </div>
                                        </div>
                                     </div>
+                                 ) : (
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full bg-green-100 text-green-700 border border-green-200">
+                                       <Shield className="h-3.5 w-3.5" />
+                                       Hoạt động
+                                    </span>
                                  )}
+                                 
+                                 {/* Profile Status Indicator */}
+                                 <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-full ${
+                                    hasTutorProfile(tutor) 
+                                       ? 'bg-blue-100 text-blue-700' 
+                                       : 'bg-gray-100 text-gray-600'
+                                 }`}>
+                                    {hasTutorProfile(tutor) ? 'Có hồ sơ' : 'Chưa có hồ sơ'}
+                                 </span>
                               </div>
                            </td>
 
@@ -443,32 +426,11 @@ const TutorManagement = () => {
                                     )}
                                  </Button>
 
-                                 {hasTutorProfile(tutor) ? (
-                                    <Button
-                                       size="sm"
-                                       onClick={() => handleViewTutor(tutor)}
-                                       variant="outline"
-                                       className="text-blue-700 hover:text-blue-800 hover:bg-blue-50"
-                                    >
-                                       <Eye className="h-4 w-4 mr-1.5" />
-                                       Xem
-                                    </Button>
-                                 ) : (
-                                    <Button
-                                       size="sm"
-                                       variant="outline"
-                                       disabled
-                                       className="cursor-not-allowed"
-                                    >
-                                       <Eye className="h-4 w-4 mr-1.5" />
-                                       Chưa có
-                                    </Button>
-                                 )}
-
                                  <Button
                                     size="sm"
                                     variant="ghost"
                                     className="p-2"
+                                    title="Thêm tùy chọn"
                                  >
                                     <MoreVertical className="h-4 w-4" />
                                  </Button>

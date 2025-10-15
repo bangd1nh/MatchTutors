@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home, User, LayoutDashboard, BookOpen, GraduationCap } from "lucide-react";
+import { LogOut, Home, User, LayoutDashboard, BookOpen, GraduationCap, FileText, Key } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export type SidebarItem = {
@@ -23,22 +23,25 @@ export const adminSidebarConfig: SidebarItem[] = [
       icon: <User className="h-4 w-4" />,
    },
    {
+      to: "/admin/tutor-profile",
+      label: "Hồ sơ gia sư",
+      icon: <FileText className="h-4 w-4" />,
+   },
+   {
       to: "/admin/tutors",
-      label: "Gia sư",
+      label: "Tài khoản gia sư",
       icon: <BookOpen className="h-4 w-4" />,
    },
    {
       to: "/admin/students",
-      label: "Học sinh",
+      label: "Tài khoản học sinh",
       icon: <GraduationCap className="h-4 w-4" />,
    },
    {
       to: "/profile/change-password",
-      label: "change pass",
-      icon: <BookOpen className="h-4 w-4" />,
+      label: "Đổi mật khẩu",
+      icon: <Key className="h-4 w-4" />,
    },
-
-   // Thêm các mục khác ở đây
 ];
 
 const AdminSidebarItems: React.FC<{
