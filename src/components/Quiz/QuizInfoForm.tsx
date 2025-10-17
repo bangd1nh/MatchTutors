@@ -55,6 +55,7 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
       } = useForm<QuizInfoValues>({
          mode: "onChange",
          defaultValues: {
+            quizMode: isFlashcard ? QuizModeEnum.STUDY : QuizModeEnum.EXAM,
             settings: {
                shuffleQuestions: false,
                showCorrectAnswersAfterSubmit: true,
@@ -67,15 +68,17 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
       useEffect(() => {
          if (isFlashcard) {
             setValue("quizMode", QuizModeEnum.STUDY);
+         } else {
+            setValue("quizMode", QuizModeEnum.EXAM);
          }
       }, [isFlashcard, setValue]);
 
       useEffect(() => {
          if (defaultValues) {
-            // Override with STUDY if isFlashcard, otherwise use provided value
+            // Override with EXAM if isFlashcard, otherwise use provided value
             const quizMode = isFlashcard
                ? QuizModeEnum.STUDY
-               : defaultValues.quizMode;
+               : QuizModeEnum.EXAM;
 
             reset({
                ...defaultValues,
@@ -92,17 +95,17 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
             const vals = getValues() as any;
             let quizMode = vals.quizMode;
 
-            // Chỉ gán STUDY làm mặc định cho flashcard
+            // Chỉ gán EXAM làm mặc định cho flashcard
             if (isFlashcard) {
                quizMode = QuizModeEnum.STUDY;
             } else if (!quizMode) {
-               quizMode = QuizModeEnum.STUDY; // Chỉ fallback khi undefined
+               quizMode = QuizModeEnum.EXAM; // Chỉ fallback khi undefined
             }
 
             return {
                title: vals.title ?? "",
                description: vals.description ?? "",
-               quizMode: quizMode, // Sử dụng giá trị đã xử lý
+               quizMode: isFlashcard ? QuizModeEnum.STUDY : QuizModeEnum.EXAM, // Sử dụng giá trị đã xử lý
                settings: {
                   shuffleQuestions: vals?.settings?.shuffleQuestions ?? false,
                   showCorrectAnswersAfterSubmit:
@@ -123,11 +126,7 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
 
             // quizMode must exist
             if (!isFlashcard && !vals.quizMode) {
-               setError("quizMode" as any, {
-                  type: "manual",
-                  message: "Vui lòng chọn Quiz mode",
-               });
-               valid = false;
+               vals.quizMode = QuizModeEnum.EXAM;
             }
 
             // tags: no empty values
@@ -161,7 +160,9 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
                   tags: v.tags ?? [],
                   title: v.title ?? "",
                   description: v.description ?? "",
-                  quizMode: v.quizMode ?? QuizModeEnum.STUDY,
+                  quizMode: isFlashcard
+                     ? QuizModeEnum.STUDY
+                     : v.quizMode ?? QuizModeEnum.EXAM,
                   totalQuestions: v.totalQuestions,
                } as any);
             } else {
@@ -241,15 +242,21 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
                   <Controller
                      name="quizMode"
                      control={control}
-                     rules={{ required: "Vui lòng chọn Quiz mode" }}
+                     // rules={{ required: "Vui lòng chọn Quiz mode" }}
                      render={({ field }) => (
                         <Select
                            onValueChange={field.onChange}
                            value={
-                              isFlashcard ? QuizModeEnum.STUDY : field.value
+                              isFlashcard
+                                 ? QuizModeEnum.STUDY
+                                 : QuizModeEnum.EXAM
                            }
-                           defaultValue={QuizModeEnum.STUDY}
-                           disabled={isFlashcard}
+                           defaultValue={
+                              isFlashcard
+                                 ? QuizModeEnum.STUDY
+                                 : QuizModeEnum.EXAM
+                           }
+                           disabled={true}
                         >
                            <SelectTrigger className="w-full">
                               <SelectValue placeholder="Chọn mode" />

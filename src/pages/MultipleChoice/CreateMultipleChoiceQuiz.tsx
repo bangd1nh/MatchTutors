@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMCQ } from "@/hooks/useMCQ";
 import { useToast } from "@/hooks/useToast";
-import { QuestionTypeEnum } from "@/enums/quiz.enum";
+import { QuestionTypeEnum, QuizModeEnum } from "@/enums/quiz.enum";
 import { IQuizBody } from "@/types/quiz";
 import { useEffect, useRef } from "react";
 
@@ -35,6 +35,7 @@ const CreateMultipleChoiceQuiz = () => {
       // Xử lý câu hỏi (cần phải làm sạch các dữ liệu)
       const mappedQuestions = newQuestions.map((q) => ({
          questionType: QuestionTypeEnum.MULTIPLE_CHOICE,
+         quizMode: QuizModeEnum.EXAM,
          questionText: q.questionText,
          options: (q.options || []).map((opt) => opt.trim()),
          correctAnswer: q.correctAnswer?.trim() || "",
@@ -63,7 +64,7 @@ const CreateMultipleChoiceQuiz = () => {
 
             <CardContent className="space-y-6">
                <div>
-                  <QuizInfoForm ref={quizInfoRef} />
+                  <QuizInfoForm ref={quizInfoRef} isFlashcard={false} />
                </div>
 
                <div>
