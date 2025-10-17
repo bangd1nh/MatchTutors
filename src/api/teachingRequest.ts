@@ -168,3 +168,34 @@ export const confirmCompletion = async (
    );
    return response.data.metadata;
 };
+
+
+/**
+ * Lấy yêu cầu dạy học đã hoàn thành giữa học sinh và gia sư (nếu có).
+ */
+export const getCompletedRequestBetween = async (
+   studentUserId: string,
+   tutorId: string
+): Promise<TeachingRequest | null> => {
+   const response = await apiClient.get(`/teachingRequest/completed/between`, {
+      params: { studentUserId, tutorId },
+   });
+
+   const data = response.data;
+   console.log("getCompletedRequestBetween response data:", data);
+
+   //  Extract correctly from nested structure
+   const payload =
+      data?.data?.request ??
+      data?.metadata ??
+      data?.data ??
+      data?.teachingRequest ??
+      data;
+
+   console.log("getCompletedRequestBetween payload:", payload);
+
+   //  Return only if _id exists
+   return payload && (payload._id || payload.id)
+      ? (payload as TeachingRequest)
+      : null;
+};

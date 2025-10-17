@@ -1,4 +1,4 @@
-import { TutorFilterBar } from "@/components/tutor/tutor-search/TutorFilterSidebar";
+import TutorFilterBar from "@/components/tutor/tutor-search/TutorFilterSidebar";
 import TutorListPage from "./TutorList";
 import { useState } from "react";
 

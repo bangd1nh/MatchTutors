@@ -28,32 +28,31 @@ interface TutorHeaderProps {
 
 export function TutorHeader({ tutor }: TutorHeaderProps) {
    const toast = useToast();
-
    const { isAuthenticated } = useUser();
-   const {
-      data: isFav,
-      isLoading,
-      isError,
-   } = isAuthenticated
-      ? useFetchFav(tutor._id)
-      : { data: undefined, isLoading: false, isError: false };
 
-   const fav = isAuthenticated ? useAddFav() : undefined;
-   const removeFav = isAuthenticated ? useRemoveFav() : undefined;
+   // Always call the hooks (never wrap them in conditionals)
+   const { data: isFav, isLoading, isError } = useFetchFav(tutor._id, {
+      enabled: !!isAuthenticated,
+   });
+
+   const fav = useAddFav();
+   const removeFav = useRemoveFav();
 
    const handleSave = () => {
       if (!isAuthenticated) {
          toast("warning", "Please login to favorite this tutor");
          return;
       }
+
       if (isFav?.isFav) {
-         removeFav?.mutate(tutor._id);
+         removeFav.mutate(tutor._id);
       } else {
-         fav?.mutate(tutor._id);
+         fav.mutate(tutor._id);
       }
    };
 
-   if (isLoading) {
+   // ✅ Only show loading/error when authenticated and query is running
+   if (isAuthenticated && isLoading) {
       return (
          <div className="flex justify-center items-center p-10">
             <Loader2 className="h-8 w-8 animate-spin text-sky-600" />
@@ -61,7 +60,7 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
       );
    }
 
-   if (isError) {
+   if (isAuthenticated && isError) {
       return (
          <div className="text-center text-red-500 p-10">
             Không thể tải hồ sơ học gia sư.
@@ -98,12 +97,11 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                         {[...Array(5)].map((_, i: number) => (
                            <Star
                               key={i}
-                              className={`w-4 h-4 ${
-                                 tutor.ratings &&
+                              className={`w-4 h-4 ${tutor.ratings &&
                                  i < Math.floor(tutor.ratings.average)
-                                    ? "fill-yellow-400 text-yellow-400"
-                                    : "text-gray-300"
-                              }`}
+                                 ? "fill-yellow-400 text-yellow-400"
+                                 : "text-gray-300"
+                                 }`}
                            />
                         ))}
                         <span className="ml-2 text-sm text-muted-foreground">
@@ -190,9 +188,8 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                         disabled={fav?.isPending || removeFav?.isPending}
                      >
                         <Heart
-                           className={`w-4 h-4 mr-2 ${
-                              isFav?.isFav ? "text-red-500 fill-red-500" : ""
-                           }`}
+                           className={`w-4 h-4 mr-2 ${isFav?.isFav ? "text-red-500 fill-red-500" : ""
+                              }`}
                         />
                         {isFav?.isFav ? "Unsave" : "Save"}
                      </Button>

@@ -9,7 +9,8 @@ import {
    BookOpen,
    Heart,
    Calendar, // Thêm icon Calendar
-   XCircle, // Thêm icon cho rejected sessions
+   XCircle,
+   Star, // Thêm icon cho rejected sessions
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -51,6 +52,11 @@ export const studentSidebarConfig: SidebarItem[] = [
       label: "Buổi học bị từ chối",
       icon: <XCircle className="h-4 w-4" />,
    },
+   {
+      to: "/student/review-history",
+      label: "Lịch sử đánh giá",
+      icon: <Star className="h-4 w-4" />,
+   }
 ];
 
 const StudentSidebarItems: React.FC<{
@@ -94,10 +100,9 @@ const StudentSidebarItems: React.FC<{
                      to={item.to}
                      onClick={() => onLinkClick?.()}
                      className={`flex items-center gap-3 p-2 rounded-md text-sm font-medium transition-colors duration-200
-                        ${
-                           active
-                              ? "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300"
-                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        ${active
+                           ? "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300"
+                           : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                         }
                      `}
                      title={item.label}

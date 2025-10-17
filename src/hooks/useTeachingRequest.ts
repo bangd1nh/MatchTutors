@@ -10,6 +10,7 @@ import {
    confirmCancellation,
    confirmCompletion,
    getTeachingRequestById,
+   getCompletedRequestBetween,
 } from "@/api/teachingRequest";
 import { useToast } from "./useToast";
 import { CreateTeachingRequestPayload } from "@/types/teachingRequest";
@@ -284,5 +285,20 @@ export const useRespondToRequest = () => {
       onError: (err: any) => {
          toast("error", err.response?.data?.message || "Phản hồi thất bại.");
       },
+   });
+};
+
+/**
+ * Hook để lấy yêu cầu đã hoàn thành giữa học sinh và gia sư.
+ */
+export const useCompletedRequestBetween = (
+   studentUserId?: string,
+   tutorId?: string
+) => {
+   return useQuery({
+      queryKey: ["teachingRequests", "completedBetween", studentUserId, tutorId],
+      queryFn: () => getCompletedRequestBetween(studentUserId!, tutorId!),
+      enabled: !!studentUserId && !!tutorId, // chỉ chạy khi cả hai có giá trị
+      staleTime: 1000 * 60 * 5, // 5 phút cache
    });
 };

@@ -63,7 +63,7 @@ interface TutorFilterBarProps {
     tutors: Tutor[]
 }
 
-export function TutorFilterBar({
+export default function TutorFilterBar({
     currentFilters,
     onFilterChange,
     onApplyFilters,
@@ -88,6 +88,12 @@ export function TutorFilterBar({
         });
     };
 
+    const removeCityFilter = (city: string) => {
+        onFilterChange({
+            selectedCities: currentFilters.selectedCities.filter(c => c !== city)
+        });
+    };
+
     const removeTimeSlotFilter = (slot: string) => {
         onFilterChange({
             selectedTimeSlots: currentFilters.selectedTimeSlots.filter(s => s !== slot)
@@ -98,10 +104,6 @@ export function TutorFilterBar({
         onFilterChange({
             selectedDays: currentFilters.selectedDays.filter(d => d !== day)
         });
-    };
-
-    const removeLocationFilter = () => {
-        onFilterChange({ selectedLocation: "" });
     };
 
     const removeRatingFilter = () => {
@@ -123,6 +125,7 @@ export function TutorFilterBar({
             currentFilters.selectedTimeSlots.length > 0 ||
             currentFilters.selectedDays.length > 0 ||
             currentFilters.selectedLocation !== "" ||
+            currentFilters.selectedCities.length > 0 ||
             currentFilters.ratingRange[0] > 0 || currentFilters.ratingRange[1] < 5 ||
             currentFilters.priceRange[0] > 0 || currentFilters.priceRange[1] < 2000000 ||
             currentFilters.experienceYears[0] > 0 || currentFilters.experienceYears[1] < 20;
@@ -196,18 +199,6 @@ export function TutorFilterBar({
                                     </Badge>
                                 ))}
 
-                                {/* Location Badge */}
-                                {currentFilters.selectedLocation && (
-                                    <Badge variant="secondary" className="flex items-center gap-1 py-1">
-                                        <MapPin className="h-3 w-3" />
-                                        {currentFilters.selectedLocation}
-                                        <X
-                                            className="h-3 w-3 cursor-pointer hover:text-destructive"
-                                            onClick={removeLocationFilter}
-                                        />
-                                    </Badge>
-                                )}
-
                                 {/* City Badges */}
                                 {currentFilters.selectedCities.map(city => (
                                     <Badge key={city} variant="secondary" className="flex items-center gap-1 py-1">
@@ -215,11 +206,7 @@ export function TutorFilterBar({
                                         {city}
                                         <X
                                             className="h-3 w-3 cursor-pointer hover:text-destructive"
-                                            onClick={() => {
-                                                onFilterChange({
-                                                    selectedCities: currentFilters.selectedCities.filter(c => c !== city)
-                                                })
-                                            }}
+                                            onClick={() => removeCityFilter(city)}
                                         />
                                     </Badge>
                                 ))}
@@ -430,7 +417,7 @@ export function TutorFilterBar({
                                             value={currentFilters.ratingRange}
                                             onValueChange={(value) => onFilterChange({ ratingRange: value as [number, number] })}
                                             max={5}
-                                            step={0.5}
+                                            step={1}
                                             className="w-full"
                                         />
                                         <div className="flex justify-between text-xs text-gray-500 mt-1">
