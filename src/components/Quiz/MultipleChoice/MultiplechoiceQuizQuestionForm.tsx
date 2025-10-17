@@ -14,6 +14,7 @@ import { Trash, ChevronUp, ChevronDown, Plus } from "lucide-react";
 import { MultipleChoiceQuestions } from "@/types/quiz";
 import { QuestionTypeEnum } from "@/enums/quiz.enum";
 import { useMultipleChoiceQuizStore } from "@/store/useMultipleChoiceQuizStore";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export type MultipleChoiceQuestionsFormHandle = {
    validate: () => Promise<{ valid: boolean; errors?: Record<string, string> }>;
@@ -32,7 +33,7 @@ const emptyQuestion = (): MultipleChoiceQuestions => ({
    questionType: QuestionTypeEnum.MULTIPLE_CHOICE,
    questionText: "",
    options: ["", ""],
-   correctAnswer: "",
+   correctAnswer: [],
    explanation: "",
    points: 1,
 });
@@ -50,9 +51,16 @@ const shallowEqualQuestion = (
       a.options.length === b.options.length &&
       a.options.every((opt, i) => opt === b.options?.[i]);
 
+   // Compare correctAnswer arrays
+   const correctAnswerEqual =
+      Array.isArray(a.correctAnswer) &&
+      Array.isArray(b.correctAnswer) &&
+      a.correctAnswer.length === b.correctAnswer.length &&
+      a.correctAnswer.every((ans, i) => ans === b.correctAnswer?.[i]);
+
    return (
       (a.questionText ?? "") === (b.questionText ?? "") &&
-      (a.correctAnswer ?? "") === (b.correctAnswer ?? "") &&
+      correctAnswerEqual &&
       (a.explanation ?? "") === (b.explanation ?? "") &&
       (a.points ?? 0) === (b.points ?? 0) &&
       (a.order ?? 0) === (b.order ?? 0) &&
@@ -76,6 +84,9 @@ const MultipleChoiceQuizQuestionForm =
                  ...q,
                  order: q.order ?? i + 1,
                  _id: q._id ?? makeId(),
+                 correctAnswer: Array.isArray(q.correctAnswer)
+                    ? q.correctAnswer
+                    : [],
               }))
             : [emptyQuestion()]
       );
@@ -101,7 +112,14 @@ const MultipleChoiceQuizQuestionForm =
             // Sửa điều kiện nhận biết câu hỏi từ server - MongoDB ID có độ dài 24
             if (id && id.length === 24) {
                ids.add(id);
-               snapshot[id] = { ...q, _id: id, order: q.order ?? i + 1 };
+               snapshot[id] = {
+                  ...q,
+                  _id: id,
+                  order: q.order ?? i + 1,
+                  correctAnswer: Array.isArray(q.correctAnswer)
+                     ? q.correctAnswer
+                     : [],
+               };
             }
          });
 
@@ -124,18 +142,24 @@ const MultipleChoiceQuizQuestionForm =
                   if (!q.options || q.options.length < 2)
                      e[`${q._id}-options`] = "At least 2 options are required";
 
-                  if (!q.correctAnswer || q.correctAnswer.trim() === "")
-                     e[`${q._id}-answer`] = "Correct answer is required";
-
-                  // Only check inclusion when correctAnswer is a defined, non-empty string
-                  if (
-                     q.options &&
-                     typeof q.correctAnswer === "string" &&
-                     q.correctAnswer.trim() !== "" &&
-                     !q.options.includes(q.correctAnswer)
-                  )
+                  if (!q.correctAnswer || q.correctAnswer.length === 0)
                      e[`${q._id}-answer`] =
-                        "Correct answer must be one of the options";
+                        "At least one correct answer is required";
+
+                  // Check if all correct answers are in options
+                  if (
+                     Array.isArray(q.correctAnswer) &&
+                     q.correctAnswer.length > 0 &&
+                     Array.isArray(q.options)
+                  ) {
+                     const allAnswersValid = q.correctAnswer.every((ans) =>
+                        q.options.includes(ans)
+                     );
+                     if (!allAnswersValid) {
+                        e[`${q._id}-answer`] =
+                           "All correct answers must be from the available options";
+                     }
+                  }
                });
 
                setErrors(e);
@@ -149,6 +173,9 @@ const MultipleChoiceQuizQuestionForm =
                      ...q,
                      _id: q._id ?? makeId(),
                      order: q.order ?? i + 1,
+                     correctAnswer: Array.isArray(q.correctAnswer)
+                        ? q.correctAnswer
+                        : [],
                   }));
                   setQuestionsState(normalized);
                } else setQuestionsState([emptyQuestion()]);
@@ -167,7 +194,14 @@ const MultipleChoiceQuizQuestionForm =
                   const id = q._id ?? makeId();
                   if (id && !id.startsWith("client-")) {
                      ids.add(id);
-                     snapshot[id] = { ...q, _id: id, order: q.order ?? i + 1 };
+                     snapshot[id] = {
+                        ...q,
+                        _id: id,
+                        order: q.order ?? i + 1,
+                        correctAnswer: Array.isArray(q.correctAnswer)
+                           ? q.correctAnswer
+                           : [],
+                     };
                   }
                });
 
@@ -193,7 +227,7 @@ const MultipleChoiceQuizQuestionForm =
                      questionType: QuestionTypeEnum.MULTIPLE_CHOICE,
                      questionText: q.questionText || "",
                      options: q.options || [],
-                     correctAnswer: q.correctAnswer || "",
+                     correctAnswer: q.correctAnswer || [],
                      explanation: q.explanation || "",
                      order: q.order || 0,
                      points: q.points || 0,
@@ -397,9 +431,15 @@ const MultipleChoiceQuizQuestionForm =
                options: newOptions,
             };
 
-            // If this option was the correct answer, update correctAnswer too
-            if (question.correctAnswer === oldOption) {
-               updates.correctAnswer = value;
+            // If this option was in the correct answers, update correctAnswer too
+            if (
+               Array.isArray(question.correctAnswer) &&
+               question.correctAnswer.includes(oldOption) &&
+               oldOption !== value
+            ) {
+               updates.correctAnswer = question.correctAnswer.map((ans) =>
+                  ans === oldOption ? value : ans
+               );
             }
 
             update(questionId, updates);
@@ -419,14 +459,17 @@ const MultipleChoiceQuizQuestionForm =
                   const newOptions = q.options.filter(
                      (_, i) => i !== optionIndex
                   );
-                  let updates = { options: newOptions };
 
-                  // If removed option was correct answer, reset correctAnswer
-                  if (q.correctAnswer === removedOption) {
-                     return { ...q, ...updates, correctAnswer: "" };
-                  }
+                  // Remove from correct answers if it was selected
+                  const newCorrectAnswer = Array.isArray(q.correctAnswer)
+                     ? q.correctAnswer.filter((ans) => ans !== removedOption)
+                     : [];
 
-                  return { ...q, ...updates };
+                  return {
+                     ...q,
+                     options: newOptions,
+                     correctAnswer: newCorrectAnswer,
+                  };
                }
                return q;
             })
@@ -448,27 +491,61 @@ const MultipleChoiceQuizQuestionForm =
                options: newOptions,
             };
 
-            // If removed option was correct answer, reset correctAnswer
-            if (question.correctAnswer === removedOption) {
-               updates.correctAnswer = "";
+            // Remove from correct answers if it was selected
+            if (Array.isArray(question.correctAnswer)) {
+               updates.correctAnswer = question.correctAnswer.filter(
+                  (ans) => ans !== removedOption
+               );
             }
 
             update(questionId, updates);
          }
       };
 
-      // Function to set correct answer
-      const setCorrectAnswer = (questionId: string, option: string) => {
+      // Function to toggle correct answer (for multiple selection)
+      const toggleCorrectAnswer = (questionId: string, option: string) => {
          setQuestionsState((prev) =>
             prev.map((q) => {
                if (q._id === questionId) {
-                  return { ...q, correctAnswer: option };
+                  const currentCorrect = Array.isArray(q.correctAnswer)
+                     ? q.correctAnswer
+                     : [];
+                  let newCorrectAnswer: string[];
+
+                  if (currentCorrect.includes(option)) {
+                     // Remove from correct answers
+                     newCorrectAnswer = currentCorrect.filter(
+                        (ans) => ans !== option
+                     );
+                  } else {
+                     // Add to correct answers
+                     newCorrectAnswer = [...currentCorrect, option];
+                  }
+
+                  return { ...q, correctAnswer: newCorrectAnswer };
                }
                return q;
             })
          );
 
-         update(questionId, { correctAnswer: option });
+         // Update tracking
+         const question = questions.find((q) => q._id === questionId);
+         if (question) {
+            const currentCorrect = Array.isArray(question.correctAnswer)
+               ? question.correctAnswer
+               : [];
+            let newCorrectAnswer: string[];
+
+            if (currentCorrect.includes(option)) {
+               newCorrectAnswer = currentCorrect.filter(
+                  (ans) => ans !== option
+               );
+            } else {
+               newCorrectAnswer = [...currentCorrect, option];
+            }
+
+            update(questionId, { correctAnswer: newCorrectAnswer });
+         }
       };
 
       // Calculate total points
@@ -480,7 +557,10 @@ const MultipleChoiceQuizQuestionForm =
       return (
          <div className="space-y-4">
             {questions.map((q, idx) => (
-               <Card key={q._id} className="bg-slate-800/40">
+               <Card
+                  key={q._id}
+                  className="bg-slate-300/30 dark:bg-slate-800/30"
+               >
                   <CardHeader className="flex items-center justify-between py-2 px-4">
                      <CardTitle className="text-sm">
                         Câu hỏi #{q.order ?? idx + 1}
@@ -526,7 +606,7 @@ const MultipleChoiceQuizQuestionForm =
                            variant="ghost"
                            size="sm"
                            onClick={() => {
-                              if (q._id) remove(q._id); // Thêm kiểm tra trước khi gọi hàm
+                              if (q._id) remove(q._id);
                            }}
                            disabled={questions.length <= 1}
                            className="text-red-500"
@@ -574,21 +654,25 @@ const MultipleChoiceQuizQuestionForm =
                      </div>
 
                      <div className="mt-3">
-                        <Label>Các lựa chọn (min 2, chọn 1 đúng)</Label>
+                        <Label>
+                           Các lựa chọn (min 1, có thể chọn nhiều đáp án đúng)
+                        </Label>
                         <div className="space-y-2">
                            {(q.options || []).map((option, optIdx) => (
                               <div
                                  key={optIdx}
                                  className="flex items-center gap-2"
                               >
-                                 <input
-                                    type="radio"
-                                    checked={q.correctAnswer === option}
-                                    onChange={() => {
-                                       if (q._id)
-                                          setCorrectAnswer(q._id, option);
+                                 <Checkbox
+                                    checked={
+                                       Array.isArray(q.correctAnswer) &&
+                                       q.correctAnswer.includes(option)
+                                    }
+                                    onCheckedChange={() => {
+                                       if (q._id && option.trim())
+                                          toggleCorrectAnswer(q._id, option);
                                     }}
-                                    disabled={!option}
+                                    disabled={!option.trim()}
                                  />
 
                                  <Input
@@ -639,6 +723,14 @@ const MultipleChoiceQuizQuestionForm =
                               {errors[`${q._id}-answer`]}
                            </div>
                         )}
+
+                        {/* Display selected correct answers */}
+                        {Array.isArray(q.correctAnswer) &&
+                           q.correctAnswer.length > 0 && (
+                              <div className="mt-2 text-sm text-blue-500 font-medium">
+                                 Đáp án đúng: {q.correctAnswer.join(", ")}
+                              </div>
+                           )}
                      </div>
 
                      <div className="mt-3">

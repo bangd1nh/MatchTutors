@@ -32,7 +32,7 @@ export type MultipleChoiceQuestions = {
    questionType: QuestionTypeEnum;
    questionText: string;
    options: string[];
-   correctAnswer?: string;
+   correctAnswer?: string[];
    explanation?: string;
    points?: number;
 };

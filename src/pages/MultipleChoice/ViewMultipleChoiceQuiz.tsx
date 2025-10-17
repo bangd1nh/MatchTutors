@@ -203,53 +203,65 @@ const ViewMultipleChoiceQuiz = () => {
                      {/* Options */}
                      <ScrollArea className="max-h-[300px] pr-4">
                         <div className="space-y-3">
-                           {question.options.map(
-                              (option: any, optIndex: number) => {
-                                 const isCorrect =
-                                    option === question.correctAnswer;
-                                 return (
-                                    <div
-                                       key={optIndex}
-                                       className={`p-3 rounded-md flex items-center gap-3 
+                           {Array.isArray(question.options) &&
+                              question.options.map(
+                                 (option: any, optIndex: number) => {
+                                    // Sửa logic để kiểm tra nhiều đáp án đúng
+                                    const isCorrect = Array.isArray(
+                                       question.correctAnswer
+                                    )
+                                       ? question.correctAnswer.includes(option)
+                                       : question.correctAnswer === option;
+
+                                    return (
+                                       <div
+                                          key={optIndex}
+                                          className={`p-3 rounded-md flex items-center gap-3 
                                        ${
                                           isCorrect
-                                             ? "bg-green-950/20 border border-green-500/40"
+                                             ? "bg-green-300/30 border border-green-500/40"
                                              : "bg-secondary/30 border border-border"
                                        }`}
-                                    >
-                                       <div
-                                          className={`w-5 h-5 rounded-full flex items-center justify-center border 
+                                       >
+                                          <div
+                                             className={`w-5 h-5 rounded-sm flex items-center justify-center border 
                                        ${
                                           isCorrect
-                                             ? "border-green-500 text-green-500"
+                                             ? "border-green-500 text-green-500 bg-green-500/10"
                                              : "border-muted-foreground"
                                        }`}
-                                       >
+                                          >
+                                             {isCorrect && (
+                                                <CheckCircle2 className="h-4 w-4" />
+                                             )}
+                                          </div>
+                                          <div
+                                             className={
+                                                isCorrect
+                                                   ? "flex-1 font-medium"
+                                                   : "flex-1"
+                                             }
+                                          >
+                                             <span className="font-medium mr-2">
+                                                {String.fromCharCode(
+                                                   65 + optIndex
+                                                )}
+                                                .
+                                             </span>
+                                             {option}
+                                          </div>
                                           {isCorrect && (
-                                             <CheckCircle2 className="h-4 w-4" />
+                                             <Badge
+                                                variant="outline"
+                                                className="text-green-500 border-green-500/30"
+                                             >
+                                                Đáp án đúng
+                                             </Badge>
                                           )}
                                        </div>
-                                       <div
-                                          className={
-                                             isCorrect
-                                                ? "flex-1 font-medium"
-                                                : "flex-1"
-                                          }
-                                       >
-                                          {option}
-                                       </div>
-                                       {isCorrect && (
-                                          <Badge
-                                             variant="outline"
-                                             className="text-green-500 border-green-500/30"
-                                          >
-                                             Đáp án đúng
-                                          </Badge>
-                                       )}
-                                    </div>
-                                 );
-                              }
-                           )}
+                                    );
+                                 }
+                              )}
                         </div>
                      </ScrollArea>
 
@@ -282,11 +294,18 @@ const ViewMultipleChoiceQuiz = () => {
                   {quizQuestions.map((q: any, i: number) => (
                      <div
                         key={q._id}
-                        className="flex items-center justify-between border-b pb-2"
+                        className="flex flex-col border-b pb-2 gap-1"
                      >
-                        <div className="text-sm">Câu {q.order || i + 1}:</div>
-                        <div className="font-medium text-green-500">
-                           {q.correctAnswer}
+                        <div className="text-sm font-medium">
+                           Câu {q.order || i + 1}:
+                        </div>
+                        <div className="text-sm dark:text-green-500 text-green-600">
+                           {/* Hiển thị nhiều đáp án đúng */}
+                           {Array.isArray(q.correctAnswer)
+                              ? q.correctAnswer.length > 0
+                                 ? q.correctAnswer.join(", ")
+                                 : "Chưa có đáp án"
+                              : q.correctAnswer || "Chưa có đáp án"}
                         </div>
                      </div>
                   ))}
@@ -294,19 +313,22 @@ const ViewMultipleChoiceQuiz = () => {
             </CardContent>
          </Card>
 
+         {/* Action Buttons */}
          <div className="flex justify-between">
             <Button variant="outline" onClick={() => navigate(-1)}>
                Quay lại
             </Button>
-            <Button
-               onClick={() =>
-                  navigate(
-                     `/tutor/editMultipleChoice?multipleChoiceId=${quizId}`
-                  )
-               }
-            >
-               Chỉnh sửa
-            </Button>
+            <div className="flex gap-2">
+               <Button
+                  onClick={() =>
+                     navigate(
+                        `/tutor/editMultipleChoice?multipleChoiceId=${quizId}`
+                     )
+                  }
+               >
+                  Chỉnh sửa
+               </Button>
+            </div>
          </div>
       </div>
    );

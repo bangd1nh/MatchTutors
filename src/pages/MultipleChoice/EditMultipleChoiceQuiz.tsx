@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/useToast";
 import { useMultipleChoiceQuizStore } from "@/store/useMultipleChoiceQuizStore";
-import { updateIMCQBody } from "@/types/quiz";
+import { MultipleChoiceQuestions, updateIMCQBody } from "@/types/quiz";
 import QuizInfoForm, { QuizInfoHandle } from "@/components/Quiz/QuizInfoForm";
 import { ArrowLeft } from "lucide-react";
 import { QuestionTypeEnum } from "@/enums/quiz.enum";
@@ -204,9 +204,22 @@ const EditMultipleChoiceQuiz = () => {
                </div>
 
                <div className="flex justify-between mt-2">
-                  <Button variant="outline" onClick={() => navigate(-1)}>
-                     Hủy
-                  </Button>
+                  {updateMCQ.isSuccess ? (
+                     <Button variant="outline" onClick={() => navigate(-1)}>
+                        Quay lại
+                     </Button>
+                  ) : (
+                     <Button
+                        variant="outline"
+                        onClick={() =>
+                           mcqRef.current?.reset?.(
+                              quizQuestions as MultipleChoiceQuestions[]
+                           )
+                        }
+                     >
+                        Hủy
+                     </Button>
+                  )}
                   <Button
                      onClick={handleSubmit}
                      disabled={updateMCQ.isPending || updateMCQ.isSuccess}

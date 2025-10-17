@@ -38,7 +38,7 @@ const CreateMultipleChoiceQuiz = () => {
          quizMode: QuizModeEnum.EXAM,
          questionText: q.questionText,
          options: (q.options || []).map((opt) => opt.trim()),
-         correctAnswer: q.correctAnswer?.trim() || "",
+         correctAnswer: q.correctAnswer?.map((ans: string) => ans.trim()) || [],
          explanation: q.explanation || "",
          points: q.points || 0,
          order: q.order || 0,
