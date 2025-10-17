@@ -1,18 +1,19 @@
 import React from "react";
-import { useDeleteFlashcard, useFetchQuizByTutor } from "@/hooks/useQuiz";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useNavigate } from "react-router-dom";
+import { useMCQ } from "@/hooks/useMCQ";
 import { IQuizInfo } from "@/types/quiz";
 
-const FlashcardQuizList: React.FC = () => {
-   const { data, isLoading, isError } = useFetchQuizByTutor();
+const ViewMultipleQuizList: React.FC = () => {
+   const { fetchList } = useMCQ();
    const navigate = useNavigate();
-   const deleteQuiz = useDeleteFlashcard();
 
-   // API returns { ..., data: [...] } per example
-   const quizzes = Array.isArray(data?.data) ? data!.data : [];
+   const isLoading = fetchList.isLoading;
+   const isError = fetchList.isError;
+   const data = fetchList.data;
+   const quizzes: IQuizInfo[] = Array.isArray(data?.data) ? data!.data : [];
 
    if (isLoading) {
       return (
@@ -38,7 +39,7 @@ const FlashcardQuizList: React.FC = () => {
       return (
          <div className="min-h-[240px] flex items-center justify-center">
             <div className="text-sm text-muted-foreground">
-               Chưa có flashcard quiz nào
+               Chưa có multiple choice quiz nào
             </div>
          </div>
       );
@@ -65,7 +66,7 @@ const FlashcardQuizList: React.FC = () => {
                               variant="default"
                               className="uppercase text-xs"
                            >
-                              {String(q.quizType ?? "FLASHCARD")}
+                              {String(q.quizType ?? "MULTIPLE_CHOICE")}
                            </Badge>
                            <Badge
                               variant="secondary"
@@ -75,7 +76,7 @@ const FlashcardQuizList: React.FC = () => {
                            </Badge>
                            <div className="text-xs text-muted-foreground">
                               {q.totalQuestions != null
-                                 ? `${q.totalQuestions} thẻ`
+                                 ? `${q.totalQuestions} câu`
                                  : "—"}
                            </div>
                         </div>
@@ -94,12 +95,14 @@ const FlashcardQuizList: React.FC = () => {
                      <div className="text-xs text-muted-foreground mb-3">
                         {q.settings ? (
                            <>
-                              Shuffle:{" "}
-                              {q.settings.shuffleQuestions ? "Yes" : "No"} •
-                              Show answers:{" "}
+                              Thời gian:{" "}
+                              {q.settings.timeLimitMinutes
+                                 ? q.settings.timeLimitMinutes + " phút"
+                                 : "Không giới hạn"}{" "}
+                              • Hiện câu trả lời:{" "}
                               {q.settings.showCorrectAnswersAfterSubmit
-                                 ? "Yes"
-                                 : "No"}
+                                 ? "Có"
+                                 : "Không"}
                            </>
                         ) : (
                            "No settings"
@@ -119,7 +122,7 @@ const FlashcardQuizList: React.FC = () => {
                               size="sm"
                               onClick={() =>
                                  navigate(
-                                    `/tutor/flashcard?flashcardId=${q._id}`
+                                    `/tutor/multipleChoice?multipleChoiceId=${q._id}`
                                  )
                               }
                            >
@@ -130,19 +133,11 @@ const FlashcardQuizList: React.FC = () => {
                               size="sm"
                               onClick={() =>
                                  navigate(
-                                    `/tutor/editFlashcard?flashcardId=${q._id}`
+                                    `/tutor/editMultipleChoice?multipleChoiceId=${q._id}`
                                  )
                               }
                            >
                               Chỉnh sửa
-                           </Button>
-                           <Button
-                              variant="destructive"
-                              size="sm"
-                              disabled={deleteQuiz.isPending}
-                              onClick={() => deleteQuiz.mutate(q._id)}
-                           >
-                              Xóa
                            </Button>
                         </div>
                      </div>
@@ -154,4 +149,4 @@ const FlashcardQuizList: React.FC = () => {
    );
 };
 
-export default FlashcardQuizList;
+export default ViewMultipleQuizList;

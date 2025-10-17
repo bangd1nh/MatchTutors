@@ -97,7 +97,7 @@ const CreateFlashcardQuiz: React.FC = () => {
 
             <CardContent className="space-y-6">
                <div>
-                  <QuizInfoForm ref={quizInfoRef} />
+                  <QuizInfoForm ref={quizInfoRef} isFlashcard={true} />
                </div>
 
                <div>

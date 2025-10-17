@@ -11,7 +11,7 @@ export const createFlashCardQuiz = async (
 };
 
 export const fetchFlashCardQuiz = async (): Promise<IQuizResponse> => {
-   const response = await apiClient.get("/quiz/getTutorQuiz");
+   const response = await apiClient.get("/quiz/getTutorFlashcardQuiz");
    return response.data;
 };
 

@@ -13,6 +13,10 @@ import TeachingRequestsList from "@/pages/Tutor/TeachingRequestsList";
 import TeachingRequestDetail from "@/pages/Tutor/TeachingRequestDetail";
 import SchedulePage from "@/pages/SchedulePage"; // Import trang mới
 import RejectedSessionsPage from "@/pages/RejectedSessionsPage"; // Import trang rejected sessions
+import CreateMultipleChoiceQuiz from "@/pages/MultipleChoice/CreateMultipleChoiceQuiz";
+import ViewMultipleQuizList from "@/pages/MultipleChoice/ViewMultipleQuizList";
+import ViewMultipleChoiceQuiz from "@/pages/MultipleChoice/ViewMultipleChoiceQuiz";
+import EditMultipleChoiceQuiz from "@/pages/MultipleChoice/EditMultipleChoiceQuiz";
 import { ReviewList } from "@/pages/Review/TutorReviewList";
 // import SessionDetailPage from "@/pages/SessionDetailPage"; // Moved to sharedRoutes
 
@@ -50,6 +54,10 @@ export const tutorRoutes = {
          element: <CreateFlashcardQuiz />,
       },
       {
+         path: "/tutor/createMultipleChoiceQuiz",
+         element: <CreateMultipleChoiceQuiz />,
+      },
+      {
          path: "/tutor/flashcardList",
          element: <FlashcardQuizList />,
       },
@@ -66,8 +74,20 @@ export const tutorRoutes = {
          element: <RejectedSessionsPage />,
       },
       {
+         path: "/tutor/MultipleChoiceList",
+         element: <ViewMultipleQuizList />,
+      },
+      {
+         path: "/tutor/multipleChoice",
+         element: <ViewMultipleChoiceQuiz />,
+      },
+      {
+         path: "/tutor/editMultipleChoice",
+         element: <EditMultipleChoiceQuiz />,
+      },
+      {
          path: "/tutor/review-list",
          element: <ReviewList />,
-      }
+      },
    ],
 };
