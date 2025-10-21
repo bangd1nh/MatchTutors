@@ -1,7 +1,17 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home, User, LayoutDashboard, BookOpen, GraduationCap, FileText, Key } from "lucide-react";
+import {
+   LogOut,
+   Home,
+   User,
+   LayoutDashboard,
+   BookOpen,
+   GraduationCap,
+   MessageSquare,
+   FileText,
+   Key,
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export type SidebarItem = {
@@ -41,6 +51,11 @@ export const adminSidebarConfig: SidebarItem[] = [
       to: "/profile/change-password",
       label: "Đổi mật khẩu",
       icon: <Key className="h-4 w-4" />,
+   },
+   {
+      to: "/admin/teaching-requests",
+      label: "Yêu cầu dạy học",
+      icon: <MessageSquare className="h-4 w-4" />,
    },
 ];
 

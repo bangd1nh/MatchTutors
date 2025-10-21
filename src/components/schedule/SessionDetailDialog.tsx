@@ -17,6 +17,7 @@ import {
    useConfirmAttendance,
    useDeleteSession,
    useCancelSession,
+   useRejectAttendance, // Import the new hook
 } from "@/hooks/useSessions";
 import { Session } from "@/types/session";
 import { SessionStatus } from "@/enums/session.enum";
@@ -41,6 +42,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
    const { user } = useUser();
    const confirmParticipationMutation = useConfirmParticipation();
    const confirmAttendanceMutation = useConfirmAttendance();
+   const rejectAttendanceMutation = useRejectAttendance(); // Instantiate the new mutation
    const deleteSessionMutation = useDeleteSession();
    const cancelSessionMutation = useCancelSession();
 
@@ -84,20 +86,21 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
       session.status === SessionStatus.SCHEDULED &&
       session.studentConfirmation?.status === "PENDING";
 
-   // Hiển thị nút điểm danh sau buổi học
-   /*
-    const showAttendanceButton =
-      isSessionEnded &&
-      session.status === SessionStatus.CONFIRMED &&
-      ((isTutor && !session.attendanceConfirmation?.tutorConfirmed) ||
-         (isStudent && !session.attendanceConfirmation?.studentConfirmed));
-    */
+   // NEW: Check if the current user has already made an attendance decision
+   // const hasUserMadeAttendanceDecision =
+   //    (isTutor && session.attendanceConfirmation?.tutor.status !== "PENDING") ||
+   //    (isStudent &&
+   //       session.attendanceConfirmation?.student.status !== "PENDING");
 
-   // TEST: Luôn hiển thị nút điểm danh để test (bỏ qua isSessionEnded)
-   const showAttendanceButton =
-      // isSessionEnded && // Tạm thời bỏ qua điều kiện này
-      (isTutor && !session.attendanceConfirmation?.tutorConfirmed) ||
-      (isStudent && !session.attendanceConfirmation?.studentConfirmed);
+   // Show attendance buttons if the session is over and the user hasn't decided yet
+   const showAttendanceButtons = true; // Luôn hiển thị để test
+   /*
+      isSessionEnded &&
+      (session.status === SessionStatus.CONFIRMED ||
+         session.status === SessionStatus.COMPLETED ||
+         session.status === SessionStatus.NOT_CONDUCTED) &&
+      !hasUserMadeAttendanceDecision;
+   */
 
    const getStatusBadge = (status: SessionStatus) => {
       const statusMap = {
@@ -143,6 +146,12 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
    const handleAttendanceConfirm = () => {
       confirmAttendanceMutation.mutate(session._id, {
+         onSuccess: onClose,
+      });
+   };
+
+   const handleAttendanceReject = () => {
+      rejectAttendanceMutation.mutate(session._id, {
          onSuccess: onClose,
       });
    };
@@ -402,30 +411,42 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                  <span className="text-sm font-medium text-gray-600">
                                     Gia sư
                                  </span>
-                                 {session.attendanceConfirmation
-                                    .tutorConfirmed ? (
-                                    <Badge
-                                       variant="default"
-                                       className="text-xs bg-green-100 text-green-800"
-                                    >
-                                       ✓ Đã điểm danh
-                                    </Badge>
-                                 ) : (
-                                    <Badge
-                                       variant="secondary"
-                                       className="text-xs bg-red-100 text-red-800"
-                                    >
-                                       ✗ Chưa điểm danh
-                                    </Badge>
-                                 )}
+                                 <Badge
+                                    variant={
+                                       session.attendanceConfirmation.tutor
+                                          .status === "ACCEPTED"
+                                          ? "default"
+                                          : session.attendanceConfirmation.tutor
+                                               .status === "REJECTED"
+                                          ? "destructive"
+                                          : "secondary"
+                                    }
+                                    className={`text-xs ${
+                                       session.attendanceConfirmation.tutor
+                                          .status === "ACCEPTED"
+                                          ? "bg-green-100 text-green-800"
+                                          : session.attendanceConfirmation.tutor
+                                               .status === "REJECTED"
+                                          ? "bg-red-100 text-red-800"
+                                          : ""
+                                    }`}
+                                 >
+                                    {session.attendanceConfirmation.tutor
+                                       .status === "ACCEPTED"
+                                       ? "✓ Đã xác nhận"
+                                       : session.attendanceConfirmation.tutor
+                                            .status === "REJECTED"
+                                       ? "✗ Đã từ chối"
+                                       : "Chờ xác nhận"}
+                                 </Badge>
                               </div>
-                              {session.attendanceConfirmation
-                                 .tutorConfirmedAt && (
+                              {session.attendanceConfirmation.tutor
+                                 .decidedAt && (
                                  <div className="text-xs text-gray-500">
                                     Lúc:{" "}
                                     {moment(
-                                       session.attendanceConfirmation
-                                          .tutorConfirmedAt
+                                       session.attendanceConfirmation.tutor
+                                          .decidedAt
                                     ).format("HH:mm DD/MM/YYYY")}
                                  </div>
                               )}
@@ -437,30 +458,42 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                  <span className="text-sm font-medium text-gray-600">
                                     Học sinh
                                  </span>
-                                 {session.attendanceConfirmation
-                                    .studentConfirmed ? (
-                                    <Badge
-                                       variant="default"
-                                       className="text-xs bg-green-100 text-green-800"
-                                    >
-                                       ✓ Đã điểm danh
-                                    </Badge>
-                                 ) : (
-                                    <Badge
-                                       variant="secondary"
-                                       className="text-xs bg-red-100 text-red-800"
-                                    >
-                                       ✗ Chưa điểm danh
-                                    </Badge>
-                                 )}
+                                 <Badge
+                                    variant={
+                                       session.attendanceConfirmation.student
+                                          .status === "ACCEPTED"
+                                          ? "default"
+                                          : session.attendanceConfirmation
+                                               .student.status === "REJECTED"
+                                          ? "destructive"
+                                          : "secondary"
+                                    }
+                                    className={`text-xs ${
+                                       session.attendanceConfirmation.student
+                                          .status === "ACCEPTED"
+                                          ? "bg-green-100 text-green-800"
+                                          : session.attendanceConfirmation
+                                               .student.status === "REJECTED"
+                                          ? "bg-red-100 text-red-800"
+                                          : ""
+                                    }`}
+                                 >
+                                    {session.attendanceConfirmation.student
+                                       .status === "ACCEPTED"
+                                       ? "✓ Đã xác nhận"
+                                       : session.attendanceConfirmation.student
+                                            .status === "REJECTED"
+                                       ? "✗ Đã từ chối"
+                                       : "Chờ xác nhận"}
+                                 </Badge>
                               </div>
-                              {session.attendanceConfirmation
-                                 .studentConfirmedAt && (
+                              {session.attendanceConfirmation.student
+                                 .decidedAt && (
                                  <div className="text-xs text-gray-500">
                                     Lúc:{" "}
                                     {moment(
-                                       session.attendanceConfirmation
-                                          .studentConfirmedAt
+                                       session.attendanceConfirmation.student
+                                          .decidedAt
                                     ).format("HH:mm DD/MM/YYYY")}
                                  </div>
                               )}
@@ -469,12 +502,20 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
                         {/* Overall Status */}
                         <div className="text-center">
-                           {session.attendanceConfirmation.isAttended ? (
-                              <div className="inline-flex items-center px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
-                                 <span className="text-sm font-medium text-green-800">
-                                    🎉 Buổi học đã được xác nhận thành công
-                                 </span>
-                              </div>
+                           {session.attendanceConfirmation.finalizedAt ? (
+                              session.attendanceConfirmation.isAttended ? (
+                                 <div className="inline-flex items-center px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
+                                    <span className="text-sm font-medium text-green-800">
+                                       🎉 Buổi học đã được xác nhận thành công
+                                    </span>
+                                 </div>
+                              ) : (
+                                 <div className="inline-flex items-center px-4 py-2 bg-red-50 border border-red-200 rounded-lg">
+                                    <span className="text-sm font-medium text-red-800">
+                                       Buổi học được ghi nhận là không diễn ra
+                                    </span>
+                                 </div>
+                              )
                            ) : (
                               <div className="inline-flex items-center px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
                                  <span className="text-sm font-medium text-yellow-800">
@@ -549,16 +590,24 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                         )}
 
                         {/* Attendance Button */}
-                        {showAttendanceButton && (
-                           <Button
-                              onClick={() =>
-                                 setShowAttendanceConfirmDialog(true)
-                              }
-                              disabled={confirmAttendanceMutation.isPending}
-                              className="w-full bg-blue-600 hover:bg-blue-700"
-                           >
-                              Xác nhận điểm danh
-                           </Button>
+                        {showAttendanceButtons && (
+                           <div className="grid grid-cols-2 gap-3">
+                              <Button
+                                 onClick={handleAttendanceConfirm}
+                                 disabled={confirmAttendanceMutation.isPending}
+                                 className="w-full bg-green-600 hover:bg-green-700"
+                              >
+                                 Đồng ý điểm danh
+                              </Button>
+                              <Button
+                                 variant="destructive"
+                                 onClick={handleAttendanceReject}
+                                 disabled={rejectAttendanceMutation.isPending}
+                                 className="w-full"
+                              >
+                                 Không đồng ý
+                              </Button>
+                           </div>
                         )}
 
                         {/* Edit/Delete Buttons for Tutor */}

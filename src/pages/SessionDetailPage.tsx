@@ -33,15 +33,6 @@ export default function SessionDetailPage() {
    const canEdit = () => {
       if (!currentUser || !session) return false;
 
-      // Debug log để kiểm tra cấu trúc dữ liệu
-      console.log("canEdit Debug:", {
-         currentUser: currentUser,
-         session: session,
-         teachingRequestId: session.teachingRequestId,
-         tutorId: session.teachingRequestId?.tutorId,
-         studentId: session.teachingRequestId?.studentId,
-      });
-
       if (currentUser.role === Role.ADMIN) return true;
 
       // Cho phép cả TUTOR và STUDENT chỉnh sửa

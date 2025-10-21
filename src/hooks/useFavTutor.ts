@@ -29,11 +29,15 @@ export const useAddFav = () => {
    });
 };
 
-export const useFetchFav = (tutorId: string, options?: { enabled?: boolean }) => {
-   return useQuery<FavoriteTutor>({
+export const useFetchFav = (
+   tutorId?: string,
+   options?: { enabled?: boolean }
+) => {
+   return useQuery<FavoriteTutor | null>({
       queryKey: ["TUTORFAV", tutorId],
-      queryFn: () => fetchFavoriteTutor(tutorId),
-      enabled: options?.enabled ?? true, // ✅ allow disabling
+      queryFn: () => fetchFavoriteTutor(tutorId!),
+      enabled: Boolean(tutorId) && Boolean(options?.enabled),
+      staleTime: 1000 * 60 * 2,
    });
 };
 

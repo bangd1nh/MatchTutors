@@ -111,6 +111,16 @@ export const confirmAttendance = async (
 };
 
 /**
+ * Từ chối điểm danh sau buổi học
+ */
+export const rejectAttendance = async (sessionId: string): Promise<Session> => {
+   const response = await apiClient.patch(
+      `/session/${sessionId}/reject-attendance`
+   );
+   return response.data.metadata;
+};
+
+/**
  * Lấy danh sách các session bị rejected và soft-deleted cho user hiện tại
  */
 export const getMyRejectedSessions = async (): Promise<Session[]> => {

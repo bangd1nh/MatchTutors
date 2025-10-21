@@ -18,10 +18,15 @@ export interface StudentConfirmation {
 
 // Attendance confirmation
 export interface AttendanceConfirmation {
-   tutorConfirmed: boolean;
-   studentConfirmed: boolean;
-   tutorConfirmedAt?: string;
-   studentConfirmedAt?: string;
+   tutor: {
+      status: "PENDING" | "ACCEPTED" | "REJECTED";
+      decidedAt?: Date;
+   };
+   student: {
+      status: "PENDING" | "ACCEPTED" | "REJECTED";
+      decidedAt?: Date;
+   };
+   finalizedAt?: Date;
    isAttended: boolean;
 }
 

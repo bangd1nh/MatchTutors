@@ -205,14 +205,16 @@ export const useConfirmAction = () => {
          requestId,
          action,
          decision,
+         reason, // Thêm reason parameter
       }: {
          requestId: string;
          action: "cancellation" | "completion";
          decision: "ACCEPTED" | "REJECTED";
+         reason?: string; // Thêm reason parameter
       }) =>
          action === "cancellation"
-            ? confirmCancellation(requestId, decision)
-            : confirmCompletion(requestId, decision),
+            ? confirmCancellation(requestId, decision, reason)
+            : confirmCompletion(requestId, decision, reason),
       onSuccess: (data: any) => {
          try {
             const id =
