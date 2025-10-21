@@ -1,4 +1,4 @@
-import { TutorFilterBar } from "@/components/tutor/tutor-search/TutorFilterSidebar";
+import TutorFilterBar from "@/components/tutor/tutor-search/TutorFilterSidebar";
 import TutorListPage from "./TutorList";
 import { useState } from "react";
 
@@ -16,6 +16,7 @@ export default function TutorSearch() {
       selectedGenders: string[];
       selectedClassTypes: string[];
       selectedLevels: string[];
+      selectedCities: string[];
    };
 
    // UI filters (what user is editing)
@@ -32,6 +33,7 @@ export default function TutorSearch() {
       selectedGenders: [],
       selectedClassTypes: [],
       selectedLevels: [],
+      selectedCities: [],
    });
 
    // Applied filters (only used for searching)
@@ -59,6 +61,7 @@ export default function TutorSearch() {
          selectedGenders: [],
          selectedClassTypes: [],
          selectedLevels: [],
+         selectedCities: [],
       };
       setFilters(cleared);
       setAppliedFilters(cleared);

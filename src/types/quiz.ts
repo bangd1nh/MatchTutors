@@ -1,4 +1,4 @@
-import { QuizModeEnum } from "@/enums/quiz.enum";
+import { QuestionTypeEnum, QuizModeEnum } from "@/enums/quiz.enum";
 import { IQuizQuestion } from "./quizQuestion";
 import { BaseAPIResponse } from "./response";
 
@@ -21,6 +21,18 @@ export type FlashcardQuestion = {
    order?: number;
    frontText: string;
    backText: string;
+   explanation?: string;
+   points?: number;
+};
+
+export type MultipleChoiceQuestions = {
+   // mirror subset of server IQuizQuestion for multiple choice usage
+   _id?: string; // client id
+   order?: number;
+   questionType: QuestionTypeEnum;
+   questionText: string;
+   options: string[];
+   correctAnswer?: string[];
    explanation?: string;
    points?: number;
 };
@@ -65,6 +77,7 @@ export interface IQuizInfo {
    title: string;
    description?: string;
    quizMode: QuizModeEnum;
+   quizType: QuestionTypeEnum;
    settings?: QuizSettings;
    createdBy: {
       role: string;
@@ -72,8 +85,8 @@ export interface IQuizInfo {
    };
    tags: string[];
    totalQuestions: number;
-   createdAt?: Date;
-   updatedAt?: Date;
+   createdAt: Date;
+   updatedAt: Date;
 }
 
 export interface IQUizUpdate {
@@ -91,4 +104,38 @@ export interface IQUizUpdate {
    newQuestionArr: IQuizQuestion[];
    deleteQuestionArr: { _id: string }[];
    editQuestionArr: IQuizQuestion[];
+}
+
+export interface MCQResponse extends BaseAPIResponse {
+   data: {
+      _id?: string;
+      title: string;
+      description?: string;
+      quizMode?: QuizModeEnum;
+      settings?: QuizSettings;
+      createdBy?: string;
+      tags?: string[];
+      totalQuestions?: number;
+      createdAt?: Date;
+      updatedAt?: Date;
+      questionArr?: IQuizQuestion[];
+   };
+}
+
+export interface updateIMCQBody {
+   _id: string;
+   title: string;
+   description: string;
+   quizMode: QuizModeEnum;
+   quizType: QuestionTypeEnum;
+   settings?: QuizSettings;
+   createdBy: {
+      role: string;
+      name: string;
+   };
+   tags: string[];
+   totalQuestions: number;
+   newMultipleChoiceQuizQuestionsArr?: IQuizQuestion[];
+   deleteMultipleChoiceQuizQuestionsArr?: { _id: string }[];
+   editMultipleChoiceQuizQuestionsArr?: IQuizQuestion[];
 }

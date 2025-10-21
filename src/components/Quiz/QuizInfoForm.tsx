@@ -19,9 +19,17 @@ import Switch from "@/components/ui/switch";
 import { QuizInfoValues } from "@/types/quiz";
 import { Button } from "@/components/ui/button";
 import { QuizModeEnum } from "@/enums/quiz.enum";
+import {
+   Tooltip,
+   TooltipContent,
+   TooltipProvider,
+   TooltipTrigger,
+} from "../ui/tooltip";
+import { InfoIcon } from "lucide-react";
 
 type Props = {
    defaultValues?: Partial<QuizInfoValues>;
+   isFlashcard?: boolean;
 };
 
 export type QuizInfoHandle = {
@@ -32,7 +40,7 @@ export type QuizInfoHandle = {
 };
 
 const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
-   ({ defaultValues }, ref) => {
+   ({ defaultValues, isFlashcard = false }, ref) => {
       const {
          register,
          control,
@@ -47,6 +55,7 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
       } = useForm<QuizInfoValues>({
          mode: "onChange",
          defaultValues: {
+            quizMode: isFlashcard ? QuizModeEnum.STUDY : QuizModeEnum.EXAM,
             settings: {
                shuffleQuestions: false,
                showCorrectAnswersAfterSubmit: true,
@@ -56,21 +65,47 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
             ...defaultValues,
          },
       });
+      useEffect(() => {
+         if (isFlashcard) {
+            setValue("quizMode", QuizModeEnum.STUDY);
+         } else {
+            setValue("quizMode", QuizModeEnum.EXAM);
+         }
+      }, [isFlashcard, setValue]);
 
       useEffect(() => {
-         if (defaultValues) reset(defaultValues as Partial<QuizInfoValues>);
+         if (defaultValues) {
+            // Override with EXAM if isFlashcard, otherwise use provided value
+            const quizMode = isFlashcard
+               ? QuizModeEnum.STUDY
+               : QuizModeEnum.EXAM;
+
+            reset({
+               ...defaultValues,
+               quizMode,
+            } as Partial<QuizInfoValues>);
+         }
          // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [defaultValues]);
+      }, [defaultValues, isFlashcard]);
 
       // expose imperative handle so parent can call getValues()
       useImperativeHandle(ref, () => ({
          getValues: () => {
             // ensure nested defaults exist
             const vals = getValues() as any;
+            let quizMode = vals.quizMode;
+
+            // Chỉ gán EXAM làm mặc định cho flashcard
+            if (isFlashcard) {
+               quizMode = QuizModeEnum.STUDY;
+            } else if (!quizMode) {
+               quizMode = QuizModeEnum.EXAM; // Chỉ fallback khi undefined
+            }
+
             return {
                title: vals.title ?? "",
                description: vals.description ?? "",
-               quizMode: vals.quizMode ?? QuizModeEnum.STUDY,
+               quizMode: isFlashcard ? QuizModeEnum.STUDY : QuizModeEnum.EXAM, // Sử dụng giá trị đã xử lý
                settings: {
                   shuffleQuestions: vals?.settings?.shuffleQuestions ?? false,
                   showCorrectAnswersAfterSubmit:
@@ -90,14 +125,8 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
             let valid = ok;
 
             // quizMode must exist
-            if (!vals.quizMode) {
-               setError("quizMode" as any, {
-                  type: "manual",
-                  message: "Vui lòng chọn Quiz mode",
-               });
-               valid = false;
-            } else {
-               clearErrors("quizMode" as any);
+            if (!isFlashcard && !vals.quizMode) {
+               vals.quizMode = QuizModeEnum.EXAM;
             }
 
             // tags: no empty values
@@ -131,7 +160,9 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
                   tags: v.tags ?? [],
                   title: v.title ?? "",
                   description: v.description ?? "",
-                  quizMode: v.quizMode ?? QuizModeEnum.STUDY,
+                  quizMode: isFlashcard
+                     ? QuizModeEnum.STUDY
+                     : v.quizMode ?? QuizModeEnum.EXAM,
                   totalQuestions: v.totalQuestions,
                } as any);
             } else {
@@ -211,11 +242,21 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
                   <Controller
                      name="quizMode"
                      control={control}
-                     rules={{ required: "Vui lòng chọn Quiz mode" }}
+                     // rules={{ required: "Vui lòng chọn Quiz mode" }}
                      render={({ field }) => (
                         <Select
                            onValueChange={field.onChange}
-                           value={field.value}
+                           value={
+                              isFlashcard
+                                 ? QuizModeEnum.STUDY
+                                 : QuizModeEnum.EXAM
+                           }
+                           defaultValue={
+                              isFlashcard
+                                 ? QuizModeEnum.STUDY
+                                 : QuizModeEnum.EXAM
+                           }
+                           disabled={true}
                         >
                            <SelectTrigger className="w-full">
                               <SelectValue placeholder="Chọn mode" />
@@ -238,8 +279,8 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
                </div>
             </div>
 
-            <div className="flex items-center justify-between gap-4">
-               <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between gap-4 ">
+               <div className="flex items-center gap-3 flex-shrink-0">
                   <div>
                      <div className="text-sm">Shuffle questions</div>
                      <div className="text-xs text-muted-foreground">
@@ -251,6 +292,7 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
                      control={control}
                      render={({ field }) => (
                         <Switch
+                           disabled={!isFlashcard}
                            checked={Boolean(field.value)}
                            onCheckedChange={(v) => field.onChange(Boolean(v))}
                         />
@@ -258,15 +300,77 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
                   />
                </div>
 
-               <div className="flex items-center gap-3">
-                  <div>
-                     <div className="text-sm">Show answers after submit</div>
+               <div className="flex items-center gap-3 w-full">
+                  <Label
+                     htmlFor="timeLimit"
+                     className="flex items-center gap-2 flex-shrink-0"
+                  >
+                     <div className="flex flex-col ">
+                        <div className="text-sm">Giới hạn thời gian(phút)</div>
+                        <div className="text-xs text-muted-foreground">
+                           Dùng cho trắc nghiệm
+                        </div>
+                     </div>
+
+                     <TooltipProvider>
+                        <Tooltip>
+                           <TooltipTrigger asChild>
+                              <button type="button" className="ml-1 p-0">
+                                 <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                              </button>
+                           </TooltipTrigger>
+                           <TooltipContent
+                              side="left"
+                              align="center"
+                              sideOffset={4}
+                              className="whitespace-nowrap"
+                           >
+                              <p>Để trống nếu không giới hạn thời gian</p>
+                           </TooltipContent>
+                        </Tooltip>
+                     </TooltipProvider>
+                  </Label>
+
+                  <Controller
+                     name="settings.timeLimitMinutes"
+                     control={control}
+                     render={({ field }) => (
+                        <Input
+                           id="timeLimit"
+                           type="number"
+                           min="0"
+                           placeholder="Không giới hạn"
+                           className="w-full"
+                           disabled={isFlashcard}
+                           value={field.value === null ? "" : field.value}
+                           onChange={(e) => {
+                              const value =
+                                 e.target.value === ""
+                                    ? null
+                                    : Math.max(
+                                         0,
+                                         parseInt(e.target.value) || 0
+                                      );
+                              field.onChange(value);
+                           }}
+                        />
+                     )}
+                  />
+               </div>
+
+               <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="">
+                     <div className="text-sm">Xem đáp án sau khi nộp</div>
+                     <div className="text-xs text-muted-foreground">
+                        Dùng cho trắc nghiệm
+                     </div>
                   </div>
                   <Controller
                      name="settings.showCorrectAnswersAfterSubmit"
                      control={control}
                      render={({ field }) => (
                         <Switch
+                           disabled={isFlashcard}
                            checked={Boolean(field.value)}
                            onCheckedChange={(v) => field.onChange(Boolean(v))}
                         />

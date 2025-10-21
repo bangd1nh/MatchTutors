@@ -12,6 +12,7 @@ import {
    TutorSubject,
 } from "@/components/tutor/tutor-detail";
 import { useTutorDetail } from "@/hooks/useTutorListAndDetail";
+import { TutorReviewSection } from "@/components/tutor/tutor-review/TutorReviewSection";
 
 const TutorDetail: React.FC = () => {
    const { id } = useParams<{ id: string }>();
@@ -72,42 +73,42 @@ const TutorDetail: React.FC = () => {
       // normalize availability: ensure slots AND timeSlots exist, dayOfWeek present
       availability: Array.isArray(source.availability)
          ? source.availability.map((a: any) => {
-              const slots = Array.isArray(a.slots)
-                 ? a.slots
-                 : Array.isArray(a.timeSlots)
-                 ? a.timeSlots
-                 : [];
-              const timeSlots = Array.isArray(a.timeSlots)
-                 ? a.timeSlots
-                 : Array.isArray(a.slots)
-                 ? a.slots
-                 : [];
-              return {
-                 dayOfWeek:
-                    typeof a.dayOfWeek === "number"
-                       ? a.dayOfWeek
-                       : Number(a.dayOfWeek) || 0,
-                 slots,
-                 timeSlots,
-              };
-           })
+            const slots = Array.isArray(a.slots)
+               ? a.slots
+               : Array.isArray(a.timeSlots)
+                  ? a.timeSlots
+                  : [];
+            const timeSlots = Array.isArray(a.timeSlots)
+               ? a.timeSlots
+               : Array.isArray(a.slots)
+                  ? a.slots
+                  : [];
+            return {
+               dayOfWeek:
+                  typeof a.dayOfWeek === "number"
+                     ? a.dayOfWeek
+                     : Number(a.dayOfWeek) || 0,
+               slots,
+               timeSlots,
+            };
+         })
          : [],
       // normalize education: ensure dateRange with startDate/endDate
       education: Array.isArray(source.education)
          ? source.education.map((edu: any) => ({
-              institution: edu.institution ?? edu.school ?? "",
-              degree: edu.degree ?? edu.degreeTitle ?? "",
-              fieldOfStudy: edu.fieldOfStudy ?? edu.major ?? "",
-              dateRange:
-                 edu.dateRange ??
-                 (edu.startDate || edu.endDate
-                    ? {
-                         startDate: edu.startDate ?? "",
-                         endDate: edu.endDate ?? "",
-                      }
-                    : { startDate: "", endDate: "" }),
-              description: edu.description ?? "",
-           }))
+            institution: edu.institution ?? edu.school ?? "",
+            degree: edu.degree ?? edu.degreeTitle ?? "",
+            fieldOfStudy: edu.fieldOfStudy ?? edu.major ?? "",
+            dateRange:
+               edu.dateRange ??
+               (edu.startDate || edu.endDate
+                  ? {
+                     startDate: edu.startDate ?? "",
+                     endDate: edu.endDate ?? "",
+                  }
+                  : { startDate: "", endDate: "" }),
+            description: edu.description ?? "",
+         }))
          : [],
       // ratings default
       ratings: source.ratings ?? { average: 0, totalReviews: 0 },
@@ -118,8 +119,8 @@ const TutorDetail: React.FC = () => {
       classType: Array.isArray(source.classType)
          ? source.classType
          : source.classType
-         ? [source.classType]
-         : [],
+            ? [source.classType]
+            : [],
    };
 
    return (
@@ -132,6 +133,7 @@ const TutorDetail: React.FC = () => {
                <TutorEducation tutor={normalizedTutor} />
                <TutorSubject tutor={normalizedTutor} />
                <TutorAvailability tutor={normalizedTutor} />
+               <TutorReviewSection tutorId={normalizedTutor._id} />
             </div>
 
             <div className="lg:col-span-4 space-y-6">

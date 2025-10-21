@@ -10,15 +10,15 @@ export interface IQuizQuestion {
    // Multiple choice
    questionText?: string;
    options?: string[];
-   correctAnswer?: string;
+   correctAnswer?: string[];
 
    // Short answer
    acceptedAnswers?: string[];
    caseSensitive?: boolean;
 
    // Flashcard
-   frontText: string;
-   backText: string;
+   frontText?: string;
+   backText?: string;
 
    // Common
    explanation?: string;

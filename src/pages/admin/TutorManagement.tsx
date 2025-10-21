@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,7 @@ import {
    useGetTutorMapping,
    AdminTutor 
 } from "@/hooks/useAdminTutors";
-import { Search, ShieldOff, Shield, MoreVertical, Eye } from "lucide-react";
+import { Search, ShieldOff, Shield, MoreVertical, Clock, ChevronLeft, ChevronRight, UserCheck } from "lucide-react";
 import {
    Dialog,
    DialogContent,
@@ -22,42 +22,104 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+// Constants
+const ITEMS_PER_PAGE = 10;
+const MIN_BAN_REASON_LENGTH = 10;
+const MAX_BAN_REASON_LENGTH = 500;
+const SEARCH_DEBOUNCE_MS = 300;
+
+type TabType = 'all' | 'active' | 'banned';
+
+
 const TutorManagement = () => {
    const navigate = useNavigate();
+   
+   // State
    const [searchTerm, setSearchTerm] = useState("");
+   const [debouncedSearch, setDebouncedSearch] = useState("");
    const [selectedTutor, setSelectedTutor] = useState<AdminTutor | null>(null);
    const [banReason, setBanReason] = useState("");
    const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
    const [isUnbanDialogOpen, setIsUnbanDialogOpen] = useState(false);
-   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'banned'>('all');
-   const [userIdToTutorId, setUserIdToTutorId] = useState<Record<string, string>>({});
+   const [activeTab, setActiveTab] = useState<TabType>('all');
+   const [currentPage, setCurrentPage] = useState(1);
 
    // API calls
    const { data: allTutors, isLoading: isLoadingAll } = useGetAllTutors({ 
-      search: searchTerm || undefined 
+      search: debouncedSearch || undefined 
    });
    
-   // Get tutor mapping to convert userId to tutorId
    const { data: tutorMappingData } = useGetTutorMapping({ page: 1, limit: 1000 });
    
    const banTutorMutation = useBanTutor();
    const unbanTutorMutation = useUnbanTutor();
 
-   // Update mapping when tutor mapping data changes
+   // Debounce search
    useEffect(() => {
-      if (tutorMappingData?.data?.tutors) {
-         const mapping: Record<string, string> = {};
-         tutorMappingData.data.tutors.forEach((tutor: any) => {
-            if (tutor.tutorId) {
-               mapping[tutor.userId] = tutor.tutorId;
-            }
-         });
-         setUserIdToTutorId(mapping);
-      }
+      const timer = setTimeout(() => {
+         setDebouncedSearch(searchTerm);
+      }, SEARCH_DEBOUNCE_MS);
+
+      return () => clearTimeout(timer);
+   }, [searchTerm]);
+
+   // Memoized mappings
+   const { userIdToTutorId } = useMemo(() => {
+      const mapping: Record<string, string> = {};
+      
+      tutorMappingData?.data?.tutors?.forEach((item: any) => {
+         if (item.tutorId) mapping[item.userId] = item.tutorId;
+      });
+      
+      return { userIdToTutorId: mapping };
    }, [tutorMappingData]);
 
-   const handleBanTutor = () => {
-      if (selectedTutor && banReason.trim()) {
+   // Memoized filtered tutors
+   const filteredTutors = useMemo(() => {
+      const tutors = allTutors?.data?.users || [];
+      
+      switch (activeTab) {
+         case 'active':
+            return tutors.filter(t => !t.isBanned);
+         case 'banned':
+            return tutors.filter(t => t.isBanned);
+         default:
+            return tutors;
+      }
+   }, [allTutors, activeTab]);
+
+   // Memoized counts
+   const { totalTutors, activeCount, bannedCount } = useMemo(() => {
+      const all = allTutors?.data?.users || [];
+      return {
+         totalTutors: all.length,
+         activeCount: all.filter(t => !t.isBanned).length,
+         bannedCount: all.filter(t => t.isBanned).length,
+      };
+   }, [allTutors]);
+
+   // Memoized pagination
+   const { totalPages, paginatedTutors, startIndex, endIndex } = useMemo(() => {
+      const pages = Math.ceil(filteredTutors.length / ITEMS_PER_PAGE);
+      const start = (currentPage - 1) * ITEMS_PER_PAGE;
+      const end = start + ITEMS_PER_PAGE;
+      
+      return {
+         totalPages: pages,
+         paginatedTutors: filteredTutors.slice(start, end),
+         startIndex: start,
+         endIndex: end,
+      };
+   }, [filteredTutors, currentPage]);
+
+   // Reset page when filter changes
+   useEffect(() => {
+      setCurrentPage(1);
+   }, [activeTab, debouncedSearch]);
+
+   // Handlers with useCallback
+   const handleBanTutor = useCallback(() => {
+      if (selectedTutor && banReason.trim().length >= MIN_BAN_REASON_LENGTH) {
          banTutorMutation.mutate({
             userId: selectedTutor._id,
             reason: banReason.trim(),
@@ -66,9 +128,9 @@ const TutorManagement = () => {
          setBanReason("");
          setSelectedTutor(null);
       }
-   };
+   }, [selectedTutor, banReason, banTutorMutation]);
 
-   const handleUnbanTutor = () => {
+   const handleUnbanTutor = useCallback(() => {
       if (selectedTutor) {
          unbanTutorMutation.mutate({
             userId: selectedTutor._id,
@@ -76,72 +138,55 @@ const TutorManagement = () => {
          setIsUnbanDialogOpen(false);
          setSelectedTutor(null);
       }
-   };
+   }, [selectedTutor, unbanTutorMutation]);
 
-   const handleToggleBan = (tutor: AdminTutor) => {
+   const handleToggleBan = useCallback((tutor: AdminTutor) => {
       setSelectedTutor(tutor);
       if (tutor.isBanned) {
          setIsUnbanDialogOpen(true);
       } else {
          setIsBanDialogOpen(true);
       }
-   };
+   }, []);
 
-   const handleViewTutor = (tutor: AdminTutor) => {
-      // Get tutorId from mapping - only tutors with profiles will have mapping
-      const tutorId = userIdToTutorId[tutor._id];
-      if (tutorId) {
-         // Navigate to tutor profile page with tutorId
-         navigate(`/admin/tutors/${tutorId}`);
-      }
-   };
+   const handleViewTutorProfiles = useCallback(() => {
+      navigate('/admin/tutor-profile');
+   }, [navigate]);
 
-   // Check if tutor has created profile
-   const hasTutorProfile = (tutor: AdminTutor) => {
+   const hasTutorProfile = useCallback((tutor: AdminTutor) => {
       return !!userIdToTutorId[tutor._id];
-   };
+   }, [userIdToTutorId]);
 
-   const getStatusColor = (tutor: AdminTutor) => {
-      if (tutor.isBanned) return 'bg-red-100 text-red-800';
-      if (tutor.isVerifiedEmail) return 'bg-green-100 text-green-800';
-      return 'bg-yellow-100 text-yellow-800';
-   };
 
-   const getStatus = (tutor: AdminTutor) => {
-      if (tutor.isBanned) return 'Tài khoản bị khóa';
-      if (tutor.isVerifiedEmail) return 'Đã xác thực';
-      return 'Cần xác minh';
-   };
-
-   const getFilteredTutors = () => {
-      const tutors = allTutors?.data?.users || [];
-      return tutors.filter((tutor) => {
-         if (activeTab === 'all') return true;
-         if (activeTab === 'active') return !tutor.isBanned;
-         if (activeTab === 'banned') return tutor.isBanned;
-         return true;
-      });
-   };
-
-   const filteredTutors = getFilteredTutors();
-   const totalTutors = allTutors?.data?.users?.length || 0;
-   const activeCount = (allTutors?.data?.users || []).filter(t => !t.isBanned).length;
-   const bannedCount = (allTutors?.data?.users || []).filter(t => t.isBanned).length;
+   // Validation
+   const isBanReasonValid = banReason.length >= MIN_BAN_REASON_LENGTH && 
+                            banReason.length <= MAX_BAN_REASON_LENGTH;
 
    return (
-      <div className="h-full flex flex-col">
+      <div className="w-full">
          {/* Header */}
-         <div className="flex-shrink-0 mb-6">
-            <h1 className="text-2xl font-bold mb-2">Quản lý Gia sư</h1>
-            <p className="text-gray-600">Quản lý trạng thái và thông tin của các gia sư trong hệ thống</p>
+         <div className="mb-6">
+            <div className="flex items-center justify-between">
+               <div>
+                  <h1 className="text-2xl font-bold mb-2">Quản lý Tài khoản Gia sư</h1>
+                  <p className="text-gray-600">Quản lý trạng thái tài khoản và khóa/mở khóa gia sư</p>
+               </div>
+               <Button
+                  onClick={handleViewTutorProfiles}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+               >
+                  <UserCheck className="h-4 w-4 mr-2" />
+                  Xem Hồ sơ Gia sư
+               </Button>
+            </div>
          </div>
 
-         {/* Search and Filters */}
-         <div className="flex-shrink-0 mb-4">
+         {/* Search */}
+         <div className="mb-4">
             <div className="relative">
                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                <Input
-                  placeholder="Tìm kiếm gia sư..."
+                  placeholder="Tìm kiếm gia sư theo tên hoặc email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -149,237 +194,330 @@ const TutorManagement = () => {
             </div>
          </div>
 
-         {/* Tab Navigation */}
-         <div className="flex-shrink-0 mb-6 border-b border-gray-200">
+         {/* Tabs */}
+         <div className="mb-6 border-b border-gray-200">
             <div className="flex space-x-4">
-               <button
-                  onClick={() => setActiveTab('all')}
-                  className={`py-2 px-4 font-medium text-sm ${
-                     activeTab === 'all' 
-                        ? 'border-b-2 border-blue-600 text-blue-600' 
-                        : 'text-gray-500 hover:text-gray-700'
-                  }`}
-               >
-                  Tất cả ({totalTutors})
-               </button>
-               <button
-                  onClick={() => setActiveTab('active')}
-                  className={`py-2 px-4 font-medium text-sm ${
-                     activeTab === 'active' 
-                        ? 'border-b-2 border-blue-600 text-blue-600' 
-                        : 'text-gray-500 hover:text-gray-700'
-                  }`}
-               >
-                  Đang hoạt động ({activeCount})
-               </button>
-               <button
-                  onClick={() => setActiveTab('banned')}
-                  className={`py-2 px-4 font-medium text-sm ${
-                     activeTab === 'banned' 
-                        ? 'border-b-2 border-blue-600 text-blue-600' 
-                        : 'text-gray-500 hover:text-gray-700'
-                  }`}
-               >
-                  Đã khóa ({bannedCount})
-               </button>
+               {[
+                  { key: 'all' as TabType, label: `Tất cả (${totalTutors})` },
+                  { key: 'active' as TabType, label: `Đang hoạt động (${activeCount})` },
+                  { key: 'banned' as TabType, label: `Đã khóa (${bannedCount})` },
+               ].map(({ key, label }) => (
+                  <button
+                     key={key}
+                     onClick={() => setActiveTab(key)}
+                     className={`py-2 px-4 font-medium text-sm transition-colors ${
+                        activeTab === key
+                           ? 'border-b-2 border-blue-600 text-blue-600' 
+                           : 'text-gray-500 hover:text-gray-700'
+                     }`}
+                  >
+                     {label}
+                  </button>
+               ))}
             </div>
          </div>
 
          {/* Table */}
-         <div className="flex-1 overflow-hidden bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="h-full overflow-auto">
-               <table className="min-w-full divide-y divide-gray-100">
-                  <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+         <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">
+            <table className="w-full divide-y divide-gray-100">
+               <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                  <tr>
+                     {['Gia sư', 'Liên hệ', 'Địa chỉ', 'Xác thực', 'Trạng thái tài khoản', 'Hành động'].map((header) => (
+                        <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           {header}
+                        </th>
+                     ))}
+                  </tr>
+               </thead>
+               <tbody className="bg-white divide-y divide-gray-50">
+                  {isLoadingAll ? (
                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                           Gia sư
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                           Thông tin liên hệ
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                           Địa chỉ
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                           Xác thực
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                           Trạng thái & Thông tin ban
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                           Hành động
-                        </th>
-                     </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-50">
-                     {isLoadingAll ? (
-                        <tr>
-                           <td colSpan={6} className="px-6 py-10 text-center text-gray-500">
+                        <td colSpan={6} className="px-6 py-10 text-center text-gray-500">
+                           <div className="flex items-center justify-center gap-2">
+                              <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
                               Đang tải...
-                           </td>
-                        </tr>
-                     ) : filteredTutors.length > 0 ? (
-                        filteredTutors.map((tutor) => (
-                           <tr
-                              key={tutor._id}
-                              className={tutor.isBanned ? 'bg-gray-50' : 'hover:bg-gray-50'}
-                           >
-                              <td className="px-6 py-6 whitespace-nowrap">
-                                 <div className="flex items-center">
-                                    <div className="h-12 w-12 flex-shrink-0 relative">
-                                       {tutor.avatarUrl ? (
-                                          <div className="relative">
-                                             <img
-                                                className={`h-12 w-12 rounded-xl object-cover ring-2 ring-white shadow-sm transition-all duration-200 ${tutor.isBanned ? 'grayscale opacity-75' : 'hover:scale-105'}`}
-                                                src={tutor.avatarUrl}
-                                                alt={tutor.name}
-                                             />
-                                             {tutor.isBanned && (
-                                                <div className="absolute inset-0 bg-red-500 bg-opacity-20 rounded-xl"></div>
-                                             )}
-                                          </div>
-                                       ) : (
-                                          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center shadow-sm">
-                                             <span className="text-lg font-semibold text-white">
-                                                {tutor.name.charAt(0).toUpperCase()}
-                                             </span>
-                                          </div>
-                                       )}
-                                    </div>
-                                    <div className="ml-4">
-                                       <div className="flex items-center space-x-2">
-                                          <div className="text-sm font-semibold text-gray-900">
-                                             {tutor.name}
-                                          </div>
+                           </div>
+                        </td>
+                     </tr>
+                  ) : paginatedTutors.length > 0 ? (
+                     paginatedTutors.map((tutor) => (
+                        <tr
+                           key={tutor._id}
+                           className={`transition-colors ${tutor.isBanned ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
+                        >
+                           {/* Avatar & Name */}
+                           <td className="px-6 py-6 whitespace-nowrap">
+                              <div className="flex items-center">
+                                 <div className="h-12 w-12 flex-shrink-0 relative">
+                                    {tutor.avatarUrl ? (
+                                       <div className="relative">
+                                          <img
+                                             className={`h-12 w-12 rounded-xl object-cover ring-2 ring-white shadow-sm transition-all ${
+                                                tutor.isBanned ? 'grayscale opacity-75' : 'hover:scale-105'
+                                             }`}
+                                             src={tutor.avatarUrl}
+                                             alt={tutor.name}
+                                          />
                                           {tutor.isBanned && (
-                                             <span className="px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full bg-red-100 text-red-700 border border-red-200">
-                                                Đã khóa
-                                             </span>
+                                             <div className="absolute inset-0 bg-red-500 bg-opacity-20 rounded-xl"></div>
                                           )}
                                        </div>
-                                       <div className="text-sm text-gray-600 mt-1">
-                                          {tutor.email}
+                                    ) : (
+                                       <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center shadow-sm">
+                                          <span className="text-lg font-semibold text-white">
+                                             {tutor.name.charAt(0).toUpperCase()}
+                                          </span>
                                        </div>
+                                    )}
+                                 </div>
+                                 <div className="ml-4">
+                                    <div className="flex items-center space-x-2">
+                                       <div className="text-sm font-semibold text-gray-900">
+                                          {tutor.name}
+                                       </div>
+                                       {tutor.isBanned && (
+                                          <span className="px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full bg-red-100 text-red-700 border border-red-200">
+                                             Đã khóa
+                                          </span>
+                                       )}
+                                    </div>
+                                    <div className="text-sm text-gray-600 mt-1">
+                                       {tutor.email}
                                     </div>
                                  </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                 {tutor.phone || 'Chưa cập nhật'}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                 {tutor.address ? (
-                                    <div>
-                                       <div>{tutor.address.city}</div>
+                              </div>
+                           </td>
+
+                           {/* Contact */}
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {tutor.phone || <span className="italic text-gray-400">Chưa cập nhật</span>}
+                           </td>
+
+                           {/* Address */}
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {tutor.address ? (
+                                 <div>
+                                    <div className="font-medium">{tutor.address.city}</div>
+                                    {tutor.address.street && (
                                        <div className="text-xs text-gray-400">{tutor.address.street}</div>
+                                    )}
+                                 </div>
+                              ) : (
+                                 <span className="italic text-gray-400">Chưa cập nhật</span>
+                              )}
+                           </td>
+
+                           {/* Verification */}
+                           <td className="px-6 py-4 whitespace-nowrap">
+                              <Badge 
+                                 variant={tutor.isVerifiedEmail ? "default" : "secondary"}
+                                 className="text-xs"
+                              >
+                                 {tutor.isVerifiedEmail ? "✓ Email" : "✗ Email"}
+                              </Badge>
+                           </td>
+
+                           {/* Account Status */}
+                           <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                 {/* Ban Status */}
+                                 {tutor.isBanned ? (
+                                    <div className="relative group">
+                                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full bg-red-100 text-red-700 border border-red-200 cursor-help">
+                                          <ShieldOff className="h-3.5 w-3.5" />
+                                          Đã khóa
+                                       </span>
+                                       
+                                       <div className="absolute left-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl p-4 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                                          <div className="space-y-3">
+                                             <div className="flex items-start gap-2 pb-3 border-b border-gray-200">
+                                                <div className="bg-red-100 rounded-lg p-2">
+                                                   <ShieldOff className="h-4 w-4 text-red-600" />
+                                                </div>
+                                                <div className="flex-1">
+                                                   <div className="font-bold text-red-900 text-sm">Tài khoản bị khóa</div>
+                                                   <div className="text-xs text-gray-500 mt-0.5">Thông tin chi tiết</div>
+                                                </div>
+                                             </div>
+                                             
+                                             {tutor.banReason && (
+                                                <div>
+                                                   <div className="font-semibold text-gray-700 text-xs uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                                                      <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                                                      Lý do khóa
+                                                   </div>
+                                                   <div className="text-gray-800 text-sm leading-relaxed bg-red-50 p-3 rounded-lg border border-red-100 max-h-32 overflow-hidden">
+                                                      <p className="line-clamp-4">{tutor.banReason}</p>
+                                                   </div>
+                                                </div>
+                                             )}
+                                             
+                                             {tutor.bannedAt && (
+                                                <div>
+                                                   <div className="font-semibold text-gray-700 text-xs uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                                                      <div className="w-1.5 h-1.5 rounded-full bg-gray-500"></div>
+                                                      Thời gian khóa
+                                                   </div>
+                                                   <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                      <div className="flex items-center gap-2 text-gray-800 text-sm font-medium">
+                                                         <Clock className="h-4 w-4 text-gray-500" />
+                                                         <span>
+                                                            {new Date(tutor.bannedAt).toLocaleDateString('vi-VN', { 
+                                                               weekday: 'short',
+                                                               year: 'numeric', 
+                                                               month: 'short', 
+                                                               day: 'numeric' 
+                                                            })}
+                                                         </span>
+                                                      </div>
+                                                      <div className="text-xs text-gray-500 mt-1.5 ml-6">
+                                                         🕐 {new Date(tutor.bannedAt).toLocaleTimeString('vi-VN', {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                         })}
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             )}
+                                          </div>
+                                       </div>
                                     </div>
                                  ) : (
-                                    'Chưa cập nhật'
-                                 )}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                 <Badge 
-                                    variant={tutor.isVerifiedEmail ? "default" : "secondary"}
-                                    className="text-xs w-fit"
-                                 >
-                                    {tutor.isVerifiedEmail ? "Email ✓" : "Email ✗"}
-                                 </Badge>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                 <div className="flex items-center space-x-3">
-                                    {/* Trạng thái */}
-                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(tutor)}`}>
-                                       {getStatus(tutor)}
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full bg-green-100 text-green-700 border border-green-200">
+                                       <Shield className="h-3.5 w-3.5" />
+                                       Hoạt động
                                     </span>
-                                    
-                                    {/* Ban info indicator */}
-                                    {tutor.isBanned && (
-                                       <div className="relative group">
-                                          <div className="flex items-center space-x-1 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium cursor-pointer hover:bg-red-200 transition-colors">
-                                             <div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div>
-                                             <span>Chi tiết ban</span>
-                                          </div>
-                                          
-                                          {/* Tooltip */}
-                                          <div className="absolute left-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                                             <div className="space-y-3">
-                                                {tutor.banReason && (
-                                                   <div>
-                                                      <div className="font-semibold text-red-800 text-xs uppercase tracking-wide mb-1">Lý do ban</div>
-                                                      <div className="text-red-700 text-sm leading-relaxed">
-                                                         {tutor.banReason}
-                                                      </div>
-                                                   </div>
-                                                )}
-                                                {tutor.bannedAt && (
-                                                   <div>
-                                                      <div className="font-semibold text-gray-700 text-xs uppercase tracking-wide mb-1">Thời gian ban</div>
-                                                      <div className="text-gray-600 text-sm">
-                                                         {new Date(tutor.bannedAt).toLocaleDateString('vi-VN')} lúc {new Date(tutor.bannedAt).toLocaleTimeString('vi-VN')}
-                                                      </div>
-                                                   </div>
-                                                )}
-                                             </div>
-                                          </div>
-                                       </div>
-                                    )}
-                                 </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                 <div className="flex items-center space-x-2">
-                                    <button
-                                       onClick={() => handleToggleBan(tutor)}
-                                       className={`flex items-center px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
-                                          tutor.isBanned 
-                                             ? 'bg-green-100 text-green-700 hover:bg-green-200 hover:shadow-md' 
-                                             : 'bg-red-100 text-red-700 hover:bg-red-200 hover:shadow-md'
-                                       }`}
-                                       title={tutor.isBanned ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}
-                                    >
-                                       {tutor.isBanned ? (
+                                 )}
+                                 
+                                 {/* Profile Status Indicator */}
+                                 <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-full ${
+                                    hasTutorProfile(tutor) 
+                                       ? 'bg-blue-100 text-blue-700' 
+                                       : 'bg-gray-100 text-gray-600'
+                                 }`}>
+                                    {hasTutorProfile(tutor) ? 'Có hồ sơ' : 'Chưa có hồ sơ'}
+                                 </span>
+                              </div>
+                           </td>
+
+                           {/* Actions */}
+                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                              <div className="flex items-center space-x-2">
+                                 <Button
+                                    size="sm"
+                                    onClick={() => handleToggleBan(tutor)}
+                                    variant="outline"
+                                    className={`${
+                                       tutor.isBanned 
+                                          ? 'text-green-700 hover:text-green-800 hover:bg-green-50' 
+                                          : 'text-red-700 hover:text-red-800 hover:bg-red-50'
+                                    }`}
+                                 >
+                                    {tutor.isBanned ? (
+                                       <>
                                           <Shield className="h-4 w-4 mr-1.5" />
-                                       ) : (
-                                          <ShieldOff className="h-4 w-4 mr-1.5" />
-                                       )}
-                                       {tutor.isBanned ? 'Mở khóa' : 'Khóa'}
-                                    </button>
-                                    {hasTutorProfile(tutor) ? (
-                                       <button 
-                                          onClick={() => handleViewTutor(tutor)}
-                                          className="flex items-center px-3 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 hover:shadow-md transition-all duration-200"
-                                          title="Xem chi tiết profile"
-                                       >
-                                          <Eye className="h-4 w-4 mr-1.5" />
-                                          <span className="text-sm font-medium">Xem</span>
-                                       </button>
+                                          Mở khóa
+                                       </>
                                     ) : (
-                                       <div 
-                                          className="flex items-center px-3 py-2 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
-                                          title="Tutor chưa tạo profile"
-                                       >
-                                          <Eye className="h-4 w-4 mr-1.5" />
-                                          <span className="text-sm font-medium">Chưa có profile</span>
-                                       </div>
+                                       <>
+                                          <ShieldOff className="h-4 w-4 mr-1.5" />
+                                          Khóa
+                                       </>
                                     )}
-                                    <button className="flex items-center p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-md transition-all duration-200">
-                                       <MoreVertical className="h-4 w-4" />
-                                    </button>
-                                 </div>
-                              </td>
-                           </tr>
-                        ))
-                     ) : (
-                        <tr>
-                           <td colSpan={6} className="px-6 py-10 text-center text-gray-500">
-                              {activeTab === 'banned'
-                                 ? 'Không có gia sư nào bị khóa.'
-                                 : 'Không có gia sư nào được tìm thấy.'}
+                                 </Button>
+
+                                 <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="p-2"
+                                    title="Thêm tùy chọn"
+                                 >
+                                    <MoreVertical className="h-4 w-4" />
+                                 </Button>
+                              </div>
                            </td>
                         </tr>
-                     )}
-                  </tbody>
-               </table>
-            </div>
+                     ))
+                  ) : (
+                     <tr>
+                        <td colSpan={6} className="px-6 py-10 text-center text-gray-500">
+                           <div className="flex flex-col items-center gap-2">
+                              <Search className="h-12 w-12 text-gray-300" />
+                              <div>
+                                 {activeTab === 'banned'
+                                    ? 'Không có gia sư nào bị khóa.'
+                                    : searchTerm
+                                    ? 'Không tìm thấy gia sư phù hợp.'
+                                    : 'Chưa có gia sư nào.'}
+                              </div>
+                           </div>
+                        </td>
+                     </tr>
+                  )}
+               </tbody>
+            </table>
          </div>
+
+         {/* Pagination */}
+         {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4">
+               <div className="text-sm text-gray-600">
+                  Hiển thị <span className="font-medium">{startIndex + 1}</span> - <span className="font-medium">{Math.min(endIndex, filteredTutors.length)}</span> trong tổng số <span className="font-medium">{filteredTutors.length}</span> gia sư
+               </div>
+               <div className="flex items-center gap-2">
+                  <Button
+                     variant="outline"
+                     size="sm"
+                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                     disabled={currentPage === 1}
+                  >
+                     <ChevronLeft className="h-4 w-4 mr-1" />
+                     Trước
+                  </Button>
+                  
+                  <div className="flex items-center gap-1">
+                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                        const showPage = 
+                           page === 1 ||
+                           page === totalPages ||
+                           (page >= currentPage - 1 && page <= currentPage + 1);
+                        
+                        const showEllipsis =
+                           (page === currentPage - 2 && currentPage > 3) ||
+                           (page === currentPage + 2 && currentPage < totalPages - 2);
+
+                        if (showEllipsis) {
+                           return <span key={page} className="px-2 text-gray-400">...</span>;
+                        }
+
+                        if (!showPage) return null;
+
+                        return (
+                           <Button
+                              key={page}
+                              variant={currentPage === page ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(page)}
+                              className={`h-9 w-9 p-0 ${currentPage === page ? 'bg-blue-600 text-white hover:bg-blue-700' : ''}`}
+                           >
+                              {page}
+                           </Button>
+                        );
+                     })}
+                  </div>
+
+                  <Button
+                     variant="outline"
+                     size="sm"
+                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                     disabled={currentPage === totalPages}
+                  >
+                     Sau
+                     <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+               </div>
+            </div>
+         )}
 
          {/* Ban Dialog */}
          <Dialog open={isBanDialogOpen} onOpenChange={setIsBanDialogOpen}>
@@ -387,7 +525,7 @@ const TutorManagement = () => {
                <DialogHeader>
                   <DialogTitle>Khóa tài khoản gia sư</DialogTitle>
                   <DialogDescription>
-                     Bạn có chắc chắn muốn khóa tài khoản gia sư {selectedTutor?.name}? 
+                     Bạn có chắc chắn muốn khóa tài khoản gia sư <strong>{selectedTutor?.name}</strong>? 
                      Gia sư sẽ không thể đăng nhập hoặc nhận kết nối mới.
                   </DialogDescription>
                </DialogHeader>
@@ -398,17 +536,17 @@ const TutorManagement = () => {
                         id="ban-reason"
                         value={banReason}
                         onChange={(e) => setBanReason(e.target.value)}
-                        placeholder="Nhập lý do khóa tài khoản gia sư (10-500 ký tự)..."
+                        placeholder="Nhập lý do khóa tài khoản gia sư..."
                         className="mt-1"
                         rows={4}
-                        maxLength={500}
+                        maxLength={MAX_BAN_REASON_LENGTH}
                      />
                      <div className="mt-1 text-sm text-gray-500">
-                        {banReason.length}/500 ký tự (tối thiểu 10 ký tự)
+                        {banReason.length}/{MAX_BAN_REASON_LENGTH} ký tự (tối thiểu {MIN_BAN_REASON_LENGTH} ký tự)
                      </div>
-                     {banReason.length > 0 && banReason.length < 10 && (
+                     {banReason.length > 0 && banReason.length < MIN_BAN_REASON_LENGTH && (
                         <div className="mt-1 text-sm text-red-500">
-                           Lý do phải có ít nhất 10 ký tự
+                           Lý do phải có ít nhất {MIN_BAN_REASON_LENGTH} ký tự
                         </div>
                      )}
                   </div>
@@ -419,7 +557,7 @@ const TutorManagement = () => {
                   </Button>
                   <Button 
                      onClick={handleBanTutor}
-                     disabled={banReason.length < 10 || banReason.length > 500 || banTutorMutation.isPending}
+                     disabled={!isBanReasonValid || banTutorMutation.isPending}
                   >
                      {banTutorMutation.isPending ? "Đang khóa..." : "Khóa tài khoản"}
                   </Button>
@@ -434,8 +572,7 @@ const TutorManagement = () => {
                   <DialogTitle>Mở khóa tài khoản gia sư</DialogTitle>
                   <DialogDescription>
                      Bạn có chắc chắn muốn mở khóa tài khoản gia sư <strong>{selectedTutor?.name}</strong>?
-                     <br />
-                     <br />
+                     <br /><br />
                      Gia sư sẽ có thể đăng nhập và hoạt động bình thường trở lại.
                   </DialogDescription>
                </DialogHeader>
@@ -452,7 +589,6 @@ const TutorManagement = () => {
                </DialogFooter>
             </DialogContent>
          </Dialog>
-
       </div>
    );
 };

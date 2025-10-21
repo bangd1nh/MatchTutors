@@ -4,6 +4,7 @@ import OverviewPage from "../pages/dashboard/OverviewPage";
 import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
 import TutorManagement from "@/pages/admin/TutorManagement";
 import TutorProfilePage from "@/pages/admin/TutorProfilePage";
+import TutorProfileListPage from "@/pages/admin/TutorProfileListPage";
 import StudentManagement from "@/pages/admin/StudentManagement";
 import TeachingRequestManagement from "@/pages/admin/TeachingRequestManagement";
 import ProfilePage from "@/pages/Profilepage";
@@ -19,6 +20,7 @@ export const adminRoutes = {
       { path: "/admin/dashboard", element: <OverviewPage /> },
       { path: "/admin/tutors", element: <TutorManagement /> },
       { path: "/admin/tutors/:tutorId", element: <TutorProfilePage /> },
+      { path: "/admin/tutor-profile", element: <TutorProfileListPage /> },
       { path: "/admin/students", element: <StudentManagement /> },
       {
          path: "/admin/teaching-requests",

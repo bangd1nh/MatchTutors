@@ -7,10 +7,12 @@ import {
    User,
    LayoutDashboard,
    BookOpen,
+   GraduationCap,
    MessageSquare,
+   FileText,
+   Key,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { Users } from "lucide-react";
 
 export type SidebarItem = {
    to: string;
@@ -31,32 +33,30 @@ export const adminSidebarConfig: SidebarItem[] = [
       icon: <User className="h-4 w-4" />,
    },
    {
+      to: "/admin/tutor-profile",
+      label: "Hồ sơ gia sư",
+      icon: <FileText className="h-4 w-4" />,
+   },
+   {
       to: "/admin/tutors",
-      label: "Gia sư",
+      label: "Tài khoản gia sư",
       icon: <BookOpen className="h-4 w-4" />,
    },
    {
       to: "/admin/students",
-      label: "Quản lý học sinh",
-      icon: <Users className="h-4 w-4" />,
+      label: "Tài khoản học sinh",
+      icon: <GraduationCap className="h-4 w-4" />,
+   },
+   {
+      to: "/profile/change-password",
+      label: "Đổi mật khẩu",
+      icon: <Key className="h-4 w-4" />,
    },
    {
       to: "/admin/teaching-requests",
       label: "Yêu cầu dạy học",
       icon: <MessageSquare className="h-4 w-4" />,
    },
-   {
-      to: "/admin/profile",
-      label: "Hồ sơ",
-      icon: <User className="h-4 w-4" />,
-   },
-   {
-      to: "/profile/change-password",
-      label: "change pass",
-      icon: <BookOpen className="h-4 w-4" />,
-   },
-
-   // Thêm các mục khác ở đây
 ];
 
 const AdminSidebarItems: React.FC<{

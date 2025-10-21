@@ -4,9 +4,11 @@ import type { TutorsApiResponse, Tutor } from "@/types/tutorListandDetail";
 
 interface UseSearchTutorsOptions {
    keyword?: string;
+   name?: string;
    subjects?: string[];
    levels?: string[];
    city?: string;
+   cities?: string[];
    minRate?: number;
    maxRate?: number;
    minExperience?: number;
