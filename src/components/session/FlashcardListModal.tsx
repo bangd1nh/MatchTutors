@@ -1,4 +1,4 @@
-import { useFetchQuizByTutor } from "@/hooks/useQuiz";
+import { useAsignQuizToSession, useFetchQuizByTutor } from "@/hooks/useQuiz";
 import { Loader2, Calendar, BookOpen, Users } from "lucide-react";
 import {
    Dialog,
@@ -11,58 +11,56 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { useState, useMemo } from "react";
-import { IQuizInfo } from "@/types/quiz";
+import { useState, useMemo, useEffect } from "react";
+import {
+   AsignFlashcard,
+   useAsignFlashcardStore,
+} from "@/store/useAsignFlashcardStore";
 
 interface FlashcardListModalProps {
    isOpen: boolean;
    onClose: () => void;
-   onSave?: (selectedFlashcards: string[]) => void;
-   initSelectedFlashcards?: string[];
 }
 
-const FlashcardListModal = ({
-   isOpen,
-   onClose,
-   onSave,
-   initSelectedFlashcards,
-}: FlashcardListModalProps) => {
+const FlashcardListModal = ({ isOpen, onClose }: FlashcardListModalProps) => {
    const { data: response, isLoading, isError } = useFetchQuizByTutor();
    const [searchTerm, setSearchTerm] = useState("");
-   const quizzes = Array.isArray(response?.data) ? response!.data : [];
-   const [selectedFlashcards, setSelectedFlashcards] = useState<IQuizInfo[]>(
-      initSelectedFlashcards
-         ? quizzes.filter((quiz: IQuizInfo) =>
-              initSelectedFlashcards.includes(quiz._id)
-           )
-         : []
-   );
    const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
-   const handleSelectFlashcardToggle = (flashcard: IQuizInfo) => {
-      const isSelected = selectedFlashcards.some(
-         (f) => f._id === flashcard._id
-      );
-      if (isSelected) {
-         setSelectedFlashcards((prev) =>
-            prev.filter((f) => f._id !== flashcard._id)
-         );
-      } else {
-         setSelectedFlashcards((prev) => [...prev, flashcard]);
+   const quizzes = Array.isArray(response?.data) ? response!.data : [];
+   const { setAsignFlashcards, asignFl, toogleFlashcard, sessionId } =
+      useAsignFlashcardStore();
+
+   useEffect(() => {
+      if (!isLoading && response && isOpen) {
+         setAsignFlashcards(quizzes);
       }
-   };
+   }, [isOpen]);
+
+   const asign = useAsignQuizToSession();
+
+   const selectedFlashcards: string[] = asignFl
+      .filter((a) => a.isAsigned)
+      .map((f) => f._id);
 
    const handleSave = () => {
-      if (onSave) {
-         onSave(selectedFlashcards.map((f) => f._id));
-      }
+      asign.mutate({ sessionId, quizIds: selectedFlashcards });
       onClose();
    };
 
    const flashcards = useMemo(() => {
-      if (!quizzes) return [];
-      return quizzes.filter((quiz: any) => quiz.quizType === "FLASHCARD");
-   }, [quizzes]);
+      if (!asignFl) return [];
+      const filtered = asignFl.filter(
+         (quiz: any) => quiz.quizType === "FLASHCARD"
+      );
+
+      const uniqueFlashcards = filtered.filter(
+         (flashcard, index, self) =>
+            index === self.findIndex((f) => f._id === flashcard._id)
+      );
+
+      return uniqueFlashcards;
+   }, [asignFl]);
 
    const filteredFlashcards = useMemo(() => {
       if (!searchTerm) return flashcards;
@@ -92,7 +90,6 @@ const FlashcardListModal = ({
          </Dialog>
       );
    }
-
    if (isError) {
       return (
          <Dialog open={isOpen} onOpenChange={onClose}>
@@ -153,15 +150,11 @@ const FlashcardListModal = ({
                   </div>
                ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                     {filteredFlashcards.map((flashcard: any) => {
-                        const isSelected = selectedFlashcards.some(
-                           (f) => f._id === flashcard._id
-                        );
-
+                     {filteredFlashcards.map((flashcard: AsignFlashcard) => {
                         return (
                            <Card
                               key={flashcard._id}
-                              className="hover:shadow-md transition-all duration-200  border-l-4"
+                              className="hover:shadow-md transition-all duration-200 border-l-4"
                            >
                               <CardHeader className="pb-2 space-y-1">
                                  <div className="flex items-start gap-3">
@@ -185,7 +178,7 @@ const FlashcardListModal = ({
                                  </div>
                               </CardHeader>
 
-                              <CardContent className="space-y-2 grid grid-cols-2 ">
+                              <CardContent className="space-y-2 grid grid-cols-2">
                                  <div>
                                     {/* Stats - compact row */}
                                     <div className="flex items-center gap-5 text-xs text-muted-foreground mb-2">
@@ -292,14 +285,22 @@ const FlashcardListModal = ({
                                        </div>
                                     )}
                                  </div>
+
                                  <Button
-                                    variant={isSelected ? "outline" : "default"}
+                                    variant={
+                                       flashcard.isAsigned
+                                          ? "outline"
+                                          : "default"
+                                    }
                                     className="mt-0.5 flex-shrink-0 h-[90%]"
                                     onClick={() =>
-                                       handleSelectFlashcardToggle(flashcard)
+                                       toogleFlashcard(
+                                          flashcard,
+                                          !flashcard.isAsigned
+                                       )
                                     }
                                  >
-                                    {isSelected
+                                    {flashcard.isAsigned
                                        ? "Bỏ chọn Flashcard"
                                        : "Chọn Flashcard"}
                                  </Button>
@@ -320,11 +321,7 @@ const FlashcardListModal = ({
                   <Button variant="outline" onClick={onClose}>
                      Hủy
                   </Button>
-                  <Button
-                     onClick={handleSave}
-                     disabled={selectedFlashcards.length === 0}
-                     className="min-w-[100px]"
-                  >
+                  <Button onClick={handleSave} className="min-w-[100px]">
                      Lưu ({selectedFlashcards.length})
                   </Button>
                </div>

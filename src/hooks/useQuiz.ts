@@ -7,11 +7,12 @@ import {
    editFlashcardQuestion,
    fetchFlashcardQuestions,
    fetchFlashCardQuiz,
+   fetchQuizzesAssignedToSession,
    fetchSessionAssigned,
 } from "@/api/quiz";
-import { IQuizResponse } from "@/types/quiz";
+import { IQuizInfo, IQuizResponse } from "@/types/quiz";
 import { IQuizQuestionResponse } from "@/types/quizQuestion";
-import { useSessionDetail } from "./useSessions";
+import { useAsignFlashcardStore } from "@/store/useAsignFlashcardStore";
 
 export const useCreateQuiz = () => {
    const addToast = useToast();
@@ -71,15 +72,14 @@ export const useDeleteFlashcard = () => {
    });
 };
 
-export const useAsignQuizToSession = (sessionId: string) => {
+export const useAsignQuizToSession = () => {
    const addToast = useToast();
-   const sessionDetail = useSessionDetail(sessionId);
-
+   const { setRefetchFlashcard } = useAsignFlashcardStore();
    return useMutation({
       mutationFn: asignQuizToSession,
       onSuccess: (response) => {
          addToast("success", response.message);
-         sessionDetail.refetch();
+         setRefetchFlashcard();
       },
       onError: (error: any) => {
          addToast("error", error.response?.data.message);
@@ -91,5 +91,12 @@ export const useSessionAssignedQuizzes = (quizId: string) => {
    return useQuery({
       queryKey: ["SESSIONASSIGNEDQUIZS", quizId],
       queryFn: () => fetchSessionAssigned(quizId),
+   });
+};
+
+export const useQuizzesAssignedToSession = (sessionId: string) => {
+   return useQuery({
+      queryKey: ["ASSSIGNEDQUIZ", sessionId],
+      queryFn: () => fetchQuizzesAssignedToSession(sessionId),
    });
 };

@@ -9,13 +9,16 @@ import {
    useUpdateFlashcard,
 } from "@/hooks/useQuiz";
 import { IQUizUpdate } from "@/types/quiz";
+import { ArrowLeft } from "lucide-react";
 import { useRef, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 const EditFlashcardQuiz = () => {
    const searchParams = new URLSearchParams(window.location.search);
    const quizId = searchParams.get("flashcardId") || "";
    const { data, isLoading, isError } = useFetchFlashcardQuestions(quizId);
    const editFlashcard = useUpdateFlashcard();
+   const navigate = useNavigate();
 
    const quizInfoRef = useRef<QuizInfoHandle | null>(null);
    const quizQuestionsRef = useRef<QuizQuestionsHandle | null>(null);
@@ -136,6 +139,15 @@ const EditFlashcardQuiz = () => {
 
    return (
       <div className=" mx-auto my-6 p-4">
+         <div className="mb-6">
+            <Button
+               variant="ghost"
+               onClick={() => navigate(-1)}
+               className="pl-0"
+            >
+               <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại
+            </Button>
+         </div>
          <Card>
             <CardHeader>
                <CardTitle>Sửa / Chỉnh sửa Flashcard Quiz</CardTitle>

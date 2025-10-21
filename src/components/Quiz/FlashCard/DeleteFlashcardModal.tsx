@@ -57,10 +57,8 @@ const DeleteFlashcardModal: React.FC<DeleteFlashcardModalProps> = ({
 
    const handleDelete = () => {
       if (hasAssignedSessions) {
-         // Hiển thị confirm dialog khi có sessions
          setShowConfirmDialog(true);
       } else {
-         // Xóa trực tiếp khi không có sessions
          executeDelete();
       }
    };

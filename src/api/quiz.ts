@@ -67,3 +67,12 @@ export const fetchSessionAssigned = async (
    });
    return response.data;
 };
+
+export const fetchQuizzesAssignedToSession = async (
+   sessionId: string
+): Promise<ISessionAssignedQuizzesResponse> => {
+   const response = await apiClient.get("/quiz/getQuizzesAssignedToSession", {
+      params: { sessionId },
+   });
+   return response.data;
+};

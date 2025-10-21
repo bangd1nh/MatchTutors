@@ -3,9 +3,10 @@ import { useFetchFlashcardQuestions } from "@/hooks/useQuiz";
 import { Card, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import FlashcardQuestions from "@/components/Quiz/FlashCard/FlashcardQuestions";
 import QuizInfo from "@/components/Quiz/QuizInfo";
+import { useNavigate } from "react-router-dom";
 
 export default function ViewFlashcardQuizQuestion() {
    const searchParams = new URLSearchParams(window.location.search);
@@ -15,6 +16,7 @@ export default function ViewFlashcardQuizQuestion() {
       isLoading,
       isError,
    } = useFetchFlashcardQuestions(quizId);
+   const navigate = useNavigate();
 
    const cards = useMemo(
       () =>
@@ -73,6 +75,15 @@ export default function ViewFlashcardQuizQuestion() {
 
    return (
       <div className="mx-auto px-4 py-6 ">
+         <div className="mb-6">
+            <Button
+               variant="ghost"
+               onClick={() => navigate(-1)}
+               className="pl-0"
+            >
+               <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại
+            </Button>
+         </div>
          <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Flashcards</h2>
             <Badge>
