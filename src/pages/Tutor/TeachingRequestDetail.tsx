@@ -2,7 +2,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
    useTeachingRequestDetail,
    useRespondToRequest,
-   useMakeTrialDecision,
    useRequestCancellation,
    useRequestCompletion,
    useConfirmAction,
@@ -28,7 +27,6 @@ export default function TeachingRequestDetail() {
    const { user } = useUser();
    const { data: req, isLoading } = useTeachingRequestDetail(id ?? "");
    const respond = useRespondToRequest();
-   const makeDecision = useMakeTrialDecision();
    const requestCancel = useRequestCancellation();
    const requestComplete = useRequestCompletion();
    const confirmAction = useConfirmAction();
@@ -52,7 +50,7 @@ export default function TeachingRequestDetail() {
                      })
                   }
                >
-                  Chấp nhận dạy thử
+                  Chấp nhận dạy
                </Button>
                <Button
                   variant="destructive"
@@ -69,41 +67,8 @@ export default function TeachingRequestDetail() {
          );
       }
 
-      // 2. Cả 2 đưa ra quyết định sau khi học thử
-      if (req.status === TeachingRequestStatus.TRIAL_COMPLETED) {
-         const decisionMade =
-            user.role === "STUDENT"
-               ? req.trialDecision?.student !== "PENDING"
-               : req.trialDecision?.tutor !== "PENDING";
-         if (decisionMade) {
-            return <p>Đã gửi quyết định. Chờ phản hồi từ phía bên kia.</p>;
-         }
-         return (
-            <>
-               <Button
-                  onClick={() =>
-                     makeDecision.mutate({
-                        requestId: req._id,
-                        decision: "ACCEPTED",
-                     })
-                  }
-               >
-                  Tiếp tục học
-               </Button>
-               <Button
-                  variant="destructive"
-                  onClick={() =>
-                     makeDecision.mutate({
-                        requestId: req._id,
-                        decision: "REJECTED",
-                     })
-                  }
-               >
-                  Không tiếp tục
-               </Button>
-            </>
-         );
-      }
+      // 2. Cả 2 đưa ra quyết định sau khi học thử - BỎ QUA LOGIC NÀY
+      // if (req.status === TeachingRequestStatus.TRIAL_COMPLETED) { ... }
 
       // 3. Yêu cầu hủy/hoàn thành khi đang học
       if (req.status === TeachingRequestStatus.IN_PROGRESS) {
@@ -218,6 +183,8 @@ export default function TeachingRequestDetail() {
    if (!req)
       return <div className="p-6 text-red-500">Yêu cầu không tồn tại.</div>;
 
+   // BỎ QUA KHỐI LOGIC XỬ LÝ CHO TRIAL_COMPLETED
+   /*
    if (req?.status === TeachingRequestStatus.TRIAL_COMPLETED) {
       return (
          <>
@@ -250,6 +217,7 @@ export default function TeachingRequestDetail() {
          </>
       );
    }
+   */
 
    return (
       <Card>

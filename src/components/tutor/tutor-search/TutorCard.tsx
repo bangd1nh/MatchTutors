@@ -22,24 +22,23 @@ interface TutorCardProps {
 export function TutorCard({ tutor }: TutorCardProps) {
    const { isAuthenticated } = useUser();
    const toast = useToast();
-   const { data: isFav } = isAuthenticated
-      ? useFetchFav(tutor._id)
-      : { data: undefined };
 
-   // Chỉ gọi các hook fav khi đã đăng nhập
-   const addFav = isAuthenticated ? useAddFav() : undefined;
-   const deleteFav = isAuthenticated ? useRemoveFav() : undefined;
+   // GỌI HOOKS Ở TOP-LEVEL (KHÔNG ĐIỀU KIỆN)
+   const favQuery = useFetchFav(tutor._id, { enabled: isAuthenticated });
+   const addFav = useAddFav();
+   const deleteFav = useRemoveFav();
+
+   const isFav = favQuery.data;
 
    const handleFav = (tutorId: string) => {
       if (!isAuthenticated) {
-         // Có thể chuyển hướng sang login hoặc show toast
          toast("warning", "Please login to favorite this tutor");
          return;
       }
       if (isFav?.isFav) {
-         deleteFav?.mutate(tutorId);
+         deleteFav.mutate(tutorId);
       } else {
-         addFav?.mutate(tutorId);
+         addFav.mutate(tutorId);
       }
    };
 

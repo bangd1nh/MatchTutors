@@ -8,6 +8,7 @@ import {
    confirmParticipation,
    confirmAttendance,
    cancelSession,
+   rejectAttendance, // Import a new function
 } from "@/api/sessions";
 import { useToast } from "@/hooks/useToast";
 import { UpsertSessionPayload } from "@/types/session";
@@ -178,6 +179,28 @@ export const useConfirmAttendance = () => {
          toast(
             "error",
             error.response?.data?.message || "Xác nhận điểm danh thất bại."
+         );
+      },
+   });
+};
+
+/**
+ * Hook để từ chối điểm danh
+ */
+export const useRejectAttendance = () => {
+   const queryClient = useQueryClient();
+   const toast = useToast();
+
+   return useMutation({
+      mutationFn: (sessionId: string) => rejectAttendance(sessionId),
+      onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+         toast("success", "Đã từ chối điểm danh!");
+      },
+      onError: (error: any) => {
+         toast(
+            "error",
+            error.response?.data?.message || "Từ chối điểm danh thất bại."
          );
       },
    });

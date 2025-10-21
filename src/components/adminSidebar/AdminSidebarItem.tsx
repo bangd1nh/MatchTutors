@@ -1,8 +1,16 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home, User, LayoutDashboard, BookOpen, GraduationCap } from "lucide-react";
+import {
+   LogOut,
+   Home,
+   User,
+   LayoutDashboard,
+   BookOpen,
+   MessageSquare,
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { Users } from "lucide-react";
 
 export type SidebarItem = {
    to: string;
@@ -29,8 +37,18 @@ export const adminSidebarConfig: SidebarItem[] = [
    },
    {
       to: "/admin/students",
-      label: "Học sinh",
-      icon: <GraduationCap className="h-4 w-4" />,
+      label: "Quản lý học sinh",
+      icon: <Users className="h-4 w-4" />,
+   },
+   {
+      to: "/admin/teaching-requests",
+      label: "Yêu cầu dạy học",
+      icon: <MessageSquare className="h-4 w-4" />,
+   },
+   {
+      to: "/admin/profile",
+      label: "Hồ sơ",
+      icon: <User className="h-4 w-4" />,
    },
    {
       to: "/profile/change-password",

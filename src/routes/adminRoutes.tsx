@@ -5,6 +5,7 @@ import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
 import TutorManagement from "@/pages/admin/TutorManagement";
 import TutorProfilePage from "@/pages/admin/TutorProfilePage";
 import StudentManagement from "@/pages/admin/StudentManagement";
+import TeachingRequestManagement from "@/pages/admin/TeachingRequestManagement";
 import ProfilePage from "@/pages/Profilepage";
 import AdminLayout from "@/layouts/AdminLayout";
 
@@ -19,6 +20,10 @@ export const adminRoutes = {
       { path: "/admin/tutors", element: <TutorManagement /> },
       { path: "/admin/tutors/:tutorId", element: <TutorProfilePage /> },
       { path: "/admin/students", element: <StudentManagement /> },
+      {
+         path: "/admin/teaching-requests",
+         element: <TeachingRequestManagement />,
+      },
       { path: "/admin/profile", element: <ProfilePage /> },
       { path: "/profile/change-password", element: <ChangePasswordPage /> },
    ],

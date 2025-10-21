@@ -146,11 +146,12 @@ export const requestCompletion = async (
  */
 export const confirmCancellation = async (
    requestId: string,
-   decision: "ACCEPTED" | "REJECTED"
+   decision: "ACCEPTED" | "REJECTED",
+   reason?: string // Thêm reason parameter
 ): Promise<TeachingRequest> => {
    const response = await apiClient.patch(
       `/teachingRequest/${requestId}/confirm-cancellation`,
-      { decision }
+      { decision, reason } // Gửi reason cùng với decision
    );
    return response.data.metadata;
 };
@@ -160,11 +161,12 @@ export const confirmCancellation = async (
  */
 export const confirmCompletion = async (
    requestId: string,
-   decision: "ACCEPTED" | "REJECTED"
+   decision: "ACCEPTED" | "REJECTED",
+   reason?: string // Thêm reason parameter
 ): Promise<TeachingRequest> => {
    const response = await apiClient.patch(
       `/teachingRequest/${requestId}/confirm-completion`,
-      { decision }
+      { decision, reason } // Gửi reason cùng với decision
    );
    return response.data.metadata;
 };
