@@ -412,8 +412,10 @@ const TutorProfileListPage: React.FC = () => {
                             </div>
                           )}
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900 text-lg">{tutor.name}</h3>
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-gray-900 text-lg truncate max-w-[220px]" title={tutor.name}>
+                            {tutor.name}
+                          </h3>
                           <div className="flex items-center text-yellow-500">
                             <Star className="h-4 w-4 fill-current" />
                             <span className="ml-1 text-sm font-medium text-gray-900">
