@@ -11,13 +11,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input"; // Import Input
 import { useUser } from "@/hooks/useUser";
 import {
    useConfirmParticipation,
    useConfirmAttendance,
    useDeleteSession,
    useCancelSession,
-   useRejectAttendance, // Import the new hook
+   useRejectAttendance,
 } from "@/hooks/useSessions";
 import { Session } from "@/types/session";
 import { SessionStatus } from "@/enums/session.enum";
@@ -42,97 +43,92 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
    const { user } = useUser();
    const confirmParticipationMutation = useConfirmParticipation();
    const confirmAttendanceMutation = useConfirmAttendance();
-   const rejectAttendanceMutation = useRejectAttendance(); // Instantiate the new mutation
+   const rejectAttendanceMutation = useRejectAttendance();
    const deleteSessionMutation = useDeleteSession();
    const cancelSessionMutation = useCancelSession();
 
-   // show confirmation modal before calling confirmAttendance
-   const [showAttendanceConfirmDialog, setShowAttendanceConfirmDialog] =
-      useState(false);
-
    const [showCancelDialog, setShowCancelDialog] = useState(false);
    const [cancelReason, setCancelReason] = useState("");
+
+   // State for dispute dialog
+   const [showDisputeDialog, setShowDisputeDialog] = useState(false);
+   const [disputeReason, setDisputeReason] = useState("");
+   const [evidenceUrls, setEvidenceUrls] = useState("");
 
    if (!session || !user) return null;
 
    const isTutor = user.role === Role.TUTOR;
    const isStudent = user.role === Role.STUDENT;
-   const teachingRequest = session.teachingRequestId as any;
+   const learningCommitment = (session as any).learningCommitmentId as any;
 
-   // Debug: Log the session data to understand the structure
-   console.log("Session data:", session);
-   console.log("TeachingRequest data:", teachingRequest);
-   console.log("Tutor data:", teachingRequest?.tutorId);
-   console.log("Tutor user data:", teachingRequest?.tutorId?.userId);
+   const canEdit =
+      isTutor &&
+      (learningCommitment?.tutor?.userId === user._id ||
+         learningCommitment?.tutor?.userId?._id === user._id);
 
-   // Kiểm tra quyền chỉnh sửa
-   const canEdit = isTutor && teachingRequest?.tutorId?.userId === user._id;
-
-   // Kiểm tra trạng thái buổi học đã kết thúc chưa
    const now = new Date();
    const sessionEnd = new Date(session.endTime);
    const isSessionEnded = now >= sessionEnd;
 
-   // Kiểm tra có thể hủy buổi học không (trước 10 phút)
    const tenMinutesBeforeStart = new Date(
       new Date(session.startTime).getTime() - 10 * 60 * 1000
    );
    const canCancelSession =
       now < tenMinutesBeforeStart && session.status === SessionStatus.CONFIRMED;
 
-   // Hiển thị nút xác nhận tham gia cho học sinh
    const showParticipationButtons =
       isStudent &&
       session.status === SessionStatus.SCHEDULED &&
       session.studentConfirmation?.status === "PENDING";
 
-   // NEW: Check if the current user has already made an attendance decision
-   // const hasUserMadeAttendanceDecision =
-   //    (isTutor && session.attendanceConfirmation?.tutor.status !== "PENDING") ||
-   //    (isStudent &&
-   //       session.attendanceConfirmation?.student.status !== "PENDING");
+   const tutorHasConfirmed =
+      session.attendanceConfirmation?.tutor.status === "ACCEPTED";
+   const studentHasDecided =
+      session.attendanceConfirmation?.student.status !== "PENDING";
+   const tutorHasDecided =
+      session.attendanceConfirmation?.tutor.status !== "PENDING";
 
-   // Show attendance buttons if the session is over and the user hasn't decided yet
-   const showAttendanceButtons = true; // Luôn hiển thị để test
-   /*
-      isSessionEnded &&
-      (session.status === SessionStatus.CONFIRMED ||
-         session.status === SessionStatus.COMPLETED ||
-         session.status === SessionStatus.NOT_CONDUCTED) &&
-      !hasUserMadeAttendanceDecision;
-   */
+   const showAttendanceButtons =
+      // Temporarily enabled for testing.
+      // isSessionEnded &&
+      // session.status === SessionStatus.CONFIRMED &&
+      (isTutor && !tutorHasDecided) || (isStudent && !studentHasDecided);
 
-   const getStatusBadge = (status: SessionStatus) => {
-      const statusMap = {
+   const getStatusBadge = (status: SessionStatus | string) => {
+      const statusMap: Record<string, { label: string; variant: any }> = {
          [SessionStatus.SCHEDULED]: {
             label: "Chờ xác nhận",
-            variant: "secondary" as const,
+            variant: "secondary",
          },
          [SessionStatus.CONFIRMED]: {
             label: "Đã xác nhận",
-            variant: "default" as const,
+            variant: "default",
          },
          [SessionStatus.REJECTED]: {
             label: "Đã từ chối",
-            variant: "destructive" as const,
+            variant: "destructive",
          },
          [SessionStatus.CANCELLED]: {
             label: "Đã hủy",
-            variant: "destructive" as const,
+            variant: "destructive",
          },
          [SessionStatus.COMPLETED]: {
             label: "Hoàn thành",
-            variant: "default" as const,
+            variant: "default",
          },
          [SessionStatus.NOT_CONDUCTED]: {
             label: "Không diễn ra",
-            variant: "outline" as const,
+            variant: "outline",
+         },
+         [SessionStatus.DISPUTED]: {
+            label: "Đang tranh chấp",
+            variant: "destructive",
          },
       };
 
       const config = statusMap[status] || {
          label: status,
-         variant: "outline" as const,
+         variant: "outline",
       };
       return <Badge variant={config.variant}>{config.label}</Badge>;
    };
@@ -151,9 +147,46 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
    };
 
    const handleAttendanceReject = () => {
-      rejectAttendanceMutation.mutate(session._id, {
-         onSuccess: onClose,
-      });
+      // If tutor has confirmed, student must provide reason for dispute
+      if (isStudent && tutorHasConfirmed) {
+         setShowDisputeDialog(true);
+      } else {
+         // Otherwise, just reject
+         rejectAttendanceMutation.mutate(
+            { sessionId: session._id },
+            { onSuccess: onClose }
+         );
+      }
+   };
+
+   const handleSubmitDispute = () => {
+      if (disputeReason.trim().length < 10) {
+         alert("Lý do tranh chấp phải có ít nhất 10 ký tự.");
+         return;
+      }
+      const urls = evidenceUrls
+         .split(",")
+         .map((url) => url.trim())
+         .filter(Boolean);
+      if (urls.length === 0) {
+         alert("Vui lòng cung cấp ít nhất một URL bằng chứng.");
+         return;
+      }
+
+      rejectAttendanceMutation.mutate(
+         {
+            sessionId: session._id,
+            payload: { reason: disputeReason, evidenceUrls: urls },
+         },
+         {
+            onSuccess: () => {
+               setShowDisputeDialog(false);
+               setDisputeReason("");
+               setEvidenceUrls("");
+               onClose();
+            },
+         }
+      );
    };
 
    const handleDelete = () => {
@@ -191,7 +224,8 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                      Chi tiết buổi học
                   </DialogTitle>
                   <DialogDescription className="text-base">
-                     {teachingRequest?.subject ?? "Môn học không xác định"}
+                     {learningCommitment?.teachingRequest?.subject ??
+                        "Môn học không xác định"}
                   </DialogDescription>
                </DialogHeader>
 
@@ -204,6 +238,50 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                      {getStatusBadge(session.status as SessionStatus)}
                   </div>
 
+                  {/* Dispute Info */}
+                  {session.dispute &&
+                     session.status === SessionStatus.DISPUTED && (
+                        <div className="border-t pt-6">
+                           <h3 className="text-lg font-semibold text-yellow-700 mb-4">
+                              Thông tin Tranh chấp
+                           </h3>
+                           <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg space-y-3">
+                              <div>
+                                 <span className="text-sm font-medium text-yellow-800">
+                                    Lý do:
+                                 </span>
+                                 <p className="text-sm text-gray-800 mt-1">
+                                    {session.dispute.reason}
+                                 </p>
+                              </div>
+                              <div>
+                                 <span className="text-sm font-medium text-yellow-800">
+                                    Bằng chứng:
+                                 </span>
+                                 <ul className="list-disc list-inside mt-1">
+                                    {session.dispute.evidenceUrls.map(
+                                       (url, index) => (
+                                          <li key={index} className="text-sm">
+                                             <a
+                                                href={url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:underline"
+                                             >
+                                                Link {index + 1}
+                                             </a>
+                                          </li>
+                                       )
+                                    )}
+                                 </ul>
+                              </div>
+                              <p className="text-xs text-gray-500 pt-2 border-t border-yellow-100">
+                                 Tranh chấp đang chờ quản trị viên xem xét.
+                              </p>
+                           </div>
+                        </div>
+                     )}
+
                   {/* Basic Info Section */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      <div className="space-y-3">
@@ -212,7 +290,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                               Môn học
                            </span>
                            <span className="text-sm font-semibold text-gray-900">
-                              {teachingRequest?.subject ??
+                              {learningCommitment?.teachingRequest?.subject ??
                                  "Môn học không xác định"}
                            </span>
                         </div>
@@ -263,11 +341,18 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                            </div>
                            <div className="space-y-1">
                               <div className="text-sm font-semibold text-gray-900">
-                                 {teachingRequest?.tutorId?.userId?.name ||
+                                 {learningCommitment?.tutor?.userId?.name ||
+                                    [
+                                       learningCommitment?.tutor?.firstName,
+                                       learningCommitment?.tutor?.lastName,
+                                    ]
+                                       .filter(Boolean)
+                                       .join(" ") ||
                                     "Chưa có"}
                               </div>
                               <div className="text-xs text-gray-500">
-                                 {teachingRequest?.tutorId?.userId?.email ||
+                                 {learningCommitment?.tutor?.userId?.email ||
+                                    learningCommitment?.tutor?.email ||
                                     "N/A"}
                               </div>
                            </div>
@@ -285,11 +370,18 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                            </div>
                            <div className="space-y-1">
                               <div className="text-sm font-semibold text-gray-900">
-                                 {teachingRequest?.studentId?.userId?.name ||
+                                 {learningCommitment?.student?.userId?.name ||
+                                    [
+                                       learningCommitment?.student?.firstName,
+                                       learningCommitment?.student?.lastName,
+                                    ]
+                                       .filter(Boolean)
+                                       .join(" ") ||
                                     "Chưa có"}
                               </div>
                               <div className="text-xs text-gray-500">
-                                 {teachingRequest?.studentId?.userId?.email ||
+                                 {learningCommitment?.student?.userId?.email ||
+                                    learningCommitment?.student?.email ||
                                     "N/A"}
                               </div>
                            </div>
@@ -421,15 +513,6 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                           ? "destructive"
                                           : "secondary"
                                     }
-                                    className={`text-xs ${
-                                       session.attendanceConfirmation.tutor
-                                          .status === "ACCEPTED"
-                                          ? "bg-green-100 text-green-800"
-                                          : session.attendanceConfirmation.tutor
-                                               .status === "REJECTED"
-                                          ? "bg-red-100 text-red-800"
-                                          : ""
-                                    }`}
                                  >
                                     {session.attendanceConfirmation.tutor
                                        .status === "ACCEPTED"
@@ -468,15 +551,6 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                           ? "destructive"
                                           : "secondary"
                                     }
-                                    className={`text-xs ${
-                                       session.attendanceConfirmation.student
-                                          .status === "ACCEPTED"
-                                          ? "bg-green-100 text-green-800"
-                                          : session.attendanceConfirmation
-                                               .student.status === "REJECTED"
-                                          ? "bg-red-100 text-red-800"
-                                          : ""
-                                    }`}
                                  >
                                     {session.attendanceConfirmation.student
                                        .status === "ACCEPTED"
@@ -558,7 +632,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                  disabled={
                                     confirmParticipationMutation.isPending
                                  }
-                                 className="w-full bg-green-600 hover:bg-green-700"
+                                 variant="default"
                               >
                                  Đồng ý tham gia
                               </Button>
@@ -570,7 +644,6 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                  disabled={
                                     confirmParticipationMutation.isPending
                                  }
-                                 className="w-full"
                               >
                                  Từ chối
                               </Button>
@@ -595,17 +668,16 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                               <Button
                                  onClick={handleAttendanceConfirm}
                                  disabled={confirmAttendanceMutation.isPending}
-                                 className="w-full bg-green-600 hover:bg-green-700"
+                                 variant="default"
                               >
-                                 Đồng ý điểm danh
+                                 Xác nhận có mặt
                               </Button>
                               <Button
                                  variant="destructive"
                                  onClick={handleAttendanceReject}
                                  disabled={rejectAttendanceMutation.isPending}
-                                 className="w-full"
                               >
-                                 Không đồng ý
+                                 Báo vắng / Khiếu nại
                               </Button>
                            </div>
                         )}
@@ -715,41 +787,66 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
             </DialogContent>
          </Dialog>
 
-         {/* Attendance Confirmation Dialog */}
-         <Dialog
-            open={showAttendanceConfirmDialog}
-            onOpenChange={setShowAttendanceConfirmDialog}
-         >
+         {/* Dispute Dialog */}
+         <Dialog open={showDisputeDialog} onOpenChange={setShowDisputeDialog}>
             <DialogContent>
                <DialogHeader>
-                  <DialogTitle>Xác nhận điểm danh</DialogTitle>
+                  <DialogTitle>Tạo Khiếu nại Điểm danh</DialogTitle>
                   <DialogDescription>
-                     Bạn có chắc chắn muốn xác nhận điểm danh cho buổi học này?
-                     Hành động này sẽ ghi nhận trạng thái điểm danh.
+                     Gia sư đã xác nhận có mặt. Nếu bạn không đồng ý, vui lòng
+                     cung cấp lý do và bằng chứng để quản trị viên xem xét.
                   </DialogDescription>
                </DialogHeader>
-               <div className="py-4">
-                  <p className="text-sm text-gray-700">
-                     Vui lòng xác nhận — hành động này không thể hoàn tác.
-                  </p>
+               <div className="py-4 space-y-4">
+                  <div>
+                     <Label htmlFor="disputeReason">Lý do khiếu nại</Label>
+                     <Textarea
+                        id="disputeReason"
+                        placeholder="Ví dụ: Gia sư không đến, buổi học kết thúc sớm..."
+                        value={disputeReason}
+                        onChange={(e) => setDisputeReason(e.target.value)}
+                        rows={4}
+                        className="mt-2"
+                     />
+                     <p className="text-sm text-gray-500 mt-2">
+                        Yêu cầu tối thiểu 10 ký tự.
+                     </p>
+                  </div>
+                  <div>
+                     <Label htmlFor="evidenceUrls">
+                        Link bằng chứng (nếu có)
+                     </Label>
+                     <Input
+                        id="evidenceUrls"
+                        placeholder="Dán các link ảnh/video, cách nhau bởi dấu phẩy"
+                        value={evidenceUrls}
+                        onChange={(e) => setEvidenceUrls(e.target.value)}
+                        className="mt-2"
+                     />
+                     <p className="text-sm text-gray-500 mt-2">
+                        Cung cấp link Google Drive, Imgur, YouTube, etc.
+                     </p>
+                  </div>
                </div>
                <DialogFooter>
                   <Button
                      variant="outline"
-                     onClick={() => setShowAttendanceConfirmDialog(false)}
+                     onClick={() => setShowDisputeDialog(false)}
                   >
                      Hủy
                   </Button>
                   <Button
-                     onClick={() => {
-                        setShowAttendanceConfirmDialog(false);
-                        handleAttendanceConfirm();
-                     }}
-                     disabled={confirmAttendanceMutation.isPending}
+                     variant="destructive"
+                     onClick={handleSubmitDispute}
+                     disabled={
+                        disputeReason.trim().length < 10 ||
+                        evidenceUrls.trim().length === 0 ||
+                        rejectAttendanceMutation.isPending
+                     }
                   >
-                     {confirmAttendanceMutation.isPending
-                        ? "Đang xác nhận..."
-                        : "Xác nhận điểm danh"}
+                     {rejectAttendanceMutation.isPending
+                        ? "Đang gửi..."
+                        : "Gửi khiếu nại"}
                   </Button>
                </DialogFooter>
             </DialogContent>

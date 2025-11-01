@@ -48,9 +48,14 @@ export function SessionCalendar() {
 
    const events: CalendarEvent[] = useMemo(() => {
       return (sessions ?? []).map((session) => {
-         const tr = session.teachingRequestId;
-         const studentName = tr?.studentId?.userId?.name ?? "Học sinh";
-         const subject = tr?.subject ?? "Môn học";
+         const lc: any = (session as any).learningCommitmentId;
+         const studentName =
+            (lc?.student?.userId?.name as string) ||
+            [lc?.student?.firstName, lc?.student?.lastName]
+               .filter(Boolean)
+               .join(" ") ||
+            "Học sinh";
+         const subject = lc?.teachingRequest?.subject ?? "Môn học";
 
          // Tùy chỉnh màu sắc theo trạng thái
          let style = {};

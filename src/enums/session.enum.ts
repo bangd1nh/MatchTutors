@@ -4,7 +4,8 @@ export enum SessionStatus {
    REJECTED = "REJECTED", // Học sinh từ chối
    CANCELLED = "CANCELLED", // Đã hủy bởi một trong hai bên
    COMPLETED = "COMPLETED", // Buổi học đã kết thúc
-   NOT_CONDUCTED = "NOT_CONDUCTED", // Không diễn ra
+   NOT_CONDUCTED = "NOT_CONDUCTED",
+   DISPUTED = "DISPUTED", // Không diễn ra
 }
 
 export const SESSION_STATUS_VALUES = Object.values(SessionStatus);

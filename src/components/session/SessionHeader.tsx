@@ -26,8 +26,8 @@ export default function SessionHeader({
    // Debug log
    console.log("SessionHeader canEdit:", canEdit);
 
-   // Fix: Use teachingRequestId instead of teachingRequest
-   const teachingRequest = session.teachingRequestId;
+   // Use learningCommitment for subject/level
+   const learningCommitment = (session as any).learningCommitmentId;
 
    // >>> changed code: map status -> label + classes
    const statusMap: Record<string, { label: string; className: string }> = {
@@ -73,8 +73,11 @@ export default function SessionHeader({
                   <div>
                      <div className="flex items-center gap-3">
                         <h1 className="text-2xl font-semibold text-foreground">
-                           {teachingRequest?.subject || "Môn học"} -{" "}
-                           {teachingRequest?.level || "Cấp độ"}
+                           {learningCommitment?.teachingRequest?.subject ||
+                              "Môn học"}
+                           {" - "}
+                           {learningCommitment?.teachingRequest?.level ||
+                              "Cấp độ"}
                         </h1>
                         {/* >>> changed code: use mapped label + class */}
                         <Badge className={statusInfo.className}>

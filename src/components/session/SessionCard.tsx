@@ -34,29 +34,39 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, type }) => {
    };
 
    const getParticipantInfo = (session: Session) => {
-      const teachingRequest = session.teachingRequestId as any;
+      const lc: any = (session as any).learningCommitmentId;
       const isStudent = user?.role === "STUDENT";
 
       if (isStudent) {
          return {
-            name: teachingRequest?.tutorId?.userId?.name || "Gia sư",
-            avatar: teachingRequest?.tutorId?.userId?.avatarUrl,
+            name:
+               lc?.tutor?.userId?.name ||
+               [lc?.tutor?.firstName, lc?.tutor?.lastName]
+                  .filter(Boolean)
+                  .join(" ") ||
+               "Gia sư",
+            avatar: lc?.tutor?.userId?.avatarUrl,
             role: "Gia sư",
          };
       } else {
          return {
-            name: teachingRequest?.studentId?.userId?.name || "Học sinh",
-            avatar: teachingRequest?.studentId?.userId?.avatarUrl,
+            name:
+               lc?.student?.userId?.name ||
+               [lc?.student?.firstName, lc?.student?.lastName]
+                  .filter(Boolean)
+                  .join(" ") ||
+               "Học sinh",
+            avatar: lc?.student?.userId?.avatarUrl,
             role: "Học sinh",
          };
       }
    };
 
    const getSubjectInfo = (session: Session) => {
-      const teachingRequest = session.teachingRequestId as any;
+      const lc: any = (session as any).learningCommitmentId;
       return {
-         subject: teachingRequest?.subject || "Môn học",
-         level: teachingRequest?.level || "Cấp độ",
+         subject: lc?.teachingRequest?.subject || "Môn học",
+         level: lc?.teachingRequest?.level || "Cấp độ",
       };
    };
 

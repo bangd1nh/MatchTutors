@@ -3,22 +3,22 @@ import { Session, UpsertSessionPayload } from "@/types/session";
 
 /**
  * Fetches all sessions for the currently authenticated user (tutor or student).
- * The backend is expected to populate teachingRequest details.
+ * The backend is expected to populate learning commitment details.
  */
 export const getMySessions = async (): Promise<Session[]> => {
    const response = await apiClient.get("/session/me");
    // API trả về sessions trong `data`, không phải `metadata`
-   return response.data.metadata ?? response.data.data ?? [];
+   return response.data.data ?? [];
 };
 
 /**
  * Lấy danh sách session theo teachingRequestId.
  */
-export const getSessionsByRequest = async (
-   teachingRequestId: string
+export const getSessionsByLearningCommitment = async (
+   learningCommitmentId: string
 ): Promise<Session[]> => {
    const response = await apiClient.get(
-      `/session/request/${teachingRequestId}`
+      `/session/commitment/${learningCommitmentId}`
    );
    const payload =
       response.data?.metadata ?? response.data?.data ?? response.data;
@@ -113,9 +113,13 @@ export const confirmAttendance = async (
 /**
  * Từ chối điểm danh sau buổi học
  */
-export const rejectAttendance = async (sessionId: string): Promise<Session> => {
+export const rejectAttendance = async (
+   sessionId: string,
+   payload?: { reason?: string; evidenceUrls?: string[] }
+): Promise<Session> => {
    const response = await apiClient.patch(
-      `/session/${sessionId}/reject-attendance`
+      `/session/${sessionId}/reject-attendance`,
+      payload
    );
    return response.data.metadata;
 };

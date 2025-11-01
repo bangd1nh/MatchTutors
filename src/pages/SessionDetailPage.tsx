@@ -35,24 +35,15 @@ export default function SessionDetailPage() {
 
       if (currentUser.role === Role.ADMIN) return true;
 
-      // Cho phép cả TUTOR và STUDENT chỉnh sửa
+      // Cho phép cả TUTOR và STUDENT chỉnh sửa dựa trên learningCommitment
+      const lc: any = (session as any).learningCommitmentId;
       if (currentUser.role === Role.TUTOR) {
-         const tutorUserId = (session.teachingRequestId.tutorId as any)?.userId
-            ?._id;
-         console.log("Tutor check:", {
-            currentUserId: currentUser._id,
-            tutorUserId,
-         });
+         const tutorUserId = lc?.tutor?.userId?._id || lc?.tutor?.userId;
          return tutorUserId === currentUser._id;
       }
 
       if (currentUser.role === Role.STUDENT) {
-         const studentUserId = (session.teachingRequestId.studentId as any)
-            ?.userId?._id;
-         console.log("Student check:", {
-            currentUserId: currentUser._id,
-            studentUserId,
-         });
+         const studentUserId = lc?.student?.userId?._id || lc?.student?.userId;
          return studentUserId === currentUser._id;
       }
 

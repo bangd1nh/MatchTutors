@@ -11,6 +11,8 @@ import {
    MessageSquare,
    FileText,
    Key,
+   AlertCircle,
+   Users,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -48,14 +50,24 @@ export const adminSidebarConfig: SidebarItem[] = [
       icon: <GraduationCap className="h-4 w-4" />,
    },
    {
-      to: "/profile/change-password",
-      label: "Đổi mật khẩu",
-      icon: <Key className="h-4 w-4" />,
-   },
-   {
       to: "/admin/teaching-requests",
       label: "Yêu cầu dạy học",
       icon: <MessageSquare className="h-4 w-4" />,
+   },
+   {
+      to: "/admin/learning",
+      label: "Tranh chấp học tập",
+      icon: <Users className="h-4 w-4" />,
+   },
+   {
+      to: "/admin/disputes",
+      label: "Tranh chấp buổi học",
+      icon: <AlertCircle className="h-4 w-4" />,
+   },
+   {
+      to: "/profile/change-password",
+      label: "Đổi mật khẩu",
+      icon: <Key className="h-4 w-4" />,
    },
 ];
 

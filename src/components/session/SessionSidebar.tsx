@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2 } from "lucide-react";
 
 export default function SessionSidebar({ session, isEditing }: any) {
-   const teachingRequest = session.teachingRequestId;
+   const learningCommitment = (session as any).learningCommitmentId;
 
    return (
       <div className="space-y-6">
@@ -72,13 +72,15 @@ export default function SessionSidebar({ session, isEditing }: any) {
                      Môn học:
                   </span>
                   <span className="text-sm font-medium">
-                     {teachingRequest?.subject || "Không xác định"}
+                     {learningCommitment?.teachingRequest?.subject ||
+                        "Không xác định"}
                   </span>
                </div>
                <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Cấp độ:</span>
                   <span className="text-sm font-medium">
-                     {teachingRequest?.level || "Không xác định"}
+                     {learningCommitment?.teachingRequest?.level ||
+                        "Không xác định"}
                   </span>
                </div>
                <div className="flex justify-between">
@@ -86,7 +88,7 @@ export default function SessionSidebar({ session, isEditing }: any) {
                      Trạng thái khóa:
                   </span>
                   <Badge variant="outline">
-                     {teachingRequest?.status || "Không xác định"}
+                     {learningCommitment?.status || "Không xác định"}
                   </Badge>
                </div>
                <Separator />

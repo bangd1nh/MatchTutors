@@ -10,7 +10,6 @@ import VerifyEmailPage from "@/pages/auth/VerifyEmailPage";
 import Application from "@/pages/Jobseeker/Application";
 import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/auth/ResetPasswordPage";
-import { StudentReviewHistory } from "@/pages/Review/StudentReviewHistory";
 
 export const guestRoutes = {
    element: <GuestLayout />,

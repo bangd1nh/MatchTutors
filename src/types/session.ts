@@ -1,4 +1,4 @@
-import { TeachingRequest } from "@/types/teachingRequest";
+import { LearningCommitment } from "@/types/learningCommitment";
 import { SessionStatus } from "@/enums/session.enum";
 import { IUser } from "@/types/user";
 
@@ -30,6 +30,19 @@ export interface AttendanceConfirmation {
    isAttended: boolean;
 }
 
+// NEW: Dispute info
+export interface DisputeInfo {
+   status: "OPEN" | "RESOLVED";
+   openedBy: string | IUser;
+   reason: string;
+   evidenceUrls: string[];
+   openedAt: string;
+   resolvedAt?: string;
+   resolvedBy?: string | IUser;
+   decision?: string;
+   adminNotes?: string;
+}
+
 // Cancellation info (can be user id or populated user)
 export interface CancellationInfo {
    cancelledBy: string | IUser;
@@ -39,7 +52,7 @@ export interface CancellationInfo {
 
 // Payload used to create/update session
 export interface UpsertSessionPayload {
-   teachingRequestId: string;
+   learningCommitmentId: string;
    startTime: string;
    endTime: string;
    isTrial: boolean;
@@ -53,9 +66,9 @@ export interface UpsertSessionPayload {
 
 // Session returned from API
 export interface Session
-   extends Omit<UpsertSessionPayload, "teachingRequestId"> {
+   extends Omit<UpsertSessionPayload, "learningCommitmentId"> {
    _id: string;
-   teachingRequestId: TeachingRequest;
+   learningCommitmentId: LearningCommitment | any;
    startTime: string;
    endTime: string;
    status: SessionStatus | string;
@@ -67,6 +80,7 @@ export interface Session
    studentConfirmation?: StudentConfirmation;
    attendanceConfirmation?: AttendanceConfirmation;
    cancellation?: CancellationInfo;
+   dispute?: DisputeInfo; // Add dispute field
 
    // soft-delete fields
    isDeleted?: boolean;

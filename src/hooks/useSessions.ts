@@ -8,11 +8,11 @@ import {
    confirmParticipation,
    confirmAttendance,
    cancelSession,
-   rejectAttendance, // Import a new function
+   rejectAttendance,
 } from "@/api/sessions";
+
 import { useToast } from "@/hooks/useToast";
 import { UpsertSessionPayload } from "@/types/session";
-import { teachingRequestKeys } from "./useTeachingRequest";
 
 // Query key factory for sessions
 export const sessionKeys = {
@@ -29,7 +29,7 @@ export const sessionKeys = {
 export const useMySessions = () => {
    return useQuery({
       queryKey: sessionKeys.lists(),
-      queryFn: getMySessions,
+      queryFn: () => getMySessions(),
       staleTime: 1000 * 60 * 5, // 5 minutes
       select: (data) => data ?? [], // Ensure it always returns an array
    });
@@ -60,15 +60,15 @@ export const useCreateSession = () => {
          // Luôn vô hiệu hóa toàn bộ danh sách sessions để cập nhật lịch
          queryClient.invalidateQueries({ queryKey: sessionKeys.all });
 
-         // Nếu có teachingRequestId, thì cũng vô hiệu hóa query chi tiết của request đó
-         if (data?.teachingRequestId) {
-            const requestId =
-               typeof data.teachingRequestId === "string"
-                  ? data.teachingRequestId
-                  : (data.teachingRequestId as any)._id;
-            if (requestId) {
+         // Nếu có learningCommitmentId, thì cũng vô hiệu hóa query chi tiết của commitment đó
+         if ((data as any)?.learningCommitmentId) {
+            const commitmentId =
+               typeof (data as any).learningCommitmentId === "string"
+                  ? (data as any).learningCommitmentId
+                  : (data as any).learningCommitmentId?._id;
+            if (commitmentId) {
                queryClient.invalidateQueries({
-                  queryKey: teachingRequestKeys.detail(requestId),
+                  queryKey: ["learningCommitment", commitmentId],
                });
             }
          }
@@ -192,16 +192,19 @@ export const useRejectAttendance = () => {
    const toast = useToast();
 
    return useMutation({
-      mutationFn: (sessionId: string) => rejectAttendance(sessionId),
+      mutationFn: ({
+         sessionId,
+         payload,
+      }: {
+         sessionId: string;
+         payload?: { reason?: string; evidenceUrls?: string[] };
+      }) => rejectAttendance(sessionId, payload),
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: sessionKeys.all });
-         toast("success", "Đã từ chối điểm danh!");
+         toast("success", "Phản hồi của bạn đã được ghi nhận!");
       },
       onError: (error: any) => {
-         toast(
-            "error",
-            error.response?.data?.message || "Từ chối điểm danh thất bại."
-         );
+         toast("error", error.response?.data?.message || "Thao tác thất bại.");
       },
    });
 };

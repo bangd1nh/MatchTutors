@@ -14,6 +14,9 @@ import SchedulePage from "@/pages/SchedulePage"; // Import trang mới
 import TeachingRequestDetail from "@/pages/Tutor/TeachingRequestDetail"; // Import component detail
 import RejectedSessionsPage from "@/pages/RejectedSessionsPage"; // Import trang rejected sessions
 import { StudentReviewHistory } from "@/pages/Review/StudentReviewHistory";
+import { LearningCommitmentsPage } from "@/pages/Student/LearningCommitmentsPage";
+import WalletManagement from "@/pages/wallet/walletManagement";
+
 // import SessionDetailPage from "@/pages/SessionDetailPage"; // Moved to sharedRoutes
 
 export const studentRoutes = {
@@ -51,9 +54,8 @@ export const studentRoutes = {
       },
       {
          path: "student/review-history",
-         element: <StudentReviewHistory />
-      }
-      ,
+         element: <StudentReviewHistory />,
+      },
       {
          // Session detail route moved to sharedRoutes (accessible by both roles)
          // path: "/session/:id",
@@ -111,6 +113,14 @@ export const studentRoutes = {
       {
          path: "/student/create-student-profile",
          element: <CreateStudentProfile />,
+      },
+      {
+         path: "/student/learning-commitments",
+         element: <LearningCommitmentsPage />,
+      },
+      {
+         path: "/student/wallet",
+         element: <WalletManagement />,
       },
    ],
 };

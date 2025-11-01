@@ -12,10 +12,11 @@ export const CalendarEvent = ({ event }: EventProps<CalendarEventObject>) => {
    const session = event.resource;
    const { user } = useUser();
 
+   const lc: any = (session as any).learningCommitmentId;
    const otherPartyName =
       user?.role === "TUTOR"
-         ? session.teachingRequestId.studentId.userId.name
-         : session.teachingRequestId.tutorId.userId.name;
+         ? lc?.student?.userId?.name || [lc?.student?.firstName, lc?.student?.lastName].filter(Boolean).join(" ")
+         : lc?.tutor?.userId?.name || [lc?.tutor?.firstName, lc?.tutor?.lastName].filter(Boolean).join(" ");
 
    return (
       <div className="p-1 text-white text-xs leading-tight">

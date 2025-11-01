@@ -23,16 +23,17 @@ import {
    SelectValue,
 } from "@/components/ui/select";
 import { useCreateSession, useUpdateSession } from "@/hooks/useSessions";
-import { useTutorTeachingRequests } from "@/hooks/useTeachingRequest";
+import { useLearningCommitments } from "@/hooks/useLearningCommitment";
 import { Session } from "@/types/session";
-import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
 import { SessionStatus } from "@/enums/session.enum"; // THÊM DÒNG NÀY
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
 const sessionFormSchema = z
    .object({
-      teachingRequestId: z.string().min(1, "Vui lòng chọn một yêu cầu dạy."),
+      learningCommitmentId: z
+         .string()
+         .min(1, "Vui lòng chọn một cam kết học."),
       startTime: z.date({ error: "Thời gian bắt đầu không hợp lệ." }),
       endTime: z.date({ error: "Thời gian kết thúc không hợp lệ." }),
       location: z.string().min(1, "Vui lòng nhập địa điểm."),
@@ -62,19 +63,13 @@ export const SessionFormDialog = ({
    defaultDate,
 }: SessionFormDialogProps) => {
    const isEditMode = !!initialData?._id;
-   const { data: teachingRequests, isLoading: isLoadingRequests } =
-      useTutorTeachingRequests();
+   const { data: commitments, isLoading: isLoadingCommitments } =
+      useLearningCommitments(1, 100);
    const createSessionMutation = useCreateSession();
    const updateSessionMutation = useUpdateSession();
 
-   const validRequests = teachingRequests?.filter(
-      (req: any) =>
-         req.studentId &&
-         [
-            TeachingRequestStatus.TRIAL_ACCEPTED,
-            TeachingRequestStatus.TRIAL_SCHEDULED,
-            TeachingRequestStatus.IN_PROGRESS,
-         ].includes(req.status)
+   const validCommitments = commitments?.filter(
+      (c: any) => c?.status === "active"
    );
 
    const form = useForm<SessionFormValues>({
@@ -91,9 +86,9 @@ export const SessionFormDialog = ({
       if (initialData) {
          form.reset({
             ...initialData,
-            teachingRequestId:
-               (initialData.teachingRequestId as any)?._id ||
-               initialData.teachingRequestId,
+            learningCommitmentId:
+               (initialData as any).learningCommitmentId?._id ||
+               (initialData as any).learningCommitmentId,
             startTime: initialData.startTime
                ? new Date(initialData.startTime)
                : defaultDate || new Date(),
@@ -105,7 +100,7 @@ export const SessionFormDialog = ({
          });
       } else {
          form.reset({
-            teachingRequestId: "",
+            learningCommitmentId: "",
             location: "",
             description: "",
             isTrial: false,
@@ -122,11 +117,11 @@ export const SessionFormDialog = ({
          console.log("Form values:", values); // Debug log
 
          const payload = {
-            teachingRequestId: values.teachingRequestId,
+            learningCommitmentId: values.learningCommitmentId,
             startTime: values.startTime.toISOString(),
             endTime: values.endTime.toISOString(),
             location: values.location,
-            description: values.description || "",
+            notes: values.description || "",
             isTrial: values.isTrial,
             status: SessionStatus.SCHEDULED,
          };
@@ -166,30 +161,32 @@ export const SessionFormDialog = ({
             </DialogHeader>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                <div className="space-y-2">
-                  <Label htmlFor="teachingRequestId">Yêu cầu dạy</Label>
+                  <Label htmlFor="learningCommitmentId">Cam kết học</Label>
                   <Controller
-                     name="teachingRequestId"
+                     name="learningCommitmentId"
                      control={form.control}
                      render={({ field }) => (
                         <Select
                            onValueChange={field.onChange}
                            defaultValue={field.value}
-                           disabled={isLoadingRequests || isEditMode}
+                           disabled={isLoadingCommitments || isEditMode}
                         >
                            <SelectTrigger>
-                              <SelectValue placeholder="Chọn yêu cầu dạy..." />
+                              <SelectValue placeholder="Chọn cam kết học..." />
                            </SelectTrigger>
                            <SelectContent>
-                              {isLoadingRequests ? (
+                              {isLoadingCommitments ? (
                                  <SelectItem value="loading" disabled>
                                     Đang tải...
                                  </SelectItem>
                               ) : (
-                                 validRequests?.map((req: any) => (
-                                    <SelectItem key={req._id} value={req._id}>
-                                       {req.subject} -{" "}
-                                       {req.studentId?.userId?.name ??
-                                          "Học sinh"}
+                                 validCommitments?.map((c: any) => (
+                                    <SelectItem key={c._id} value={c._id}>
+                                       {c.teachingRequest?.subject ?? "Môn học"}
+                                       {" - "}
+                                       {c.student?.firstName || c.student?.lastName
+                                          ? `${c.student?.firstName ?? ""} ${c.student?.lastName ?? ""}`.trim()
+                                          : "Học sinh"}
                                     </SelectItem>
                                  ))
                               )}
@@ -197,9 +194,9 @@ export const SessionFormDialog = ({
                         </Select>
                      )}
                   />
-                  {form.formState.errors.teachingRequestId && (
+                  {form.formState.errors.learningCommitmentId && (
                      <p className="text-sm text-red-500">
-                        {form.formState.errors.teachingRequestId.message}
+                        {form.formState.errors.learningCommitmentId.message}
                      </p>
                   )}
                </div>

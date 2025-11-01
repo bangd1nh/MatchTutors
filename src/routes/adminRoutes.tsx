@@ -7,8 +7,13 @@ import TutorProfilePage from "@/pages/admin/TutorProfilePage";
 import TutorProfileListPage from "@/pages/admin/TutorProfileListPage";
 import StudentManagement from "@/pages/admin/StudentManagement";
 import TeachingRequestManagement from "@/pages/admin/TeachingRequestManagement";
+import AdminLearningManagement from "@/pages/admin/AdminLearningManagement"; // Import new page
+import AdminLearningDetailPage from "@/pages/admin/AdminLearningDetailPage"; // Import new page
+
+import DisputeDetailPage from "@/pages/admin/DisputeDetailPage";
 import ProfilePage from "@/pages/Profilepage";
 import AdminLayout from "@/layouts/AdminLayout";
+import SessionDisputeManagement from "@/pages/admin/SessionDisputeManagement";
 
 export const adminRoutes = {
    element: (
@@ -25,6 +30,22 @@ export const adminRoutes = {
       {
          path: "/admin/teaching-requests",
          element: <TeachingRequestManagement />,
+      },
+      {
+         path: "/admin/learning", // Add route for listing
+         element: <AdminLearningManagement />,
+      },
+      {
+         path: "/admin/learning/:commitmentId", // Add route for detail
+         element: <AdminLearningDetailPage />,
+      },
+      {
+         path: "/admin/disputes",
+         element: <SessionDisputeManagement />,
+      },
+      {
+         path: "/admin/disputes/:sessionId",
+         element: <DisputeDetailPage />,
       },
       { path: "/admin/profile", element: <ProfilePage /> },
       { path: "/profile/change-password", element: <ChangePasswordPage /> },

@@ -11,6 +11,7 @@ import {
    BookPlus,
    BookCopy,
    XCircle, // Thêm icon cho rejected sessions
+   Wallet, // Thêm icon Wallet
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -43,6 +44,11 @@ export const tutorSidebarConfig: SidebarItem[] = [
       icon: <Calendar className="h-4 w-4" />,
    },
    {
+      to: "/tutor/learning-commitments",
+      label: "Learning Commitments",
+      icon: <BookCopy className="h-4 w-4" />,
+   },
+   {
       to: "/tutor/createFlashcardQuiz",
       label: "Tạo bộ câu hỏi Flashcard",
       icon: <BookPlus className="h-4 w-4" />,
@@ -71,7 +77,12 @@ export const tutorSidebarConfig: SidebarItem[] = [
       to: "/tutor/review-list",
       label: "Quản lý đánh giá",
       icon: <BookCopy className="h-4 w-4" />,
-   }
+   },
+   {
+      to: "/tutor/wallet",
+      label: "Ví của tôi",
+      icon: <Wallet className="h-4 w-4" />,
+   },
 
    // Thêm các mục khác ở đây
 ];
@@ -117,9 +128,10 @@ const TutorSidebarItems: React.FC<{
                      to={item.to}
                      onClick={() => onLinkClick?.()}
                      className={`flex items-center gap-3 p-2 rounded-md text-sm font-medium transition-colors duration-200
-                        ${active
-                           ? "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300"
-                           : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        ${
+                           active
+                              ? "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                         }
                      `}
                      title={item.label}
