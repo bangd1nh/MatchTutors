@@ -22,7 +22,8 @@ import { CreateLearningCommitmentPage } from "@/pages/Student/CreateLearningComm
 import { LearningCommitmentsPage } from "@/pages/Student/LearningCommitmentsPage";
 import WalletManagement from "@/pages/wallet/walletManagement";
 import SessionDetailPage from "@/pages/SessionDetailPage";
-// import SessionDetailPage from "@/pages/SessionDetailPage"; // Moved to sharedRoutes
+import CreateMaterialPage from "@/pages/material/createMaterial"; // Import trang mới
+import MaterialManagementPage from "@/pages/material/materialManagement"; // Import trang mới
 
 export const tutorRoutes = {
    element: (
@@ -108,6 +109,14 @@ export const tutorRoutes = {
       {
          path: "/tutor/session/:id",
          element: <SessionDetailPage />,
+      },
+      {
+         path: "/tutor/create-material",
+         element: <CreateMaterialPage />,
+      },
+      {
+         path: "/tutor/material-management",
+         element: <MaterialManagementPage />,
       },
    ],
 };

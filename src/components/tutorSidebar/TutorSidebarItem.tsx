@@ -6,12 +6,14 @@ import {
    Home,
    User,
    LayoutDashboard,
-   Calendar, // Thêm icon Calendar
-   BookHeart, // Thêm icon BookHeart
+   Calendar,
+   BookHeart,
    BookPlus,
    BookCopy,
-   XCircle, // Thêm icon cho rejected sessions
-   Wallet, // Thêm icon Wallet
+   XCircle,
+   FileUp,
+   FolderKanban,
+   Wallet,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -78,6 +80,17 @@ export const tutorSidebarConfig: SidebarItem[] = [
       label: "Quản lý đánh giá",
       icon: <BookCopy className="h-4 w-4" />,
    },
+   {
+      to: "/tutor/create-material",
+      label: "Tải lên tài liệu",
+      icon: <FileUp className="h-4 w-4" />,
+   },
+   {
+      to: "/tutor/material-management",
+      label: "Quản lý tài liệu",
+      icon: <FolderKanban className="h-4 w-4" />,
+   },
+
    {
       to: "/tutor/wallet",
       label: "Ví của tôi",
