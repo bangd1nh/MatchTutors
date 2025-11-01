@@ -6,11 +6,13 @@ import {
    Home,
    User,
    LayoutDashboard,
-   Calendar, // Thêm icon Calendar
-   BookHeart, // Thêm icon BookHeart
+   Calendar,
+   BookHeart,
    BookPlus,
    BookCopy,
-   XCircle, // Thêm icon cho rejected sessions
+   XCircle,
+   FileUp,
+   FolderKanban,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -71,7 +73,17 @@ export const tutorSidebarConfig: SidebarItem[] = [
       to: "/tutor/review-list",
       label: "Quản lý đánh giá",
       icon: <BookCopy className="h-4 w-4" />,
-   }
+   },
+   {
+      to: "/tutor/create-material",
+      label: "Tải lên tài liệu",
+      icon: <FileUp className="h-4 w-4" />,
+   },
+   {
+      to: "/tutor/material-management",
+      label: "Quản lý tài liệu",
+      icon: <FolderKanban className="h-4 w-4" />,
+   },
 
    // Thêm các mục khác ở đây
 ];
@@ -117,9 +129,10 @@ const TutorSidebarItems: React.FC<{
                      to={item.to}
                      onClick={() => onLinkClick?.()}
                      className={`flex items-center gap-3 p-2 rounded-md text-sm font-medium transition-colors duration-200
-                        ${active
-                           ? "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300"
-                           : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        ${
+                           active
+                              ? "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                         }
                      `}
                      title={item.label}
