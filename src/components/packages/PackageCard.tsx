@@ -1,14 +1,13 @@
 import { UIPackage } from "@/types/package";
-import { Check, Trash2, Power } from "lucide-react";
+import { Check, Power } from "lucide-react";
 
 interface PackageCardProps {
   package: UIPackage;
   onEdit: (pkg: UIPackage) => void;
-  onDelete: (id: string) => void;
   onToggleStatus: (id: string) => void;
 }
 
-export function PackageCard({ package: pkg, onEdit, onDelete, onToggleStatus }: PackageCardProps) {
+export function PackageCard({ package: pkg, onEdit, onToggleStatus }: PackageCardProps) {
   const isFeatured = pkg.popular || false;
   const desc = (pkg.description || []).filter((s) => s && s.trim().length > 0);
 
@@ -93,24 +92,15 @@ export function PackageCard({ package: pkg, onEdit, onDelete, onToggleStatus }: 
 
       {/* Action buttons */}
       <div className="px-6 pb-6 border-t border-gray-100 pt-4 mt-auto">
-        <div className="flex gap-2">
-          <button
-            onClick={() => onToggleStatus(pkg.id)}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors ${
-              pkg.isActive ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
-            }`}
-          >
-            <Power className="w-4 h-4" />
-            {pkg.isActive ? "Tắt" : "Bật"}
-          </button>
-          <button
-            onClick={() => onDelete(pkg.id)}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm border border-red-200"
-          >
-            <Trash2 className="w-4 h-4" />
-            Xóa
-          </button>
-        </div>
+        <button
+          onClick={() => onToggleStatus(pkg.id)}
+          className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+            pkg.isActive ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
+          }`}
+        >
+          <Power className="w-4 h-4" />
+          {pkg.isActive ? "Tắt" : "Bật"}
+        </button>
       </div>
     </div>
   );

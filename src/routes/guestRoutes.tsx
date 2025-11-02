@@ -10,6 +10,7 @@ import VerifyEmailPage from "@/pages/auth/VerifyEmailPage";
 import Application from "@/pages/Jobseeker/Application";
 import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/auth/ResetPasswordPage";
+import PricingPage from "@/pages/PricingPage";
 
 export const guestRoutes = {
    element: <GuestLayout />,
@@ -25,5 +26,6 @@ export const guestRoutes = {
       { path: "/tutor-list", element: <TutorSearch /> },
       { path: "/tutor-detail/:id", element: <TutorDetail /> },
       { path: "/viewQuizz", element: <ViewQuiz /> },
+      { path: "/pricing", element: <PricingPage /> },
    ],
 };

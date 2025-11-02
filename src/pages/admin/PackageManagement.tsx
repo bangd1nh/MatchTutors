@@ -3,7 +3,7 @@ import { UIPackage, PackageFormData } from "@/types/package";
 import { PackageCard } from "@/components/packages/PackageCard";
 import { PackageForm } from "@/components/packages/PackageForm";
 import { Plus, Search as SearchIcon, Filter, ArrowUpDown, Package as PkgIcon, CheckCircle2, XCircle } from "lucide-react";
-import { usePackages, useCreatePackage, useUpdatePackage, useDeletePackage, useTogglePackageStatus } from "@/hooks/useAdminPackages";
+import { usePackages, useCreatePackage, useUpdatePackage, useTogglePackageStatus } from "@/hooks/useAdminPackages";
 
 type StatusFilter = "all" | "active" | "inactive";
 
@@ -13,7 +13,6 @@ export default function PackageManagement() {
   const { data: packagesData, isLoading, isError } = usePackages();
   const createMutation = useCreatePackage();
   const updateMutation = useUpdatePackage();
-  const deleteMutation = useDeletePackage();
   const toggleMutation = useTogglePackageStatus();
 
   const rawList = ((packagesData as any)?.data?.packages || []) as any[];
@@ -22,7 +21,7 @@ export default function PackageManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingPackage, setEditingPackage] = useState<UIPackage | undefined>();
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("active");
   const [sortKey, setSortKey] = useState<SortKey>("price-asc");
 
   const stats = useMemo(() => {
@@ -66,12 +65,6 @@ export default function PackageManagement() {
   const handleUpdatePackage = (data: PackageFormData) => {
     if (!editingPackage) return;
     updateMutation.mutate({ id: editingPackage.id, data }, { onSuccess: () => { setEditingPackage(undefined); setShowForm(false); } });
-  };
-
-  const handleDeletePackage = (id: string) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa gói này?")) {
-      deleteMutation.mutate(id);
-    }
   };
 
   const handleToggleStatus = (id: string) => {
@@ -211,7 +204,6 @@ export default function PackageManagement() {
                   <PackageCard
                     package={pkg}
                     onEdit={handleEdit}
-                    onDelete={handleDeletePackage}
                     onToggleStatus={handleToggleStatus}
                   />
                 </div>
@@ -243,6 +235,7 @@ export default function PackageManagement() {
           package={editingPackage}
           onSubmit={editingPackage ? handleUpdatePackage : handleCreatePackage}
           onClose={handleCloseForm}
+          allPackages={apiPackages}
         />
       )}
     </div>

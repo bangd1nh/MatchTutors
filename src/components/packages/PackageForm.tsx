@@ -6,12 +6,13 @@ interface PackageFormProps {
   package?: UIPackage;
   onSubmit: (data: PackageFormData) => void;
   onClose: () => void;
+  allPackages?: UIPackage[]; // Add all packages for validation
 }
 
-export function PackageForm({ package: pkg, onSubmit, onClose }: PackageFormProps) {
+export function PackageForm({ package: pkg, onSubmit, onClose, allPackages = [] }: PackageFormProps) {
   const [formData, setFormData] = useState<PackageFormData>({
     name: "",
-    description: [],
+    description: [""], // Start with one empty input
     price: 0,
     isActive: true,
     popular: false,
@@ -25,7 +26,7 @@ export function PackageForm({ package: pkg, onSubmit, onClose }: PackageFormProp
   });
 
   const [advancedOpen, setAdvancedOpen] = useState(false);
-  const [touched, setTouched] = useState<{ name?: boolean; price?: boolean; description?: boolean }>({});
+  const [touched, setTouched] = useState<{ name?: boolean; price?: boolean; description?: boolean; maxStudents?: boolean; maxQuiz?: boolean; isActive?: boolean; popular?: boolean }>({});
 
   useEffect(() => {
     if (pkg) {
@@ -44,24 +45,86 @@ export function PackageForm({ package: pkg, onSubmit, onClose }: PackageFormProp
         },
       });
     } else {
-      setFormData((f) => ({ ...f, description: [] }));
+      setFormData((f) => ({ ...f, description: [""] }));
     }
   }, [pkg]);
 
   const errors = useMemo(() => {
     const hasDesc = (formData.description || []).some((s) => s && s.trim().length > 0);
+    
+    // Name validation
+    let nameError: string | undefined;
+    if (!formData.name?.trim()) {
+      nameError = "Tên gói bắt buộc";
+    } else if (formData.name.trim().length < 3) {
+      nameError = "Tên gói phải có ít nhất 3 ký tự";
+    } else if (formData.name.trim().length > 100) {
+      nameError = "Tên gói không được vượt quá 100 ký tự";
+    }
+    
+    // Price validation
+    let priceError: string | undefined;
+    if (!Number.isFinite(formData.price)) {
+      priceError = "Giá phải là số hợp lệ";
+    } else if (formData.price < 0) {
+      priceError = "Giá không được nhỏ hơn 0";
+    } else if (formData.price > 999999999) {
+      priceError = "Giá quá lớn";
+    }
+    
+    // Description validation
+    const descriptionError = !hasDesc ? "Ít nhất 1 dòng mô tả" : undefined;
+    
+    // Features validation
+    const featuresErrors: { maxStudents?: string; maxQuiz?: string } = {};
+    if (formData.features.maxStudents !== undefined) {
+      if (formData.features.maxStudents < 0) {
+        featuresErrors.maxStudents = "Số học sinh phải >= 0";
+      } else if (formData.features.maxStudents > 999999) {
+        featuresErrors.maxStudents = "Số học sinh quá lớn";
+      }
+    }
+    if (formData.features.maxQuiz !== undefined) {
+      if (formData.features.maxQuiz < 0) {
+        featuresErrors.maxQuiz = "Số bài quiz phải >= 0";
+      } else if (formData.features.maxQuiz > 999999) {
+        featuresErrors.maxQuiz = "Số bài quiz quá lớn";
+      }
+    }
+    
+    // Active packages limit validation (max 4)
+    let isActiveError: string | undefined;
+    if (formData.isActive) {
+      const activeCount = allPackages.filter(p => p.isActive && p.id !== pkg?.id).length;
+      if (activeCount >= 4) {
+        isActiveError = "Đã đạt tối đa 4 gói hoạt động";
+      }
+    }
+    
+    // Popular packages limit validation (max 1)
+    let popularError: string | undefined;
+    if (formData.popular) {
+      const popularCount = allPackages.filter(p => p.popular && p.id !== pkg?.id).length;
+      if (popularCount >= 1) {
+        popularError = "Chỉ được phép có 1 gói phổ biến";
+      }
+    }
+    
     return {
-      name: !formData.name?.trim() ? "Tên gói bắt buộc" : undefined,
-      price: !(Number.isFinite(formData.price) && formData.price >= 0) ? "Giá không hợp lệ" : undefined,
-      description: !hasDesc ? "Ít nhất 1 dòng mô tả" : undefined,
-    } as { name?: string; price?: string; description?: string };
-  }, [formData]);
+      name: nameError,
+      price: priceError,
+      description: descriptionError,
+      features: featuresErrors,
+      isActive: isActiveError,
+      popular: popularError,
+    } as { name?: string; price?: string; description?: string; features?: { maxStudents?: string; maxQuiz?: string }; isActive?: string; popular?: string };
+  }, [formData, allPackages, pkg]);
 
-  const isInvalid = !!(errors.name || errors.price || errors.description);
+  const isInvalid = !!(errors.name || errors.price || errors.description || errors.features?.maxStudents || errors.features?.maxQuiz || errors.isActive || errors.popular);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setTouched({ name: true, price: true, description: true });
+    setTouched({ name: true, price: true, description: true, maxStudents: true, maxQuiz: true, isActive: true, popular: true });
     if (isInvalid) return;
     const descArray = (formData.description || []).map((s) => s.trim()).filter((s) => s.length > 0);
     onSubmit({
@@ -154,10 +217,16 @@ export function PackageForm({ package: pkg, onSubmit, onClose }: PackageFormProp
                 Giá (VNĐ) <span className="text-red-500">*</span>
               </label>
               <input
-                type="number"
-                min="0"
-                value={Number.isFinite(formData.price) ? formData.price : 0}
-                onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                type="text"
+                inputMode="numeric"
+                value={formData.price > 0 ? formData.price.toString() : ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Only allow numbers
+                  if (value === "" || /^\d+$/.test(value)) {
+                    setFormData({ ...formData, price: value === "" ? 0 : Number(value) });
+                  }
+                }}
                 onBlur={() => setTouched((t) => ({ ...t, price: true }))}
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${touched.price && errors.price ? "border-red-400" : "border-gray-300"}`}
                 placeholder="0"
@@ -170,12 +239,18 @@ export function PackageForm({ package: pkg, onSubmit, onClose }: PackageFormProp
               <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
               <select
                 value={formData.isActive ? "active" : "inactive"}
-                onChange={(e) => setFormData({ ...formData, isActive: e.target.value === "active" })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onChange={(e) => {
+                  setFormData({ ...formData, isActive: e.target.value === "active" });
+                  setTouched((t) => ({ ...t, isActive: true }));
+                }}
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${touched.isActive && errors.isActive ? "border-red-400" : "border-gray-300"}`}
               >
                 <option value="active">Hoạt động</option>
                 <option value="inactive">Không hoạt động</option>
               </select>
+              {touched.isActive && errors.isActive && (
+                <p className="mt-1 text-xs text-red-600">{errors.isActive}</p>
+              )}
             </div>
           </div>
 
@@ -184,10 +259,17 @@ export function PackageForm({ package: pkg, onSubmit, onClose }: PackageFormProp
               <input
                 type="checkbox"
                 checked={!!formData.popular}
-                onChange={(e) => setFormData({ ...formData, popular: e.target.checked })}
+                onChange={(e) => {
+                  setFormData({ ...formData, popular: e.target.checked });
+                  setTouched((t) => ({ ...t, popular: true }));
+                }}
+                className={touched.popular && errors.popular ? "border-red-400" : ""}
               />
               <span className="text-sm font-medium text-gray-700">Phổ biến nhất (hiển thị badge)</span>
             </label>
+            {touched.popular && errors.popular && (
+              <p className="mt-1 text-xs text-red-600">{errors.popular}</p>
+            )}
           </div>
 
           <div className="pt-4 border-t border-gray-200">
@@ -234,9 +316,13 @@ export function PackageForm({ package: pkg, onSubmit, onClose }: PackageFormProp
                       min="0"
                       value={formData.features.maxStudents ?? ""}
                       onChange={(e) => setFormData({ ...formData, features: { ...formData.features, maxStudents: e.target.value ? Number(e.target.value) : undefined } })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onBlur={() => setTouched((t) => ({ ...t, maxStudents: true }))}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${touched.maxStudents && errors.features?.maxStudents ? "border-red-400" : "border-gray-300"}`}
                       placeholder="Không giới hạn"
                     />
+                    {touched.maxStudents && errors.features?.maxStudents && (
+                      <p className="mt-1 text-xs text-red-600">{errors.features.maxStudents}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Số bài quiz tối đa</label>
@@ -245,9 +331,13 @@ export function PackageForm({ package: pkg, onSubmit, onClose }: PackageFormProp
                       min="0"
                       value={formData.features.maxQuiz ?? ""}
                       onChange={(e) => setFormData({ ...formData, features: { ...formData.features, maxQuiz: e.target.value ? Number(e.target.value) : undefined } })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onBlur={() => setTouched((t) => ({ ...t, maxQuiz: true }))}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${touched.maxQuiz && errors.features?.maxQuiz ? "border-red-400" : "border-gray-300"}`}
                       placeholder="Không giới hạn"
                     />
+                    {touched.maxQuiz && errors.features?.maxQuiz && (
+                      <p className="mt-1 text-xs text-red-600">{errors.features.maxQuiz}</p>
+                    )}
                   </div>
                 </div>
               </div>
