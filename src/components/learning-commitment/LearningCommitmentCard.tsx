@@ -48,12 +48,12 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
    };
 
    // allow match by either student.userId (auth user id) or profile _id
-   // cast student to any to avoid TS error when backend returns userId
    const studentObj: any = commitment.student;
    const isStudentOwner = Boolean(
       studentObj &&
-         (String(studentObj.userId) === String(user?.id) ||
-            String(studentObj._id) === String(user?.id))
+         (String(studentObj.userId?._id || studentObj.userId) ===
+            String(user?.id || user?._id) ||
+            String(studentObj._id) === String(user?.id || user?._id))
    );
 
    const isStudentRole = String(user?.role || "").toLowerCase() === "student";
