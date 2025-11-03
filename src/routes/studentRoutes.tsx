@@ -14,6 +14,7 @@ import SchedulePage from "@/pages/SchedulePage"; // Import trang mới
 import TeachingRequestDetail from "@/pages/Tutor/TeachingRequestDetail"; // Import component detail
 import RejectedSessionsPage from "@/pages/RejectedSessionsPage"; // Import trang rejected sessions
 import { StudentReviewHistory } from "@/pages/Review/StudentReviewHistory";
+import SessionDetailPage from "@/pages/SessionDetailPage";
 import { LearningCommitmentsPage } from "@/pages/Student/LearningCommitmentsPage";
 import WalletManagement from "@/pages/wallet/walletManagement";
 
@@ -106,6 +107,22 @@ export const studentRoutes = {
          element: (
             <IsCreatedProfileRoute>
                <RejectedSessionsPage />
+            </IsCreatedProfileRoute>
+         ),
+      },
+      {
+         path: "/student/flashcard",
+         element: (
+            <IsCreatedProfileRoute>
+               <ViewFlashcardQuizQuestion />
+            </IsCreatedProfileRoute>
+         ),
+      },
+      {
+         path: "/student/session/:id",
+         element: (
+            <IsCreatedProfileRoute>
+               <SessionDetailPage />
             </IsCreatedProfileRoute>
          ),
       },

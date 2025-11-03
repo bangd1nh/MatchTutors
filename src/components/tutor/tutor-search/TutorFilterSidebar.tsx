@@ -163,7 +163,7 @@ export default function TutorFilterBar({
    };
 
    return (
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+      <div className="sticky top-16 z-40 bg-white border-b border-gray-200 shadow-sm">
          <div className="px-6 py-4 space-y-3">
             {/* Search Bar - Full width */}
             <div className="flex w-full max-w-2xl">

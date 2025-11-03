@@ -3,176 +3,176 @@
 @tailwind utilities;
 
 @keyframes slide-in {
-    0% {
-        transform: translateX(120%);
-        opacity: 0;
-    }
-    100% {
-        transform: translateX(0);
-        opacity: 1;
-    }
+   0% {
+      transform: translateX(120%);
+      opacity: 0;
+   }
+   100% {
+      transform: translateX(0);
+      opacity: 1;
+   }
 }
 
 @keyframes shrink {
-    from {
-        width: 100%;
-    }
-    to {
-        width: 0%;
-    }
+   from {
+      width: 100%;
+   }
+   to {
+      width: 0%;
+   }
 }
 
 :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+   --background: 0 0% 100%;
+   --foreground: 222.2 84% 4.9%;
+   --card: 0 0% 100%;
+   --card-foreground: 222.2 84% 4.9%;
+   --popover: 0 0% 100%;
+   --popover-foreground: 222.2 84% 4.9%;
+   --primary: 221.2 83.2% 53.3%;
+   --primary-foreground: 210 40% 98%;
+   --secondary: 210 40% 96.1%;
+   --secondary-foreground: 222.2 47.4% 11.2%;
+   --muted: 210 40% 96.1%;
+   --muted-foreground: 215.4 16.3% 46.9%;
+   --accent: 210 40% 96.1%;
+   --accent-foreground: 222.2 47.4% 11.2%;
+   --destructive: 0 84.2% 60.2%;
+   --destructive-foreground: 210 40% 98%;
+   --border: 214.3 31.8% 91.4%;
+   --input: 214.3 31.8% 91.4%;
+   --ring: 221.2 83.2% 53.3%;
+   --radius: 0.5rem;
 }
 
 .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 217.2 91.2% 59.8%;
+   --background: 222.2 84% 4.9%;
+   --foreground: 210 40% 98%;
+   --card: 222.2 84% 4.9%;
+   --card-foreground: 210 40% 98%;
+   --popover: 222.2 84% 4.9%;
+   --popover-foreground: 210 40% 98%;
+   --primary: 217.2 91.2% 59.8%;
+   --primary-foreground: 222.2 47.4% 11.2%;
+   --secondary: 217.2 32.6% 17.5%;
+   --secondary-foreground: 210 40% 98%;
+   --muted: 217.2 32.6% 17.5%;
+   --muted-foreground: 215 20.2% 65.1%;
+   --accent: 217.2 32.6% 17.5%;
+   --accent-foreground: 210 40% 98%;
+   --destructive: 0 62.8% 30.6%;
+   --destructive-foreground: 210 40% 98%;
+   --border: 217.2 32.6% 17.5%;
+   --input: 217.2 32.6% 17.5%;
+   --ring: 217.2 91.2% 59.8%;
 }
 
 @layer base {
-    * {
-        @apply border-border outline-ring;
-    }
-    body {
-        @apply bg-background text-foreground;
-    }
+   * {
+      @apply border-border outline-ring;
+   }
+   body {
+      @apply bg-background text-foreground;
+   }
 }
 
 .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
+   height: 6em;
+   padding: 1.5em;
+   will-change: filter;
+   transition: filter 300ms;
 }
 .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
+   filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
-    filter: drop-shadow(0 0 2em #61dafbaa);
+   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
 @keyframes logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+   from {
+      transform: rotate(0deg);
+   }
+   to {
+      transform: rotate(360deg);
+   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    a:nth-of-type(2) .logo {
-        animation: logo-spin infinite 20s linear;
-    }
+   a:nth-of-type(2) .logo {
+      animation: logo-spin infinite 20s linear;
+   }
 }
 
 .card {
-    padding: 2em;
+   padding: 2em;
 }
 
 .read-the-docs {
-    color: #888;
+   color: #888;
 }
 
 .nav-link {
-    @apply text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium;
+   @apply text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium;
 }
 
 /* ================================================
    React Big Calendar Dark Mode Styles
    ================================================ */
 .dark .rbc-calendar {
-    @apply bg-card text-foreground;
+   @apply bg-card text-foreground;
 }
 
 .dark .rbc-toolbar {
-    @apply mb-4;
+   @apply mb-4;
 }
 
 .dark .rbc-toolbar .rbc-toolbar-label {
-    @apply text-2xl font-bold text-foreground;
+   @apply text-2xl font-bold text-foreground;
 }
 
 .dark .rbc-btn-group button {
-    @apply text-foreground bg-secondary hover:bg-accent;
+   @apply text-foreground bg-secondary hover:bg-accent;
 }
 
 .dark .rbc-header {
-    @apply border-b border-border p-2 text-center font-medium text-muted-foreground;
+   @apply border-b border-border p-2 text-center font-medium text-muted-foreground;
 }
 
 .dark .rbc-day-bg {
-    @apply border-l border-border;
+   @apply border-l border-border;
 }
 
 .dark .rbc-day-bg:first-child {
-    @apply border-l-0;
+   @apply border-l-0;
 }
 
 .dark .rbc-month-row {
-    @apply border-t border-border;
+   @apply border-t border-border;
 }
 
 .dark .rbc-off-range-bg {
-    @apply bg-muted/40;
+   @apply bg-muted/40;
 }
 
 .dark .rbc-today {
-    @apply bg-accent;
+   @apply bg-accent;
 }
 
 .dark .rbc-event {
-    @apply bg-primary text-primary-foreground p-1 rounded-md text-sm;
+   @apply bg-primary text-primary-foreground p-1 rounded-md text-sm;
 }
 
 .dark .rbc-event:focus {
-    @apply outline-none ring-2 ring-ring ring-offset-2;
+   @apply outline-none ring-2 ring-ring ring-offset-2;
 }
 
 .dark .rbc-event.rbc-selected {
-    @apply bg-primary/80;
+   @apply bg-primary/80;
 }
 
 .dark .rbc-show-more {
-    @apply text-primary hover:text-primary/80;
+   @apply text-primary hover:text-primary/80;
 }
 
 /* ================================================
@@ -181,87 +181,95 @@
 
 /* General container */
 .ql-container {
-    @apply rounded-b-md;
-    background-color: hsl(var(--background));
-    border-color: hsl(var(--border)) !important;
+   @apply rounded-b-md;
+   background-color: hsl(var(--background));
+   border-color: hsl(var(--border)) !important;
 }
 
 /* Toolbar */
 .ql-toolbar {
-    @apply rounded-t-md;
-    background-color: hsl(var(--muted));
-    border-color: hsl(var(--border)) !important;
+   @apply rounded-t-md;
+   background-color: hsl(var(--muted));
+   border-color: hsl(var(--border)) !important;
 }
 
 /* Editor content area */
 .ql-editor {
-    min-height: 150px;
-    color: hsl(var(--foreground));
-    background-color: hsl(var(--background));
+   min-height: 150px;
+   color: hsl(var(--foreground));
+   background-color: hsl(var(--background));
+   word-wrap: break-word; /* Ensures long words break to the next line */
+   overflow-wrap: break-word; /* Alias for word-wrap */
 }
 
 .ql-editor.ql-blank::before {
-    color: hsl(var(--muted-foreground));
-    font-style: normal;
-    left: 1rem;
+   color: hsl(var(--muted-foreground));
+   font-style: normal;
+   left: 1rem;
 }
 
 /* Toolbar icons */
 .ql-snow .ql-stroke {
-    stroke: hsl(var(--foreground));
+   stroke: hsl(var(--foreground));
 }
 .ql-snow .ql-fill {
-    fill: hsl(var(--foreground));
+   fill: hsl(var(--foreground));
 }
 
 /* Toolbar buttons on hover */
 .ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg,
 .ql-snow .ql-toolbar .ql-picker-label:hover,
 .ql-snow .ql-toolbar button:hover {
-    background-color: hsl(var(--accent));
-    color: hsl(var(--accent-foreground));
+   background-color: hsl(var(--accent));
+   color: hsl(var(--accent-foreground));
 }
 
 .ql-snow .ql-toolbar button:hover .ql-stroke,
 .ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke {
-    stroke: hsl(var(--accent-foreground));
+   stroke: hsl(var(--accent-foreground));
 }
 
 /* Active/selected toolbar buttons */
 .ql-snow .ql-toolbar button.ql-active,
 .ql-snow .ql-toolbar .ql-picker-label.ql-active {
-    background-color: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
+   background-color: hsl(var(--primary));
+   color: hsl(var(--primary-foreground));
 }
 
 .ql-snow .ql-toolbar button.ql-active .ql-stroke,
 .ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke {
-    stroke: hsl(var(--primary-foreground));
+   stroke: hsl(var(--primary-foreground));
 }
 
 /* Dropdown pickers */
 .ql-snow .ql-picker-options {
-    background-color: hsl(var(--popover));
-    border-color: hsl(var(--border)) !important;
-    color: hsl(var(--popover-foreground));
+   background-color: hsl(var(--popover));
+   border-color: hsl(var(--border)) !important;
+   color: hsl(var(--popover-foreground));
 }
 
 .ql-snow .ql-picker-options .ql-picker-item:hover {
-    background-color: hsl(var(--accent));
-    color: hsl(var(--accent-foreground));
+   background-color: hsl(var(--accent));
+   color: hsl(var(--accent-foreground));
 }
 
 /* Read-only mode styles */
 .ql-read-only .ql-toolbar {
-    display: none !important;
+   display: none !important;
 }
 
 .ql-read-only .ql-container {
-    border-top: 1px solid hsl(var(--border)) !important;
+   border-top: 1px solid hsl(var(--border)) !important;
 }
 
 .ql-read-only .ql-editor {
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-    min-height: auto;
+   padding-top: 0.75rem;
+   padding-bottom: 0.75rem;
+   min-height: auto;
+}
+
+.quill-editor-container {
+   /* Or target .ql-editor directly */
+   max-height: 300px; /* Set a maximum height for the editor */
+   overflow-y: auto; /* Add vertical scrollbar if content exceeds max-height */
 }

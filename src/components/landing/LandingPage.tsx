@@ -5,9 +5,7 @@ import MidPage from "@/components/common/MidPage";
 const LandingPage = () => {
    return (
       <div>
-         <Header />
          <MidPage />
-         <Footer />
       </div>
    );
 };

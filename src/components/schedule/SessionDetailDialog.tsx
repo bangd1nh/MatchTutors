@@ -712,7 +712,14 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
                      {/* Secondary Actions */}
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t">
-                        <Link to={`/session/${session._id}`} className="w-full">
+                        <Link
+                           to={
+                              user.role === "TUTOR"
+                                 ? `/tutor/session/${session._id}`
+                                 : `/student/session/${session._id}`
+                           }
+                           className="w-full"
+                        >
                            <Button
                               variant="outline"
                               className="w-full flex items-center justify-center gap-2"

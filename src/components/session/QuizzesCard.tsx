@@ -163,7 +163,9 @@ export default function QuizzesCard({ session, canManage }: any) {
                                              variant="outline"
                                              className="text-xs"
                                           >
-                                             {quiz.quizMode}
+                                             {quiz.quizMode === "STUDY"
+                                                ? "HỌC TẬP"
+                                                : "   "}
                                           </Badge>
                                        </div>
 
@@ -238,9 +240,9 @@ export default function QuizzesCard({ session, canManage }: any) {
                                           </div>
                                        )}
 
-                                       <p className="text-xs text-muted-foreground mt-2">
-                                          ID: {quiz._id}
-                                       </p>
+                                       {/* <p className="text-xs text-muted-foreground mt-2"> */}
+                                       {/* ID: {quiz._id} */}
+                                       {/* </p> */}
                                     </div>
 
                                     <div className="flex items-center gap-2 ml-4">
@@ -250,7 +252,11 @@ export default function QuizzesCard({ session, canManage }: any) {
 
                                        {/* Nút Xem: dẫn tới /viewQuizz */}
                                        <Link
-                                          to={`/tutor/flashcard?flashcardId=${quiz._id}`}
+                                          to={
+                                             canManage
+                                                ? `/tutor/flashcard?flashcardId=${quiz._id}`
+                                                : `/student/flashcard?flashcardId=${quiz._id}`
+                                          }
                                        >
                                           <Button size="sm">Xem</Button>
                                        </Link>

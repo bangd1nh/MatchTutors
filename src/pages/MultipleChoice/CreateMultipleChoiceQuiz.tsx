@@ -27,6 +27,8 @@ const CreateMultipleChoiceQuiz = () => {
       const mcqValid = await mcqRef.current.validate?.();
       if (infoValid === false || mcqValid?.valid === false) {
          addToast("error", "Vui lòng kiểm tra thông tin quiz và các câu hỏi");
+         const infoValues = quizInfoRef.current.getValues();
+         console.log(infoValues);
          return;
       }
 
