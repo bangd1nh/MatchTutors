@@ -23,6 +23,8 @@ const ALLOWED_FILE_TYPES = [
    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
    "application/vnd.ms-excel",
    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+   "application/vnd.ms-powerpoint",
+   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 ];
 
 const formSchema = z.object({
@@ -37,7 +39,7 @@ const formSchema = z.object({
       )
       .refine(
          (files) => ALLOWED_FILE_TYPES.includes(files?.[0]?.type),
-         "Định dạng file không hợp lệ. Chỉ chấp nhận: PDF, Word, Excel."
+         "Định dạng file không hợp lệ. Chỉ chấp nhận: PDF, Word, Excel, Powerpoint."
       ),
 });
 
