@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "./useToast";
 import { MCQResponse } from "@/types/quiz";
 import { IQuizQuestionResponse } from "@/types/quizQuestion";
+import { submitMCQtoServer } from "@/api/quiz";
 
 export const useMCQ = (quizId?: string) => {
    const addToast = useToast();
@@ -50,5 +51,18 @@ export const useMCQ = (quizId?: string) => {
       },
    });
 
-   return { create, fetchList, fetchMCQByQuizId, updateMCQ };
+   const submitMCQ = useMutation({
+      mutationFn: submitMCQtoServer,
+      onSuccess: (response) => {
+         addToast("success", response.message);
+      },
+      onError: (error: any) => {
+         addToast(
+            "error",
+            error?.response?.data.message || "Error submiting MCQ"
+         );
+      },
+   });
+
+   return { create, fetchList, fetchMCQByQuizId, updateMCQ, submitMCQ };
 };

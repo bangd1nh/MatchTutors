@@ -1,18 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "./useToast";
 import {
+   asignMCQToSession,
    asignQuizToSession,
    createFlashCardQuiz,
    deleteFlashcardQuestion,
    editFlashcardQuestion,
    fetchFlashcardQuestions,
    fetchFlashCardQuiz,
+   fetchMCQAssignedToSession,
    fetchQuizzesAssignedToSession,
    fetchSessionAssigned,
 } from "@/api/quiz";
-import { IQuizInfo, IQuizResponse } from "@/types/quiz";
+import { IQuizResponse } from "@/types/quiz";
 import { IQuizQuestionResponse } from "@/types/quizQuestion";
 import { useAsignFlashcardStore } from "@/store/useAsignFlashcardStore";
+import { useAsignMCQStore } from "@/store/useAsignMCQStore";
 
 export const useCreateQuiz = () => {
    const addToast = useToast();
@@ -98,5 +101,27 @@ export const useQuizzesAssignedToSession = (sessionId: string) => {
    return useQuery({
       queryKey: ["ASSSIGNEDQUIZ", sessionId],
       queryFn: () => fetchQuizzesAssignedToSession(sessionId),
+   });
+};
+
+export const useMCQAssignedToSession = (sessionId: string) => {
+   return useQuery({
+      queryKey: ["ASSSIGNEDMCQ", sessionId],
+      queryFn: () => fetchMCQAssignedToSession(sessionId),
+   });
+};
+
+export const useAsignMCQToSession = () => {
+   const addToast = useToast();
+   const { setRefetchMCQ } = useAsignMCQStore();
+   return useMutation({
+      mutationFn: asignMCQToSession,
+      onSuccess: (response) => {
+         addToast("success", response.message);
+         setRefetchMCQ();
+      },
+      onError: (error: any) => {
+         addToast("error", error.response?.data.message);
+      },
    });
 };
