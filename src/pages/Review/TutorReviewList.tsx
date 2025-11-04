@@ -168,6 +168,7 @@ export function ReviewList() {
             </div>
         )
     }
+    console.log('Rendered reviews:', reviews);
 
     return (
         <div className="min-h-screen bg-background">

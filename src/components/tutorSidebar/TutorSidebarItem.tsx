@@ -61,6 +61,11 @@ export const tutorSidebarConfig: SidebarItem[] = [
       icon: <BookPlus className="h-4 w-4" />,
    },
    {
+      to: "/tutor/createShortAnswerQuiz",
+      label: "Tạo bộ câu hỏi Short Answer",
+      icon: <BookPlus className="h-4 w-4" />,
+   },
+   {
       to: "/tutor/flashcardList",
       label: "Xem bộ câu hỏi Flashcard",
       icon: <BookCopy className="h-4 w-4" />,
@@ -68,6 +73,11 @@ export const tutorSidebarConfig: SidebarItem[] = [
    {
       to: "/tutor/MultipleChoiceList",
       label: "Xem bộ câu hỏi Trắc nghiệm",
+      icon: <BookCopy className="h-4 w-4" />,
+   },
+   {
+      to: "/tutor/ShortAnswerList",
+      label: "Xem bộ câu hỏi Short Answer",
       icon: <BookCopy className="h-4 w-4" />,
    },
    {
@@ -141,10 +151,9 @@ const TutorSidebarItems: React.FC<{
                      to={item.to}
                      onClick={() => onLinkClick?.()}
                      className={`flex items-center gap-3 p-2 rounded-md text-sm font-medium transition-colors duration-200
-                        ${
-                           active
-                              ? "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300"
-                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        ${active
+                           ? "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300"
+                           : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                         }
                      `}
                      title={item.label}

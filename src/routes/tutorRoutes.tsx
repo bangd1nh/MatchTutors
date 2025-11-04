@@ -24,6 +24,10 @@ import WalletManagement from "@/pages/wallet/walletManagement";
 import SessionDetailPage from "@/pages/SessionDetailPage";
 import CreateMaterialPage from "@/pages/material/createMaterial"; // Import trang mới
 import MaterialManagementPage from "@/pages/material/materialManagement"; // Import trang mới
+import ViewShortAnswerQuizList from "@/pages/ShortAnswer/ViewShortAnswerQuizList";
+import ViewShortAnswerQuiz from "@/pages/ShortAnswer/ViewShortAnswerQuiz";
+import EditShortAnswerQuiz from "@/pages/ShortAnswer/EditShortAnswerQuiz";
+import CreateShortAnswerQuiz from "@/pages/ShortAnswer/CreateShortAnswerQuiz";
 
 export const tutorRoutes = {
    element: (
@@ -67,6 +71,10 @@ export const tutorRoutes = {
          element: <CreateMultipleChoiceQuiz />,
       },
       {
+         path: "/tutor/createShortAnswerQuiz",
+         element: <CreateShortAnswerQuiz />,
+      },
+      {
          path: "/tutor/flashcardList",
          element: <FlashcardQuizList />,
       },
@@ -94,6 +102,19 @@ export const tutorRoutes = {
          path: "/tutor/editMultipleChoice",
          element: <EditMultipleChoiceQuiz />,
       },
+      {
+         path: "/tutor/shortAnswerList",
+         element: <ViewShortAnswerQuizList />,
+      },
+      {
+         path: "/tutor/shortAnswer",
+         element: <ViewShortAnswerQuiz />,
+      },
+      {
+         path: "/tutor/editShortAnswer",
+         element: <EditShortAnswerQuiz />,
+      },
+
       {
          path: "/tutor/review-list",
          element: <ReviewList />,

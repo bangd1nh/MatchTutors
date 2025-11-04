@@ -58,16 +58,17 @@ export const useReview = (tutorId?: string, filters?: {
         enabled: !!tutorId,
     });
 
-    //  Student’s review history
+    // Student's review history with filtering
     const {
         data: studentReviewHistory,
         isLoading: isHistoryLoading,
         refetch: refetchHistory,
     } = useQuery({
-        queryKey: ["studentReviewHistory"],
-        queryFn: getStudentReviewHistory,
+        queryKey: ["studentReviewHistory", filters],
+        queryFn: () => getStudentReviewHistory(filters),
         enabled: user?.role === Role.STUDENT,
-    });
+        keepPreviousData: true,
+    } as any);
 
     //  Create review
     const createMutation = useMutation({

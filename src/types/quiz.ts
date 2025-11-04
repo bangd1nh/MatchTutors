@@ -140,6 +140,35 @@ export interface updateIMCQBody {
    editMultipleChoiceQuizQuestionsArr?: IQuizQuestion[];
 }
 
+export type ShortAnswerQuestions = {
+   _id?: string;
+   order?: number;
+   questionType: QuestionTypeEnum;
+   questionText: string;
+   acceptedAnswers: string[];
+   caseSensitive?: boolean;
+   explanation?: string;
+   points?: number;
+};
+
+export interface updateIShortAnswerBody {
+   _id: string;
+   title: string;
+   description: string;
+   quizMode: QuizModeEnum;
+   quizType: QuestionTypeEnum;
+   settings?: QuizSettings;
+   createdBy: {
+      role: string;
+      name: string;
+   };
+   tags: string[];
+   totalQuestions: number;
+   newShortAnswerQuizQuestionsArr?: ShortAnswerQuestions[];
+   deleteShortAnswerQuizQuestionsArr?: { _id: string }[];
+   editShortAnswerQuizQuestionsArr?: ShortAnswerQuestions[];
+}
+
 export interface ISessionAssignedQuizzesResponse extends BaseAPIResponse {
    data: {
       _id: string;
@@ -163,3 +192,5 @@ export interface ISessionAssignedQuizzesResponse extends BaseAPIResponse {
       createdAt?: string | Date;
    }[];
 }
+
+

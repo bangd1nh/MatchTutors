@@ -76,3 +76,41 @@ export const fetchQuizzesAssignedToSession = async (
    });
    return response.data;
 };
+
+// Short Answer
+export const createShortAnswerQuiz = async (
+   data: IQuizBody
+): Promise<IQuizResponse> => {
+   const response = await apiClient.post("/quiz/short-answer", data);
+   return response.data;
+};
+
+export const fetchShortAnswerQuizByTutor = async (): Promise<IQuizResponse> => {
+   const response = await apiClient.get("/quiz/short-answer/tutor");
+   return response.data;
+};
+
+export const fetchShortAnswerQuestions = async (
+   quizId: string
+): Promise<IQuizQuestionResponse> => {
+   const response = await apiClient.get("/quiz/short-answer", {
+      params: { quizId },
+   });
+   return response.data;
+};
+
+export const editShortAnswerQuiz = async (
+   data: IQUizUpdate
+): Promise<IQuizQuestionResponse> => {
+   const response = await apiClient.put("/quiz/short-answer", data);
+   return response.data;
+};
+
+export const deleteShortAnswerQuiz = async (
+   quizId: string
+): Promise<BaseAPIResponse> => {
+   const response = await apiClient.delete("/quiz/deleteQuiz", {
+      data: { quizId },
+   });
+   return response.data;
+};

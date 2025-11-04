@@ -18,7 +18,7 @@ export const getTutorReviews = async (tutorId: string): Promise<Review[]> => {
 };
 
 //  Get all reviews for the current tutor (dashboard)
-export const getMyTutorReviews = async (params?: {
+export const getMyTutorReviews = async (filters?: {
     page?: number;
     limit?: number;
     keyword?: string;
@@ -27,9 +27,34 @@ export const getMyTutorReviews = async (params?: {
     minRating?: number;
     maxRating?: number;
     sort?: "newest" | "oldest";
+    rating?: string;
 }) => {
-    const response = await apiClient.get("/review/tutor/me", { params });
-    return response.data.data; // { reviews, total, totalPages, page, limit }
+    const params = new URLSearchParams();
+
+    if (filters?.page) params.append('page', filters.page.toString());
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.keyword) params.append('keyword', filters.keyword);
+    if (filters?.minRating !== undefined) params.append('minRating', filters.minRating.toString());
+    if (filters?.maxRating !== undefined) params.append('maxRating', filters.maxRating.toString());
+    if (filters?.sort) params.append('sort', filters.sort);
+    if (filters?.rating) params.append('rating', filters.rating);
+
+    if (filters?.subjects && filters.subjects.length > 0) {
+        params.append('subjects', filters.subjects.join(','));
+    }
+
+    if (filters?.levels && filters.levels.length > 0) {
+        params.append('levels', filters.levels.join(','));
+    }
+
+    console.log('API call params:', params.toString());
+
+    const response = await apiClient.get(`/review/tutor/me?${params.toString()}`);
+
+    // Add this logging to see what's returned
+    console.log('API response:', response.data);
+
+    return response.data.data;
 };
 
 // Get tutor rating stats
@@ -42,10 +67,42 @@ export const getTutorRatingStats = async (tutorId: string): Promise<{
     return response.data.data.stats;
 };
 
-// Get all reviews written by current student
-export const getStudentReviewHistory = async (): Promise<Review[]> => {
-    const response = await apiClient.get("/review/student/history");
-    return response.data.data.reviews;
+// Get all reviews written by current student with filtering
+export const getStudentReviewHistory = async (filters?: {
+    page?: number;
+    limit?: number;
+    keyword?: string;
+    subjects?: string[];
+    levels?: string[];
+    minRating?: number;
+    maxRating?: number;
+    sort?: "newest" | "oldest";
+    rating?: string;
+}) => {
+    const params = new URLSearchParams();
+
+    if (filters?.page) params.append('page', filters.page.toString());
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.keyword) params.append('keyword', filters.keyword);
+    if (filters?.minRating !== undefined) params.append('minRating', filters.minRating.toString());
+    if (filters?.maxRating !== undefined) params.append('maxRating', filters.maxRating.toString());
+    if (filters?.sort) params.append('sort', filters.sort);
+    if (filters?.rating) params.append('rating', filters.rating);
+
+    if (filters?.subjects && filters.subjects.length > 0) {
+        params.append('subjects', filters.subjects.join(','));
+    }
+
+    if (filters?.levels && filters.levels.length > 0) {
+        params.append('levels', filters.levels.join(','));
+    }
+
+    console.log('Student Reviews API call params:', params.toString());
+
+    const response = await apiClient.get(`/review/student/history?${params.toString()}`);
+
+    console.log('Student Reviews API response:', response.data);
+    return response.data.data;
 };
 
 // Update review
