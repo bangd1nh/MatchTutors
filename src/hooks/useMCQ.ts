@@ -8,6 +8,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "./useToast";
 import { MCQResponse } from "@/types/quiz";
 import { IQuizQuestionResponse } from "@/types/quizQuestion";
+import { submitMCQtoServer } from "@/api/quiz";
+import { IQuizSubmissionResponse } from "@/types/quizSubmission";
+import { fetchMCQHistory, fetchMCQHistoryList } from "@/api/doQuiz";
 
 export const useMCQ = (quizId?: string) => {
    const addToast = useToast();
@@ -50,5 +53,37 @@ export const useMCQ = (quizId?: string) => {
       },
    });
 
-   return { create, fetchList, fetchMCQByQuizId, updateMCQ };
+   const submitMCQ = useMutation({
+      mutationFn: submitMCQtoServer,
+      onSuccess: (response) => {
+         addToast("success", response.message);
+      },
+      onError: (error: any) => {
+         addToast(
+            "error",
+            error?.response?.data.message || "Error submiting MCQ"
+         );
+      },
+   });
+
+   const fetchMCQSubmitHistoryList = useQuery<IQuizSubmissionResponse>({
+      queryKey: ["MCQSUBMITHISTORYLIST"],
+      queryFn: fetchMCQHistoryList,
+   });
+
+   return {
+      create,
+      fetchList,
+      fetchMCQByQuizId,
+      updateMCQ,
+      submitMCQ,
+      fetchMCQSubmitHistoryList,
+   };
 };
+
+export const usefetchHistory = (quizId: string) =>
+   useQuery<IQuizSubmissionResponse>({
+      queryKey: ["MCQSUBMITHISTORY", quizId],
+      queryFn: () => fetchMCQHistory(quizId!),
+      enabled: !!quizId,
+   });

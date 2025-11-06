@@ -12,7 +12,8 @@ import {
    Calendar, // Thêm icon Calendar
    XCircle,
    Star, // Thêm icon cho rejected sessions
-   Wallet, // Thêm icon cho ví
+   Wallet,
+   History, // Thêm icon cho ví
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -68,6 +69,11 @@ export const studentSidebarConfig: SidebarItem[] = [
       to: "/student/wallet",
       label: "Ví của tôi",
       icon: <Wallet className="h-4 w-4" />,
+   },
+   {
+      to: "/student/MCQHistory",
+      label: "lịch sử bài trắc nghiệm",
+      icon: <History className="h-4 w-4" />,
    },
 ];
 

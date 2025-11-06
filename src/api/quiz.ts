@@ -6,6 +6,7 @@ import {
    ISessionAssignedQuizzesResponse,
 } from "@/types/quiz";
 import { IQuizQuestionResponse } from "@/types/quizQuestion";
+import { IQuizSubmissionBody } from "@/types/quizSubmission";
 import { BaseAPIResponse } from "@/types/response";
 
 export const createFlashCardQuiz = async (
@@ -77,40 +78,30 @@ export const fetchQuizzesAssignedToSession = async (
    return response.data;
 };
 
-// Short Answer
-export const createShortAnswerQuiz = async (
-   data: IQuizBody
-): Promise<IQuizResponse> => {
-   const response = await apiClient.post("/quiz/short-answer", data);
+export const submitMCQtoServer = async (data: IQuizSubmissionBody) => {
+   const response = await apiClient.post("/doQuiz/submitMCQ", data);
    return response.data;
 };
 
-export const fetchShortAnswerQuizByTutor = async (): Promise<IQuizResponse> => {
-   const response = await apiClient.get("/quiz/short-answer/tutor");
-   return response.data;
-};
-
-export const fetchShortAnswerQuestions = async (
-   quizId: string
-): Promise<IQuizQuestionResponse> => {
-   const response = await apiClient.get("/quiz/short-answer", {
-      params: { quizId },
+export const fetchMCQAssignedToSession = async (
+   sessionId: string
+): Promise<ISessionAssignedQuizzesResponse> => {
+   const response = await apiClient.get("/quiz/getMCQAssignedToSession", {
+      params: { sessionId },
    });
    return response.data;
 };
 
-export const editShortAnswerQuiz = async (
-   data: IQUizUpdate
-): Promise<IQuizQuestionResponse> => {
-   const response = await apiClient.put("/quiz/short-answer", data);
-   return response.data;
-};
-
-export const deleteShortAnswerQuiz = async (
-   quizId: string
-): Promise<BaseAPIResponse> => {
-   const response = await apiClient.delete("/quiz/deleteQuiz", {
-      data: { quizId },
+export const asignMCQToSession = async ({
+   sessionId,
+   quizIds,
+}: {
+   sessionId: string;
+   quizIds: string[];
+}): Promise<BaseAPIResponse> => {
+   const response = await apiClient.post("/quiz/asignMCQToSession", {
+      sessionId,
+      quizIds,
    });
    return response.data;
 };

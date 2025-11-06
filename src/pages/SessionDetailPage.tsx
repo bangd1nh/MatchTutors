@@ -11,6 +11,7 @@ import SessionSidebar from "@/components/session/SessionSidebar";
 import MaterialsCard from "@/components/session/MaterialsCard";
 import QuizzesCard from "@/components/session/QuizzesCard";
 import { useToast } from "@/hooks/useToast";
+import MCQCard from "@/components/session/MCQCard";
 
 export default function SessionDetailPage() {
    const { id } = useParams<{ id: string }>();
@@ -42,10 +43,10 @@ export default function SessionDetailPage() {
          return tutorUserId === currentUser.id;
       }
 
-      if (currentUser.role === Role.STUDENT) {
-         const studentUserId = lc?.student?.userId?._id || lc?.student?.userId;
-         return studentUserId === currentUser.id;
-      }
+      // if (currentUser.role === Role.STUDENT) {
+      //    const studentUserId = lc?.student?.userId?._id || lc?.student?.userId;
+      //    return studentUserId === currentUser.id;
+      // }
 
       return false;
    };
@@ -123,10 +124,11 @@ export default function SessionDetailPage() {
                onValueChange={setActiveTab}
                className="space-y-6"
             >
-               <TabsList className="grid w-full grid-cols-3">
+               <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="details">Chi tiết buổi học</TabsTrigger>
                   <TabsTrigger value="materials">Tài liệu</TabsTrigger>
-                  <TabsTrigger value="quizzes">Bài tập & Quiz</TabsTrigger>
+                  <TabsTrigger value="quizzes">Flashcards</TabsTrigger>
+                  <TabsTrigger value="mcq">Bài tập trắc nghiệm</TabsTrigger>
                </TabsList>
 
                <TabsContent value="details" className="space-y-6">
@@ -152,6 +154,10 @@ export default function SessionDetailPage() {
 
                <TabsContent value="quizzes" className="space-y-6">
                   <QuizzesCard session={session} canManage={canEdit()} />
+               </TabsContent>
+
+               <TabsContent value="mcq" className="space-y-6">
+                  <MCQCard session={session} canManage={canEdit()} />
                </TabsContent>
             </Tabs>
          </div>
