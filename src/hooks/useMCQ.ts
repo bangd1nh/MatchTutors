@@ -13,7 +13,11 @@ import {
    IAttemptSubmissionResponse,
    IQuizSubmissionResponse,
 } from "@/types/quizSubmission";
-import { fetchMCQHistory, fetchMCQHistoryList } from "@/api/doQuiz";
+import {
+   fetchMCQHistory,
+   fetchMCQHistoryList,
+   fetchStudentMCQHistoryList,
+} from "@/api/doQuiz";
 
 export const useMCQ = (quizId?: string) => {
    const addToast = useToast();
@@ -84,12 +88,19 @@ export const useMCQ = (quizId?: string) => {
    };
 };
 
-export const usefetchHistory = (quizId: string) =>
-   useQuery<IQuizSubmissionResponse>({
+export const usefetchHistory = (quizId?: string) => {
+   const studentHistory = useQuery<IQuizSubmissionResponse>({
       queryKey: ["MCQSUBMITHISTORY", quizId],
       queryFn: () => fetchMCQHistory(quizId!),
       enabled: !!quizId,
    });
+
+   const tutorHistory = useQuery({
+      queryKey: ["TUTORMCQhISTORY"],
+      queryFn: fetchStudentMCQHistoryList,
+   });
+   return { studentHistory, tutorHistory };
+};
 
 export const useFetchAttempt = (sessionId: string) => {
    const attempts = useQuery<IAttemptSubmissionResponse>({

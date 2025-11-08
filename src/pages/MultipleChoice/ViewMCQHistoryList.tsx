@@ -67,6 +67,8 @@ const ViewMCQHistoryList = () => {
       return format(new Date(dateString), "dd/MM/yyyy HH:mm", { locale: vi });
    };
 
+   console.log(submissionHistory);
+
    return (
       <div className="container mx-auto p-6 space-y-6">
          {/* Header */}
@@ -82,7 +84,7 @@ const ViewMCQHistoryList = () => {
 
          {/* Quiz History List */}
          <div className="grid gap-6">
-            {submissionHistory.map((submission: any, index: number) => {
+            {submissionHistory.map((submission: any) => {
                const correctAnswers = submission.answers.filter(
                   (answer: any) => answer.isCorrect
                ).length;
@@ -228,7 +230,7 @@ const ViewMCQHistoryList = () => {
                         {/* Action Buttons */}
                         <div className="flex items-center justify-between pt-2 border-t">
                            <div className="text-sm text-muted-foreground">
-                              Lần thứ {index + 1} làm bài
+                              Lần thứ {submission.attempt} làm bài
                            </div>
                            <div className="flex gap-2">
                               <Button

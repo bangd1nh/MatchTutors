@@ -1,5 +1,8 @@
 import apiClient from "@/lib/api";
-import { IQuizSubmissionResponse } from "@/types/quizSubmission";
+import {
+   IQuizSubmissionResponse,
+   IStudentMCQHistoryResponse,
+} from "@/types/quizSubmission";
 
 export const fetchMCQHistoryList =
    async (): Promise<IQuizSubmissionResponse> => {
@@ -15,3 +18,9 @@ export const fetchMCQHistory = async (
    });
    return response.data;
 };
+
+export const fetchStudentMCQHistoryList =
+   async (): Promise<IStudentMCQHistoryResponse> => {
+      const response = await apiClient.get("doQUiz/getAllStudenSubmitedMCQ");
+      return response.data;
+   };

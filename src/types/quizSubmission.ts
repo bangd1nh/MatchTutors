@@ -1,5 +1,6 @@
 import { QuestionTypeEnum, QuizModeEnum } from "@/enums/quiz.enum";
 import { BaseAPIResponse } from "./response";
+import { QuizSettings } from "./quiz";
 
 export interface IAnswer {
    questionId: string;
@@ -62,4 +63,34 @@ export interface IAttemptSubmissionResponse extends BaseAPIResponse {
       attempt: number;
       submissionIds: string[];
    }[];
+}
+
+export interface IStudentMCQHistoryResponse extends BaseAPIResponse {
+   data: {
+      _id: string;
+      quizSnapShot: {
+         quizMode: QuizModeEnum;
+         settings: QuizSettings;
+      };
+      quizId: {
+         _id: string;
+         title: string;
+         description: string;
+         quizMode: QuizModeEnum;
+         quizType: QuestionTypeEnum;
+         tags: string[];
+         totalQuestions: number;
+         createdAt: Date;
+         updatedAt: Date;
+      };
+      studentId: {
+         _id: string;
+         name: string;
+         email: string;
+      };
+      score: number;
+      gradedAt: Date;
+      attempt: Date;
+      submittedAt: Date;
+   };
 }
