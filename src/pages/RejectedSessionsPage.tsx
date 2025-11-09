@@ -1,13 +1,24 @@
 import React, { useState } from "react";
-import { useRejectedSessions, useCancelledSessions } from "@/hooks/useRejectedSessions";
+import {
+   useRejectedSessions,
+   useCancelledSessions,
+} from "@/hooks/useRejectedSessions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle } from "lucide-react";
 import SessionCard from "@/components/session/SessionCard";
 
 const RejectedSessionsPage: React.FC = () => {
-   const { data: rejectedSessions, isLoading: rejectedLoading, error: rejectedError } = useRejectedSessions();
-   const { data: cancelledSessions, isLoading: cancelledLoading, error: cancelledError } = useCancelledSessions();
+   const {
+      data: rejectedSessions,
+      isLoading: rejectedLoading,
+      error: rejectedError,
+   } = useRejectedSessions();
+   const {
+      data: cancelledSessions,
+      isLoading: cancelledLoading,
+      error: cancelledError,
+   } = useCancelledSessions();
    const [activeTab, setActiveTab] = useState("rejected");
 
    const isLoading = rejectedLoading || cancelledLoading;
@@ -49,7 +60,11 @@ const RejectedSessionsPage: React.FC = () => {
             </p>
          </div>
 
-         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+         <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+         >
             <TabsList className="grid w-full grid-cols-2">
                <TabsTrigger value="rejected">
                   Buổi học bị từ chối ({rejectedSessions?.length || 0})
@@ -72,7 +87,11 @@ const RejectedSessionsPage: React.FC = () => {
                ) : (
                   <div className="grid gap-4">
                      {rejectedSessions.map((session) => (
-                        <SessionCard key={session._id} session={session} type="rejected" />
+                        <SessionCard
+                           key={session._id}
+                           session={session}
+                           type="rejected"
+                        />
                      ))}
                   </div>
                )}
@@ -91,7 +110,11 @@ const RejectedSessionsPage: React.FC = () => {
                ) : (
                   <div className="grid gap-4">
                      {cancelledSessions.map((session) => (
-                        <SessionCard key={session._id} session={session} type="cancelled" />
+                        <SessionCard
+                           key={session._id}
+                           session={session}
+                           type="cancelled"
+                        />
                      ))}
                   </div>
                )}

@@ -44,6 +44,13 @@ export const learningCommitmentApi = {
       return response.data.data.teachingRequests;
    },
 
+   getActiveLearningCommitmentsByTutor: async () => {
+      const response = await apiClient.get(
+         "/learningCommitment/tutor/active-commitments"
+      );
+      return response.data.data.commitments;
+   },
+
    requestCancellation: async (id: string, reason: string): Promise<any> => {
       const response = await apiClient.post(
          `/learningCommitment/${id}/request-cancellation`,
@@ -57,6 +64,11 @@ export const learningCommitmentApi = {
          `/learningCommitment/${id}/reject-cancellation`,
          { reason }
       );
+      return response.data.data;
+   },
+
+   rejectLearningCommitment: async (id: string): Promise<any> => {
+      const response = await apiClient.post(`/learningCommitment/${id}/reject`);
       return response.data.data;
    },
 };

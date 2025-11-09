@@ -9,14 +9,9 @@ import {
  */
 export const getMyTeachingRequests = async (): Promise<TeachingRequest[]> => {
    const response = await apiClient.get("/teachingRequest/student/me");
-   // Sửa ở đây: Trích xuất mảng dữ liệu từ cấu trúc response thực tế.
-   // Giả định cấu trúc là { metadata: [...] } hoặc { data: { users: [...] } } hoặc chỉ là data: [...]
    const data = response.data;
    if (Array.isArray(data.metadata)) {
       return data.metadata;
-   }
-   if (Array.isArray(data.data?.users)) {
-      return data.data.users;
    }
    if (Array.isArray(data.data)) {
       return data.data;
@@ -38,54 +33,27 @@ export const createTeachingRequest = async (
 };
 
 /**
- * Học sinh hoặc gia sư đưa ra quyết định sau khi học thử.
- */
-export const makeTrialDecision = async (
-   requestId: string,
-   decision: "ACCEPTED" | "REJECTED"
-): Promise<TeachingRequest> => {
-   const response = await apiClient.patch(
-      `/teachingRequest/${requestId}/trial-decision`,
-      { decision }
-   );
-   return response.data.metadata;
-};
-
-/**
  * Lấy chi tiết một yêu cầu dạy học.
  */
 export const getTeachingRequestById = async (
    id: string
 ): Promise<TeachingRequest | null> => {
    const response = await apiClient.get(`/teachingRequest/${id}`);
-
-   // Thử nhiều chỗ có thể chứa payload (metadata | data | direct)
    const data = response.data ?? {};
-   const payload =
-      data?.metadata ?? // { metadata: {...} }
-      data?.data ?? // { data: {...} } or { data: { teachingRequest: {...} } }
-      data?.teachingRequest ?? // { teachingRequest: {...} }
-      data;
+   const payload = data?.metadata ?? data?.data ?? data;
 
-   // Nếu payload là object chứa trường _id -> trả về, nếu không trả null
    if (payload && typeof payload === "object" && (payload._id || payload.id)) {
       return payload as TeachingRequest;
-   }
-
-   // Nếu payload.data là object, unwrap
-   if (payload?.data && typeof payload.data === "object") {
-      return (payload.data as TeachingRequest) ?? null;
    }
 
    return null;
 };
 
-// Thêm: Lấy requests của tutor hiện tại
+// Lấy requests của tutor hiện tại
 export const getTutorTeachingRequests = async (): Promise<
    TeachingRequest[]
 > => {
    const response = await apiClient.get("/teachingRequest/tutor/me");
-   // Sửa ở đây: Thêm logic kiểm tra cấu trúc response linh hoạt
    const data = response.data;
    if (Array.isArray(data.metadata)) {
       return data.metadata;
@@ -99,7 +67,7 @@ export const getTutorTeachingRequests = async (): Promise<
    return []; // Luôn trả về một mảng
 };
 
-// Thêm: Tutor respond (ACCEPTED | REJECTED)
+// Tutor respond (ACCEPTED | REJECTED)
 export const respondToTeachingRequest = async (
    requestId: string,
    decision: "ACCEPTED" | "REJECTED"
@@ -170,7 +138,6 @@ export const confirmCompletion = async (
    );
    return response.data.metadata;
 };
-
 
 /**
  * Lấy yêu cầu dạy học đã hoàn thành giữa học sinh và gia sư (nếu có).

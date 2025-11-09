@@ -12,22 +12,6 @@ export const getMySessions = async (): Promise<Session[]> => {
 };
 
 /**
- * Lấy danh sách session theo teachingRequestId.
- */
-export const getSessionsByLearningCommitment = async (
-   learningCommitmentId: string
-): Promise<Session[]> => {
-   const response = await apiClient.get(
-      `/session/commitment/${learningCommitmentId}`
-   );
-   const payload =
-      response.data?.metadata ?? response.data?.data ?? response.data;
-   if (Array.isArray(payload)) return payload as Session[];
-   if (Array.isArray(payload?.sessions)) return payload.sessions as Session[];
-   return [];
-};
-
-/**
  * Creates a new session.
  * @param payload - The data for the new session.
  */
@@ -147,6 +131,14 @@ export const getRejectedSessionById = async (
  */
 export const getMyCancelledSessions = async (): Promise<Session[]> => {
    const response = await apiClient.get("/session/me/cancelled");
+   return response.data.metadata ?? response.data.data ?? [];
+};
+
+/**
+ * Lấy danh sách các buổi học vắng của user hiện tại
+ */
+export const getMyAbsenceSessions = async (): Promise<Session[]> => {
+   const response = await apiClient.get("/session/me/absences");
    return response.data.metadata ?? response.data.data ?? [];
 };
 

@@ -16,9 +16,10 @@ import { Session } from "@/types/session";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
 
+// Tìm interface SessionCardProps trong SessionCard.tsx và update:
 interface SessionCardProps {
    session: Session;
-   type: "rejected" | "cancelled";
+   type: "rejected" | "cancelled" | "absence"; // Thêm "absence"
 }
 
 const SessionCard: React.FC<SessionCardProps> = ({ session, type }) => {
@@ -76,6 +77,8 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, type }) => {
    const getStatusBadge = () => {
       if (type === "rejected") {
          return <Badge variant="destructive">Đã từ chối</Badge>;
+      } else if (type === "absence") {
+         return <Badge variant="outline">Vắng mặt</Badge>;
       } else {
          return <Badge variant="secondary">Đã hủy</Badge>;
       }
@@ -174,6 +177,26 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, type }) => {
                                  {(session.cancellation.cancelledBy as any)
                                     ?.name || "Người dùng"}
                               </span>
+                           </div>
+                        )}
+                     </div>
+                  )}
+
+                  {type === "absence" && session.absence && (
+                     <div className="text-sm text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-2">
+                           <AlertTriangle className="h-4 w-4" />
+                           <span>
+                              {session.absence.tutorAbsent && "Gia sư vắng"}
+                              {session.absence.tutorAbsent &&
+                                 session.absence.studentAbsent &&
+                                 ", "}
+                              {session.absence.studentAbsent && "Học sinh vắng"}
+                           </span>
+                        </div>
+                        {session.absence.reason && (
+                           <div className="mt-1">
+                              <span>Lý do: {session.absence.reason}</span>
                            </div>
                         )}
                      </div>

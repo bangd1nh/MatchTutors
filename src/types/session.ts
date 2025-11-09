@@ -55,7 +55,6 @@ export interface UpsertSessionPayload {
    learningCommitmentId: string;
    startTime: string;
    endTime: string;
-   isTrial: boolean;
    location?: string;
    notes?: string;
    status?: SessionStatus | string;
@@ -65,6 +64,14 @@ export interface UpsertSessionPayload {
 }
 
 // Session returned from API
+export interface AbsenceInfo {
+   tutorAbsent?: boolean;
+   studentAbsent?: boolean;
+   reason?: string;
+   recordedAt?: string;
+   recordedBy?: string | IUser;
+}
+
 export interface Session
    extends Omit<UpsertSessionPayload, "learningCommitmentId"> {
    _id: string;
@@ -80,7 +87,8 @@ export interface Session
    studentConfirmation?: StudentConfirmation;
    attendanceConfirmation?: AttendanceConfirmation;
    cancellation?: CancellationInfo;
-   dispute?: DisputeInfo; // Add dispute field
+   dispute?: DisputeInfo;
+   absence?: AbsenceInfo; // Thêm dòng này
 
    // soft-delete fields
    isDeleted?: boolean;

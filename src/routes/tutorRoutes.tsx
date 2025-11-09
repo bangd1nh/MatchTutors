@@ -13,6 +13,7 @@ import TeachingRequestsList from "@/pages/Tutor/TeachingRequestsList";
 import TeachingRequestDetail from "@/pages/Tutor/TeachingRequestDetail";
 import SchedulePage from "@/pages/SchedulePage"; // Import trang mới
 import RejectedSessionsPage from "@/pages/RejectedSessionsPage"; // Import trang rejected sessions
+import AbsenceSessionPage from "@/pages/absenceSession";
 import CreateMultipleChoiceQuiz from "@/pages/MultipleChoice/CreateMultipleChoiceQuiz";
 import ViewMultipleQuizList from "@/pages/MultipleChoice/ViewMultipleQuizList";
 import ViewMultipleChoiceQuiz from "@/pages/MultipleChoice/ViewMultipleChoiceQuiz";
@@ -89,6 +90,10 @@ export const tutorRoutes = {
       {
          path: "/tutor/rejected-sessions",
          element: <RejectedSessionsPage />,
+      },
+      {
+         path: "/tutor/absence-sessions",
+         element: <AbsenceSessionPage />,
       },
       {
          path: "/tutor/MultipleChoiceList",

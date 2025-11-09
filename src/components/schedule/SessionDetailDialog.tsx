@@ -81,8 +81,6 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
       session.status === SessionStatus.SCHEDULED &&
       session.studentConfirmation?.status === "PENDING";
 
-   const tutorHasConfirmed =
-      session.attendanceConfirmation?.tutor.status === "ACCEPTED";
    const studentHasDecided =
       session.attendanceConfirmation?.student.status !== "PENDING";
    const tutorHasDecided =
@@ -147,21 +145,13 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
    };
 
    const handleAttendanceReject = () => {
-      // If tutor has confirmed, student must provide reason for dispute
-      if (isStudent && tutorHasConfirmed) {
-         setShowDisputeDialog(true);
-      } else {
-         // Otherwise, just reject
-         rejectAttendanceMutation.mutate(
-            { sessionId: session._id },
-            { onSuccess: onClose }
-         );
-      }
+      // Both tutor and student must provide reason for rejection
+      setShowDisputeDialog(true);
    };
 
    const handleSubmitDispute = () => {
       if (disputeReason.trim().length < 10) {
-         alert("Lý do tranh chấp phải có ít nhất 10 ký tự.");
+         alert("Lý do phải có ít nhất 10 ký tự.");
          return;
       }
       const urls = evidenceUrls
@@ -794,22 +784,22 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
             </DialogContent>
          </Dialog>
 
-         {/* Dispute Dialog */}
+         {/* Dispute/Absence Dialog */}
          <Dialog open={showDisputeDialog} onOpenChange={setShowDisputeDialog}>
             <DialogContent>
                <DialogHeader>
-                  <DialogTitle>Tạo Khiếu nại Điểm danh</DialogTitle>
+                  <DialogTitle>Báo vắng / Khiếu nại Điểm danh</DialogTitle>
                   <DialogDescription>
-                     Gia sư đã xác nhận có mặt. Nếu bạn không đồng ý, vui lòng
-                     cung cấp lý do và bằng chứng để quản trị viên xem xét.
+                     Vui lòng cung cấp lý do và bằng chứng cho quản trị viên xem
+                     xét.
                   </DialogDescription>
                </DialogHeader>
                <div className="py-4 space-y-4">
                   <div>
-                     <Label htmlFor="disputeReason">Lý do khiếu nại</Label>
+                     <Label htmlFor="disputeReason">Lý do báo vắng</Label>
                      <Textarea
                         id="disputeReason"
-                        placeholder="Ví dụ: Gia sư không đến, buổi học kết thúc sớm..."
+                        placeholder="Ví dụ: Gia sư không đến, buổi học kết thúc sớm, học sinh vắng mặt..."
                         value={disputeReason}
                         onChange={(e) => setDisputeReason(e.target.value)}
                         rows={4}
@@ -821,7 +811,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                   </div>
                   <div>
                      <Label htmlFor="evidenceUrls">
-                        Link bằng chứng (nếu có)
+                        Link bằng chứng (bắt buộc)
                      </Label>
                      <Input
                         id="evidenceUrls"
@@ -853,7 +843,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                   >
                      {rejectAttendanceMutation.isPending
                         ? "Đang gửi..."
-                        : "Gửi khiếu nại"}
+                        : "Gửi báo vắng"}
                   </Button>
                </DialogFooter>
             </DialogContent>

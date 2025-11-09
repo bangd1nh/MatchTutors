@@ -110,9 +110,38 @@ export const useRejectCancellation = () => {
    });
 };
 
+export const useRejectLearningCommitment = () => {
+   const queryClient = useQueryClient();
+   const addToast = useToast();
+
+   return useMutation({
+      mutationFn: (id: string) =>
+         learningCommitmentApi.rejectLearningCommitment(id),
+      onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: ["learningCommitment"] });
+         addToast("success", "Learning commitment rejected successfully");
+      },
+      onError: (error: any) => {
+         addToast(
+            "error",
+            error.response?.data?.message ||
+               "Failed to reject learning commitment"
+         );
+      },
+   });
+};
+
 export const useTeachingRequestsByTutor = () => {
    return useQuery({
       queryKey: ["teachingRequests"],
       queryFn: () => learningCommitmentApi.getTeachingRequestsByTutor(),
+   });
+};
+
+export const useActiveLearningCommitmentsByTutor = () => {
+   return useQuery({
+      queryKey: ["learningCommitment", "tutor", "active"],
+      queryFn: () =>
+         learningCommitmentApi.getActiveLearningCommitmentsByTutor(),
    });
 };
