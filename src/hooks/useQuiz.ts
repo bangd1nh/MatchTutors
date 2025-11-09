@@ -10,7 +10,7 @@ import {
    fetchQuizzesAssignedToSession,
    fetchSessionAssigned,
 } from "@/api/quiz";
-import { IQuizInfo, IQuizResponse } from "@/types/quiz";
+import { IQuizResponse } from "@/types/quiz";
 import { IQuizQuestionResponse } from "@/types/quizQuestion";
 import { useAsignFlashcardStore } from "@/store/useAsignFlashcardStore";
 
