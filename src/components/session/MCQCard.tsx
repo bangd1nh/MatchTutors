@@ -129,8 +129,8 @@ const MCQCard = ({ session, canManage }: any) => {
                                        <span>
                                           {quiz.createdAt
                                              ? new Date(
-                                                  quiz.createdAt
-                                               ).toLocaleDateString("vi-VN")
+                                                quiz.createdAt
+                                             ).toLocaleDateString("vi-VN")
                                              : "N/A"}
                                        </span>
                                     </div>
@@ -190,13 +190,13 @@ const MCQCard = ({ session, canManage }: any) => {
                                        )}
                                        {quiz.settings
                                           .showCorrectAnswersAfterSubmit && (
-                                          <Badge
-                                             variant="outline"
-                                             className="text-xs"
-                                          >
-                                             Hiện đáp án
-                                          </Badge>
-                                       )}
+                                             <Badge
+                                                variant="outline"
+                                                className="text-xs"
+                                             >
+                                                Hiện đáp án
+                                             </Badge>
+                                          )}
                                        {quiz.settings.timeLimitMinutes && (
                                           <Badge
                                              variant="outline"

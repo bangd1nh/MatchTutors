@@ -24,7 +24,85 @@ const educationSchema = z.object({
     startDate: z.string().min(1, "Start date is required"),
     endDate: z.string().optional(),
     description: z.string().max(500, "Description too long").min(10, "Description must be at least 10 characters"),
-});
+})
+    .refine(
+        (data) => {
+            // DATE VALIDATION 1: Check if start date is valid
+            if (!data.startDate) return false;
+            const startDate = new Date(data.startDate);
+            return !isNaN(startDate.getTime());
+        },
+        {
+            message: "Invalid start date",
+            path: ["startDate"],
+        }
+    )
+    .refine(
+        (data) => {
+            // DATE VALIDATION 2: Check if end date is valid when provided
+            if (!data.endDate) return true; // End date is optional
+            const endDate = new Date(data.endDate);
+            return !isNaN(endDate.getTime());
+        },
+        {
+            message: "Invalid end date",
+            path: ["endDate"],
+        }
+    )
+    .refine(
+        (data) => {
+            // DATE VALIDATION 3: Start date should not be in the future
+            if (!data.startDate) return false;
+            const startDate = new Date(data.startDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Compare only dates, not times
+            return startDate <= today;
+        },
+        {
+            message: "Start date cannot be in the future",
+            path: ["startDate"],
+        }
+    )
+    .refine(
+        (data) => {
+            // DATE VALIDATION 4: End date should not be in the future (if provided)
+            if (!data.endDate) return true;
+            const endDate = new Date(data.endDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return endDate <= today;
+        },
+        {
+            message: "End date cannot be in the future",
+            path: ["endDate"],
+        }
+    )
+    .refine(
+        (data) => {
+            // DATE VALIDATION 5: Start date should be before end date (if both provided)
+            if (!data.startDate || !data.endDate) return true;
+            const startDate = new Date(data.startDate);
+            const endDate = new Date(data.endDate);
+            return startDate <= endDate;
+        },
+        {
+            message: "Start date must be before end date",
+            path: ["endDate"],
+        }
+    )
+    .refine(
+        (data) => {
+            // DATE VALIDATION 6: Start date should be reasonable (not before 1950)
+            if (!data.startDate) return false;
+            const startDate = new Date(data.startDate);
+            const minDate = new Date("1950-01-01");
+            return startDate >= minDate;
+        },
+        {
+            message: "Start date seems too far in the past",
+            path: ["startDate"],
+        }
+    );
 
 const certificationSchema = z.object({
     name: z.string().min(1, "Certification name is required").max(100, "Name too long"),
@@ -58,7 +136,7 @@ export const tutorProfileFormSchema = z.object({
     gender: GenderEnum.optional(),
     avatarUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
 
-    // Address - USE THE PRE-DEFINED SCHEMA HERE
+    // Address
     address: addressSchema,
 
     // Teaching information

@@ -133,7 +133,6 @@ export function EducationForm({
                                         value={getDateDisplayValue(edu.startDate)}
                                         id={`education.${index}.startDate`}
                                         name={`education.${index}.startDate`}
-
                                         onChange={(e) =>
                                             handleEducationChange(index, "startDate", e.target.value)
                                         }
@@ -141,6 +140,7 @@ export function EducationForm({
                                             ? "border-red-500"
                                             : ""
                                             }`}
+                                        max={new Date().toISOString().slice(0, 7)} // Prevent future dates in UI
                                     />
                                     <ValidationError
                                         message={getError(`education.${index}.startDate`)}
@@ -161,6 +161,8 @@ export function EducationForm({
                                             ? "border-red-500"
                                             : ""
                                             }`}
+                                        max={new Date().toISOString().slice(0, 7)} // Prevent future dates in UI
+                                        min={edu.startDate} // End date cannot be before start date
                                     />
                                     <ValidationError
                                         message={getError(`education.${index}.endDate`)}

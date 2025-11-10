@@ -45,8 +45,29 @@ export const deleteShortAnswerQuiz = async (
     return response.data;
 };
 
+export const asignShortAnswerQuizToSession = async ({
+    sessionId,
+    quizIds,
+}: {
+    sessionId: string;
+    quizIds: string[];
+}): Promise<BaseAPIResponse> => {
+    const response = await apiClient.post("/quiz/asignShortAnswerQuizToSession", {
+        sessionId,
+        quizIds,
+    });
+    return response.data;
+};
+
+export const fetchShortAnswerQuizzesAssignedToSession = async (
+    sessionId: string
+): Promise<ISessionAssignedQuizzesResponse> => {
+    const response = await apiClient.get("/quiz/getShortAnswerQuizzesAssignedToSession", {
+        params: { sessionId },
+    });
+    return response.data;
+};
+
 export {
-    asignQuizToSession,
     fetchSessionAssigned,
-    fetchQuizzesAssignedToSession
 } from "./quiz";

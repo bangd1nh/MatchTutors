@@ -40,7 +40,7 @@ export default function TutorProfile() {
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [certificationFiles, setCertificationFiles] = useState<{ [key: string]: File[] }>({});
     const [removedImages, setRemovedImages] = useState<
-        { certId?: string; tempCertId?: string; imageIndex: number }[]
+        { certId?: string; certIndex: number; tempCertId?: string; imageIndex: number }[]
     >([]);
     // console.log("Loaded tutor profile:", tutorProfile);
     const [isEditing, setIsEditing] = useState(!tutor);
@@ -150,6 +150,7 @@ export default function TutorProfile() {
         if (avatarFile) {
             formData.append("avatar", avatarFile);
         }
+
         const imageCertMapping: Array<{
             action: "add" | "remove";
             certIndex?: number;
@@ -159,19 +160,38 @@ export default function TutorProfile() {
             imageIndex?: number;
         }> = [];
 
-        // Handle uploads
+        // Handle uploads - collect ALL files first with proper indexing
+        const allFiles: File[] = [];
+        Object.entries(certificationFiles).forEach(([certIndexStr, files]) => {
+            files.forEach(file => {
+                allFiles.push(file);
+            });
+        });
+
+        // Append all files to FormData with proper indexing
+        allFiles.forEach((file, globalIndex) => {
+            formData.append("certificationImages", file);
+        });
+
+        // Now create mapping with correct global file indexes
         Object.entries(certificationFiles).forEach(([certIndexStr, files]) => {
             const certIndex = parseInt(certIndexStr);
-            files.forEach((file, fileIndex) => {
-                formData.append("certificationImages", file);
-                const cert = data.certifications?.[certIndex];
-                imageCertMapping.push({
-                    action: "add",
-                    certIndex,
-                    fileIndex,
-                    tempCertId: cert?.tempId,
-                    certId: cert?._id,
-                });
+            const cert = data.certifications?.[certIndex];
+
+            files.forEach((file, localFileIndex) => {
+                // Find the global index of this file
+                const globalIndex = allFiles.indexOf(file);
+
+                if (globalIndex !== -1) {
+                    imageCertMapping.push({
+                        action: "add",
+                        certIndex,
+                        fileIndex: globalIndex, // Use global index
+                        tempCertId: cert?.tempId,
+                        certId: cert?._id,
+                    });
+                    console.log(`📸 Mapping: certIndex=${certIndex}, fileIndex=${globalIndex}, fileName=${file.name}`);
+                }
             });
         });
 
@@ -179,6 +199,7 @@ export default function TutorProfile() {
         removedImages.forEach(r => {
             imageCertMapping.push({
                 action: "remove",
+                certIndex: r.certIndex,
                 certId: r.certId,
                 tempCertId: r.tempCertId,
                 imageIndex: r.imageIndex,
@@ -187,6 +208,7 @@ export default function TutorProfile() {
 
         // Add the mapping information
         if (imageCertMapping.length > 0) {
+            console.log("📨 Final imageCertMapping being sent:", imageCertMapping);
             formData.append("imageCertMapping", JSON.stringify(imageCertMapping));
         }
 
@@ -203,43 +225,43 @@ export default function TutorProfile() {
         };
 
         const validation = validateForm(submissionData as TutorProfileFormData, !!tutorProfile);
-        console.log("Form data being submitted:", submissionData);
+
+        // console.log("📤 Form data being submitted:", submissionData);
+        // console.log("🗑️ removedImages being sent:", removedImages);
+
         if (!validation.isValid) {
-            const firstErrorField = Object.keys(validation.errors)[0];
-
-            let element: HTMLElement | null = null;
-
-            if (firstErrorField === "levels" && levelsRef.current) {
-                levelsRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-            } else if (firstErrorField === "subjects" && subjectRef.current) {
-                subjectRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-            } else {
-                // Fallback for nested fields like certifications.1.name
-                element = document.querySelector(`[name="${firstErrorField}"]`);
-                if (element) {
-                    element.scrollIntoView({ behavior: "smooth", block: "center" });
-                    element.focus({ preventScroll: true });
-                }
-            }
-
             return;
         }
 
         try {
-            if (tutorProfile) {
-                await updateTutor(convertFormDataToFormData(formData as Tutor));
-            } else {
-                await createTutor(convertFormDataToFormData(formData as Tutor));
+            const formDataToSend = convertFormDataToFormData(formData as Tutor);
+
+            // Log the actual FormData contents
+            // console.log("📨 FormData contents:");
+            for (let [key, value] of formDataToSend.entries()) {
+                if (key === 'imageCertMapping') {
+                    console.log(`  ${key}:`, JSON.parse(value as string));
+                } else {
+                    console.log(`  ${key}:`, value);
+                }
             }
+
+            if (tutorProfile) {
+                await updateTutor(formDataToSend);
+            } else {
+                await createTutor(formDataToSend);
+            }
+
             setCertificationFiles({});
+            setRemovedImages([]);
             clearErrors();
             setIsEditing(false);
             refetch();
+            toast("success", "Profile saved successfully!");
         } catch (error: any) {
             toast("error", error.response?.data?.message || "Failed to save profile");
         }
     };
-
 
     const handleFieldChange = (field: string, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -354,31 +376,54 @@ export default function TutorProfile() {
         });
     };
 
-    const handleRemoveExistingImage = (cert: any, imageIndex: number) => {
-        // Optimistic UI update
-        setFormData(prev => ({
-            ...prev,
-            certifications: prev.certifications?.map(c =>
-                c === cert
-                    ? {
-                        ...c,
-                        imageUrls: Array.isArray(c.imageUrls)
-                            ? c.imageUrls.filter((_, i) => i !== imageIndex)
-                            : [],
-                    }
-                    : c
-            ),
-        }));
+    const handleRemoveExistingImage = (cert: any, imageIndex: number, certIndex: number) => {
+        // console.log("🔄 handleRemoveExistingImage called with:", {
+        //     certIndex,
+        //     imageIndex,
+        //     certId: cert._id,
+        //     tempCertId: cert.tempId,
+        //     currentImageUrls: cert.imageUrls
+        // });
 
         // Track for backend
-        setRemovedImages(prev => [
-            ...prev,
-            {
-                certId: cert._id,        // existing cert
-                tempCertId: cert.tempId, // new cert before saved
-                imageIndex,
-            },
-        ]);
+        const removalData = {
+            certId: cert._id,
+            tempCertId: cert.tempId,
+            certIndex: certIndex,
+            imageIndex: imageIndex,
+        };
+
+        // console.log("📝 Adding to removedImages:", removalData);
+
+        setRemovedImages(prev => {
+            const newRemovedImages = [...prev, removalData];
+            console.log("📋 removedImages state updated:", newRemovedImages);
+            return newRemovedImages;
+        });
+
+        // Optimistic UI update
+        setFormData(prev => {
+            const updatedCertifications = prev.certifications?.map((c, idx) => {
+                if (idx === certIndex) {
+                    const currentUrls = Array.isArray(c.imageUrls) ? c.imageUrls : [];
+                    const updatedImageUrls = currentUrls.filter((_, i) => i !== imageIndex);
+
+                    // console.log(`🖼️ Cert ${idx}: removed image ${imageIndex}, from ${currentUrls.length} to ${updatedImageUrls.length} images`);
+
+                    return {
+                        ...c,
+                        imageUrls: updatedImageUrls
+                    };
+                }
+                return c;
+            });
+
+            // console.log("✅ Form data updated with new certifications");
+            return {
+                ...prev,
+                certifications: updatedCertifications
+            };
+        });
     };
 
     const addEducation = () => {
@@ -664,8 +709,8 @@ export default function TutorProfile() {
                                                                     {/* Remove button */}
                                                                     <button
                                                                         type="button"
-                                                                        onClick={() => handleRemoveExistingImage(cert, urlIndex)}
-                                                                        className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100"
+                                                                        onClick={() => handleRemoveExistingImage(cert, urlIndex, index)}
+                                                                        className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                                                     >
                                                                         ✕
                                                                     </button>
@@ -673,8 +718,7 @@ export default function TutorProfile() {
                                                             ))}
                                                         </div>
                                                     </div>
-                                                )}
-                                            </div>
+                                                )}                                            </div>
                                         </div>
                                     </div>
                                 ))}

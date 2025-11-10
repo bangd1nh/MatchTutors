@@ -12,6 +12,7 @@ import MaterialsCard from "@/components/session/MaterialsCard";
 import QuizzesCard from "@/components/session/QuizzesCard";
 import { useToast } from "@/hooks/useToast";
 import MCQCard from "@/components/session/MCQCard";
+import SAQCard from "@/components/session/SAQCard";
 
 export default function SessionDetailPage() {
    const { id } = useParams<{ id: string }>();
@@ -124,11 +125,12 @@ export default function SessionDetailPage() {
                onValueChange={setActiveTab}
                className="space-y-6"
             >
-               <TabsList className="grid w-full grid-cols-4">
+               <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="details">Chi tiết buổi học</TabsTrigger>
                   <TabsTrigger value="materials">Tài liệu</TabsTrigger>
                   <TabsTrigger value="quizzes">Flashcards</TabsTrigger>
                   <TabsTrigger value="mcq">Bài tập trắc nghiệm</TabsTrigger>
+                  <TabsTrigger value="saq">Bài tập tự luận</TabsTrigger>
                </TabsList>
 
                <TabsContent value="details" className="space-y-6">
@@ -159,6 +161,11 @@ export default function SessionDetailPage() {
                <TabsContent value="mcq" className="space-y-6">
                   <MCQCard session={session} canManage={canEdit()} />
                </TabsContent>
+
+               <TabsContent value="saq" className="space-y-6">
+                  <SAQCard session={session} canManage={canEdit()} />
+               </TabsContent>
+
             </Tabs>
          </div>
       </div>
