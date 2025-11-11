@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import type { Tutor, Education } from "@/types/tutorListandDetail";
-import { Check, GraduationCap } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 
 interface TutorEducationProps {
    tutor: Tutor;
@@ -61,74 +61,83 @@ export function TutorEducation({ tutor }: TutorEducationProps) {
       : [];
 
    return (
-      <Card>
-         <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-               <GraduationCap className="w-5 h-5 text-primary" />
-               Education
+      <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+         <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-xl font-medium text-sky-800">
+               <div className="w-8 h-8 bg-sky-50 rounded-lg flex items-center justify-center">
+                  <GraduationCap className="w-4 h-4 text-sky-600" />
+               </div>
+               Học vấn
             </CardTitle>
          </CardHeader>
-         <CardContent className="space-y-6">
+         <CardContent>
             {educations.length > 0 ? (
-               educations.map((edu, index) => {
-                  // support multiple shapes: edu.startDate/edu.endDate OR edu.dateRange.{startDate,endDate} OR edu.dateRange string
-                  const startSource =
-                     edu.startDate ??
-                     (edu.dateRange && typeof edu.dateRange === "object"
-                        ? edu.dateRange.startDate
-                        : typeof edu.dateRange === "string"
-                        ? edu.dateRange
-                        : undefined);
+               <div className="space-y-8">
+                  {educations.map((edu, index) => {
+                     // support multiple shapes: edu.startDate/edu.endDate OR edu.dateRange.{startDate,endDate} OR edu.dateRange string
+                     const startSource =
+                        edu.startDate ??
+                        (edu.dateRange && typeof edu.dateRange === "object"
+                           ? edu.dateRange.startDate
+                           : typeof edu.dateRange === "string"
+                           ? edu.dateRange
+                           : undefined);
 
-                  const endSource =
-                     edu.endDate ??
-                     (edu.dateRange && typeof edu.dateRange === "object"
-                        ? edu.dateRange.endDate
-                        : undefined);
+                     const endSource =
+                        edu.endDate ??
+                        (edu.dateRange && typeof edu.dateRange === "object"
+                           ? edu.dateRange.endDate
+                           : undefined);
 
-                  return (
-                     <div
-                        key={index}
-                        className="border-l-2 border-primary pl-4"
-                     >
-                        <h3 className="font-semibold text-lg mb-3">
-                           {edu.degree ?? "-"}
-                        </h3>
+                     return (
+                        <div key={index} className="relative">
+                           {/* Timeline dot */}
+                           <div className="absolute left-0 top-2 w-3 h-3 bg-gray-400 rounded-full border-2 border-white shadow-sm"></div>
+                           
+                           {/* Timeline line */}
+                           {index < educations.length - 1 && (
+                              <div className="absolute left-1.5 top-5 w-0.5 h-16 bg-gray-200"></div>
+                           )}
+                           
+                           {/* Content */}
+                           <div className="ml-8 space-y-3">
+                              <div>
+                                 <h3 className="text-lg font-medium text-gray-900 mb-1">
+                                    {edu.degree || "Chưa có thông tin bằng cấp"}
+                                 </h3>
+                                 <p className="text-base text-gray-700 font-medium">
+                                    {edu.institution || "Chưa có thông tin trường học"}
+                                 </p>
+                              </div>
 
-                        <div className="space-y-2 mb-3">
-                           <div className="flex items-center gap-2">
-                              <Check className="w-4 h-4 text-green-600" />
-                              <span className="text-sm">
-                                 {edu.institution ?? "-"}
-                              </span>
-                           </div>
+                              <div className="space-y-2 text-sm text-gray-600">
+                                 {edu.fieldOfStudy && (
+                                    <div className="flex items-center gap-2">
+                                       <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                                       <span>Chuyên ngành: {edu.fieldOfStudy}</span>
+                                    </div>
+                                 )}
+                                 
+                                 <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                                    <span>
+                                       Thời gian: {formatDate(startSource)} - {formatDate(endSource)}
+                                    </span>
+                                 </div>
+                              </div>
 
-                           <div className="flex items-center gap-2">
-                              <Check className="w-4 h-4 text-green-600" />
-                              <span className="text-sm">
-                                 {edu.fieldOfStudy ?? "-"}
-                              </span>
-                           </div>
-
-                           <div className="flex items-center gap-2">
-                              <Check className="w-4 h-4 text-green-600" />
-                              <span className="text-sm">
-                                 {formatDate(startSource)} -{" "}
-                                 {formatDate(endSource)}
-                              </span>
+                              {edu.description && (
+                                 <p className="text-sm text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-lg">
+                                    {edu.description}
+                                 </p>
+                              )}
                            </div>
                         </div>
-
-                        <p className="text-sm text-muted-foreground">
-                           {edu.description ?? ""}
-                        </p>
-                     </div>
-                  );
-               })
+                     );
+                  })}
+               </div>
             ) : (
-               <p className="text-sm text-muted-foreground">
-                  No education history available.
-               </p>
+               <p className="text-gray-500 italic">Chưa có thông tin học vấn.</p>
             )}
          </CardContent>
       </Card>

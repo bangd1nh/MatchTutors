@@ -124,20 +124,24 @@ const TutorDetail: React.FC = () => {
    };
 
    return (
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
-         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-8 space-y-6">
-               <TutorHeader tutor={normalizedTutor} />
-               <TutorIntroduction tutor={normalizedTutor} />
-               <TutorCertification tutor={normalizedTutor} />
-               <TutorEducation tutor={normalizedTutor} />
-               <TutorSubject tutor={normalizedTutor} />
-               <TutorAvailability tutor={normalizedTutor} />
-               <TutorReviewSection tutorId={normalizedTutor._id} />
-            </div>
+      <div className="min-h-screen bg-gray-50/30">
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+               <div className="lg:col-span-2 space-y-8">
+                  <TutorHeader tutor={normalizedTutor} />
+                  <TutorIntroduction tutor={normalizedTutor} />
+                  <TutorSubject tutor={normalizedTutor} />
+                  <TutorEducation tutor={normalizedTutor} />
+                  <TutorCertification tutor={normalizedTutor} />
+                  <TutorAvailability tutor={normalizedTutor} />
+                  <TutorReviewSection tutorId={normalizedTutor._id} />
+               </div>
 
-            <div className="lg:col-span-4 space-y-6">
-               <TutorContactCard tutor={normalizedTutor} />
+               <div className="lg:col-span-1">
+                  <div className="sticky top-8 space-y-6">
+                     <TutorContactCard tutor={normalizedTutor} />
+                  </div>
+               </div>
             </div>
          </div>
       </div>

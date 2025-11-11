@@ -70,7 +70,7 @@ export default function SessionDetails({
                      <Label>Trạng thái</Label>
                      <Select
                         value={session.status}
-                        disabled={!isEditing || !isTutor}
+                        disabled={true}
                         onValueChange={(value: any) =>
                            setSession({ ...session, status: value })
                         }

@@ -118,7 +118,7 @@ export default function SessionHeader({
                </div>
                <div className="flex items-center gap-2">
                   {/* Force hiển thị để test */}
-                  {true && (
+                  {canEdit && session.status === "SCHEDULED" && (
                      <>
                         {isEditing ? (
                            <>

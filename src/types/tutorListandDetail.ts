@@ -18,7 +18,6 @@ export interface Education {
    startDate?: string;
    endDate?: string;
    description?: string;
-   // optional legacy dateRange helper
    dateRange?: { startDate?: string; endDate?: string } | string;
 }
 
@@ -58,9 +57,10 @@ export interface Tutor {
    availability?: Availability[];
    isApproved?: boolean;
    ratings?: Ratings;
+   maxStudents?: number;
+   maxQuiz?: number;
    createdAt?: string;
    updatedAt?: string;
-   // backend can return other fields, keep index signature if needed
    [key: string]: any;
 }
 

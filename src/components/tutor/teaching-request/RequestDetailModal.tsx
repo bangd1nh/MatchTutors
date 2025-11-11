@@ -13,6 +13,7 @@ import { TeachingRequest } from "@/types/teachingRequest";
 import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
 import { useUser } from "@/hooks/useUser";
 import { useRespondToRequest } from "@/hooks/useTeachingRequest";
+import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { Clock, BookOpen, BookMarked } from "lucide-react";
 
@@ -29,6 +30,7 @@ export const RequestDetailModal = ({
 }: RequestDetailModalProps) => {
    const { user } = useUser();
    const respond = useRespondToRequest();
+   const navigate = useNavigate();
 
    if (!request) return null;
 
@@ -46,32 +48,57 @@ export const RequestDetailModal = ({
       );
    };
 
+   const handleViewProfile = () => {
+      const studentId = request.studentId?._id;
+      if (studentId) {
+         navigate(`/tutor/student-profile/${studentId}`);
+         onClose();
+      }
+   };
+
    const renderActions = () => {
       if (
          user?.role === "TUTOR" &&
          request.status === TeachingRequestStatus.PENDING
       ) {
          return (
-            <div className="flex gap-3 pt-2">
+            <div className="flex flex-col gap-3 pt-2">
+               <div className="flex gap-3">
+                  <Button
+                     onClick={() => handleRespond("ACCEPTED")}
+                     disabled={respond.isPending}
+                     className="flex-1"
+                  >
+                     Chấp nhận dạy
+                  </Button>
+                  <Button
+                     variant="outline"
+                     onClick={() => handleRespond("REJECTED")}
+                     disabled={respond.isPending}
+                     className="flex-1"
+                  >
+                     Từ chối
+                  </Button>
+               </div>
                <Button
-                  onClick={() => handleRespond("ACCEPTED")}
-                  disabled={respond.isPending}
-                  className="flex-1"
+                  variant="secondary"
+                  onClick={handleViewProfile}
+                  className="w-full"
                >
-                  Chấp nhận dạy
-               </Button>
-               <Button
-                  variant="outline"
-                  onClick={() => handleRespond("REJECTED")}
-                  disabled={respond.isPending}
-                  className="flex-1"
-               >
-                  Từ chối
+                  Xem hồ sơ học sinh
                </Button>
             </div>
          );
       }
-      return null;
+      return (
+         <Button
+            variant="secondary"
+            onClick={handleViewProfile}
+            className="w-full"
+         >
+            Xem hồ sơ học sinh
+         </Button>
+      );
    };
 
    const student = request.studentId?.userId;
