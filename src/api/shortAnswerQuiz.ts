@@ -68,6 +68,11 @@ export const fetchShortAnswerQuizzesAssignedToSession = async (
     return response.data;
 };
 
-export {
-    fetchSessionAssigned,
-} from "./quiz";
+export const fetchSessionsAssignedForSAQ = async (
+    quizId: string
+): Promise<ISessionAssignedQuizzesResponse> => {
+    const response = await apiClient.get("/quiz/getSessionsAssignedForSAQ", {
+        params: { quizId },
+    });
+    return response.data;
+};

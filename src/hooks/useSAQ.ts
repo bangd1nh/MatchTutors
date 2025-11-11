@@ -8,6 +8,7 @@ import {
     fetchShortAnswerQuiz,
     fetchShortAnswerQuizzesAssignedToSession,
     asignShortAnswerQuizToSession,
+    fetchSessionsAssignedForSAQ, // ADD THIS IMPORT
 } from "@/api/shortAnswerQuiz";
 import { IQuizResponse } from "@/types/quiz";
 import { IQuizQuestionResponse } from "@/types/quizQuestion";
@@ -95,6 +96,15 @@ export const useShortAnswerQuizzesAssignedToSession = (sessionId: string) => {
         queryKey: ["SHORT_ANSWER_QUIZ_SESSION", sessionId],
         queryFn: () => fetchShortAnswerQuizzesAssignedToSession(sessionId),
         enabled: !!sessionId,
+    });
+};
+
+// NEW: Add this hook for fetching sessions assigned to SAQ
+export const useSessionsAssignedForSAQ = (quizId: string) => {
+    return useQuery({
+        queryKey: ["SESSIONS_ASSIGNED_FOR_SAQ", quizId],
+        queryFn: () => fetchSessionsAssignedForSAQ(quizId),
+        enabled: !!quizId,
     });
 };
 
@@ -213,4 +223,13 @@ export const useShortAnswerQuizSession = (sessionId?: string) => {
         isAssigning: assignMutation.isPending,
         isFetchingAssigned: assignedQuizzesQuery.isFetching,
     };
+};
+
+// UPDATE: Replace this with the new hook
+export const useSessionAssignedShortAnswerQuizzes = (quizId: string) => {
+    return useQuery({
+        queryKey: ["SESSION_ASSIGNED_SHORT_ANSWER", quizId],
+        queryFn: () => fetchSessionsAssignedForSAQ(quizId),
+        enabled: !!quizId,
+    });
 };
