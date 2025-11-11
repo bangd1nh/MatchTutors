@@ -44,7 +44,7 @@ export default function TutorProfile() {
     >([]);
     // console.log("Loaded tutor profile:", tutorProfile);
     const [isEditing, setIsEditing] = useState(!tutor);
-    const { validateForm, getError, hasError, clearFieldError, validateField, clearErrors } = useTutorFormValidation();
+    const { validateForm, getError, hasError, clearFieldError, validateField, clearErrors, scrollToFirstError } = useTutorFormValidation();
     const levelsRef = useRef<HTMLDivElement>(null);
     const subjectRef = useRef<HTMLDivElement>(null);
     const [formData, setFormData] = useState<Partial<Tutor>>({
@@ -225,6 +225,7 @@ export default function TutorProfile() {
         const validation = validateForm(submissionData as TutorProfileFormData, !!tutorProfile);
 
         if (!validation.isValid) {
+            scrollToFirstError();
             return;
         }
 
