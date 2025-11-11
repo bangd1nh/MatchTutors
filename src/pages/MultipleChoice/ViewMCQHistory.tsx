@@ -25,9 +25,9 @@ const ViewMCQHistory = () => {
    const quizId = searchParams.get("quizId") || "";
    const navigate = useNavigate();
 
-   const { isLoading, isError, data } = usefetchHistory(quizId);
+   const { studentHistory } = usefetchHistory(quizId);
 
-   if (isLoading) {
+   if (studentHistory.isLoading) {
       return (
          <div className="min-h-[400px] flex flex-col items-center justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
@@ -38,7 +38,7 @@ const ViewMCQHistory = () => {
       );
    }
 
-   if (isError) {
+   if (studentHistory.isError) {
       return (
          <div className="min-h-[400px] flex flex-col items-center justify-center">
             <BookOpen className="h-16 w-16 text-red-400 mb-4" />
@@ -52,7 +52,7 @@ const ViewMCQHistory = () => {
       );
    }
 
-   const submissionData = data?.data;
+   const submissionData = studentHistory.data?.data;
 
    if (!submissionData) {
       return (

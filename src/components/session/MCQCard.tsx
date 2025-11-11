@@ -7,6 +7,7 @@ import {
    Plus,
    Tag,
    Users,
+   History,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
@@ -16,6 +17,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "../ui/badge";
 import { IQuizInfo } from "@/types/quiz";
 import MCQListModal from "./MCQListModal";
+import { useFetchAttempt } from "@/hooks/useMCQ";
 
 const MCQCard = ({ session, canManage }: any) => {
    const {
@@ -24,7 +26,9 @@ const MCQCard = ({ session, canManage }: any) => {
       isError,
    } = useMCQAssignedToSession(session._id);
 
-   const { initMCQ, mcq, setSessionId, sessionId } = useAsignMCQStore();
+   const { attempts } = useFetchAttempt(session._id);
+
+   const { initMCQ, mcq, setSessionId } = useAsignMCQStore();
    const navigate = useNavigate();
 
    const quizzes = Array.isArray(quizzesAssignedData?.data)
@@ -34,14 +38,26 @@ const MCQCard = ({ session, canManage }: any) => {
    const [isShowingModal, setIsShowingModal] = useState(false);
 
    useEffect(() => {
-      if (!isLoading && quizzesAssignedData?.data && quizzes.length > 0) {
+      if (
+         !isLoading &&
+         !attempts.isLoading &&
+         quizzesAssignedData?.data &&
+         quizzes.length > 0
+      ) {
          initMCQ(quizzes, session._id);
          setSessionId(session._id);
       }
-      console.log(mcq, sessionId);
-   }, [quizzesAssignedData, session._id, isLoading]);
+   }, [quizzesAssignedData, session._id, isLoading, attempts.isLoading]);
 
-   if (isLoading) {
+   // Function to get attempt data for a specific quiz
+   const getQuizAttempts = (quizId: string) => {
+      if (!attempts.data?.data) return null;
+      return attempts.data.data.find(
+         (attempt: any) => attempt.quizId === quizId
+      );
+   };
+
+   if (isLoading || attempts.isLoading) {
       return (
          <div className="flex items-center justify-center h-96">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -50,7 +66,7 @@ const MCQCard = ({ session, canManage }: any) => {
       );
    }
 
-   if (isError) {
+   if (isError || attempts.isError) {
       return (
          <div className="text-center h-96 flex items-center justify-center">
             <div className="text-red-500">
@@ -60,8 +76,6 @@ const MCQCard = ({ session, canManage }: any) => {
          </div>
       );
    }
-
-   console.log("mcq", mcq, sessionId);
 
    return (
       <div>
@@ -96,100 +110,128 @@ const MCQCard = ({ session, canManage }: any) => {
                   </div>
                ) : (
                   <div className="space-y-4">
-                     {mcq.map((quiz, index: number) => (
-                        <div key={quiz._id} className="border rounded-lg p-4">
-                           <div className="flex items-center justify-between mb-3">
-                              <div className="flex-1">
-                                 <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="font-medium">
-                                       {quiz.title || `MCQ ${index + 1}`}
-                                    </h3>
-                                    <Badge
-                                       variant="default"
-                                       className="text-xs"
-                                    >
-                                       MCQ
-                                    </Badge>
-                                 </div>
+                     {mcq.map((quiz, index: number) => {
+                        const quizAttempts = getQuizAttempts(quiz._id);
 
-                                 <p className="text-sm text-muted-foreground mb-2">
-                                    {quiz.description || "Không có mô tả"}
-                                 </p>
-
-                                 {/* Stats Row */}
-                                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-                                    <div className="flex items-center gap-1">
-                                       <Users className="h-3 w-3" />
-                                       <span>
-                                          {quiz.totalQuestions || 0} câu hỏi
-                                       </span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                       <Calendar className="h-3 w-3" />
-                                       <span>
-                                          {quiz.createdAt
-                                             ? new Date(
-                                                quiz.createdAt
-                                             ).toLocaleDateString("vi-VN")
-                                             : "N/A"}
-                                       </span>
-                                    </div>
-                                    <Badge
-                                       variant="outline"
-                                       className="text-xs"
-                                    >
-                                       {quiz.quizMode === "STUDY"
-                                          ? "HỌC TẬP"
-                                          : quiz.quizMode || "STUDY"}
-                                    </Badge>
-                                 </div>
-
-                                 {/* Tags */}
-                                 {quiz.tags && quiz.tags.length > 0 && (
-                                    <div className="flex items-center gap-1 mb-2">
-                                       <Tag className="h-3 w-3 text-muted-foreground" />
-                                       <div className="flex flex-wrap gap-1">
-                                          {quiz.tags
-                                             .slice(0, 3)
-                                             .map(
-                                                (
-                                                   tag: string,
-                                                   tagIndex: number
-                                                ) => (
-                                                   <Badge
-                                                      key={`${quiz._id}-tag-${tagIndex}`}
-                                                      variant="secondary"
-                                                      className="text-xs px-2 py-0.5"
-                                                   >
-                                                      {tag}
-                                                   </Badge>
-                                                )
+                        return (
+                           <Card
+                              key={quiz._id}
+                              className="border border-border"
+                           >
+                              <CardContent className="p-4">
+                                 <div className="space-y-3">
+                                    {/* Header Row */}
+                                    <div className="flex items-start justify-between">
+                                       <div className="flex-1 min-w-0">
+                                          <div className="flex items-center gap-2 mb-2">
+                                             <h3 className="font-semibold text-lg truncate">
+                                                {quiz.title ||
+                                                   `MCQ ${index + 1}`}
+                                             </h3>
+                                             <Badge
+                                                variant="default"
+                                                className="text-xs shrink-0"
+                                             >
+                                                MCQ
+                                             </Badge>
+                                             {quizAttempts && (
+                                                <Badge
+                                                   variant="secondary"
+                                                   className="text-xs shrink-0"
+                                                >
+                                                   {quizAttempts.attempt} lần
+                                                   làm
+                                                </Badge>
                                              )}
-                                          {quiz.tags.length > 3 && (
+                                          </div>
+                                          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                                             {quiz.description ||
+                                                "Không có mô tả"}
+                                          </p>
+                                       </div>
+
+                                       <Badge
+                                          variant="outline"
+                                          className="ml-3 shrink-0 bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800"
+                                       >
+                                          Multiple Choice
+                                       </Badge>
+                                    </div>
+
+                                    {/* Stats Row */}
+                                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                       <div className="flex items-center gap-1">
+                                          <Users className="h-3 w-3" />
+                                          <span>
+                                             {quiz.totalQuestions || 0} câu hỏi
+                                          </span>
+                                       </div>
+                                       <div className="flex items-center gap-1">
+                                          <Calendar className="h-3 w-3" />
+                                          <span>
+                                             {quiz.createdAt
+                                                ? new Date(
+                                                     quiz.createdAt
+                                                  ).toLocaleDateString("vi-VN")
+                                                : "N/A"}
+                                          </span>
+                                       </div>
+                                       <Badge
+                                          variant="outline"
+                                          className="text-xs"
+                                       >
+                                          {quiz.quizMode === "STUDY"
+                                             ? "HỌC TẬP"
+                                             : quiz.quizMode || "STUDY"}
+                                       </Badge>
+                                    </div>
+
+                                    {/* Tags Row */}
+                                    {quiz.tags && quiz.tags.length > 0 && (
+                                       <div className="flex items-center gap-2">
+                                          <Tag className="h-3 w-3 text-muted-foreground shrink-0" />
+                                          <div className="flex flex-wrap gap-1">
+                                             {quiz.tags
+                                                .slice(0, 3)
+                                                .map(
+                                                   (
+                                                      tag: string,
+                                                      tagIndex: number
+                                                   ) => (
+                                                      <Badge
+                                                         key={`${quiz._id}-tag-${tagIndex}`}
+                                                         variant="secondary"
+                                                         className="text-xs px-2 py-0.5"
+                                                      >
+                                                         {tag}
+                                                      </Badge>
+                                                   )
+                                                )}
+                                             {quiz.tags.length > 3 && (
+                                                <Badge
+                                                   variant="outline"
+                                                   className="text-xs px-2 py-0.5"
+                                                >
+                                                   +{quiz.tags.length - 3} khác
+                                                </Badge>
+                                             )}
+                                          </div>
+                                       </div>
+                                    )}
+
+                                    {/* Settings Row */}
+                                    {quiz.settings && (
+                                       <div className="flex items-center gap-2">
+                                          {quiz.settings.shuffleQuestions && (
                                              <Badge
                                                 variant="outline"
-                                                className="text-xs px-2 py-0.5"
+                                                className="text-xs"
                                              >
-                                                +{quiz.tags.length - 3} khác
+                                                Xáo trộn
                                              </Badge>
                                           )}
-                                       </div>
-                                    </div>
-                                 )}
-
-                                 {/* Settings */}
-                                 {quiz.settings && (
-                                    <div className="flex items-center gap-2 text-xs">
-                                       {quiz.settings.shuffleQuestions && (
-                                          <Badge
-                                             variant="outline"
-                                             className="text-xs"
-                                          >
-                                             Xáo trộn
-                                          </Badge>
-                                       )}
-                                       {quiz.settings
-                                          .showCorrectAnswersAfterSubmit && (
+                                          {quiz.settings
+                                             .showCorrectAnswersAfterSubmit && (
                                              <Badge
                                                 variant="outline"
                                                 className="text-xs"
@@ -197,57 +239,109 @@ const MCQCard = ({ session, canManage }: any) => {
                                                 Hiện đáp án
                                              </Badge>
                                           )}
-                                       {quiz.settings.timeLimitMinutes && (
-                                          <Badge
-                                             variant="outline"
-                                             className="text-xs"
-                                          >
-                                             {quiz.settings.timeLimitMinutes}{" "}
-                                             phút
-                                          </Badge>
-                                       )}
+                                          {quiz.settings.timeLimitMinutes && (
+                                             <Badge
+                                                variant="outline"
+                                                className="text-xs"
+                                             >
+                                                {quiz.settings.timeLimitMinutes}{" "}
+                                                phút
+                                             </Badge>
+                                          )}
+                                       </div>
+                                    )}
+
+                                    {/* Action Buttons Row */}
+                                    <div className="pt-3 border-t border-border">
+                                       <div className="flex items-center justify-between">
+                                          {/* Primary Actions */}
+                                          <div className="flex items-center gap-2">
+                                             <Link
+                                                to={
+                                                   canManage
+                                                      ? `/tutor/multipleChoice?multipleChoiceId=${quiz._id}`
+                                                      : `/student/doMCQ?multipleChoiceId=${quiz._id}`
+                                                }
+                                             >
+                                                <Button
+                                                   size="sm"
+                                                   className="h-8"
+                                                >
+                                                   {canManage
+                                                      ? "Xem"
+                                                      : "Làm bài"}
+                                                </Button>
+                                             </Link>
+
+                                             {canManage && (
+                                                <Button
+                                                   variant="ghost"
+                                                   size="sm"
+                                                   className="h-8 w-8 p-0"
+                                                   onClick={() => {
+                                                      navigate(
+                                                         `/tutor/editMultipleChoice?multipleChoiceId=${quiz._id}`
+                                                      );
+                                                   }}
+                                                >
+                                                   <Edit3 className="h-4 w-4" />
+                                                </Button>
+                                             )}
+                                          </div>
+
+                                          {/* History Actions for Students */}
+                                          {!canManage && (
+                                             <div className="flex items-center gap-1">
+                                                {quizAttempts &&
+                                                quizAttempts.submissionIds ? (
+                                                   <>
+                                                      <span className="text-xs text-muted-foreground mr-2">
+                                                         Lịch sử:
+                                                      </span>
+                                                      {quizAttempts.submissionIds.map(
+                                                         (
+                                                            submissionId,
+                                                            attemptIndex
+                                                         ) => (
+                                                            <Button
+                                                               key={
+                                                                  submissionId
+                                                               }
+                                                               variant="outline"
+                                                               size="sm"
+                                                               className="h-7 px-2 text-xs"
+                                                               onClick={() => {
+                                                                  navigate(
+                                                                     `/student/doneMCQ?quizId=${submissionId}`
+                                                                  );
+                                                               }}
+                                                               title={`Xem kết quả lần làm bài thứ ${
+                                                                  attemptIndex +
+                                                                  1
+                                                               }`}
+                                                            >
+                                                               <History className="h-3 w-3 mr-1" />
+                                                               Lần{" "}
+                                                               {attemptIndex +
+                                                                  1}
+                                                            </Button>
+                                                         )
+                                                      )}
+                                                   </>
+                                                ) : (
+                                                   <span className="text-xs text-muted-foreground">
+                                                      Chưa có lần làm bài nào
+                                                   </span>
+                                                )}
+                                             </div>
+                                          )}
+                                       </div>
                                     </div>
-                                 )}
-                              </div>
-
-                              <div className="flex items-center gap-2 ml-4">
-                                 <Badge
-                                    variant="outline"
-                                    className="bg-blue-50 text-blue-600 border-blue-200"
-                                 >
-                                    Multiple Choice
-                                 </Badge>
-
-                                 {/* Nút Xem */}
-                                 <Link
-                                    to={
-                                       canManage
-                                          ? `/tutor/multipleChoice?multipleChoiceId=${quiz._id}`
-                                          : `/student/doMCQ?multipleChoiceId=${quiz._id}`
-                                    }
-                                 >
-                                    <Button size="sm">
-                                       {canManage ? "Xem" : "Làm bài"}
-                                    </Button>
-                                 </Link>
-
-                                 {canManage && (
-                                    <Button
-                                       variant="ghost"
-                                       size="sm"
-                                       onClick={() => {
-                                          navigate(
-                                             `/tutor/editMultipleChoice?multipleChoiceId=${quiz._id}`
-                                          );
-                                       }}
-                                    >
-                                       <Edit3 className="h-4 w-4" />
-                                    </Button>
-                                 )}
-                              </div>
-                           </div>
-                        </div>
-                     ))}
+                                 </div>
+                              </CardContent>
+                           </Card>
+                        );
+                     })}
                   </div>
                )}
             </CardContent>

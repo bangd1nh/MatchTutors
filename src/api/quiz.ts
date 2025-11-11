@@ -6,7 +6,10 @@ import {
    ISessionAssignedQuizzesResponse,
 } from "@/types/quiz";
 import { IQuizQuestionResponse } from "@/types/quizQuestion";
-import { IQuizSubmissionBody } from "@/types/quizSubmission";
+import {
+   IAttemptSubmissionResponse,
+   IQuizSubmissionBody,
+} from "@/types/quizSubmission";
 import { BaseAPIResponse } from "@/types/response";
 
 export const createFlashCardQuiz = async (
@@ -104,4 +107,13 @@ export const asignMCQToSession = async ({
       quizIds,
    });
    return response.data;
+};
+
+export const getAttempt = async (
+   sessionId: string
+): Promise<IAttemptSubmissionResponse> => {
+   const resposne = await apiClient.get("/doQuiz/getAttemptMCQ", {
+      params: { sessionId },
+   });
+   return resposne.data;
 };

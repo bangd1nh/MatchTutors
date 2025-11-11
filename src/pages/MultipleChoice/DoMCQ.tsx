@@ -30,9 +30,11 @@ const DoMCQ = () => {
       initQuizQuestions,
       questions,
       getSubmitQuiz,
+      reset,
    } = useDoMCQStore();
 
    useEffect(() => {
+      reset();
       if (quizInfoData) {
          initQuizInfo(quizId, quizInfoData);
          initQuizQuestions(quizQuestionsData);

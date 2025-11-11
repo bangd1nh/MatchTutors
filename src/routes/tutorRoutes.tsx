@@ -29,6 +29,8 @@ import ViewShortAnswerQuizList from "@/pages/ShortAnswer/ViewShortAnswerQuizList
 import ViewShortAnswerQuiz from "@/pages/ShortAnswer/ViewShortAnswerQuiz";
 import EditShortAnswerQuiz from "@/pages/ShortAnswer/EditShortAnswerQuiz";
 import CreateShortAnswerQuiz from "@/pages/ShortAnswer/CreateShortAnswerQuiz";
+import ViewStudentMCQHistoryList from "@/pages/MultipleChoice/ViewStudentMCQHistoryList";
+import ViewMCQHistory from "@/pages/MultipleChoice/ViewMCQHistory";
 
 export const tutorRoutes = {
    element: (
@@ -147,6 +149,14 @@ export const tutorRoutes = {
       {
          path: "/tutor/material-management",
          element: <MaterialManagementPage />,
+      },
+      {
+         path: "/tutor/studentMCQHistoryList",
+         element: <ViewStudentMCQHistoryList />,
+      },
+      {
+         path: "/tutor/MCQHistory",
+         element: <ViewMCQHistory />,
       },
    ],
 };

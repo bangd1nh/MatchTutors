@@ -14,6 +14,7 @@ import {
    FileUp,
    FolderKanban,
    Wallet,
+   History,
    AlertTriangle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -110,6 +111,12 @@ export const tutorSidebarConfig: SidebarItem[] = [
       to: "/tutor/wallet",
       label: "Ví của tôi",
       icon: <Wallet className="h-4 w-4" />,
+   },
+
+   {
+      to: "/tutor/studentMCQHistoryList",
+      label: "Lịch sử làm bài",
+      icon: <History className="h-4 w-4" />,
    },
 
    // Thêm các mục khác ở đây

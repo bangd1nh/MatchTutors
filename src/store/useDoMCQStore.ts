@@ -12,6 +12,7 @@ type DoMCQStore = {
    initQuizQuestions: (questions: IQuizQuestion[]) => void;
    doQuestion: (quizQuestionId: string, awnser: string) => void;
    getSubmitQuiz: () => IQuizSubmissionBody;
+   reset: () => void;
 };
 
 export interface IDoQuestions extends IQuizQuestion {
@@ -81,5 +82,13 @@ export const useDoMCQStore = create<DoMCQStore>((set, get) => ({
          submited: true,
       });
       return payload as IQuizSubmissionBody;
+   },
+   reset: () => {
+      set({
+         quizInfo: {} as IQuizInfo,
+         quizId: "",
+         questions: [],
+         submited: false,
+      });
    },
 }));

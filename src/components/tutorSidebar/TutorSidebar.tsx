@@ -11,7 +11,7 @@ const TutorSidebar: React.FC = () => {
    const avatarUrl = (user as any)?.avatarUrl; // Giả sử user object có avatarUrl
 
    return (
-      <aside className="w-64 overflow-auto bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-gray-800 flex flex-col shadow-sm h-screen">
+      <aside className="w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-gray-800 flex flex-col shadow-sm h-screen">
          <div className="p-4 border-b border-gray-200 dark:border-gray-800">
             <div className="flex items-center gap-3">
                <Avatar className="h-10 w-10">
