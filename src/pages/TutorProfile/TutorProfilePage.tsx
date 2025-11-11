@@ -44,7 +44,7 @@ export default function TutorProfile() {
     >([]);
     // console.log("Loaded tutor profile:", tutorProfile);
     const [isEditing, setIsEditing] = useState(!tutor);
-    const { validateForm, getError, hasError, clearFieldError, validateField, clearErrors } = useTutorFormValidation();
+    const { validateForm, getError, hasError, clearFieldError, validateField, clearErrors, scrollToFirstError } = useTutorFormValidation();
     const levelsRef = useRef<HTMLDivElement>(null);
     const subjectRef = useRef<HTMLDivElement>(null);
     const [formData, setFormData] = useState<Partial<Tutor>>({
@@ -190,7 +190,6 @@ export default function TutorProfile() {
                         tempCertId: cert?.tempId,
                         certId: cert?._id,
                     });
-                    console.log(`📸 Mapping: certIndex=${certIndex}, fileIndex=${globalIndex}, fileName=${file.name}`);
                 }
             });
         });
@@ -208,7 +207,6 @@ export default function TutorProfile() {
 
         // Add the mapping information
         if (imageCertMapping.length > 0) {
-            console.log("📨 Final imageCertMapping being sent:", imageCertMapping);
             formData.append("imageCertMapping", JSON.stringify(imageCertMapping));
         }
 
@@ -226,10 +224,8 @@ export default function TutorProfile() {
 
         const validation = validateForm(submissionData as TutorProfileFormData, !!tutorProfile);
 
-        // console.log("📤 Form data being submitted:", submissionData);
-        // console.log("🗑️ removedImages being sent:", removedImages);
-
         if (!validation.isValid) {
+            scrollToFirstError();
             return;
         }
 
@@ -245,6 +241,7 @@ export default function TutorProfile() {
                     console.log(`  ${key}:`, value);
                 }
             }
+            console.log(tutorProfile)
 
             if (tutorProfile) {
                 await updateTutor(formDataToSend);

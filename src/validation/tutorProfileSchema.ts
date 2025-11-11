@@ -65,21 +65,7 @@ const educationSchema = z.object({
     )
     .refine(
         (data) => {
-            // DATE VALIDATION 4: End date should not be in the future (if provided)
-            if (!data.endDate) return true;
-            const endDate = new Date(data.endDate);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            return endDate <= today;
-        },
-        {
-            message: "End date cannot be in the future",
-            path: ["endDate"],
-        }
-    )
-    .refine(
-        (data) => {
-            // DATE VALIDATION 5: Start date should be before end date (if both provided)
+            // DATE VALIDATION 4: Start date should be before end date (if both provided)
             if (!data.startDate || !data.endDate) return true;
             const startDate = new Date(data.startDate);
             const endDate = new Date(data.endDate);
@@ -92,7 +78,7 @@ const educationSchema = z.object({
     )
     .refine(
         (data) => {
-            // DATE VALIDATION 6: Start date should be reasonable (not before 1950)
+            // DATE VALIDATION 5: Start date should be reasonable (not before 1950)
             if (!data.startDate) return false;
             const startDate = new Date(data.startDate);
             const minDate = new Date("1950-01-01");
