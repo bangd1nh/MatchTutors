@@ -20,6 +20,7 @@ import {
    SelectTrigger,
    SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useCreateSession, useUpdateSession } from "@/hooks/useSessions";
 import { useActiveLearningCommitmentsByTutor } from "@/hooks/useLearningCommitment";
 import { Session } from "@/types/session";
@@ -33,6 +34,7 @@ const sessionFormSchema = z
       startTime: z.date({ error: "Thời gian bắt đầu không hợp lệ." }),
       endTime: z.date({ error: "Thời gian kết thúc không hợp lệ." }),
       location: z.string().min(1, "Vui lòng nhập địa điểm."),
+      notes: z.string().optional(), // Add notes field as optional string
    })
    .refine((data) => data.endTime > data.startTime, {
       message: "Thời gian kết thúc phải sau thời gian bắt đầu.",
@@ -71,6 +73,7 @@ export const SessionFormDialog = ({
       defaultValues: {
          learningCommitmentId: "",
          location: "",
+         notes: "", // Add default value for notes
          startTime: new Date(),
          endTime: new Date(new Date().getTime() + 60 * 60 * 1000),
       },
@@ -91,11 +94,13 @@ export const SessionFormDialog = ({
                     (defaultDate || new Date()).getTime() + 60 * 60 * 1000
                  ),
             location: initialData.location || "",
+            notes: (initialData as any).notes || "", // Add notes reset
          });
       } else {
          form.reset({
             learningCommitmentId: "",
             location: "",
+            notes: "", // Add notes reset
             startTime: defaultDate || new Date(),
             endTime: new Date(
                (defaultDate || new Date()).getTime() + 60 * 60 * 1000
@@ -113,6 +118,7 @@ export const SessionFormDialog = ({
             startTime: values.startTime.toISOString(),
             endTime: values.endTime.toISOString(),
             location: values.location,
+            notes: values.notes, // Add notes to payload
             status: SessionStatus.SCHEDULED,
          };
 
@@ -325,6 +331,28 @@ export const SessionFormDialog = ({
                   {form.formState.errors.location && (
                      <p className="text-sm text-red-500 flex items-center gap-1">
                         <span>⚠️</span> {form.formState.errors.location.message}
+                     </p>
+                  )}
+               </div>
+
+               {/* Ghi chú */}
+               <div className="space-y-3">
+                  <Label
+                     htmlFor="notes"
+                     className="text-sm font-semibold text-gray-700 flex items-center gap-2"
+                  >
+                     <BookOpen className="h-4 w-4 text-purple-500" />
+                     Ghi chú
+                  </Label>
+                  <Textarea
+                     id="notes"
+                     {...form.register("notes")}
+                     placeholder="Nhập ghi chú (tùy chọn)"
+                     className="w-full min-h-[80px] border-gray-300 focus:border-purple-500 focus:ring-purple-500 rounded-lg"
+                  />
+                  {form.formState.errors.notes && (
+                     <p className="text-sm text-red-500 flex items-center gap-1">
+                        <span>⚠️</span> {form.formState.errors.notes.message}
                      </p>
                   )}
                </div>

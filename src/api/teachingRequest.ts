@@ -168,3 +168,15 @@ export const getCompletedRequestBetween = async (
       ? (payload as TeachingRequest)
       : null;
 };
+
+/**
+ * Lấy thông tin profile của học sinh từ teaching request.
+ */
+export const getStudentProfile = async (
+   studentUserId: string
+): Promise<any> => {
+   const response = await apiClient.get(
+      `/teachingRequest/student-profile/${studentUserId}`
+   );
+   return response.data.data || response.data.metadata;
+};

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input"; // Import Input
+import { Input } from "@/components/ui/input";
 import { useUser } from "@/hooks/useUser";
 import {
    useConfirmParticipation,
@@ -74,7 +74,12 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
       new Date(session.startTime).getTime() - 10 * 60 * 1000
    );
    const canCancelSession =
-      now < tenMinutesBeforeStart && session.status === SessionStatus.CONFIRMED;
+      now < tenMinutesBeforeStart &&
+      session.status === SessionStatus.CONFIRMED &&
+      !(
+         session.attendanceConfirmation?.student.status !== "PENDING" ||
+         session.attendanceConfirmation?.tutor.status !== "PENDING"
+      );
 
    const showParticipationButtons =
       isStudent &&

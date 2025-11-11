@@ -11,6 +11,7 @@ import EditFlashcardQuiz from "@/pages/Flashcard/EditFlashcardQuiz";
 import TutorProfilePage from "@/pages/TutorProfile/TutorProfilePage";
 import TeachingRequestsList from "@/pages/Tutor/TeachingRequestsList";
 import TeachingRequestDetail from "@/pages/Tutor/TeachingRequestDetail";
+import StudentProfileForTutor from "@/pages/Tutor/StudentProfileForTutor";
 import SchedulePage from "@/pages/SchedulePage"; // Import trang mới
 import RejectedSessionsPage from "@/pages/RejectedSessionsPage"; // Import trang rejected sessions
 import AbsenceSessionPage from "@/pages/absenceSession";
@@ -49,17 +50,16 @@ export const tutorRoutes = {
          element: <TeachingRequestDetail />,
       },
       {
-         path: "/tutor/schedule", // Thêm route mới
+         path: "/tutor/student-profile/:studentUserId",
+         element: <StudentProfileForTutor />,
+      },
+      {
+         path: "/tutor/schedule",
          element: <SchedulePage />,
       },
       {
          path: "/tutor/learning-commitments",
          element: <LearningCommitmentsPage />,
-      },
-      {
-         // Session detail route moved to sharedRoutes (accessible by both roles)
-         // path: "/session/:id",
-         // element: <SessionDetailPage />,
       },
       {
          path: "/tutor/jobs",
@@ -121,7 +121,6 @@ export const tutorRoutes = {
          path: "/tutor/editShortAnswer",
          element: <EditShortAnswerQuiz />,
       },
-
       {
          path: "/tutor/review-list",
          element: <ReviewList />,
@@ -133,10 +132,6 @@ export const tutorRoutes = {
       {
          path: "/tutor/wallet",
          element: <WalletManagement />,
-      },
-      {
-         path: "/tutor/session/:id",
-         element: <SessionDetailPage />,
       },
       {
          path: "/tutor/session/:id",

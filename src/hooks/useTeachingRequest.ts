@@ -5,6 +5,7 @@ import {
    createTeachingRequest,
    respondToTeachingRequest,
    getTeachingRequestById,
+   getStudentProfile,
 } from "@/api/teachingRequest";
 import { useToast } from "./useToast";
 import { CreateTeachingRequestPayload } from "@/types/teachingRequest";
@@ -110,5 +111,17 @@ export const useRespondToRequest = () => {
       onError: (err: any) => {
          toast("error", err.response?.data?.message || "Phản hồi thất bại.");
       },
+   });
+};
+
+/**
+ * Hook để lấy profile học sinh.
+ */
+export const useStudentProfile = (studentUserId: string | undefined) => {
+   return useQuery({
+      queryKey: ["studentProfile", studentUserId],
+      queryFn: () => getStudentProfile(studentUserId!),
+      enabled: !!studentUserId,
+      staleTime: 1000 * 60 * 10,
    });
 };

@@ -1,10 +1,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Send, Phone, Mail, Lock, Copy } from "lucide-react";
+import {
+   DollarSign,
+   Send,
+   Phone,
+   Mail,
+   Lock,
+   Copy,
+   MessageCircle,
+} from "lucide-react";
 import type { Tutor } from "@/types/tutorListandDetail";
 import { useUser } from "@/hooks/useUser";
-import { TeachingRequestDialog } from "./TeachingRequestDialog"; // Import dialog mới
+import { TeachingRequestDialog } from "./TeachingRequestDialog";
 import { useNavigate } from "react-router-dom";
 
 interface TutorContactCardProps {
@@ -17,9 +25,11 @@ export function TutorContactCard({ tutor }: TutorContactCardProps) {
    const [showContactDetails, setShowContactDetails] = useState(false);
    const navigate = useNavigate();
 
+   const isFullyBooked = tutor.maxStudents === 0;
+
    const handleRequestClick = () => {
       if (!isAuthenticated) {
-         navigate("/login"); // Chuyển hướng đến trang đăng nhập nếu chưa đăng nhập
+         navigate("/login");
          return;
       }
       if (user?.role === "STUDENT") {
@@ -29,49 +39,64 @@ export function TutorContactCard({ tutor }: TutorContactCardProps) {
 
    const maskContact = (contact: string, type: "phone" | "email"): string => {
       if (type === "phone") {
-         // Remove all non-digit characters
          const digitsOnly = contact.replace(/\D/g, "");
 
-         // Handle different phone number lengths
          if (digitsOnly.length <= 7) {
-            // For shorter numbers (like 555-5555 becomes 555****)
             return `${digitsOnly.slice(0, 3)}****`;
          } else {
-            // Standard masking for longer numbers
             return `${digitsOnly.slice(0, 3)}****${digitsOnly.slice(-3)}`;
          }
       }
 
       const [local, domain] = contact.split("@");
-      if (!local || !domain) return "****@****"; // Invalid email fallback
+      if (!local || !domain) return "****@****";
       return `${local.slice(0, 2)}****@${domain}`;
    };
 
    return (
       <>
-         <Card className="sticky top-24 border border-gray-200 shadow-sm">
-            <CardHeader>
-               <CardTitle className="text-center text-2xl">
-                  <div className="flex items-center justify-center gap-2">
-                     <DollarSign className="h-6 w-6 text-green-500" />
-                     <span>{tutor.hourlyRate} / giờ</span>
+         <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+            <CardHeader className="text-center pb-4">
+               <div className="space-y-2">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-2">
+                     <DollarSign className="h-8 w-8 text-gray-700" />
                   </div>
-               </CardTitle>
+                  <CardTitle className="text-3xl font-light text-gray-900 tracking-tight">
+                     {tutor.hourlyRate?.toLocaleString("vi-VN")}đ
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">mỗi giờ học</p>
+               </div>
             </CardHeader>
-            <CardContent className="flex flex-col gap-4">
+            <CardContent className="space-y-3 px-6 pb-6">
                {/* Chỉ hiển thị nút này cho Student */}
                {user?.role === "STUDENT" && (
-                  <Button
-                     size="lg"
-                     className="w-full bg-primary hover:bg-primary/90"
-                     onClick={handleRequestClick}
-                  >
-                     <Send className="mr-2 h-4 w-4" />
-                     Gửi yêu cầu học
-                  </Button>
+                  <>
+                     <Button
+                        size="lg"
+                        disabled={isFullyBooked}
+                        className="w-full bg-sky-600 hover:bg-sky-700 text-white border-0 h-12 text-base font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        onClick={handleRequestClick}
+                        title={
+                           isFullyBooked ? "Gia sư này hiện tại đã hết chỗ" : ""
+                        }
+                     >
+                        <Send className="mr-2 h-4 w-4" />
+                        {isFullyBooked ? "Hết chỗ" : "Gửi yêu cầu học"}
+                     </Button>
+                     {isFullyBooked && (
+                        <p className="text-xs text-center text-red-500 font-medium">
+                           Gia sư này hiện tại đã hết chỗ
+                        </p>
+                     )}
+                  </>
                )}
 
-               <Button size="lg" variant="outline" className="w-full">
+               <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full border-gray-200 hover:bg-gray-50 hover:border-gray-300 h-12 text-base font-medium"
+               >
+                  <MessageCircle className="mr-2 h-4 w-4" />
                   Nhắn tin
                </Button>
             </CardContent>
@@ -87,96 +112,102 @@ export function TutorContactCard({ tutor }: TutorContactCardProps) {
          )}
 
          {/* Contact Details */}
-         <Card className="border border-gray-200 shadow-sm">
-            <CardHeader className="pb-4 border-t border-gray-100">
-               <div className="flex items-center gap-3">
-                  <div>
-                     <CardTitle>Contact Details</CardTitle>
-                     <p className="text-sm text-muted-foreground mt-3">
-                        {showContactDetails
-                           ? "Full contact information"
-                           : "Secure contact details"}
-                     </p>
-                  </div>
-               </div>
+         <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+            <CardHeader className="pb-4">
+               <CardTitle className="text-lg font-medium text-gray-900">
+                  Thông tin liên hệ
+               </CardTitle>
+               <p className="text-sm text-gray-600 mt-1">
+                  {showContactDetails
+                     ? "Thông tin liên hệ đầy đủ"
+                     : "Thông tin được bảo mật"}
+               </p>
             </CardHeader>
 
-            <CardContent className="pt-4 pb-6">
+            <CardContent className="space-y-4">
                {!showContactDetails ? (
-                  <div className="space-y-5">
+                  <div className="space-y-4">
                      <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-muted rounded-lg border border-border">
-                           <div className="flex items-center gap-2">
-                              <Phone className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-sm font-medium">Phone</span>
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                           <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                                 <Phone className="w-4 h-4 text-gray-600" />
+                              </div>
+                              <span className="text-sm font-medium text-gray-900">
+                                 Điện thoại
+                              </span>
                            </div>
-                           <span className="text-sm font-mono bg-background px-2 py-1 rounded border border-border text-muted-foreground">
+                           <span className="text-sm font-mono bg-white px-3 py-1 rounded-lg text-gray-600 border">
                               {maskContact(tutor.contact.phone, "phone")}
                            </span>
                         </div>
 
-                        <div className="flex items-center justify-between p-3 bg-muted rounded-lg border border-border">
-                           <div className="flex items-center gap-2">
-                              <Mail className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-sm font-medium">Email</span>
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                           <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                                 <Mail className="w-4 h-4 text-gray-600" />
+                              </div>
+                              <span className="text-sm font-medium text-gray-900">
+                                 Email
+                              </span>
                            </div>
-                           <span className="text-sm font-mono bg-background px-2 py-1 rounded border border-border text-muted-foreground">
+                           <span className="text-sm font-mono bg-white px-3 py-1 rounded-lg text-gray-600 border">
                               {maskContact(tutor.contact.email, "email")}
                            </span>
                         </div>
                      </div>
+
                      <Button
                         onClick={() => setShowContactDetails(true)}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                        className="w-full bg-sky-600 hover:bg-sky-700 text-white border-0 h-11"
                      >
                         <Lock className="w-4 h-4 mr-2" />
-                        Unlock Contact Details
+                        Mở khóa thông tin liên hệ
                      </Button>
 
-                     <div className="text-xs text-center text-muted-foreground mt-2">
-                        Click the button below to login & unlock the contact
-                        details
-                     </div>
+                     <p className="text-xs text-center text-gray-500">
+                        Đăng nhập để xem thông tin liên hệ đầy đủ
+                     </p>
                   </div>
                ) : (
                   <div className="space-y-4">
                      <div className="space-y-3">
-                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                           <div className="flex items-center gap-2 mb-1">
-                              <Phone className="w-4 h-4 text-blue-600" />
-                              <span className="text-sm font-medium text-blue-600">
-                                 Phone Number
+                        <div className="p-4 bg-gray-50 rounded-xl">
+                           <div className="flex items-center gap-2 mb-2">
+                              <Phone className="w-4 h-4 text-gray-700" />
+                              <span className="text-sm font-medium text-gray-700">
+                                 Số điện thoại
                               </span>
                            </div>
                            <div className="flex items-center justify-between">
-                              <span className="font-medium">
+                              <span className="font-medium text-gray-900">
                                  {tutor.contact.phone}
                               </span>
                               <Button
                                  variant="ghost"
                                  size="sm"
-                                 className="h-8 px-2 hover:bg-gray-100"
+                                 className="h-8 px-2 hover:bg-gray-200 rounded-lg"
                               >
                                  <Copy className="w-4 h-4 text-gray-500" />
                               </Button>
                            </div>
                         </div>
 
-                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                           <div className="flex items-center gap-2 mb-1">
-                              <Mail className="w-4 h-4 text-blue-600" />
-                              <span className="text-sm font-medium text-blue-600">
-                                 Email Address
+                        <div className="p-4 bg-gray-50 rounded-xl">
+                           <div className="flex items-center gap-2 mb-2">
+                              <Mail className="w-4 h-4 text-gray-700" />
+                              <span className="text-sm font-medium text-gray-700">
+                                 Địa chỉ email
                               </span>
                            </div>
                            <div className="flex items-center justify-between">
-                              <span className="font-medium">
+                              <span className="font-medium text-gray-900">
                                  {tutor.contact.email}
                               </span>
                               <Button
                                  variant="ghost"
                                  size="sm"
-                                 className="h-8 px-2 hover:bg-gray-100"
+                                 className="h-8 px-2 hover:bg-gray-200 rounded-lg"
                               >
                                  <Copy className="w-4 h-4 text-gray-500" />
                               </Button>
@@ -187,10 +218,10 @@ export function TutorContactCard({ tutor }: TutorContactCardProps) {
                      <Button
                         variant="outline"
                         onClick={() => setShowContactDetails(false)}
-                        className="w-full border-gray-300 hover:bg-gray-50 hover:text-gray-900"
+                        className="w-full border-gray-200 hover:bg-gray-50 hover:border-gray-300 h-11"
                      >
                         <Lock className="w-4 h-4 mr-2 text-gray-500" />
-                        Hide Details
+                        Ẩn thông tin
                      </Button>
                   </div>
                )}

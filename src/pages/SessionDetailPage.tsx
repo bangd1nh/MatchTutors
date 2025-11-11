@@ -115,7 +115,7 @@ export default function SessionDetailPage() {
             setIsEditing={setIsEditing}
             handleSave={handleSave}
             handleCancel={handleCancel}
-            canEdit={true} // Tạm thời force = true để test
+            canEdit={canEdit()}
             isSaving={updateSessionMutation.isPending}
          />
 

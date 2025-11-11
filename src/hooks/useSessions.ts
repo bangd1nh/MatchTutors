@@ -101,7 +101,7 @@ export const useUpdateSession = () => {
       }) => updateSession(sessionId, payload),
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: sessionKeys.all });
-         toast("success", "Cập nhật buổi học thành công!");
+         // toast("success", "Cập nhật buổi học thành công!");
       },
       onError: (error: any) => {
          toast(
