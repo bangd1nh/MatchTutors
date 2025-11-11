@@ -1,7 +1,7 @@
 import { SessionCalendar } from "@/components/schedule/SessionCalendar";
 import { useMySessions } from "@/hooks/useSessions";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
 import { useState } from "react";
 import { SessionFormDialog } from "@/components/schedule/SessionFormDialog";
 import { useUser } from "@/hooks/useUser";
@@ -39,11 +39,11 @@ export const SchedulePage = () => {
             </p>
          </div>
 
-         {user?.role === Role.TUTOR && (
+         {/* {user?.role === Role.TUTOR && (
             <div className="flex items-center justify-end">
                <Button onClick={() => setOpenCreate(true)}>Tạo buổi học</Button>
             </div>
-         )}
+         )} */}
 
          <div className="flex-1 p-4 bg-white rounded-lg shadow-sm">
             {isEmpty && (

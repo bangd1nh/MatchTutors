@@ -1,7 +1,4 @@
-import {
-   DecisionStatus,
-   TeachingRequestStatus,
-} from "@/enums/teachingRequest.enum";
+import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
 import { Level } from "@/enums/level.enum";
 import { Subject } from "@/enums/subject.enum";
 import { IUser } from "@/types/user";
@@ -12,45 +9,6 @@ interface PopulatedUser {
    userId: Pick<IUser, "_id" | "name" | "avatarUrl" | "email">;
 }
 
-// Type cho các quyết định, dựa theo backend
-export interface CancellationDecision {
-   student: {
-      decision: DecisionStatus;
-      reason?: string;
-   };
-   tutor: {
-      decision: DecisionStatus;
-      reason?: string;
-   };
-   requestedBy?: "student" | "tutor";
-   requestedAt?: string;
-   reason?: string; // Lý do ban đầu từ người khởi tạo
-   adminReviewRequired?: boolean;
-   adminResolvedBy?: string;
-   adminResolvedAt?: string;
-   adminNotes?: string;
-}
-
-export interface CompletePending {
-   student: {
-      decision: DecisionStatus;
-      reason?: string;
-   };
-   tutor: {
-      decision: DecisionStatus;
-      reason?: string;
-   };
-   requestedBy?: "student" | "tutor";
-   requestedAt?: string;
-   reason?: string; // Lý do ban đầu từ người khởi tạo
-   studentConfirmedAt?: string;
-   tutorConfirmedAt?: string;
-   adminReviewRequired?: boolean;
-   adminResolvedBy?: string;
-   adminResolvedAt?: string;
-   adminNotes?: string;
-}
-
 export interface TeachingRequest {
    _id: string;
    studentId: PopulatedUser;
@@ -59,30 +17,9 @@ export interface TeachingRequest {
    level: Level;
    hourlyRate: number;
    description?: string;
-   totalSessionsPlanned?: number;
-   trialSessionsCompleted?: number;
-   trialDecision?: {
-      student: DecisionStatus;
-      tutor: DecisionStatus;
-   };
    status: TeachingRequestStatus;
    createdAt: string;
    updatedAt: string;
-   // Sử dụng type chi tiết thay vì any
-   complete_pending?: CompletePending;
-   cancellationDecision?: CancellationDecision;
-   // Thêm các trường history
-   cancellationDecisionHistory?: CancellationDecisionHistory[];
-   complete_pendingHistory?: CompletePendingHistory[];
-}
-
-// Thêm interfaces cho history
-export interface CancellationDecisionHistory extends CancellationDecision {
-   resolvedDate?: string;
-}
-
-export interface CompletePendingHistory extends CompletePending {
-   resolvedDate?: string;
 }
 
 export interface CreateTeachingRequestPayload {
@@ -91,5 +28,4 @@ export interface CreateTeachingRequestPayload {
    level: Level;
    hourlyRate: number;
    description?: string;
-   totalSessionsPlanned?: number;
 }

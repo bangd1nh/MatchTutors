@@ -10,9 +10,10 @@ import IsCreatedProfileRoute from "./isCreatedProfileRoute";
 import ViewFlashcardQuizQuestion from "@/pages/Flashcard/ViewFlashcardQuizQuestion";
 import FavoriteTutor from "@/pages/Student/FavoriteTutor";
 import MyApplicationsPage from "@/pages/Student/MyApplicationsPage";
-import SchedulePage from "@/pages/SchedulePage"; // Import trang mới
-import TeachingRequestDetail from "@/pages/Tutor/TeachingRequestDetail"; // Import component detail
-import RejectedSessionsPage from "@/pages/RejectedSessionsPage"; // Import trang rejected sessions
+import SchedulePage from "@/pages/SchedulePage";
+import TeachingRequestDetail from "@/pages/Tutor/TeachingRequestDetail";
+import RejectedSessionsPage from "@/pages/RejectedSessionsPage";
+import AbsenceSessionPage from "@/pages/absenceSession";
 import { StudentReviewHistory } from "@/pages/Review/StudentReviewHistory";
 import SessionDetailPage from "@/pages/SessionDetailPage";
 import { LearningCommitmentsPage } from "@/pages/Student/LearningCommitmentsPage";
@@ -110,6 +111,14 @@ export const studentRoutes = {
          element: (
             <IsCreatedProfileRoute>
                <RejectedSessionsPage />
+            </IsCreatedProfileRoute>
+         ),
+      },
+      {
+         path: "/student/absence-sessions",
+         element: (
+            <IsCreatedProfileRoute>
+               <AbsenceSessionPage />
             </IsCreatedProfileRoute>
          ),
       },

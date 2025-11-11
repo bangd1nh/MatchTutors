@@ -20,14 +20,10 @@ import { format } from "date-fns";
 import { FileDown, PlusCircle } from "lucide-react";
 
 const MaterialManagementPage = () => {
-   const { materials, isLoadingMaterials, materialsError } = useMaterial();
+   const { materials, isLoadingMaterials } = useMaterial();
 
    if (isLoadingMaterials) {
       return <div>Đang tải danh sách tài liệu...</div>;
-   }
-
-   if (materialsError) {
-      return <div>Lỗi khi tải tài liệu: {materialsError.message}</div>;
    }
 
    return (

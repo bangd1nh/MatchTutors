@@ -1,34 +1,32 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getMaterials, uploadMaterial } from "@/api/material";
 import { useToast } from "./useToast";
 
 export const useMaterial = () => {
    const queryClient = useQueryClient();
-   const addToast = useToast();
+   const toast = useToast();
 
+   // Get all materials for current user
    const {
-      data: materials,
+      data: materials = [],
       isLoading: isLoadingMaterials,
-      error: materialsError,
+      refetch,
    } = useQuery({
       queryKey: ["materials"],
       queryFn: getMaterials,
    });
 
-   const {
-      mutate: upload,
-      isPending: isUploading,
-      error: uploadError,
-   } = useMutation({
+   // Upload material mutation
+   const uploadMutation = useMutation({
       mutationFn: (formData: FormData) => uploadMaterial(formData),
       onSuccess: () => {
-         addToast("success", "Tải lên tài liệu thành công!");
+         toast("success", "Tải lên tài liệu thành công!");
          queryClient.invalidateQueries({ queryKey: ["materials"] });
       },
-      onError: (error) => {
-         addToast(
+      onError: (error: any) => {
+         toast(
             "error",
-            `Tải lên thất bại: ${error.message || "Đã có lỗi xảy ra"}`
+            `Tải lên tài liệu thất bại: ${error.message || "Đã có lỗi xảy ra"}`
          );
       },
    });
@@ -36,9 +34,8 @@ export const useMaterial = () => {
    return {
       materials,
       isLoadingMaterials,
-      materialsError,
-      upload,
-      isUploading,
-      uploadError,
+      upload: uploadMutation.mutate,
+      isUploading: uploadMutation.isPending,
+      refetch,
    };
 };

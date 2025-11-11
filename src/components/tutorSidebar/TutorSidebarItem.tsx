@@ -15,6 +15,7 @@ import {
    FolderKanban,
    Wallet,
    History,
+   AlertTriangle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -87,6 +88,11 @@ export const tutorSidebarConfig: SidebarItem[] = [
       icon: <XCircle className="h-4 w-4" />,
    },
    {
+      to: "/tutor/absence-sessions",
+      label: "Buổi học vắng",
+      icon: <AlertTriangle className="h-4 w-4" />,
+   },
+   {
       to: "/tutor/review-list",
       label: "Quản lý đánh giá",
       icon: <BookCopy className="h-4 w-4" />,
@@ -101,7 +107,6 @@ export const tutorSidebarConfig: SidebarItem[] = [
       label: "Quản lý tài liệu",
       icon: <FolderKanban className="h-4 w-4" />,
    },
-
    {
       to: "/tutor/wallet",
       label: "Ví của tôi",

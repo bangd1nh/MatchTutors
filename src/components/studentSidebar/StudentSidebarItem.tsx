@@ -9,11 +9,12 @@ import {
    BookOpen,
    BookCopy,
    Heart,
-   Calendar, // Thêm icon Calendar
+   Calendar,
    XCircle,
-   Star, // Thêm icon cho rejected sessions
+   Star,
    Wallet,
-   History, // Thêm icon cho ví
+   History,
+   AlertTriangle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -59,6 +60,11 @@ export const studentSidebarConfig: SidebarItem[] = [
       to: "/student/rejected-sessions",
       label: "Buổi học bị từ chối",
       icon: <XCircle className="h-4 w-4" />,
+   },
+   {
+      to: "/student/absence-sessions",
+      label: "Buổi học vắng",
+      icon: <AlertTriangle className="h-4 w-4" />,
    },
    {
       to: "/student/review-history",
