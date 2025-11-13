@@ -1,3 +1,5 @@
+import { BaseAPIResponse } from "./response";
+
 export interface TutorUser {
    _id: string;
    name: string;
@@ -74,4 +76,11 @@ export interface PaginationInfo {
 export interface TutorsApiResponse {
    data: Tutor[];
    pagination: PaginationInfo;
+}
+
+export interface ITutorSearchResponse extends BaseAPIResponse {
+   data: {
+      results: Tutor[];
+      pagination: PaginationInfo;
+   };
 }
