@@ -29,6 +29,7 @@ interface MaterialModalProps {
    isOpen?: boolean;
    onClose?: () => void;
    onSelectMaterial?: (materialId: string) => void;
+   type?: "flashcard" | "mcq" | "saq";
 }
 
 export interface AIMaterial {
@@ -49,6 +50,7 @@ const MaterialModal: React.FC<MaterialModalProps> = ({
    isOpen = false,
    onClose,
    onSelectMaterial,
+   type = "flashcard",
 }) => {
    const { fetchMaterial } = useAICreateFlashcard();
    const [searchTerm, setSearchTerm] = useState("");
@@ -56,7 +58,19 @@ const MaterialModal: React.FC<MaterialModalProps> = ({
       null
    );
 
-   const materials = (fetchMaterial.data || []) as unknown as AIMaterial[];
+   const filterPDF = (obj: AIMaterial[]): AIMaterial[] => {
+      const pdfUrls = [];
+      for (let o of obj) {
+         if (o.fileUrl.toLowerCase().endsWith(".pdf")) {
+            pdfUrls.push(o);
+         }
+      }
+      return pdfUrls;
+   };
+
+   const materials = filterPDF(
+      (fetchMaterial.data || []) as unknown as AIMaterial[]
+   );
 
    // Filter materials based on search term
    const filteredMaterials = materials.filter(
@@ -132,10 +146,10 @@ const MaterialModal: React.FC<MaterialModalProps> = ({
             <DialogHeader>
                <DialogTitle className="flex items-center gap-2">
                   <Wand2 className="h-5 w-5 text-primary" />
-                  Tạo Flashcard bằng AI từ tài liệu
+                  {`Tạo Quiz ${type.toUpperCase()} bằng AI`}
                </DialogTitle>
                <DialogDescription>
-                  Chọn tài liệu để AI tạo flashcard tự động. Tìm thấy{" "}
+                  Chọn tài liệu để AI tạo {type.toUpperCase()} tự động. Tìm thấy{" "}
                   {materials.length} tài liệu.
                </DialogDescription>
             </DialogHeader>
@@ -268,7 +282,7 @@ const MaterialModal: React.FC<MaterialModalProps> = ({
                      className="min-w-[120px]"
                   >
                      <Wand2 className="h-4 w-4 mr-2" />
-                     Tạo Flashcard
+                     {`Tạo ${type.toUpperCase()}`}
                   </Button>
                </div>
             </DialogFooter>

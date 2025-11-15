@@ -17,7 +17,7 @@ export type QuizInfoValues = {
 
 export type FlashcardQuestion = {
    // mirror subset of server IQuizQuestion for flashcard usage
-   _id: string; // client id
+   _id?: string; // client id
    order?: number;
    frontText: string;
    backText: string;
@@ -192,5 +192,3 @@ export interface ISessionAssignedQuizzesResponse extends BaseAPIResponse {
       createdAt?: string | Date;
    }[];
 }
-
-
