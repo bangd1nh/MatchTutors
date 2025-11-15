@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { getTutors, getTutorById, searchTutors } from "@/api/tutorListAndDetail";
+import {
+   getTutors,
+   getTutorById,
+   searchTutors,
+} from "@/api/tutorListAndDetail";
 import type { TutorsApiResponse, Tutor } from "@/types/tutorListandDetail";
 
 interface UseSearchTutorsOptions {
@@ -24,7 +28,10 @@ interface UseSearchTutorsOptions {
    limit?: number;
 }
 
-export const useSearchTutors = (filters: UseSearchTutorsOptions = {}) => {
+export const useSearchTutors = (
+   filters: UseSearchTutorsOptions = {},
+   p0: { enabled: any }
+) => {
    return useQuery<TutorsApiResponse>({
       queryKey: ["searchTutors", filters],
       queryFn: () => searchTutors(filters),
