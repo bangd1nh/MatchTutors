@@ -9,3 +9,10 @@ export const fetchAIFlashcard = async (
    });
    return response.data;
 };
+
+export const fetchAIMCQ = async (materialId: string): Promise<IFlashcardAI> => {
+   const response = await apiClient.post("/aiCreateQuiz/createMCQ", {
+      materialId,
+   });
+   return response.data;
+};

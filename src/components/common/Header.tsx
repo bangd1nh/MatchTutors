@@ -146,9 +146,14 @@ const getNavLinksByRole = (
    }
 
    // Kết hợp role-specific links với common auth links
-   return [...roleLinks, ...COMMON_AUTH_LINKS].sort(
-      (a, b) => (a.order || 0) - (b.order || 0)
-   );
+   let combinedLinks = [...roleLinks, ...COMMON_AUTH_LINKS];
+
+   // Sinh viên không cần xem bảng giá (chỉ dành cho tutor & guest)
+   if (isAuthenticated && role === "STUDENT") {
+      combinedLinks = combinedLinks.filter((link) => link.to !== "/pricing");
+   }
+
+   return combinedLinks.sort((a, b) => (a.order || 0) - (b.order || 0));
 };
 
 const NavLinks = ({
@@ -228,7 +233,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
    return (
       <header className="w-full sticky top-0 z-40 bg-sky-50/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
-         <div className="w-[75%] mx-auto px-4 sm:px-6 lg:px-8">
+         <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
                {/* Left: logo + admin mobile menu */}
                <div className="flex items-center gap-3 min-w-0">

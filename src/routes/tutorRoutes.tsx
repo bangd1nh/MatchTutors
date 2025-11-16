@@ -32,6 +32,7 @@ import EditShortAnswerQuiz from "@/pages/ShortAnswer/EditShortAnswerQuiz";
 import CreateShortAnswerQuiz from "@/pages/ShortAnswer/CreateShortAnswerQuiz";
 import ViewStudentMCQHistoryList from "@/pages/MultipleChoice/ViewStudentMCQHistoryList";
 import ViewMCQHistory from "@/pages/MultipleChoice/ViewMCQHistory";
+import ChatPage from "@/pages/chat/chatPage";
 
 export const tutorRoutes = {
    element: (
@@ -152,6 +153,10 @@ export const tutorRoutes = {
       {
          path: "/tutor/MCQHistory",
          element: <ViewMCQHistory />,
+      },
+      {
+         path: "/chat",
+         element: <ChatPage />,
       },
    ],
 };

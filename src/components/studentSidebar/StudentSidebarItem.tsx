@@ -15,6 +15,7 @@ import {
    Wallet,
    History,
    AlertTriangle,
+   MessageCircle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -75,6 +76,11 @@ export const studentSidebarConfig: SidebarItem[] = [
       to: "/student/wallet",
       label: "Ví của tôi",
       icon: <Wallet className="h-4 w-4" />,
+   },
+   {
+      to: "/student/chat",
+      label: "Nhắn tin",
+      icon: <MessageCircle className="h-4 w-4" />,
    },
    {
       to: "/student/MCQHistory",

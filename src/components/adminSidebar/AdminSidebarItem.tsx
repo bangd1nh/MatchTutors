@@ -59,11 +59,6 @@ const managementItems: SidebarItem[] = [
       icon: <GraduationCap className="h-5 w-5" />,
    },
    {
-      to: "/admin/teaching-requests",
-      label: "Yêu cầu dạy",
-      icon: <MessageSquare className="h-5 w-5" />,
-   },
-   {
       to: "/admin/packages",
       label: "Gói dịch vụ",
       icon: <PackageIcon className="h-5 w-5" />,

@@ -23,6 +23,8 @@ export type MultipleChoiceQuestionsFormHandle = {
    getEdited: () => MultipleChoiceQuestions[];
    getDeleted: () => { _id: string }[];
    clearChangeSets?: () => void;
+   addBulk?: (questions: MultipleChoiceQuestions[]) => void;
+   setQuestions?: (questions: MultipleChoiceQuestions[]) => void;
 };
 
 const makeId = () => Math.random().toString(36).slice(2, 9);
@@ -239,6 +241,14 @@ const MultipleChoiceQuizQuestionForm =
                deletedRef.current = [];
                editedMapRef.current = {};
                newMapRef.current = {};
+            },
+
+            setQuestions: (questions: MultipleChoiceQuestions[]) => {
+               setQuestionsState(questions);
+            },
+
+            addBulk: (questions: MultipleChoiceQuestions[]) => {
+               setQuestionsState((prev) => [...prev, ...questions]);
             },
          }),
          [questions, addQuestion, resetQuestionsInStore]

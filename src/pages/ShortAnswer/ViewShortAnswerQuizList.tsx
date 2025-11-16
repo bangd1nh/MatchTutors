@@ -6,264 +6,286 @@ import { Badge } from "@/components/ui/badge";
 import { useShortAnswerQuiz } from "@/hooks/useSAQ";
 import { IQuizInfo } from "@/types/quiz";
 import {
-    Calendar,
-    Eye,
-    Edit,
-    Trash2,
-    FileText,
-    Settings,
-    Tag,
-    Clock,
-    Users,
-    Plus,
+   Calendar,
+   Eye,
+   Edit,
+   Trash2,
+   FileText,
+   Settings,
+   Tag,
+   Users,
+   Plus,
 } from "lucide-react";
 import DeleteShortAnswerQuizModal from "./DeleteShortAnswerQuizModal";
 
 const ViewShortAnswerQuizList: React.FC = () => {
-    const { fetchList } = useShortAnswerQuiz();
-    const navigate = useNavigate();
-    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [selectedQuiz, setSelectedQuiz] = useState<{ id: string; title: string } | null>(null);
+   const { fetchList } = useShortAnswerQuiz();
+   const navigate = useNavigate();
+   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+   const [selectedQuiz, setSelectedQuiz] = useState<{
+      id: string;
+      title: string;
+   } | null>(null);
 
-    const isLoading = fetchList.isLoading;
-    const isError = fetchList.isError;
-    const data = fetchList.data;
-    const quizzes: IQuizInfo[] = Array.isArray(data?.data) ? data!.data : [];
+   const isLoading = fetchList.isLoading;
+   const isError = fetchList.isError;
+   const data = fetchList.data;
+   const quizzes: IQuizInfo[] = Array.isArray(data?.data) ? data!.data : [];
 
-    const handleDeleteClick = (quizId: string, quizTitle: string) => {
-        setSelectedQuiz({ id: quizId, title: quizTitle });
-        setDeleteModalOpen(true);
-    };
+   const handleDeleteClick = (quizId: string, quizTitle: string) => {
+      setSelectedQuiz({ id: quizId, title: quizTitle });
+      setDeleteModalOpen(true);
+   };
 
-    const handleDeleteClose = () => {
-        setDeleteModalOpen(false);
-        setSelectedQuiz(null);
-    };
+   const handleDeleteClose = () => {
+      setDeleteModalOpen(false);
+      setSelectedQuiz(null);
+   };
 
-    if (isLoading) {
-        return (
-            <div className="min-h-[400px] flex flex-col items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-                <div className="text-lg text-muted-foreground">
-                    Đang tải danh sách quiz...
-                </div>
+   if (isLoading) {
+      return (
+         <div className="min-h-[400px] flex flex-col items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+            <div className="text-lg text-muted-foreground">
+               Đang tải danh sách quiz...
             </div>
-        );
-    }
+         </div>
+      );
+   }
 
-    if (isError) {
-        return (
-            <div className="min-h-[400px] flex flex-col items-center justify-center">
-                <FileText className="h-16 w-16 text-red-400 mb-4" />
-                <div className="text-lg text-red-400 mb-2">
-                    Không tải được danh sách quiz
-                </div>
-                <div className="text-sm text-muted-foreground">
-                    Vui lòng thử lại sau
-                </div>
+   if (isError) {
+      return (
+         <div className="min-h-[400px] flex flex-col items-center justify-center">
+            <FileText className="h-16 w-16 text-red-400 mb-4" />
+            <div className="text-lg text-red-400 mb-2">
+               Không tải được danh sách quiz
             </div>
-        );
-    }
-
-    if (!quizzes.length) {
-        return (
-            <div className="min-h-[400px] flex flex-col items-center justify-center">
-                <FileText className="h-20 w-20 text-muted-foreground mb-6" />
-                <div className="text-xl text-muted-foreground mb-2">
-                    Chưa có short answer quiz nào
-                </div>
-                <div className="text-sm text-muted-foreground mb-4">
-                    Tạo quiz đầu tiên của bạn
-                </div>
-                <Button
-                    onClick={() => navigate("/tutor/createShortAnswer")}
-                    className="px-6"
-                >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Tạo Quiz mới
-                </Button>
+            <div className="text-sm text-muted-foreground">
+               Vui lòng thử lại sau
             </div>
-        );
-    }
+         </div>
+      );
+   }
 
-    return (
-        <>
-            <div className="mx-auto p-6">
-                {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-foreground mb-2">
-                        Danh sách Short Answer Quiz
-                    </h1>
-                    <p className="text-muted-foreground">
-                        Quản lý và xem các bộ quiz tự luận của bạn
-                    </p>
-                </div>
+   if (!quizzes.length) {
+      return (
+         <div className="min-h-[400px] flex flex-col items-center justify-center">
+            <FileText className="h-20 w-20 text-muted-foreground mb-6" />
+            <div className="text-xl text-muted-foreground mb-2">
+               Chưa có short answer quiz nào
+            </div>
+            <div className="text-sm text-muted-foreground mb-4">
+               Tạo quiz đầu tiên của bạn
+            </div>
+            <Button
+               onClick={() => navigate("/tutor/createShortAnswer")}
+               className="px-6"
+            >
+               <Plus className="h-4 w-4 mr-2" />
+               Tạo Quiz mới
+            </Button>
+         </div>
+      );
+   }
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {quizzes.map((q: IQuizInfo) => (
-                        <Card
-                            key={q._id}
-                            className="group hover:shadow-xl transition-all duration-300 border-l-4 border-l-green-500/50 hover:border-l-green-500 bg-gradient-to-br from-card to-card/50"
-                        >
-                            <CardHeader className="pb-4">
-                                <div className="flex items-start justify-between gap-4">
-                                    <div className="flex-1 min-w-0">
-                                        <CardTitle className="text-xl font-semibold mb-2 line-clamp-2 group-hover:text-green-600 transition-colors">
-                                            {q.title}
-                                        </CardTitle>
-                                        <p className="text-sm text-muted-foreground line-clamp-2">
-                                            {q.description || "Không có mô tả"}
-                                        </p>
-                                    </div>
+   return (
+      <>
+         <div className="mx-auto p-6">
+            {/* Header */}
+            <div className="mb-8">
+               <h1 className="text-3xl font-bold text-foreground mb-2">
+                  Danh sách Short Answer Quiz
+               </h1>
+               <p className="text-muted-foreground">
+                  Quản lý và xem các bộ quiz tự luận của bạn
+               </p>
+            </div>
 
-                                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                                        <Badge
-                                            variant="default"
-                                            className="bg-green-500/10 text-green-600 border-green-500/20 font-medium"
-                                        >
-                                            {String(q.quizType ?? "SHORT_ANSWER")}
-                                        </Badge>
-                                        <Badge
-                                            variant="secondary"
-                                            className="bg-secondary/50"
-                                        >
-                                            {String(q.quizMode ?? "STUDY")}
-                                        </Badge>
-                                    </div>
-                                </div>
-                            </CardHeader>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+               {quizzes.map((q: IQuizInfo) => (
+                  <Card
+                     key={q._id}
+                     className="group hover:shadow-xl transition-all duration-300 border-l-4 border-l-green-500/50 hover:border-l-green-500 bg-gradient-to-br from-card to-card/50"
+                  >
+                     <CardHeader className="pb-4">
+                        <div className="flex items-start justify-between gap-4">
+                           <div className="flex-1 min-w-0">
+                              <CardTitle className="text-xl font-semibold mb-2 line-clamp-2 group-hover:text-green-600 transition-colors">
+                                 {q.title}
+                              </CardTitle>
+                              <p className="text-sm text-muted-foreground line-clamp-2">
+                                 {q.description || "Không có mô tả"}
+                              </p>
+                           </div>
 
-                            <CardContent className="space-y-4">
-                                {/* Stats Row */}
-                                <div className="flex items-center justify-between bg-secondary/20 rounded-lg p-3">
-                                    <div className="flex items-center gap-2">
-                                        <Users className="h-4 w-4 text-green-600" />
-                                        <span className="text-sm font-medium">
-                                            {q.totalQuestions ?? 0} câu hỏi
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-sm text-muted-foreground">
-                                            {q.createdAt
-                                                ? new Date(q.createdAt).toLocaleDateString("vi-VN")
-                                                : "—"}
-                                        </span>
-                                    </div>
-                                </div>
+                           <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                              <Badge
+                                 variant="default"
+                                 className="bg-green-500/10 text-green-600 border-green-500/20 font-medium"
+                              >
+                                 {String(q.quizType ?? "SHORT_ANSWER")}
+                              </Badge>
+                              <Badge
+                                 variant="secondary"
+                                 className="bg-secondary/50"
+                              >
+                                 {String(q.quizMode ?? "STUDY")}
+                              </Badge>
+                           </div>
+                        </div>
+                     </CardHeader>
 
-                                {/* Tags */}
-                                {q.tags && q.tags.length > 0 && (
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                            <Tag className="h-4 w-4 text-muted-foreground" />
-                                            <span className="text-sm font-medium">Tags:</span>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {q.tags.slice(0, 4).map((tag: string, index) => (
-                                                <Badge
-                                                    key={index}
-                                                    variant="outline"
-                                                    className="text-xs bg-background/50"
-                                                >
-                                                    {tag}
-                                                </Badge>
-                                            ))}
-                                            {q.tags.length > 4 && (
-                                                <Badge variant="outline" className="text-xs">
-                                                    +{q.tags.length - 4} khác
-                                                </Badge>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
+                     <CardContent className="space-y-4">
+                        {/* Stats Row */}
+                        <div className="flex items-center justify-between bg-secondary/20 rounded-lg p-3">
+                           <div className="flex items-center gap-2">
+                              <Users className="h-4 w-4 text-green-600" />
+                              <span className="text-sm font-medium">
+                                 {q.totalQuestions ?? 0} câu hỏi
+                              </span>
+                           </div>
+                           <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm text-muted-foreground">
+                                 {q.createdAt
+                                    ? new Date(q.createdAt).toLocaleDateString(
+                                         "vi-VN"
+                                      )
+                                    : "—"}
+                              </span>
+                           </div>
+                        </div>
 
-                                {/* Settings */}
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <Settings className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-sm font-medium">Cài đặt:</span>
-                                    </div>
-                                    <div className="text-xs text-muted-foreground space-y-1">
-                                        {q.settings ? (
-                                            <>
-                                                <div className="flex items-center justify-between">
-                                                    <span>Xáo trộn câu hỏi:</span>
-                                                    <Badge
-                                                        variant={
-                                                            q.settings.shuffleQuestions
-                                                                ? "default"
-                                                                : "secondary"
-                                                        }
-                                                        className="text-xs"
-                                                    >
-                                                        {q.settings.shuffleQuestions ? "Có" : "Không"}
-                                                    </Badge>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <span className="italic">Chưa có cài đặt nào</span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Action Buttons */}
-                                <div className="flex items-center gap-2 pt-2 border-t">
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="flex-1 gap-2 hover:bg-green-500 hover:text-white transition-colors"
-                                        onClick={() =>
-                                            navigate(
-                                                `/tutor/shortAnswer?shortAnswerId=${q._id}`
-                                            )
-                                        }
+                        {/* Tags */}
+                        {q.tags && q.tags.length > 0 && (
+                           <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                 <Tag className="h-4 w-4 text-muted-foreground" />
+                                 <span className="text-sm font-medium">
+                                    Tags:
+                                 </span>
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                 {q.tags
+                                    .slice(0, 4)
+                                    .map((tag: string, index) => (
+                                       <Badge
+                                          key={index}
+                                          variant="outline"
+                                          className="text-xs bg-background/50"
+                                       >
+                                          {tag}
+                                       </Badge>
+                                    ))}
+                                 {q.tags.length > 4 && (
+                                    <Badge
+                                       variant="outline"
+                                       className="text-xs"
                                     >
-                                        <Eye className="h-4 w-4" />
-                                        Xem
-                                    </Button>
+                                       +{q.tags.length - 4} khác
+                                    </Badge>
+                                 )}
+                              </div>
+                           </div>
+                        )}
 
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="flex-1 gap-2 hover:bg-blue-500 hover:text-white transition-colors"
-                                        onClick={() =>
-                                            navigate(
-                                                `/tutor/editShortAnswer?shortAnswerId=${q._id}`
-                                            )
-                                        }
-                                    >
-                                        <Edit className="h-4 w-4" />
-                                        Sửa
-                                    </Button>
+                        {/* Settings */}
+                        <div className="space-y-2">
+                           <div className="flex items-center gap-2">
+                              <Settings className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">
+                                 Cài đặt:
+                              </span>
+                           </div>
+                           <div className="text-xs text-muted-foreground space-y-1">
+                              {q.settings ? (
+                                 <>
+                                    <div className="flex items-center justify-between">
+                                       <span>Xáo trộn câu hỏi:</span>
+                                       <Badge
+                                          variant={
+                                             q.settings.shuffleQuestions
+                                                ? "default"
+                                                : "secondary"
+                                          }
+                                          className="text-xs"
+                                       >
+                                          {q.settings.shuffleQuestions
+                                             ? "Có"
+                                             : "Không"}
+                                       </Badge>
+                                    </div>
+                                 </>
+                              ) : (
+                                 <span className="italic">
+                                    Chưa có cài đặt nào
+                                 </span>
+                              )}
+                           </div>
+                        </div>
 
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="gap-2 hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                                        onClick={() => handleDeleteClick(q._id, q.title || "Untitled Quiz")}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                        Xóa
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+                        {/* Action Buttons */}
+                        <div className="flex items-center gap-2 pt-2 border-t">
+                           <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1 gap-2 hover:bg-green-500 hover:text-white transition-colors"
+                              onClick={() =>
+                                 navigate(
+                                    `/tutor/shortAnswer?shortAnswerId=${q._id}`
+                                 )
+                              }
+                           >
+                              <Eye className="h-4 w-4" />
+                              Xem
+                           </Button>
+
+                           <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1 gap-2 hover:bg-blue-500 hover:text-white transition-colors"
+                              onClick={() =>
+                                 navigate(
+                                    `/tutor/editShortAnswer?shortAnswerId=${q._id}`
+                                 )
+                              }
+                           >
+                              <Edit className="h-4 w-4" />
+                              Sửa
+                           </Button>
+
+                           <Button
+                              size="sm"
+                              variant="outline"
+                              className="gap-2 hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                              onClick={() =>
+                                 handleDeleteClick(
+                                    q._id,
+                                    q.title || "Untitled Quiz"
+                                 )
+                              }
+                           >
+                              <Trash2 className="h-4 w-4" />
+                              Xóa
+                           </Button>
+                        </div>
+                     </CardContent>
+                  </Card>
+               ))}
             </div>
+         </div>
 
-            {/* Delete Modal */}
-            {selectedQuiz && (
-                <DeleteShortAnswerQuizModal
-                    quizId={selectedQuiz.id}
-                    isOpen={deleteModalOpen}
-                    onClose={handleDeleteClose}
-                    quizTitle={selectedQuiz.title}
-                />
-            )}
-        </>
-    );
+         {/* Delete Modal */}
+         {selectedQuiz && (
+            <DeleteShortAnswerQuizModal
+               quizId={selectedQuiz.id}
+               isOpen={deleteModalOpen}
+               onClose={handleDeleteClose}
+               quizTitle={selectedQuiz.title}
+            />
+         )}
+      </>
+   );
 };
 
 export default ViewShortAnswerQuizList;

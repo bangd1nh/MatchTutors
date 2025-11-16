@@ -14,6 +14,8 @@ import type { Tutor } from "@/types/tutorListandDetail";
 import { useUser } from "@/hooks/useUser";
 import { TeachingRequestDialog } from "./TeachingRequestDialog";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { chatApi } from "@/api/chat";
 
 interface TutorContactCardProps {
    tutor: Tutor;
@@ -35,6 +37,31 @@ export function TutorContactCard({ tutor }: TutorContactCardProps) {
       if (user?.role === "STUDENT") {
          setIsRequestDialogOpen(true);
       }
+   };
+
+   // Thêm mutation để tạo conversation
+   const createConversationMutation = useMutation({
+      mutationFn: (userId: string) => chatApi.getOrCreateConversation(userId),
+      onSuccess: (data) => {
+         // Navigate với conversationId thay vì userId
+         navigate(`/student/chat?conversationId=${data.data._id}`);
+      },
+      onError: (error) => {
+         console.error("Lỗi tạo conversation:", error);
+         // Có thể hiển thị toast lỗi nếu cần
+      },
+   });
+
+   // Thêm handler cho nút nhắn tin
+   const handleMessageClick = () => {
+      if (!isAuthenticated) {
+         navigate("/login");
+         return;
+      }
+      const userId =
+         typeof tutor.userId === "string" ? tutor.userId : tutor.userId._id;
+      // Gọi mutation để tạo conversation trước
+      createConversationMutation.mutate(userId);
    };
 
    const maskContact = (contact: string, type: "phone" | "email"): string => {
@@ -95,6 +122,7 @@ export function TutorContactCard({ tutor }: TutorContactCardProps) {
                   size="lg"
                   variant="outline"
                   className="w-full border-gray-200 hover:bg-gray-50 hover:border-gray-300 h-12 text-base font-medium"
+                  onClick={handleMessageClick}
                >
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Nhắn tin
