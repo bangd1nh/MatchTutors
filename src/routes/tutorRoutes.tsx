@@ -33,6 +33,7 @@ import CreateShortAnswerQuiz from "@/pages/ShortAnswer/CreateShortAnswerQuiz";
 import ViewStudentMCQHistoryList from "@/pages/MultipleChoice/ViewStudentMCQHistoryList";
 import ViewMCQHistory from "@/pages/MultipleChoice/ViewMCQHistory";
 import ChatPage from "@/pages/chat/chatPage";
+import ViewSAQHistory from "@/pages/ShortAnswer/ViewSAQHistory";
 
 export const tutorRoutes = {
    element: (
@@ -153,6 +154,10 @@ export const tutorRoutes = {
       {
          path: "/tutor/MCQHistory",
          element: <ViewMCQHistory />,
+      },
+      {
+         path: "/tutor/SAQHistory",
+         element: <ViewSAQHistory />,
       },
       {
          path: "/chat",

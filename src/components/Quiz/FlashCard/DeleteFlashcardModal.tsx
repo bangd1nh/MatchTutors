@@ -39,6 +39,7 @@ interface DeleteFlashcardModalProps {
    isOpen: boolean;
    onClose: () => void;
    quizTitle?: string;
+   type: string;
 }
 
 const DeleteFlashcardModal: React.FC<DeleteFlashcardModalProps> = ({
@@ -46,9 +47,10 @@ const DeleteFlashcardModal: React.FC<DeleteFlashcardModalProps> = ({
    isOpen,
    onClose,
    quizTitle,
+   type,
 }) => {
-   const { data, isLoading, isError } = useSessionAssignedQuizzes(quizId);
-   const deleteQuiz = useDeleteFlashcard();
+   const { data, isLoading, isError } = useSessionAssignedQuizzes(quizId, type);
+   const deleteQuiz = useDeleteFlashcard(type);
    const navigate = useNavigate();
    const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
 

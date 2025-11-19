@@ -80,7 +80,7 @@ const ViewStudentMCQHistoryList = () => {
 
          const matchesQuizMode =
             selectedQuizMode === "all" ||
-            submission.quizId.quizMode === selectedQuizMode;
+            submission.quizId.quizType === selectedQuizMode;
 
          return matchesSearch && matchesQuizMode;
       });
@@ -120,7 +120,7 @@ const ViewStudentMCQHistoryList = () => {
 
    // Get unique quiz modes for filter
    const uniqueQuizModes = Array.from(
-      new Set(submissionHistory.map((s) => s.quizId.quizMode))
+      new Set(submissionHistory.map((s) => s.quizId.quizType))
    );
 
    if (tutorHistory.isLoading) {
@@ -428,9 +428,17 @@ const ViewStudentMCQHistoryList = () => {
                                  variant="outline"
                                  size="sm"
                                  onClick={() => {
-                                    navigate(
-                                       `/tutor/MCQHistory?quizId=${submission._id}`
-                                    );
+                                    if (
+                                       submission.quizId.quizType ===
+                                       "MULTIPLE_CHOICE"
+                                    )
+                                       navigate(
+                                          `/tutor/MCQHistory?quizId=${submission._id}`
+                                       );
+                                    else
+                                       navigate(
+                                          `/tutor/SAQHistory?quizId=${submission._id}`
+                                       );
                                  }}
                               >
                                  <Eye className="h-4 w-4 mr-2" />
