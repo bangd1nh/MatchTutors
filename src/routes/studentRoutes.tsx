@@ -16,10 +16,12 @@ import RejectedSessionsPage from "@/pages/RejectedSessionsPage"; // Import trang
 import { StudentReviewHistory } from "@/pages/Review/StudentReviewHistory";
 import SessionDetailPage from "@/pages/SessionDetailPage";
 import { LearningCommitmentsPage } from "@/pages/Student/LearningCommitmentsPage";
+
 import WalletManagement from "@/pages/wallet/walletManagement";
 import DoMCQ from "@/pages/MultipleChoice/DoMCQ";
 import ViewMCQHistoryList from "@/pages/MultipleChoice/ViewMCQHistoryList";
 import ViewMCQHistory from "@/pages/MultipleChoice/ViewMCQHistory";
+import PaymentHistoryPage from "@/pages/paymentTutor/paymentStudent";
 
 // import SessionDetailPage from "@/pages/SessionDetailPage"; // Moved to sharedRoutes
 
@@ -137,6 +139,10 @@ export const studentRoutes = {
       {
          path: "/student/learning-commitments",
          element: <LearningCommitmentsPage />,
+      },
+      {
+         path: "/student/payment-history",
+         element: <PaymentHistoryPage />,
       },
       {
          path: "/student/wallet",

@@ -1,6 +1,6 @@
 import ProtectedRoute from "./ProtectedRoute";
 import OverviewPage from "../pages/dashboard/OverviewPage";
-import JobManage from "@/pages/Employer/JobManage";
+
 import ProfilePage from "@/pages/Profilepage";
 import TutorProfile from "@/pages/TutorProfile/TutorProfile";
 import TutorLayout from "@/layouts/TutorLayout";
@@ -30,6 +30,7 @@ import EditShortAnswerQuiz from "@/pages/ShortAnswer/EditShortAnswerQuiz";
 import CreateShortAnswerQuiz from "@/pages/ShortAnswer/CreateShortAnswerQuiz";
 import ViewStudentMCQHistoryList from "@/pages/MultipleChoice/ViewStudentMCQHistoryList";
 import ViewMCQHistory from "@/pages/MultipleChoice/ViewMCQHistory";
+import PaymentTutorPage from "@/pages/paymentTutor/paymentTutor";
 
 export const tutorRoutes = {
    element: (
@@ -48,22 +49,14 @@ export const tutorRoutes = {
          element: <TeachingRequestDetail />,
       },
       {
-         path: "/tutor/schedule", // Thêm route mới
+         path: "/tutor/schedule",
          element: <SchedulePage />,
       },
       {
          path: "/tutor/learning-commitments",
          element: <LearningCommitmentsPage />,
       },
-      {
-         // Session detail route moved to sharedRoutes (accessible by both roles)
-         // path: "/session/:id",
-         // element: <SessionDetailPage />,
-      },
-      {
-         path: "/tutor/jobs",
-         element: <JobManage />,
-      },
+
       {
          path: "/tutor/createFlashcardQuiz",
          element: <CreateFlashcardQuiz />,
@@ -116,7 +109,6 @@ export const tutorRoutes = {
          path: "/tutor/editShortAnswer",
          element: <EditShortAnswerQuiz />,
       },
-
       {
          path: "/tutor/review-list",
          element: <ReviewList />,
@@ -134,16 +126,16 @@ export const tutorRoutes = {
          element: <SessionDetailPage />,
       },
       {
-         path: "/tutor/session/:id",
-         element: <SessionDetailPage />,
-      },
-      {
          path: "/tutor/create-material",
          element: <CreateMaterialPage />,
       },
       {
          path: "/tutor/material-management",
          element: <MaterialManagementPage />,
+      },
+      {
+         path: "/tutor/payment-history",
+         element: <PaymentTutorPage />,
       },
       {
          path: "/tutor/studentMCQHistoryList",

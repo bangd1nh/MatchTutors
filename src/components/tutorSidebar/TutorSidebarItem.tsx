@@ -15,6 +15,7 @@ import {
    FolderKanban,
    Wallet,
    History,
+   CreditCard,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -101,13 +102,16 @@ export const tutorSidebarConfig: SidebarItem[] = [
       label: "Quản lý tài liệu",
       icon: <FolderKanban className="h-4 w-4" />,
    },
-
    {
       to: "/tutor/wallet",
       label: "Ví của tôi",
       icon: <Wallet className="h-4 w-4" />,
    },
-
+   {
+      to: "/tutor/payment-history",
+      label: "Lịch sử thanh toán",
+      icon: <CreditCard className="h-4 w-4" />,
+   },
    {
       to: "/tutor/studentMCQHistoryList",
       label: "Lịch sử làm bài",

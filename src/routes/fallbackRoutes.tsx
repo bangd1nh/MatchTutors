@@ -1,19 +1,13 @@
+import ForbiddenPage from "../components/common/403Page";
+import NotFoundPage from "../components/common/404Page";
+
 export const fallbackRoutes = [
-    {
-        path: "/unauthorized",
-        element: (
-            <div>
-                <h1>403 - Unauthorized</h1>
-                <p>You do not have permission to access this page.</p>
-            </div>
-        ),
-    },
-    {
-        path: "*",
-        element: (
-            <div>
-                <h1>404 - Not Found</h1>
-            </div>
-        ),
-    },
+   {
+      path: "/unauthorized",
+      element: <ForbiddenPage />,
+   },
+   {
+      path: "*",
+      element: <NotFoundPage />,
+   },
 ];
