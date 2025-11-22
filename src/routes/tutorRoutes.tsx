@@ -11,8 +11,10 @@ import EditFlashcardQuiz from "@/pages/Flashcard/EditFlashcardQuiz";
 import TutorProfilePage from "@/pages/TutorProfile/TutorProfilePage";
 import TeachingRequestsList from "@/pages/Tutor/TeachingRequestsList";
 import TeachingRequestDetail from "@/pages/Tutor/TeachingRequestDetail";
+import StudentProfileForTutor from "@/pages/Tutor/StudentProfileForTutor";
 import SchedulePage from "@/pages/SchedulePage"; // Import trang mới
 import RejectedSessionsPage from "@/pages/RejectedSessionsPage"; // Import trang rejected sessions
+import AbsenceSessionPage from "@/pages/absenceSession";
 import CreateMultipleChoiceQuiz from "@/pages/MultipleChoice/CreateMultipleChoiceQuiz";
 import ViewMultipleQuizList from "@/pages/MultipleChoice/ViewMultipleQuizList";
 import ViewMultipleChoiceQuiz from "@/pages/MultipleChoice/ViewMultipleChoiceQuiz";
@@ -31,6 +33,8 @@ import CreateShortAnswerQuiz from "@/pages/ShortAnswer/CreateShortAnswerQuiz";
 import ViewStudentMCQHistoryList from "@/pages/MultipleChoice/ViewStudentMCQHistoryList";
 import ViewMCQHistory from "@/pages/MultipleChoice/ViewMCQHistory";
 import PaymentTutorPage from "@/pages/paymentTutor/paymentTutor";
+import ChatPage from "@/pages/chat/chatPage";
+import ViewSAQHistory from "@/pages/ShortAnswer/ViewSAQHistory";
 
 export const tutorRoutes = {
    element: (
@@ -49,6 +53,10 @@ export const tutorRoutes = {
          element: <TeachingRequestDetail />,
       },
       {
+         path: "/tutor/student-profile/:studentUserId",
+         element: <StudentProfileForTutor />,
+      },
+      {
          path: "/tutor/schedule",
          element: <SchedulePage />,
       },
@@ -56,7 +64,6 @@ export const tutorRoutes = {
          path: "/tutor/learning-commitments",
          element: <LearningCommitmentsPage />,
       },
-
       {
          path: "/tutor/createFlashcardQuiz",
          element: <CreateFlashcardQuiz />,
@@ -84,6 +91,10 @@ export const tutorRoutes = {
       {
          path: "/tutor/rejected-sessions",
          element: <RejectedSessionsPage />,
+      },
+      {
+         path: "/tutor/absence-sessions",
+         element: <AbsenceSessionPage />,
       },
       {
          path: "/tutor/MultipleChoiceList",
@@ -144,6 +155,14 @@ export const tutorRoutes = {
       {
          path: "/tutor/MCQHistory",
          element: <ViewMCQHistory />,
+      },
+      {
+         path: "/tutor/SAQHistory",
+         element: <ViewSAQHistory />,
+      },
+      {
+         path: "/chat",
+         element: <ChatPage />,
       },
    ],
 };

@@ -21,7 +21,7 @@ import DeleteFlashcardModal from "@/components/Quiz/FlashCard/DeleteFlashcardMod
 const FlashcardQuizList: React.FC = () => {
    const { data, isLoading, isError } = useFetchQuizByTutor();
    const navigate = useNavigate();
-   const deleteQuiz = useDeleteFlashcard();
+   const deleteQuiz = useDeleteFlashcard("flashcard");
    const [selectedQuizForDelete, setSelectedQuizForDelete] = useState<
       string | null
    >(null);
@@ -272,6 +272,7 @@ const FlashcardQuizList: React.FC = () => {
 
          {selectedQuizForDelete && (
             <DeleteFlashcardModal
+               type="flashcard"
                quizId={selectedQuizForDelete}
                isOpen={!!selectedQuizForDelete}
                onClose={() => setSelectedQuizForDelete(null)}

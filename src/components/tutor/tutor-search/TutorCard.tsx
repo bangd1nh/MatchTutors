@@ -2,7 +2,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, MapPin, Clock, Heart, User, Users, Award } from "lucide-react";
+import {
+   Star,
+   MapPin,
+   Clock,
+   Heart,
+   Users,
+   Award,
+   GraduationCap,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Tutor, TutorUser } from "@/types/tutorListandDetail";
 import { useNavigate } from "react-router-dom";
@@ -42,9 +50,13 @@ export function TutorCard({ tutor }: TutorCardProps) {
       }
    };
 
-   // const [isSaved, setIsSaved] = useState(isFav?.isFav);
-   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-   const availableDays = (tutor.availability ?? []).map((a) => a.dayOfWeek);
+   const dayNames = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+
+   // Fix availability logic - only show days that have actual time slots
+   const availableDaysWithSlots = (tutor.availability ?? [])
+      .filter((a) => a.slots && a.slots.length > 0)
+      .map((a) => a.dayOfWeek);
+
    const navigate = useNavigate();
 
    const tutorUser: TutorUser =
@@ -56,32 +68,65 @@ export function TutorCard({ tutor }: TutorCardProps) {
       navigate(`/tutor-detail/${_id}`);
    }
 
+   // Format price in VND
+   const formatPrice = (price: number) => {
+      return new Intl.NumberFormat("vi-VN", {
+         style: "currency",
+         currency: "VND",
+         minimumFractionDigits: 0,
+      }).format(price);
+   };
+
    return (
-      <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-border/60">
-         <CardContent className="p-5">
-            <div className="flex flex-col gap-4">
+      <Card className="group overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm">
+         <CardContent className="p-6">
+            <div className="space-y-4">
                {/* Header Section */}
                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                     <Avatar className="h-14 w-14 border-2 border-primary/10">
-                        <AvatarImage
-                           src={tutorUser.avatarUrl || "/placeholder.svg"}
-                           alt={tutorUser.name}
-                        />
-                        <AvatarFallback className="bg-primary/10">
-                           <User className="h-6 w-6 text-primary" />
-                        </AvatarFallback>
-                     </Avatar>
-                     <div>
+                  <div className="flex items-center gap-4">
+                     <div className="relative">
+                        <Avatar className="h-16 w-16 border-3 border-white shadow-lg ring-2 ring-primary/10">
+                           <AvatarImage
+                              src={tutorUser.avatarUrl || "/placeholder.svg"}
+                              alt={tutorUser.name}
+                              className="object-cover"
+                           />
+                           <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold text-lg">
+                              {tutorUser.name.charAt(0).toUpperCase()}
+                           </AvatarFallback>
+                        </Avatar>
+                     </div>
+                     <div className="flex-1">
                         <h3
-                           className="text-lg font-semibold cursor-pointer hover:text-primary transition-colors"
+                           className="text-xl font-bold text-gray-900 cursor-pointer hover:text-primary transition-colors group-hover:text-primary"
                            onClick={() => onViewProfile(tutor._id)}
                         >
                            {tutorUser.name}
                         </h3>
-                        <div className="flex items-center text-muted-foreground text-sm mt-1">
-                           <MapPin className="h-3.5 w-3.5 mr-1" />
-                           <span>{tutorUser.address?.city || "N/A"}</span>
+                        <div className="flex items-center text-gray-500 text-sm mt-1">
+                           <MapPin className="h-4 w-4 mr-1.5" />
+                           <span>
+                              {tutorUser.address?.city || "Chưa cập nhật"}
+                           </span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                           <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                 <Star
+                                    key={i}
+                                    className={cn(
+                                       "h-4 w-4",
+                                       tutor.ratings &&
+                                          i < Math.floor(tutor.ratings.average)
+                                          ? "fill-amber-400 text-amber-400"
+                                          : "text-gray-200"
+                                    )}
+                                 />
+                              ))}
+                              <span className="text-sm text-gray-500 ml-1">
+                                 ({tutor.ratings?.totalReviews ?? 0})
+                              </span>
+                           </div>
                         </div>
                      </div>
                   </div>
@@ -90,89 +135,90 @@ export function TutorCard({ tutor }: TutorCardProps) {
                      variant="ghost"
                      size="icon"
                      onClick={() => handleFav(tutor._id)}
-                     className="h-8 w-8 rounded-full"
+                     className="h-10 w-10 rounded-full hover:bg-red-50 transition-colors"
                   >
                      <Heart
                         className={cn(
-                           "h-4 w-4",
+                           "h-5 w-5 transition-colors",
                            isFav?.isFav === true && isFav?.tutorId === tutor._id
                               ? "fill-red-500 text-red-500"
-                              : ""
+                              : "text-gray-400 hover:text-red-400"
                         )}
                      />
                   </Button>
                </div>
 
-               {/* Rating and Class Type */}
-               <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                     {[...Array(5)].map((_, i) => (
-                        <Star
-                           key={i}
-                           className={cn(
-                              "h-4 w-4",
-                              tutor.ratings &&
-                                 i < Math.floor(tutor.ratings.average)
-                                 ? "fill-yellow-400 text-yellow-400"
-                                 : "text-gray-300"
-                           )}
-                        />
-                     ))}
-                     <span className="text-sm text-muted-foreground ml-1">
-                        ({tutor.ratings?.totalReviews ?? 0})
-                     </span>
+               {/* Price and Experience - Prominent Display */}
+               <div className="bg-gradient-to-r from-primary/5 to-primary/10 p-4 rounded-xl border border-primary/10">
+                  <div className="flex items-center justify-between">
+                     <div>
+                        <p className="text-sm text-gray-600 mb-1">Học phí</p>
+                        <p className="text-2xl font-bold text-primary">
+                           {formatPrice(tutor.hourlyRate || 0)}
+                           <span className="text-sm font-normal text-gray-500 ml-1">
+                              /giờ
+                           </span>
+                        </p>
+                     </div>
+                     <div className="text-right">
+                        <p className="text-sm text-gray-600 mb-1">
+                           Kinh nghiệm
+                        </p>
+                        <div className="flex items-center gap-1">
+                           <GraduationCap className="h-4 w-4 text-primary" />
+                           <span className="text-lg font-semibold text-gray-900">
+                              {tutor.experienceYears}+ năm
+                           </span>
+                        </div>
+                     </div>
                   </div>
+               </div>
 
-                  <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-full">
-                     <Users className="h-3.5 w-3.5 text-primary" />
-                     <span className="text-xs font-medium text-primary">
+               {/* Class Type */}
+               <div className="flex items-center justify-center">
+                  <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
+                     <Users className="h-4 w-4 text-blue-600" />
+                     <span className="text-sm font-medium text-blue-700">
                         {Array.isArray(tutor.classType)
-                           ? tutor.classType.join(", ")
+                           ? tutor.classType
+                                .map((type) =>
+                                   type === "ONLINE"
+                                      ? "Trực tuyến"
+                                      : type === "IN_PERSON"
+                                      ? "Tại nhà"
+                                      : type
+                                )
+                                .join(" • ")
                            : tutor.classType ?? ""}
                      </span>
                   </div>
                </div>
 
-               {/* Price and Experience */}
-               <div className="flex items-center justify-between bg-muted/40 p-3 rounded-lg">
-                  <div>
-                     <p className="text-xs text-muted-foreground">
-                        Starting from
-                     </p>
-                     <p className="text-xl font-bold text-primary">
-                        ${tutor.hourlyRate}
-                        <span className="text-sm font-normal text-muted-foreground">
-                           /hr
-                        </span>
-                     </p>
-                  </div>
-
-                  <div className="text-right">
-                     <p className="text-xs text-muted-foreground">Experience</p>
-                     <p className="text-sm font-medium">
-                        {tutor.experienceYears}+ years
-                     </p>
-                  </div>
-               </div>
                {/* Availability */}
                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                     <Clock className="h-4 w-4 text-muted-foreground" />
-                     <span className="text-sm font-medium">Availability</span>
+                  <div className="flex items-center gap-2 mb-3">
+                     <Clock className="h-4 w-4 text-gray-500" />
+                     <span className="text-sm font-medium text-gray-700">
+                        Lịch rảnh
+                     </span>
                   </div>
-                  <div className="flex gap-1 justify-between">
+                  <div className="flex gap-2 justify-between">
                      {dayNames.map((day, index) => (
                         <div
                            key={day}
                            className={cn(
-                              "w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-colors",
-                              availableDays.includes(index)
-                                 ? "bg-primary text-primary-foreground shadow-sm"
-                                 : "bg-muted text-muted-foreground opacity-50"
+                              "flex-1 h-10 rounded-lg flex items-center justify-center text-sm font-medium transition-all duration-200",
+                              availableDaysWithSlots.includes(index)
+                                 ? "bg-primary text-white shadow-md transform scale-105"
+                                 : "bg-gray-100 text-gray-400"
                            )}
-                           title={day}
+                           title={`${day}${
+                              availableDaysWithSlots.includes(index)
+                                 ? " - Có lịch"
+                                 : " - Không có lịch"
+                           }`}
                         >
-                           {day.charAt(0)}
+                           {day}
                         </div>
                      ))}
                   </div>
@@ -180,43 +226,45 @@ export function TutorCard({ tutor }: TutorCardProps) {
 
                {/* Subjects */}
                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                     <Award className="h-4 w-4 text-muted-foreground" />
-                     <span className="text-sm font-medium">Subjects</span>
+                  <div className="flex items-center gap-2 mb-3">
+                     <Award className="h-4 w-4 text-gray-500" />
+                     <span className="text-sm font-medium text-gray-700">
+                        Môn học
+                     </span>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                     {(tutor.subjects ?? []).slice(0, 3).map((subject) => (
+                     {(tutor.subjects ?? []).slice(0, 4).map((subject) => (
                         <Badge
                            key={subject}
                            variant="secondary"
-                           className="text-xs py-1 rounded-md"
+                           className="text-xs py-1.5 px-3 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
                         >
                            {subject}
                         </Badge>
                      ))}
 
-                     {(tutor.subjects?.length ?? 0) > 3 && (
+                     {(tutor.subjects?.length ?? 0) > 4 && (
                         <Popover>
                            <PopoverTrigger asChild>
                               <Badge
                                  variant="outline"
-                                 className="text-xs py-1 rounded-md bg-muted text-muted-foreground cursor-pointer"
+                                 className="text-xs py-1.5 px-3 rounded-full bg-primary/10 text-primary border-primary/20 cursor-pointer hover:bg-primary/20 transition-colors"
                               >
-                                 +{(tutor.subjects?.length ?? 0) - 3} more
+                                 +{(tutor.subjects?.length ?? 0) - 4} môn khác
                               </Badge>
                            </PopoverTrigger>
-                           <PopoverContent className="w-60 p-3" align="start">
-                              <h4 className="text-sm font-medium mb-2">
-                                 All Subjects
+                           <PopoverContent className="w-64 p-4" align="start">
+                              <h4 className="text-sm font-semibold mb-3 text-gray-900">
+                                 Tất cả môn học
                               </h4>
                               <div className="flex flex-wrap gap-2">
                                  {(tutor.subjects ?? [])
-                                    .slice(3)
+                                    .slice(4)
                                     .map((subject) => (
                                        <Badge
                                           key={subject}
                                           variant="outline"
-                                          className="text-xs"
+                                          className="text-xs py-1 px-2 rounded-md"
                                        >
                                           {subject}
                                        </Badge>
@@ -227,21 +275,17 @@ export function TutorCard({ tutor }: TutorCardProps) {
                      )}
                   </div>
                </div>
-               {/* Bio */}
-               <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                  {tutor.bio}
-               </p>
             </div>
          </CardContent>
 
-         {/* Footer with Action Buttons */}
-         <CardFooter className="p-5 pt-0">
+         {/* Footer with Action Button */}
+         <CardFooter className="p-6 pt-0">
             <Button
-               size="sm"
-               className="w-full"
+               size="lg"
+               className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 rounded-xl transition-all duration-200 hover:shadow-lg"
                onClick={() => onViewProfile(tutor._id)}
             >
-               View Profile
+               Xem hồ sơ chi tiết
             </Button>
          </CardFooter>
       </Card>

@@ -25,13 +25,32 @@ export interface PackageDetailResponse {
   };
 }
 
+export interface TopTutorPackageStats {
+  packageId: string;
+  name: string;
+  price: number;
+  isActive: boolean;
+  purchaseCount: number;
+  revenue: number;
+  tutorsCount: number;
+  lastPurchaseAt?: string;
+}
+
+export interface TutorPackageStatsSummary {
+  totalPackages: number;
+  activePackages: number;
+  totalSubscriptions: number;
+  activeSubscriptions: number;
+  revenue: number;
+  topPackage?: TopTutorPackageStats;
+}
+
 export interface PackageStatsResponse {
   status: string;
+  message?: string;
+  code?: number;
   data: {
-    total: number;
-    active: number;
-    inactive: number;
-    avgPrice?: number;
+    stats: TutorPackageStatsSummary;
   };
 }
 

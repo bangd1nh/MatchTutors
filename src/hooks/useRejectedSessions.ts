@@ -1,5 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { getMyRejectedSessions, getRejectedSessionById, getMyCancelledSessions } from "@/api/sessions";
+import {
+   getMyRejectedSessions,
+   getRejectedSessionById,
+   getMyCancelledSessions,
+   getMyAbsenceSessions,
+} from "@/api/sessions";
 import { Session } from "@/types/session";
 
 /**
@@ -34,6 +39,18 @@ export const useCancelledSessions = () => {
    return useQuery<Session[]>({
       queryKey: ["cancelled-sessions"],
       queryFn: getMyCancelledSessions,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
+   });
+};
+
+/**
+ * Hook để lấy danh sách các session vắng
+ */
+export const useAbsenceSessions = () => {
+   return useQuery<Session[]>({
+      queryKey: ["absence-sessions"],
+      queryFn: getMyAbsenceSessions,
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
    });

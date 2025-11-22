@@ -42,13 +42,14 @@ const AdminLearningManagement = () => {
                      <TableHead>Tutor</TableHead>
                      <TableHead>Subject</TableHead>
                      <TableHead>Status</TableHead>
+                     <TableHead>Absences</TableHead>
                      <TableHead>Requested At</TableHead>
                      <TableHead>Actions</TableHead>
                   </TableRow>
                </TableHeader>
                <TableBody>
                   {commitments.length > 0 ? (
-                     commitments.map((item: LearningCommitment) => (
+                     commitments.map((item: any) => (
                         <TableRow key={item._id}>
                            <TableCell>
                               {item.student.userId?.name ?? item.student._id}
@@ -59,6 +60,22 @@ const AdminLearningManagement = () => {
                            <TableCell>{item.teachingRequest.subject}</TableCell>
                            <TableCell>
                               <Badge variant="destructive">{item.status}</Badge>
+                           </TableCell>
+                           <TableCell>
+                              <div className="text-sm">
+                                 <div>
+                                    Total Sessions:{" "}
+                                    {item.absenceStats?.totalSessions ?? 0}
+                                 </div>
+                                 <div className="text-red-600">
+                                    Student Absent:{" "}
+                                    {item.absenceStats?.studentAbsent ?? 0}
+                                 </div>
+                                 <div className="text-orange-600">
+                                    Tutor Absent:{" "}
+                                    {item.absenceStats?.tutorAbsent ?? 0}
+                                 </div>
+                              </div>
                            </TableCell>
                            <TableCell>
                               {new Date(
@@ -80,7 +97,7 @@ const AdminLearningManagement = () => {
                      ))
                   ) : (
                      <TableRow>
-                        <TableCell colSpan={6} className="text-center">
+                        <TableCell colSpan={7} className="text-center">
                            No disputes found.
                         </TableCell>
                      </TableRow>

@@ -96,7 +96,10 @@ export function SessionCalendar() {
       (slotInfo: SlotInfo) => {
          if (user?.role !== Role.TUTOR) return;
          setDefaultDate(slotInfo.start as Date);
-         setFormInitialData(null);
+         setFormInitialData({
+            startTime: (slotInfo.start as Date).toISOString(),
+            endTime: (slotInfo.end as Date).toISOString(),
+         });
          setIsFormOpen(true);
       },
       [user]

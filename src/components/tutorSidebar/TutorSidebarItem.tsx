@@ -16,6 +16,8 @@ import {
    Wallet,
    History,
    CreditCard,
+   AlertTriangle,
+   MessageSquare,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -88,6 +90,11 @@ export const tutorSidebarConfig: SidebarItem[] = [
       icon: <XCircle className="h-4 w-4" />,
    },
    {
+      to: "/tutor/absence-sessions",
+      label: "Buổi học vắng",
+      icon: <AlertTriangle className="h-4 w-4" />,
+   },
+   {
       to: "/tutor/review-list",
       label: "Quản lý đánh giá",
       icon: <BookCopy className="h-4 w-4" />,
@@ -116,6 +123,11 @@ export const tutorSidebarConfig: SidebarItem[] = [
       to: "/tutor/studentMCQHistoryList",
       label: "Lịch sử làm bài",
       icon: <History className="h-4 w-4" />,
+   },
+   {
+      to: "/chat",
+      label: "Tin nhắn",
+      icon: <MessageSquare className="h-4 w-4" />,
    },
 
    // Thêm các mục khác ở đây

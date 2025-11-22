@@ -1,5 +1,5 @@
 import ProtectedRoute from "./ProtectedRoute";
-import OverviewPage from "../pages/dashboard/OverviewPage";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
 
 import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
 import TutorManagement from "@/pages/admin/TutorManagement";
@@ -23,7 +23,7 @@ export const adminRoutes = {
       </ProtectedRoute>
    ),
    children: [
-      { path: "/admin/dashboard", element: <OverviewPage /> },
+      { path: "/admin/dashboard", element: <AdminDashboard /> },
       { path: "/admin/tutors", element: <TutorManagement /> },
       { path: "/admin/tutors/:tutorId", element: <TutorProfilePage /> },
       { path: "/admin/tutor-profile", element: <TutorProfileListPage /> },

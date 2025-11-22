@@ -12,6 +12,14 @@ import {
    CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+   Table,
+   TableBody,
+   TableCell,
+   TableHead,
+   TableHeader,
+   TableRow,
+} from "@/components/ui/table";
 
 const AdminLearningDetailPage = () => {
    const { commitmentId } = useParams<{ commitmentId: string }>();
@@ -29,6 +37,7 @@ const AdminLearningDetailPage = () => {
    if (!commitment) return <div>Commitment not found.</div>;
 
    const decision = commitment.cancellationDecision;
+   const absenceStats = (commitment as any).absenceStats || {};
 
    const handleApprove = () => {
       if (commitmentId && adminNotes) {
@@ -40,6 +49,16 @@ const AdminLearningDetailPage = () => {
       if (commitmentId && adminNotes) {
          reject({ id: commitmentId, notes: adminNotes });
       }
+   };
+
+   const formatDate = (date: string | Date) => {
+      return new Date(date).toLocaleDateString("en-US", {
+         year: "numeric",
+         month: "short",
+         day: "numeric",
+         hour: "2-digit",
+         minute: "2-digit",
+      });
    };
 
    return (
@@ -89,6 +108,103 @@ const AdminLearningDetailPage = () => {
                   </p>
                   <p className="text-sm">Reason: {decision?.reason || "N/A"}</p>
                </div>
+            </CardContent>
+         </Card>
+
+         <Card>
+            <CardHeader>
+               <CardTitle>Absence Statistics</CardTitle>
+               <CardDescription>
+                  Summary of session absences for this learning commitment.
+               </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+               <div className="grid gap-4 md:grid-cols-3">
+                  <div className="bg-slate-50 p-4 rounded-lg">
+                     <p className="text-sm text-muted-foreground">
+                        Total Sessions
+                     </p>
+                     <p className="text-2xl font-bold">
+                        {absenceStats.totalSessions ?? 0}
+                     </p>
+                  </div>
+                  <div className="bg-red-50 p-4 rounded-lg">
+                     <p className="text-sm text-red-600 font-semibold">
+                        Student Absent
+                     </p>
+                     <p className="text-2xl font-bold text-red-600">
+                        {absenceStats.studentAbsent ?? 0}
+                     </p>
+                  </div>
+                  <div className="bg-orange-50 p-4 rounded-lg">
+                     <p className="text-sm text-orange-600 font-semibold">
+                        Tutor Absent
+                     </p>
+                     <p className="text-2xl font-bold text-orange-600">
+                        {absenceStats.tutorAbsent ?? 0}
+                     </p>
+                  </div>
+               </div>
+
+               {absenceStats.sessionDetails &&
+                  absenceStats.sessionDetails.length > 0 && (
+                     <div className="mt-6">
+                        <h4 className="font-semibold mb-3">Session Details</h4>
+                        <Table>
+                           <TableHeader>
+                              <TableRow>
+                                 <TableHead>Date & Time</TableHead>
+                                 <TableHead>Status</TableHead>
+                                 <TableHead>Student Absent</TableHead>
+                                 <TableHead>Tutor Absent</TableHead>
+                                 <TableHead>Reason</TableHead>
+                              </TableRow>
+                           </TableHeader>
+                           <TableBody>
+                              {absenceStats.sessionDetails.map(
+                                 (session: any) => (
+                                    <TableRow key={session._id}>
+                                       <TableCell className="text-sm">
+                                          {formatDate(session.startTime)}
+                                       </TableCell>
+                                       <TableCell>
+                                          <Badge variant="outline">
+                                             {session.status}
+                                             {session.isTrial && " (Trial)"}
+                                          </Badge>
+                                       </TableCell>
+                                       <TableCell>
+                                          {session.studentAbsent ? (
+                                             <Badge variant="destructive">
+                                                Absent
+                                             </Badge>
+                                          ) : (
+                                             <Badge variant="outline">
+                                                Present
+                                             </Badge>
+                                          )}
+                                       </TableCell>
+                                       <TableCell>
+                                          {session.tutorAbsent ? (
+                                             <Badge variant="destructive">
+                                                Absent
+                                             </Badge>
+                                          ) : (
+                                             <Badge variant="outline">
+                                                Present
+                                             </Badge>
+                                          )}
+                                       </TableCell>
+                                       <TableCell className="text-sm text-muted-foreground">
+                                          {session.absenceReason || "N/A"}
+                                       </TableCell>
+                                    </TableRow>
+                                 )
+                              )}
+                           </TableBody>
+                        </Table>
+                     </div>
+                  )}
             </CardContent>
          </Card>
 

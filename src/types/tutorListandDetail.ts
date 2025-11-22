@@ -1,3 +1,5 @@
+import { BaseAPIResponse } from "./response";
+
 export interface TutorUser {
    _id: string;
    name: string;
@@ -18,7 +20,6 @@ export interface Education {
    startDate?: string;
    endDate?: string;
    description?: string;
-   // optional legacy dateRange helper
    dateRange?: { startDate?: string; endDate?: string } | string;
 }
 
@@ -58,9 +59,10 @@ export interface Tutor {
    availability?: Availability[];
    isApproved?: boolean;
    ratings?: Ratings;
+   maxStudents?: number;
+   maxQuiz?: number;
    createdAt?: string;
    updatedAt?: string;
-   // backend can return other fields, keep index signature if needed
    [key: string]: any;
 }
 
@@ -74,4 +76,11 @@ export interface PaginationInfo {
 export interface TutorsApiResponse {
    data: Tutor[];
    pagination: PaginationInfo;
+}
+
+export interface ITutorSearchResponse extends BaseAPIResponse {
+   data: {
+      results: Tutor[];
+      pagination: PaginationInfo;
+   };
 }

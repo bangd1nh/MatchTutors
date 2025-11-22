@@ -60,14 +60,21 @@ export const useUpdateFlashcard = () => {
    });
 };
 
-export const useDeleteFlashcard = () => {
+export const useDeleteFlashcard = (type: string) => {
    const queryClient = useQueryClient();
    const addToast = useToast();
    return useMutation({
       mutationFn: deleteFlashcardQuestion,
       onSuccess: (response) => {
          addToast("success", response.message);
-         queryClient.invalidateQueries({ queryKey: ["TUTORFLASHCARDQUIZS"] });
+         if (type === "flashcard")
+            queryClient.invalidateQueries({
+               queryKey: ["TUTORFLASHCARDQUIZS"],
+            });
+         if (type === "mcq")
+            queryClient.invalidateQueries({
+               queryKey: ["MCQLIST"],
+            });
       },
       onError: (error: any) => {
          addToast("error", error.response?.data.message);
@@ -90,10 +97,10 @@ export const useAsignQuizToSession = () => {
    });
 };
 
-export const useSessionAssignedQuizzes = (quizId: string) => {
+export const useSessionAssignedQuizzes = (quizId: string, type: string) => {
    return useQuery({
       queryKey: ["SESSIONASSIGNEDQUIZS", quizId],
-      queryFn: () => fetchSessionAssigned(quizId),
+      queryFn: () => fetchSessionAssigned(quizId, type),
    });
 };
 

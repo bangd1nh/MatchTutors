@@ -253,7 +253,9 @@ const ViewMCQHistoryList = () => {
                               <Button
                                  size="sm"
                                  onClick={() => {
-                                    // Navigate to redo quiz
+                                    navigate(
+                                       `/student/doMCQ?multipleChoiceId=${submission.quizId._id}`
+                                    );
                                     console.log(
                                        "Redo quiz:",
                                        submission.quizId

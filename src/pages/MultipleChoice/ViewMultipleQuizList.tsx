@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,10 +17,16 @@ import {
    Users,
    Plus,
 } from "lucide-react";
+import DeleteFlashcardModal from "@/components/Quiz/FlashCard/DeleteFlashcardModal";
+import { useDeleteFlashcard } from "@/hooks/useQuiz";
 
 const ViewMultipleQuizList: React.FC = () => {
    const { fetchList } = useMCQ();
    const navigate = useNavigate();
+   const [selectedQuizForDelete, setSelectedQuizForDelete] = useState<
+      string | null
+   >(null);
+   const deleteQuiz = useDeleteFlashcard("mcq");
 
    const isLoading = fetchList.isLoading;
    const isError = fetchList.isError;
@@ -261,10 +267,8 @@ const ViewMultipleQuizList: React.FC = () => {
                            size="sm"
                            variant="outline"
                            className="gap-2 hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                           onClick={() => {
-                              // TODO: Implement delete functionality
-                              console.log("Delete quiz:", q._id);
-                           }}
+                           onClick={() => setSelectedQuizForDelete(q._id)}
+                           disabled={deleteQuiz.isPending}
                         >
                            <Trash2 className="h-4 w-4" />
                            Xóa
@@ -274,6 +278,17 @@ const ViewMultipleQuizList: React.FC = () => {
                </Card>
             ))}
          </div>
+         {selectedQuizForDelete && (
+            <DeleteFlashcardModal
+               type="mcq"
+               quizId={selectedQuizForDelete}
+               isOpen={!!selectedQuizForDelete}
+               onClose={() => setSelectedQuizForDelete(null)}
+               quizTitle={
+                  quizzes.find((q) => q._id === selectedQuizForDelete)?.title
+               }
+            />
+         )}
       </div>
    );
 };

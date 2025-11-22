@@ -15,6 +15,8 @@ import {
    Wallet,
    History,
    CreditCard, // Thêm icon này
+   AlertTriangle,
+   MessageCircle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -62,6 +64,11 @@ export const studentSidebarConfig: SidebarItem[] = [
       icon: <XCircle className="h-4 w-4" />,
    },
    {
+      to: "/student/absence-sessions",
+      label: "Buổi học vắng",
+      icon: <AlertTriangle className="h-4 w-4" />,
+   },
+   {
       to: "/student/review-history",
       label: "Lịch sử đánh giá",
       icon: <Star className="h-4 w-4" />,
@@ -77,8 +84,18 @@ export const studentSidebarConfig: SidebarItem[] = [
       icon: <CreditCard className="h-4 w-4" />,
    },
    {
+      to: "/student/chat",
+      label: "Nhắn tin",
+      icon: <MessageCircle className="h-4 w-4" />,
+   },
+   {
       to: "/student/MCQHistory",
       label: "lịch sử bài trắc nghiệm",
+      icon: <History className="h-4 w-4" />,
+   },
+   {
+      to: "/student/SAQHistory",
+      label: "Lịch sử bài tự luận",
       icon: <History className="h-4 w-4" />,
    },
 ];

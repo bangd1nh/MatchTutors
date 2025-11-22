@@ -64,11 +64,17 @@ export const asignQuizToSession = async ({
 };
 
 export const fetchSessionAssigned = async (
-   quizId: string
+   quizId: string,
+   type: string
 ): Promise<ISessionAssignedQuizzesResponse> => {
-   const response = await apiClient.get("/quiz/getSessionsAssigned", {
-      params: { quizId },
-   });
+   const response =
+      type === "flashcard"
+         ? await apiClient.get("/quiz/getSessionsAssigned", {
+              params: { quizId },
+           })
+         : await apiClient.get("/quiz/getMCQSessionsAssigned", {
+              params: { quizId },
+           });
    return response.data;
 };
 
