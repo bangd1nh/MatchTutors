@@ -23,6 +23,8 @@ export type ShortAnswerQuestionsFormHandle = {
     getEdited: () => ShortAnswerQuestions[];
     getDeleted: () => { _id: string }[];
     clearChangeSets?: () => void;
+    addBulk?: (questions: ShortAnswerQuestions[]) => void;
+    setQuestions?: (questions: ShortAnswerQuestions[]) => void;
 };
 
 const makeId = () => Math.random().toString(36).slice(2, 9);
@@ -130,9 +132,15 @@ const ShortAnswerQuizQuestionForm =
                         if (!q.acceptedAnswers || q.acceptedAnswers.length === 0)
                             e[`${q._id}-answers`] = "At least one accepted answer is required";
 
-                        // Check if any accepted answer is empty
+                        // Check if any accepted answer is empty - handle non-string values
                         const hasEmptyAnswer = q.acceptedAnswers.some(
-                            (ans) => !ans.trim()
+                            (ans) => {
+                                if (typeof ans === 'string') {
+                                    return !ans.trim();
+                                } else {
+                                    return !String(ans).trim();
+                                }
+                            }
                         );
                         if (hasEmptyAnswer)
                             e[`${q._id}-answers-empty`] = "Accepted answers cannot be empty";
@@ -202,7 +210,18 @@ const ShortAnswerQuizQuestionForm =
                         .map((q) => ({
                             questionType: QuestionTypeEnum.SHORT_ANSWER,
                             questionText: q.questionText || "",
-                            acceptedAnswers: (q.acceptedAnswers || []).map(ans => ans.trim()).filter(ans => ans),
+                            acceptedAnswers: (q.acceptedAnswers || [])
+                                .map(ans => {
+                                    // Handle non-string values safely
+                                    if (typeof ans === 'string') {
+                                        return ans.trim();
+                                    } else if (ans === null || ans === undefined) {
+                                        return '';
+                                    } else {
+                                        return String(ans).trim();
+                                    }
+                                })
+                                .filter(ans => ans && ans.trim().length > 0), // Filter out empty strings
                             caseSensitive: q.caseSensitive || false,
                             explanation: q.explanation || "",
                             order: q.order || 0,
@@ -210,12 +229,19 @@ const ShortAnswerQuizQuestionForm =
                         }));
                     return newQuestions;
                 },
-
                 clearChangeSets: () => {
                     deletedRef.current = [];
                     editedMapRef.current = {};
                     newMapRef.current = {};
                 },
+                setQuestions: (questions: ShortAnswerQuestions[]) => {
+                    setQuestionsState(questions);
+                },
+
+                addBulk: (questions: ShortAnswerQuestions[]) => {
+                    setQuestionsState((prev) => [...prev, ...questions]);
+                },
+
             }),
             [questions, addQuestion, resetQuestionsInStore]
         );

@@ -83,13 +83,13 @@ const MultipleChoiceQuizQuestionForm =
       >(
          storeQuestions?.length
             ? storeQuestions.map((q, i) => ({
-                 ...q,
-                 order: q.order ?? i + 1,
-                 _id: q._id ?? makeId(),
-                 correctAnswer: Array.isArray(q.correctAnswer)
-                    ? q.correctAnswer
-                    : [],
-              }))
+               ...q,
+               order: q.order ?? i + 1,
+               _id: q._id ?? makeId(),
+               correctAnswer: Array.isArray(q.correctAnswer)
+                  ? q.correctAnswer
+                  : [],
+            }))
             : [emptyQuestion()]
       );
 

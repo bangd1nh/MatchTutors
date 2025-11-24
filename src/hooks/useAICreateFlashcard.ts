@@ -1,4 +1,4 @@
-import { fetchAIFlashcard, fetchAIMCQ } from "@/api/aiCreateQuiz";
+import { fetchAIFlashcard, fetchAIMCQ, fetchAISAQ } from "@/api/aiCreateQuiz";
 import { getMaterials } from "@/api/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -55,5 +55,21 @@ export const useAICreateMCQMutation = () => {
 
    return {
       generateMCQ,
+   };
+};
+
+export const useAICreateSAQMutation = () => {
+   const generateSAQ = useMutation({
+      mutationFn: (materialId: string) => fetchAISAQ(materialId!),
+      onSuccess: (data) => {
+         console.log("AI Generated SAQ:", data);
+      },
+      onError: (error) => {
+         console.error("AI SAQ Generation failed:", error);
+      },
+   });
+
+   return {
+      generateSAQ,
    };
 };
