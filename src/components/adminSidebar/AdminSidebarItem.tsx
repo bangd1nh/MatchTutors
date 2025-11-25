@@ -8,7 +8,6 @@ import {
    LayoutDashboard,
    BookOpen,
    GraduationCap,
-   MessageSquare,
    FileText,
    Key,
    Package as PackageIcon,

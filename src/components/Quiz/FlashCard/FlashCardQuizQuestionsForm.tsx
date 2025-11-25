@@ -173,7 +173,7 @@ const FlashCardQuizQuestionsForm = forwardRef<QuizQuestionsHandle, Props>(
             // derive new items from current questions state to ensure up-to-date order/fields
             getNew: () =>
                questions
-                  .filter((q) => !originalIdsRef.current.has(q._id))
+                  .filter((q: any) => !originalIdsRef.current.has(q._id))
                   .map((q) => ({ ...q })),
 
             clearChangeSets: () => {
@@ -232,7 +232,7 @@ const FlashCardQuizQuestionsForm = forwardRef<QuizQuestionsHandle, Props>(
             const idx = afterId
                ? Math.max(0, nv.findIndex((q) => q._id === afterId) + 1)
                : nv.length;
-            const newQ = emptyQuestion();
+            const newQ: any = emptyQuestion();
             nv.splice(idx, 0, newQ);
             // add to newMap
             newMapRef.current[newQ._id] = { ...newQ };
@@ -275,7 +275,7 @@ const FlashCardQuizQuestionsForm = forwardRef<QuizQuestionsHandle, Props>(
             const nv = [...prev];
             [nv[index - 1], nv[index]] = [nv[index], nv[index - 1]];
             return nv.map((q, i) => {
-               const nq = { ...q, order: i + 1 };
+               const nq = { ...q, order: i + 1 } as any;
                // update change sets for re-ordered items
                if (originalIdsRef.current.has(nq._id)) {
                   const original = originalMapRef.current[nq._id];
@@ -296,7 +296,7 @@ const FlashCardQuizQuestionsForm = forwardRef<QuizQuestionsHandle, Props>(
             const nv = [...prev];
             [nv[index], nv[index + 1]] = [nv[index + 1], nv[index]];
             return nv.map((q, i) => {
-               const nq = { ...q, order: i + 1 };
+               const nq = { ...q, order: i + 1 } as any;
                if (originalIdsRef.current.has(nq._id)) {
                   const original = originalMapRef.current[nq._id];
                   if (!shallowEqualQuestion(original, nq))
@@ -312,7 +312,7 @@ const FlashCardQuizQuestionsForm = forwardRef<QuizQuestionsHandle, Props>(
 
       return (
          <div className="space-y-4">
-            {questions.map((q, idx) => (
+            {questions.map((q: any, idx) => (
                <Card key={q._id} className="bg-slate-800/40">
                   <CardHeader className="flex items-center justify-between py-2 px-4">
                      <CardTitle className="text-sm">
