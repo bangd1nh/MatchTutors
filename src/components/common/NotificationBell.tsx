@@ -24,17 +24,17 @@ const NotificationBell = () => {
       isLoading,
       isMarkingAllAsRead,
       isClearingAll,
-      isConnected,
+      isConnected: isSocketConnected,
    } = useNotification();
 
    const [isOpen, setIsOpen] = useState(false);
 
    // Load notifications when connected or popover opens
    useEffect(() => {
-      if (isConnected || isOpen) {
-         getNotifications(1, 50);
+      if (isSocketConnected || isOpen) {
+         getNotifications();
       }
-   }, [isConnected, isOpen, getNotifications]);
+   }, [isSocketConnected, isOpen, getNotifications]);
 
    const handleMarkAsRead = (notificationId: string, isRead: boolean) => {
       if (!isRead) {
@@ -66,10 +66,9 @@ const NotificationBell = () => {
                      {unreadCount > 99 ? "99+" : unreadCount}
                   </Badge>
                )}
-               {/* Socket connection indicator */}
                <div
                   className={`absolute -bottom-1 -right-1 w-2 h-2 rounded-full ${
-                     isConnected ? "bg-green-500" : "bg-red-500"
+                     isSocketConnected ? "bg-green-500" : "bg-red-500"
                   }`}
                />
             </Button>
@@ -77,6 +76,11 @@ const NotificationBell = () => {
          <PopoverContent className="w-80 p-0" align="end">
             <div className="p-4 border-b bg-muted/50">
                <div className="flex items-center justify-between">
+                  <div>
+                     <h3 className="font-semibold text-lg flex items-center gap-2">
+                        Thông báo
+                        </h3>
+                  </div>
                   <div className="flex gap-1">
                      {unreadCount > 0 && (
                         <Button

@@ -1,55 +1,20 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { notificationApi, type Notification } from "@/api/notification";
+import { useSocket } from "./useSocket";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { useToast } from "./useToast";
 import { useUser } from "./useUser";
-import { useSocket } from "./useSocket";
-import { notificationApi, type Notification } from "@/api/notification";
 
-interface NotificationData {
-   _id: string;
-   title: string;
-   message: string;
-   isRead: boolean;
-   createdAt: string;
-   userId: string;
-}
-
-interface UseNotificationReturn {
-   isConnected: boolean;
-   notifications: NotificationData[];
-   unreadCount: number;
-   sendNotification: (
-      userId: string,
-      data: { title: string; message: string }
-   ) => void;
-   markAsRead: (notificationId: string) => void;
-   markAllAsRead: () => void;
-   deleteNotification: (notificationId: string) => void;
-   clearAllNotifications: () => void;
-   getNotifications: (page?: number, limit?: number) => void;
-   error: string | null;
-   isLoading: boolean;
-   refetch: () => void;
-   // Mutation states
-   isMarkingAsRead: boolean;
-   isMarkingAllAsRead: boolean;
-   isDeletingNotification: boolean;
-   isClearingAll: boolean;
-}
-
-export const useNotification = (): UseNotificationReturn => {
-   const { user } = useUser();
+export const useNotification = () => {
+   const socket = useSocket("notifications");
    const queryClient = useQueryClient();
    const addToast = useToast();
-   const socket = useSocket("notifications");
-
-   const [isConnected, setIsConnected] = useState(false);
-   const [error, setError] = useState<string | null>(null);
+   const { user } = useUser();
 
    const {
-      notifications: storeNotifications,
-      unreadCount: storeUnreadCount,
+      notifications,
+      unreadCount,
       setNotifications,
       addNotification,
       markNotificationAsRead,
@@ -59,20 +24,34 @@ export const useNotification = (): UseNotificationReturn => {
       clearNotifications,
    } = useNotificationStore();
 
-   // Fetch notifications query (fallback)
    const {
       data: notificationsData,
-      isLoading: isLoadingNotifications,
+      isLoading: loadingNotifications,
       refetch: refetchNotifications,
    } = useQuery({
       queryKey: ["notifications"],
       queryFn: () => notificationApi.getNotifications(1, 50),
-      enabled: !!user && !isConnected, // Only fetch when not connected via socket
-      staleTime: 30000,
-      refetchOnWindowFocus: false,
+      enabled: !!user,
    });
 
-   // Mutations
+   useEffect(() => {
+      if (notificationsData?.data?.notifications) {
+         setNotifications(notificationsData.data.notifications);
+      }
+   }, [notificationsData, setNotifications, addNotification]);
+
+   const { data: unreadCountData } = useQuery({
+      queryKey: ["notifications-unread-count"],
+      queryFn: notificationApi.getUnreadCount,
+      enabled: !!user,
+   });
+
+   useEffect(() => {
+      if (unreadCountData?.count !== undefined) {
+         setUnreadCount(unreadCountData.count);
+      }
+   }, [unreadCountData, setUnreadCount]);
+
    const markAsReadMutation = useMutation({
       mutationFn: notificationApi.markAsRead,
       onSuccess: (_, notificationId) => {
@@ -92,6 +71,9 @@ export const useNotification = (): UseNotificationReturn => {
       onSuccess: () => {
          markAllNotificationsAsRead();
          queryClient.invalidateQueries({ queryKey: ["notifications"] });
+         queryClient.invalidateQueries({
+            queryKey: ["notifications-unread-count"],
+         });
       },
       onError: (error) => {
          console.error("Error marking all notifications as read:", error);
@@ -103,6 +85,9 @@ export const useNotification = (): UseNotificationReturn => {
       mutationFn: notificationApi.deleteNotification,
       onSuccess: (_, notificationId) => {
          removeNotification(notificationId);
+         queryClient.invalidateQueries({
+            queryKey: ["notifications-unread-count"],
+         });
       },
       onError: (error) => {
          console.error("Error deleting notification:", error);
@@ -114,6 +99,10 @@ export const useNotification = (): UseNotificationReturn => {
       mutationFn: notificationApi.clearAllNotifications,
       onSuccess: () => {
          clearNotifications();
+         queryClient.invalidateQueries({ queryKey: ["notifications"] });
+         queryClient.invalidateQueries({
+            queryKey: ["notifications-unread-count"],
+         });
       },
       onError: (error) => {
          console.error("Error clearing all notifications:", error);
@@ -121,218 +110,102 @@ export const useNotification = (): UseNotificationReturn => {
       },
    });
 
-   // Socket event handlers
    useEffect(() => {
       if (!socket || !user) return;
 
-      // Connection status handlers
-      const handleConnect = () => {
-         setIsConnected(true);
-         setError(null);
-         
-         // Request initial data when connected
-         socket.emit("getUnreadCount");
-         socket.emit("getNotifications", { page: 1, limit: 50 });
-      };
+      const userId = user.id || user._id;
 
-      const handleDisconnect = () => {
-         setIsConnected(false);
-      };
+      socket.emit("joinNotification", userId);
 
-      const handleConnectError = (error: any) => {
-         setError(`Connection failed: ${error.message}`);
-         setIsConnected(false);
+      return () => {
+         socket.emit("leaveNotification", userId);
       };
+   }, [socket, user]);
 
-      // Notification event handlers
+   useEffect(() => {
+      if (!socket) return;
+
       const handleNewNotification = (data: any) => {
+         if (!data.notification) {
+            console.error("❌ No notification object in data");
+            return;
+         }
+
          const notification: Notification = {
             ...data.notification,
-            type: data.notification.type || "system",
+            userId:
+               typeof data.notification.userId === "object"
+                  ? data.notification.userId._id
+                  : data.notification.userId,
+            type: data.notification?.type || "system",
          };
 
          addNotification(notification);
 
-         // Show toast for new notification
-         // addToast("info", notification.title || "Thông báo mới", {
-         //    description: notification.message,
-         // });
+         addToast("info", "Thông báo mới");
 
-         // Update unread count
          queryClient.invalidateQueries({
             queryKey: ["notifications-unread-count"],
          });
       };
 
-      const handleUnreadCount = (data: any) => {
-         setUnreadCount(data.count);
-      };
-
-      const handleNotificationList = (data: any) => {
-         const mappedNotifications = data.notifications.map((n: any) => ({
-            ...n,
-            type: n.type || n.data?.type || "system",
-         }));
-         setNotifications(mappedNotifications);
-      };
-
-      const handleNotificationMarkedRead = (data: any) => {
-         markNotificationAsRead(data.notificationId);
-      };
-
-      const handleAllNotificationsMarkedRead = () => {
-         markAllNotificationsAsRead();
-      };
-
-      const handleNotificationDeleted = (data: any) => {
-         removeNotification(data.notificationId);
-      };
-
-      const handleAllNotificationsCleared = () => {
-         clearNotifications();
-      };
-
-      const handleNotificationError = (error: any) => {
-         setError(error.message || "Notification error occurred");
-      };
-
-      // Register socket event listeners
-      socket.on("connect", handleConnect);
-      socket.on("disconnect", handleDisconnect);
-      socket.on("connect_error", handleConnectError);
-      
-      // Notification events
+      // Register listener
       socket.on("newNotification", handleNewNotification);
-      socket.on("unreadCount", handleUnreadCount);
-      socket.on("notificationList", handleNotificationList);
-      socket.on("notificationMarkedRead", handleNotificationMarkedRead);
-      socket.on("allNotificationsMarkedRead", handleAllNotificationsMarkedRead);
-      socket.on("notificationDeleted", handleNotificationDeleted);
-      socket.on("allNotificationsCleared", handleAllNotificationsCleared);
-      socket.on("notification_error", handleNotificationError);
 
-      // Special event for when notification connection is established
-      socket.on("notification_connected", () => {
-         socket.emit("getUnreadCount");
-         socket.emit("getNotifications", { page: 1, limit: 50 });
-      });
-
-      // Check if already connected
-      if (socket.connected) {
-         handleConnect();
-      }
-
-      // Cleanup function
       return () => {
-         socket.off("connect", handleConnect);
-         socket.off("disconnect", handleDisconnect);
-         socket.off("connect_error", handleConnectError);
          socket.off("newNotification", handleNewNotification);
-         socket.off("unreadCount", handleUnreadCount);
-         socket.off("notificationList", handleNotificationList);
-         socket.off("notificationMarkedRead", handleNotificationMarkedRead);
-         socket.off("allNotificationsMarkedRead", handleAllNotificationsMarkedRead);
-         socket.off("notificationDeleted", handleNotificationDeleted);
-         socket.off("allNotificationsCleared", handleAllNotificationsCleared);
-         socket.off("notification_error", handleNotificationError);
-         socket.off("notification_connected");
+         socket.offAny();
       };
-   }, [socket, user, addNotification, markNotificationAsRead, markAllNotificationsAsRead, setNotifications, setUnreadCount, removeNotification, clearNotifications, addToast, queryClient]);
-
-   // Update store when API data changes (fallback when socket not connected)
-   useEffect(() => {
-      if (notificationsData?.data?.notifications && !isConnected) {
-         const mappedNotifications = notificationsData.data.notifications.map(
-            (n: any) => ({
-               ...n,
-               type: n.type ?? n.data?.type ?? "system",
-            })
-         );
-         setNotifications(mappedNotifications);
-      }
-   }, [notificationsData, setNotifications, isConnected]);
+   }, [socket, addNotification, addToast, queryClient]);
 
    // Helper functions
-   const sendNotification = useCallback(
-      (userId: string, data: { title: string; message: string }) => {
-         if (socket?.connected) {
-            socket.emit("sendNotification", { userId, ...data });
-         }
-      },
-      [socket]
-   );
-
    const handleMarkAsRead = useCallback(
       (notificationId: string) => {
-         if (socket?.connected) {
-            socket.emit("markNotificationRead", notificationId);
-         } else {
-            // Fallback to API call
-            markAsReadMutation.mutate(notificationId);
-         }
+         markAsReadMutation.mutate(notificationId);
       },
-      [socket, markAsReadMutation]
+      [markAsReadMutation]
    );
 
    const handleMarkAllAsRead = useCallback(() => {
-      if (socket?.connected) {
-         socket.emit("markAllNotificationsRead");
-      } else {
-         // Fallback to API call
-         markAllAsReadMutation.mutate();
-      }
-   }, [socket, markAllAsReadMutation]);
+      markAllAsReadMutation.mutate();
+   }, [markAllAsReadMutation]);
 
    const handleDeleteNotification = useCallback(
       (notificationId: string) => {
-         if (socket?.connected) {
-            socket.emit("deleteNotification", notificationId);
-         } else {
-            // Fallback to API call
-            deleteNotificationMutation.mutate(notificationId);
-         }
+         deleteNotificationMutation.mutate(notificationId);
       },
-      [socket, deleteNotificationMutation]
+      [deleteNotificationMutation]
    );
 
    const handleClearAllNotifications = useCallback(() => {
-      if (socket?.connected) {
-         socket.emit("clearAllNotifications");
-      } else {
-         // Fallback to API call
-         clearAllNotificationsMutation.mutate();
-      }
-   }, [socket, clearAllNotificationsMutation]);
+      clearAllNotificationsMutation.mutate();
+   }, [clearAllNotificationsMutation]);
 
-   const getNotifications = useCallback(
-      (page = 1, limit = 50) => {
-         if (socket?.connected) {
-            socket.emit("getNotifications", { page, limit });
-         } else {
-            // Fallback to refetch API
-            refetchNotifications();
-         }
-      },
-      [socket, refetchNotifications]
-   );
+   const getNotifications = useCallback(() => {
+      refetchNotifications();
+   }, [refetchNotifications]);
 
    return {
-      isConnected,
-      notifications: storeNotifications,
-      unreadCount: storeUnreadCount,
-      sendNotification,
+      // Data
+      notifications,
+      unreadCount,
+      // Loading states
+      isLoading: loadingNotifications,
+      loadingNotifications,
+      // Connection state
+      isConnected: socket?.connected || false,
+      // Actions
       markAsRead: handleMarkAsRead,
       markAllAsRead: handleMarkAllAsRead,
       deleteNotification: handleDeleteNotification,
       clearAllNotifications: handleClearAllNotifications,
       getNotifications,
-      error,
-      isLoading: isLoadingNotifications && !isConnected,
-      refetch: refetchNotifications,
       // Mutation states
       isMarkingAsRead: markAsReadMutation.isPending,
       isMarkingAllAsRead: markAllAsReadMutation.isPending,
       isDeletingNotification: deleteNotificationMutation.isPending,
       isClearingAll: clearAllNotificationsMutation.isPending,
+      // Refetch function
+      refetch: refetchNotifications,
    };
 };
