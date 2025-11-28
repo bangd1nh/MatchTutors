@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { learningCommitmentApi } from "@/api/learningCommitment";
 import {
    CreateLearningCommitmentRequest,
-   LearningCommitment,
+   PaginatedLearningCommitments,
 } from "@/types/learningCommitment";
 
 import { useToast } from "@/hooks/useToast";
@@ -11,15 +11,17 @@ export const useLearningCommitments = (
    page: number = 1,
    limit: number = 10
 ) => {
-   return useQuery<any, unknown, LearningCommitment[]>({
+   return useQuery<PaginatedLearningCommitments, unknown>({
       queryKey: ["learningCommitment", page, limit],
       queryFn: () => learningCommitmentApi.getByUser(page, limit),
       // Backend returns { items: [...], total, page, limit, pages }
       select: (data) => {
-         console.log("Raw API response:", data); // Debug
-         const items = data?.items ?? [];
-         return Array.isArray(items) ? items : [];
+         return {
+            ...data,
+            items: Array.isArray(data?.items) ? data.items : [],
+         };
       },
+      placeholderData: (previousData) => previousData,
    });
 };
 

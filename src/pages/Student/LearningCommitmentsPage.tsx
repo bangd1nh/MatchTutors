@@ -5,6 +5,7 @@ import { Plus, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
 import { useState } from "react";
+import { Pagination } from "@/components/common/Pagination";
 
 type CommitmentStatus =
    | "all"
@@ -35,14 +36,17 @@ const STATUS_TABS: { label: string; value: CommitmentStatus; color: string }[] =
 export const LearningCommitmentsPage = () => {
    const { user } = useUser();
    const isTutor = String(user?.role).toLowerCase() === "tutor";
-   const [page] = useState(1);
+   const [page, setPage] = useState(1);
    const [activeTab, setActiveTab] = useState<CommitmentStatus>("all");
 
    const {
-      data: commitments,
+      data: paginatedData,
       isLoading,
       error,
-   } = useLearningCommitments(page, 10);
+   } = useLearningCommitments(page, 9); // 9 items for a 3-column grid
+
+   const commitments = paginatedData?.items;
+   const totalPages = paginatedData?.pages ?? 1;
 
    // Filter commitments based on active tab
    const filteredCommitments =
@@ -212,6 +216,17 @@ export const LearningCommitmentsPage = () => {
                         </Link>
                      )}
                   </div>
+               </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 0 && (
+               <div className="flex justify-center mt-12">
+                  <Pagination
+                     currentPage={page}
+                     totalPages={totalPages}
+                     onPageChange={setPage}
+                  />
                </div>
             )}
          </div>

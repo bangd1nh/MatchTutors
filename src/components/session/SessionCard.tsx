@@ -15,6 +15,7 @@ import { vi } from "date-fns/locale";
 import { Session } from "@/types/session";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 
 // Tìm interface SessionCardProps trong SessionCard.tsx và update:
 interface SessionCardProps {
@@ -97,7 +98,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, type }) => {
          <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
                <CardTitle className="text-lg">
-                  {subjectInfo.subject} - {subjectInfo.level}
+                  {getSubjectLabelVi(subjectInfo.subject)} - {getLevelLabelVi(subjectInfo.level)}
                </CardTitle>
                {getStatusBadge()}
             </div>

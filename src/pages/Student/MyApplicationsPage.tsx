@@ -25,8 +25,13 @@ import moment from "moment";
 import { useState, useEffect } from "react";
 import { RequestDetailModal } from "@/components/tutor/teaching-request/RequestDetailModal";
 import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 import { ReportModal } from "@/components/student/ReportModal";
-import { checkCanReport, submitViolationReport, CheckCanReportResponse } from "@/api/violationReport";
+import {
+   checkCanReport,
+   submitViolationReport,
+   CheckCanReportResponse,
+} from "@/api/violationReport";
 import { useToast } from "@/hooks/useToast";
 import { ViolationTypeEnum } from "@/enums/violationReport.enum";
 import { Badge } from "@/components/ui/badge";
@@ -35,42 +40,53 @@ const MyApplicationsPage = () => {
    const { data: requests, isLoading, isError } = useMyTeachingRequests();
    const [selectedRequest, setSelectedRequest] =
       useState<TeachingRequest | null>(null);
-   const [reportStatusMap, setReportStatusMap] = useState<Record<string, CheckCanReportResponse>>({});
+   const [reportStatusMap, setReportStatusMap] = useState<
+      Record<string, CheckCanReportResponse>
+   >({});
    const [reportModalOpen, setReportModalOpen] = useState(false);
    const [selectedTutorId, setSelectedTutorId] = useState<string | null>(null);
-   const [selectedTutorName, setSelectedTutorName] = useState<string | null>(null);
-   const [selectedTeachingRequestId, setSelectedTeachingRequestId] = useState<string | null>(null);
+   const [selectedTutorName, setSelectedTutorName] = useState<string | null>(
+      null
+   );
+   const [selectedTeachingRequestId, setSelectedTeachingRequestId] = useState<
+      string | null
+   >(null);
    const toast = useToast();
 
    // Check report status for each tutor when requests load
    useEffect(() => {
       if (requests && requests.length > 0) {
-            const checkReports = async () => {
-               const newReportStatusMap: Record<string, CheckCanReportResponse> = {};
-               const checkedTutorIds = new Set<string>();
+         const checkReports = async () => {
+            const newReportStatusMap: Record<string, CheckCanReportResponse> =
+               {};
+            const checkedTutorIds = new Set<string>();
 
-               for (const request of requests) {
-                  const tutorId = typeof request.tutorId === "object" 
-                     ? request.tutorId._id 
+            for (const request of requests) {
+               const tutorId =
+                  typeof request.tutorId === "object"
+                     ? request.tutorId._id
                      : request.tutorId;
-                  
-                  if (tutorId && !checkedTutorIds.has(tutorId)) {
-                     checkedTutorIds.add(tutorId);
-                     try {
-                        const reportStatus = await checkCanReport(tutorId);
-                        newReportStatusMap[tutorId] = reportStatus;
-                     } catch (error) {
-                        console.error(`Error checking reports for tutor ${tutorId}:`, error);
-                        newReportStatusMap[tutorId] = {
-                           canReport: false,
-                           hasReported: false,
-                        };
-                     }
+
+               if (tutorId && !checkedTutorIds.has(tutorId)) {
+                  checkedTutorIds.add(tutorId);
+                  try {
+                     const reportStatus = await checkCanReport(tutorId);
+                     newReportStatusMap[tutorId] = reportStatus;
+                  } catch (error) {
+                     console.error(
+                        `Error checking reports for tutor ${tutorId}:`,
+                        error
+                     );
+                     newReportStatusMap[tutorId] = {
+                        canReport: false,
+                        hasReported: false,
+                     };
                   }
                }
+            }
 
-               setReportStatusMap(newReportStatusMap);
-            };
+            setReportStatusMap(newReportStatusMap);
+         };
 
          checkReports();
       }
@@ -84,7 +100,11 @@ const MyApplicationsPage = () => {
       setSelectedRequest(null);
    };
 
-   const handleOpenReportModal = (tutorId: string, tutorName: string, teachingRequestId?: string) => {
+   const handleOpenReportModal = (
+      tutorId: string,
+      tutorName: string,
+      teachingRequestId?: string
+   ) => {
       setSelectedTutorId(tutorId);
       setSelectedTutorName(tutorName);
       setSelectedTeachingRequestId(teachingRequestId || null);
@@ -149,7 +169,11 @@ const MyApplicationsPage = () => {
          handleCloseReportModal();
       } catch (error: any) {
          console.error("Error submitting report:", error);
-         toast("error", error?.response?.data?.message || "Gửi báo cáo thất bại. Vui lòng thử lại sau.");
+         toast(
+            "error",
+            error?.response?.data?.message ||
+               "Gửi báo cáo thất bại. Vui lòng thử lại sau."
+         );
          throw error;
       }
    };
@@ -288,16 +312,25 @@ const MyApplicationsPage = () => {
                   </h2>
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                      {pendingRequests.map((request) => {
-                        const tutorId = typeof request.tutorId === "object" 
-                           ? request.tutorId._id 
-                           : request.tutorId;
+                        const tutorId =
+                           typeof request.tutorId === "object"
+                              ? request.tutorId._id
+                              : request.tutorId;
                         return (
                            <ApplicationCard
                               key={request._id}
                               request={request}
                               onViewDetail={handleViewRequest}
-                              hasReported={tutorId ? reportStatusMap[tutorId]?.hasReported : false}
-                              canReport={tutorId ? reportStatusMap[tutorId]?.canReport : false}
+                              hasReported={
+                                 tutorId
+                                    ? reportStatusMap[tutorId]?.hasReported
+                                    : false
+                              }
+                              canReport={
+                                 tutorId
+                                    ? reportStatusMap[tutorId]?.canReport
+                                    : false
+                              }
                               onOpenReport={handleOpenReportModal}
                            />
                         );
@@ -315,16 +348,25 @@ const MyApplicationsPage = () => {
                   </h2>
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                      {acceptedRequests.map((request) => {
-                        const tutorId = typeof request.tutorId === "object" 
-                           ? request.tutorId._id 
-                           : request.tutorId;
+                        const tutorId =
+                           typeof request.tutorId === "object"
+                              ? request.tutorId._id
+                              : request.tutorId;
                         return (
                            <ApplicationCard
                               key={request._id}
                               request={request}
                               onViewDetail={handleViewRequest}
-                              hasReported={tutorId ? reportStatusMap[tutorId]?.hasReported : false}
-                              canReport={tutorId ? reportStatusMap[tutorId]?.canReport : false}
+                              hasReported={
+                                 tutorId
+                                    ? reportStatusMap[tutorId]?.hasReported
+                                    : false
+                              }
+                              canReport={
+                                 tutorId
+                                    ? reportStatusMap[tutorId]?.canReport
+                                    : false
+                              }
                               onOpenReport={handleOpenReportModal}
                            />
                         );
@@ -342,16 +384,25 @@ const MyApplicationsPage = () => {
                   </h2>
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                      {rejectedRequests.map((request) => {
-                        const tutorId = typeof request.tutorId === "object" 
-                           ? request.tutorId._id 
-                           : request.tutorId;
+                        const tutorId =
+                           typeof request.tutorId === "object"
+                              ? request.tutorId._id
+                              : request.tutorId;
                         return (
                            <ApplicationCard
                               key={request._id}
                               request={request}
                               onViewDetail={handleViewRequest}
-                              hasReported={tutorId ? reportStatusMap[tutorId]?.hasReported : false}
-                              canReport={tutorId ? reportStatusMap[tutorId]?.canReport : false}
+                              hasReported={
+                                 tutorId
+                                    ? reportStatusMap[tutorId]?.hasReported
+                                    : false
+                              }
+                              canReport={
+                                 tutorId
+                                    ? reportStatusMap[tutorId]?.canReport
+                                    : false
+                              }
                               onOpenReport={handleOpenReportModal}
                            />
                         );
@@ -368,20 +419,26 @@ const MyApplicationsPage = () => {
             canReport={
                selectedRequest
                   ? (() => {
-                       const tutorId = typeof selectedRequest.tutorId === "object" 
-                          ? selectedRequest.tutorId._id 
-                          : selectedRequest.tutorId;
-                       return tutorId ? reportStatusMap[tutorId]?.canReport : false;
+                       const tutorId =
+                          typeof selectedRequest.tutorId === "object"
+                             ? selectedRequest.tutorId._id
+                             : selectedRequest.tutorId;
+                       return tutorId
+                          ? reportStatusMap[tutorId]?.canReport
+                          : false;
                     })()
                   : false
             }
             hasReported={
                selectedRequest
                   ? (() => {
-                       const tutorId = typeof selectedRequest.tutorId === "object" 
-                          ? selectedRequest.tutorId._id 
-                          : selectedRequest.tutorId;
-                       return tutorId ? reportStatusMap[tutorId]?.hasReported : false;
+                       const tutorId =
+                          typeof selectedRequest.tutorId === "object"
+                             ? selectedRequest.tutorId._id
+                             : selectedRequest.tutorId;
+                       return tutorId
+                          ? reportStatusMap[tutorId]?.hasReported
+                          : false;
                     })()
                   : false
             }
@@ -412,12 +469,17 @@ const ApplicationCard = ({
    onViewDetail: (request: TeachingRequest) => void;
    canReport?: boolean;
    hasReported?: boolean;
-   onOpenReport?: (tutorId: string, tutorName: string, teachingRequestId: string) => void;
+   onOpenReport?: (
+      tutorId: string,
+      tutorName: string,
+      teachingRequestId: string
+   ) => void;
 }) => {
    const tutor = request.tutorId?.userId;
-   const tutorId = typeof request.tutorId === "object" 
-      ? request.tutorId._id 
-      : request.tutorId;
+   const tutorId =
+      typeof request.tutorId === "object"
+         ? request.tutorId._id
+         : request.tutorId;
 
    const handleReportClick = (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -432,10 +494,10 @@ const ApplicationCard = ({
             <div className="flex items-start justify-between gap-3">
                <div className="flex-1">
                   <CardTitle className="text-base text-slate-900 line-clamp-1">
-                     {request.subject}
+                     {getSubjectLabelVi(request.subject)}
                   </CardTitle>
                   <p className="text-xs text-slate-500 mt-1">
-                     Lớp {request.level}
+                     {getLevelLabelVi(request.level)}
                   </p>
                </div>
                <TeachingRequestStatusBadge status={request.status} />
@@ -458,7 +520,10 @@ const ApplicationCard = ({
                   <p className="text-xs text-slate-500">Gia sư</p>
                </div>
                {hasReported ? (
-                  <Badge variant="outline" className="h-8 px-2 text-xs bg-blue-50 text-blue-700 border-blue-300">
+                  <Badge
+                     variant="outline"
+                     className="h-8 px-2 text-xs bg-blue-50 text-blue-700 border-blue-300"
+                  >
                      <Flag className="h-3 w-3 mr-1" />
                      Đã báo cáo
                   </Badge>

@@ -1,6 +1,7 @@
 import {
+   AdminLearningPaginatedResponse,
+   AdminResolvedCaseLog,
    LearningCommitment,
-   PaginatedLearningCommitments,
 } from "@/types/learningCommitment";
 import apiClient from "@/lib/api";
 
@@ -8,8 +9,19 @@ import apiClient from "@/lib/api";
 export const getDisputedLearningCommitments = async (
    page: number = 1,
    limit: number = 10
-): Promise<PaginatedLearningCommitments> => {
+): Promise<AdminLearningPaginatedResponse<LearningCommitment>> => {
    const response = await apiClient.get("/adminLearning/disagreements", {
+      params: { page, limit },
+   });
+   return response.data;
+};
+
+// Get learning commitments that were resolved by admins
+export const getResolvedLearningCommitments = async (
+   page: number = 1,
+   limit: number = 10
+): Promise<AdminLearningPaginatedResponse<AdminResolvedCaseLog>> => {
+   const response = await apiClient.get("/adminLearning/resolved", {
       params: { page, limit },
    });
    return response.data;

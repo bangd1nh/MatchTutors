@@ -2,6 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import type { Tutor } from "@/types/tutorListandDetail";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen } from "lucide-react";
+import { getSubjectLabelVi } from "@/utils/educationDisplay";
 
 interface TutorSubjectProps {
    tutor: Tutor;
@@ -27,7 +28,7 @@ export function TutorSubject({ tutor }: TutorSubjectProps) {
                         variant="secondary"
                         className="bg-gray-100 text-gray-800 hover:bg-gray-200 border-0 px-4 py-2 text-sm font-medium rounded-full"
                      >
-                        {subject}
+                        {getSubjectLabelVi(subject)}
                      </Badge>
                   ))}
                </div>
