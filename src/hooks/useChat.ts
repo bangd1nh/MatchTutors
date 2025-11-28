@@ -5,7 +5,7 @@ import { useSocket } from "./useSocket";
 import { useChatStore } from "@/store/useChatStore";
 
 export const useChat = () => {
-   const socket = useSocket();
+   const socket = useSocket("chat");
    const queryClient = useQueryClient();
 
    const {
@@ -55,11 +55,9 @@ export const useChat = () => {
    useEffect(() => {
       if (!socket || !activeConversationId) return;
 
-      console.log(`📍 Joining chat room: ${activeConversationId}`);
       socket.emit("joinChat", activeConversationId);
 
       return () => {
-         console.log(`📍 Leaving chat room: ${activeConversationId}`);
          socket.emit("leaveChat", activeConversationId);
       };
    }, [socket, activeConversationId]);
@@ -75,7 +73,6 @@ export const useChat = () => {
          message: Message;
          chat: string;
       }) => {
-         console.log("📬 New message received in chat:", chat);
 
          addMessage(chat, message);
          updateConversation(chat, {
@@ -103,7 +100,6 @@ export const useChat = () => {
             return;
          }
 
-         console.log("📤 Sending message via socket to:", activeConversationId);
          socket.emit("sendMessage", {
             chatId: activeConversationId,
             content: content.trim(),

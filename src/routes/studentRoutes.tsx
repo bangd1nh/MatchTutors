@@ -18,6 +18,7 @@ import SessionDetailPage from "@/pages/SessionDetailPage";
 import { LearningCommitmentsPage } from "@/pages/Student/LearningCommitmentsPage";
 
 import WalletManagement from "@/pages/wallet/walletManagement";
+import MyViolationReportsPage from "@/pages/Student/MyViolationReportsPage";
 import DoMCQ from "@/pages/MultipleChoice/DoMCQ";
 import ViewMCQHistoryList from "@/pages/MultipleChoice/ViewMCQHistoryList";
 import ViewMCQHistory from "@/pages/MultipleChoice/ViewMCQHistory";
@@ -28,6 +29,7 @@ import ViewSAQHistoryList from "@/pages/ShortAnswer/ViewSAQHistoryList";
 
 // import SessionDetailPage from "@/pages/SessionDetailPage"; // Moved to sharedRoutes
 import ChatPage from "@/pages/chat/chatPage";
+import StudentDashboardPage from "@/pages/Student/StudentDashboardPage";
 
 export const studentRoutes = {
    element: (
@@ -40,7 +42,7 @@ export const studentRoutes = {
          path: "/student/dashboard",
          element: (
             <IsCreatedProfileRoute>
-               <OverviewPage />
+               <StudentDashboardPage />,
             </IsCreatedProfileRoute>
          ),
       },
@@ -179,6 +181,10 @@ export const studentRoutes = {
       {
          path: "/student/chat",
          element: <ChatPage />,
+      },
+      {
+         path: "/student/violation-reports",
+         element: <MyViolationReportsPage />,
       },
    ],
 };

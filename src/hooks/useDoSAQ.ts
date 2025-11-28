@@ -21,7 +21,7 @@ export const useDoSAQ = (quizId?: string) => {
     // Submit short answer quiz
     const submitSAQ = useMutation({
         mutationFn: (data: IQuizSubmissionBody) => submitShortAnswer(data),
-        onSuccess: (data) => {
+        onSuccess: () => {
             toast("success", "Nộp bài short answer thành công!");
             queryClient.invalidateQueries({ queryKey: ["shortAnswerQuizAttempt"] });
             queryClient.invalidateQueries({ queryKey: ["shortAnswerHistory"] });

@@ -312,6 +312,36 @@ export const getTutorMapping = async (params?: {
   return response.data;
 };
 
+/**
+ * Ẩn tutor (khi đồng ý với violation report)
+ * Sẽ hủy tất cả learning commitments đang active,
+ * hủy tất cả sessions chưa học,
+ * và từ chối tất cả teaching requests đang pending
+ */
+export const hideTutor = async (
+  tutorId: string
+): Promise<{ success: boolean; message: string }> => {
+  const response = await apiClient.post(`/admin/tutor/${tutorId}/hide`);
+  return response.data;
+};
+
+/**
+ * Lấy tutorId từ userId (để dùng với hideTutor)
+ */
+export const getTutorIdByUserId = async (
+  userId: string
+): Promise<string | null> => {
+  try {
+    const mappingResponse = await getTutorMapping({ page: 1, limit: 1000 });
+    const tutor = mappingResponse.data?.tutors?.find(
+      (t: TutorMapping) => t.userId === userId
+    );
+    return tutor?.tutorId || null;
+  } catch (error) {
+    console.error("Error getting tutorId by userId:", error);
+    return null;
+  }
+};
 
 // Export default object chứa tất cả functions
 export default {
@@ -325,4 +355,6 @@ export default {
   acceptTutor,
   rejectTutor,
   getTutorMapping,
+  hideTutor,
+  getTutorIdByUserId,
 };

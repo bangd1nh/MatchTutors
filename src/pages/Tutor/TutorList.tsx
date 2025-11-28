@@ -93,9 +93,6 @@ export default function TutorListPage({
                : undefined,
          page: shouldFetchFromAPI ? currentPage : undefined,
          limit: shouldFetchFromAPI ? tutorsPerPage : undefined,
-      },
-      {
-         enabled: shouldFetchFromAPI, // Only enable query when not using AI results
       }
    );
 

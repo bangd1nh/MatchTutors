@@ -28,7 +28,6 @@ const DoSAQ = () => {
         questions,
         getSubmitQuiz,
         reset,
-        getCompletionStatus,
     } = useDoSAQStore();
 
     // Initialize quiz data when it's loaded

@@ -16,3 +16,10 @@ export const fetchAIMCQ = async (materialId: string): Promise<IFlashcardAI> => {
    });
    return response.data;
 };
+
+export const fetchAISAQ = async (materialId: string): Promise<IFlashcardAI> => {
+   const response = await apiClient.post("/aiCreateQuiz/createSAQ", {
+      materialId,
+   });
+   return response.data;
+};

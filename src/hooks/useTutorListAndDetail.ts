@@ -29,8 +29,8 @@ interface UseSearchTutorsOptions {
 }
 
 export const useSearchTutors = (
-   filters: UseSearchTutorsOptions = {},
-   p0: { enabled: any }
+filters: UseSearchTutorsOptions = {},
+   // p0: { enabled: any }
 ) => {
    return useQuery<TutorsApiResponse>({
       queryKey: ["searchTutors", filters],

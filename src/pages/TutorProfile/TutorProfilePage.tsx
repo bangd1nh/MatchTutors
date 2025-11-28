@@ -162,14 +162,14 @@ export default function TutorProfile() {
 
         // Handle uploads - collect ALL files first with proper indexing
         const allFiles: File[] = [];
-        Object.entries(certificationFiles).forEach(([certIndexStr, files]) => {
+        Object.entries(certificationFiles).forEach(([_, files]) => {
             files.forEach(file => {
                 allFiles.push(file);
             });
         });
 
         // Append all files to FormData with proper indexing
-        allFiles.forEach((file, globalIndex) => {
+        allFiles.forEach((file) => {
             formData.append("certificationImages", file);
         });
 
@@ -178,7 +178,7 @@ export default function TutorProfile() {
             const certIndex = parseInt(certIndexStr);
             const cert = data.certifications?.[certIndex];
 
-            files.forEach((file, localFileIndex) => {
+            files.forEach((file) => {
                 // Find the global index of this file
                 const globalIndex = allFiles.indexOf(file);
 
