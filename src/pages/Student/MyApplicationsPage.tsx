@@ -24,6 +24,7 @@ import moment from "moment";
 import { useState } from "react";
 import { RequestDetailModal } from "@/components/tutor/teaching-request/RequestDetailModal";
 import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 
 const MyApplicationsPage = () => {
    const { data: requests, isLoading, isError } = useMyTeachingRequests();
@@ -244,10 +245,10 @@ const ApplicationCard = ({
             <div className="flex items-start justify-between gap-3">
                <div className="flex-1">
                   <CardTitle className="text-base text-slate-900 line-clamp-1">
-                     {request.subject}
+                     {getSubjectLabelVi(request.subject)}
                   </CardTitle>
                   <p className="text-xs text-slate-500 mt-1">
-                     Lớp {request.level}
+                     {getLevelLabelVi(request.level)}
                   </p>
                </div>
                <TeachingRequestStatusBadge status={request.status} />

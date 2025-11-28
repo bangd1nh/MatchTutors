@@ -22,6 +22,7 @@ import { TeachingRequestStatusBadge } from "@/components/common/TeachingRequestS
 import { TeachingRequest } from "@/types/teachingRequest";
 import { RequestDetailModal } from "@/components/tutor/teaching-request/RequestDetailModal";
 import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 
 export default function TeachingRequestsList() {
    const { data: requests, isLoading, isError } = useTutorTeachingRequests();
@@ -237,9 +238,11 @@ function RequestCard({ request: r, onViewRequest }: RequestCardProps) {
             <div className="flex items-start justify-between gap-3">
                <div className="flex-1">
                   <CardTitle className="text-base text-slate-900 line-clamp-1">
-                     Môn học - {r.subject}
+                     Môn học - {getSubjectLabelVi(r.subject)}
                   </CardTitle>
-                  <p className="text-xs text-slate-500 mt-1">Lớp - {r.level}</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                     Lớp - {getLevelLabelVi(r.level)}
+                  </p>
                </div>
                <TeachingRequestStatusBadge status={r.status} />
             </div>

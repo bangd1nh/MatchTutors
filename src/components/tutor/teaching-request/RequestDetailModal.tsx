@@ -16,6 +16,7 @@ import { useRespondToRequest } from "@/hooks/useTeachingRequest";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { Clock, BookOpen, BookMarked } from "lucide-react";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 
 interface RequestDetailModalProps {
    request: TeachingRequest | null;
@@ -110,7 +111,7 @@ export const RequestDetailModal = ({
                <div className="flex items-start justify-between">
                   <div>
                      <DialogTitle className="text-2xl font-bold">
-                        {request.subject}
+                        {getSubjectLabelVi(request.subject)}
                      </DialogTitle>
                      <DialogDescription className="flex items-center gap-2 mt-2">
                         <Clock className="w-4 h-4" />
@@ -145,7 +146,9 @@ export const RequestDetailModal = ({
                            Lớp
                         </span>
                      </div>
-                     <p className="font-semibold text-sm">{request.level}</p>
+                     <p className="font-semibold text-sm">
+                        {getLevelLabelVi(request.level)}
+                     </p>
                   </div>
                   <div className="bg-muted/50 rounded-lg p-3 border border-border/50">
                      <div className="flex items-center gap-2 mb-1">
@@ -154,7 +157,9 @@ export const RequestDetailModal = ({
                            Môn học
                         </span>
                      </div>
-                     <p className="font-semibold text-sm">{request.subject}</p>
+                     <p className="font-semibold text-sm">
+                        {getSubjectLabelVi(request.subject)}
+                     </p>
                   </div>
                </div>
 

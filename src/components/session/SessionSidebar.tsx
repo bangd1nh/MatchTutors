@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 
 export default function SessionSidebar({ session }: any) {
    const learningCommitment = (session as any).learningCommitmentId;
@@ -69,15 +69,17 @@ export default function SessionSidebar({ session }: any) {
                      Môn học:
                   </span>
                   <span className="text-sm font-medium">
-                     {learningCommitment?.teachingRequest?.subject ||
-                        "Không xác định"}
+                     {learningCommitment?.teachingRequest?.subject 
+                        ? getSubjectLabelVi(learningCommitment.teachingRequest.subject)
+                        : "Không xác định"}
                   </span>
                </div>
                <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Cấp độ:</span>
                   <span className="text-sm font-medium">
-                     {learningCommitment?.teachingRequest?.level ||
-                        "Không xác định"}
+                     {learningCommitment?.teachingRequest?.level 
+                        ? getLevelLabelVi(learningCommitment.teachingRequest.level)
+                        : "Không xác định"}
                   </span>
                </div>
                <div className="flex justify-between">

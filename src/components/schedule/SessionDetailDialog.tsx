@@ -26,6 +26,7 @@ import { Role } from "@/types/user";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
+import { getSubjectLabelVi } from "@/utils/educationDisplay";
 
 interface SessionDetailDialogProps {
    isOpen: boolean;
@@ -213,14 +214,16 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
    return (
       <>
          <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <DialogContent className="w-full sm:max-w-3xl h-[100dvh] sm:h-auto sm:max-h-[90vh] overflow-y-auto p-0 sm:p-6 rounded-none sm:rounded-lg">
                <DialogHeader className="pb-4 border-b">
                   <DialogTitle className="text-xl font-semibold">
                      Chi tiết buổi học
                   </DialogTitle>
                   <DialogDescription className="text-base">
-                     {learningCommitment?.teachingRequest?.subject ??
-                        "Môn học không xác định"}
+                     {getSubjectLabelVi(
+                        learningCommitment?.teachingRequest?.subject ??
+                           "Môn học không xác định"
+                     )}
                   </DialogDescription>
                </DialogHeader>
 
@@ -285,8 +288,10 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                               Môn học
                            </span>
                            <span className="text-sm font-semibold text-gray-900">
-                              {learningCommitment?.teachingRequest?.subject ??
-                                 "Môn học không xác định"}
+                              {getSubjectLabelVi(
+                                 learningCommitment?.teachingRequest?.subject ??
+                                    "Môn học không xác định"
+                              )}
                            </span>
                         </div>
 
@@ -740,7 +745,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
          {/* Cancel Session Dialog */}
          <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-            <DialogContent>
+            <DialogContent className="w-full sm:max-w-lg h-[100dvh] sm:h-auto sm:max-h-[85vh] overflow-y-auto p-0 sm:p-6 rounded-none sm:rounded-lg">
                <DialogHeader>
                   <DialogTitle>Hủy buổi học</DialogTitle>
                   <DialogDescription>
@@ -791,7 +796,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
          {/* Dispute/Absence Dialog */}
          <Dialog open={showDisputeDialog} onOpenChange={setShowDisputeDialog}>
-            <DialogContent>
+            <DialogContent className="w-full sm:max-w-lg h-[100dvh] sm:h-auto sm:max-h-[85vh] overflow-y-auto p-0 sm:p-6 rounded-none sm:rounded-lg">
                <DialogHeader>
                   <DialogTitle>Báo vắng / Khiếu nại Điểm danh</DialogTitle>
                   <DialogDescription>

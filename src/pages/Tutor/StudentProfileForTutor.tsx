@@ -15,6 +15,7 @@ import {
    User,
    Clock,
 } from "lucide-react";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 
 const formatDayOfWeek = (dayOfWeek: number): string => {
    const daysMap: Record<number, string> = {
@@ -112,7 +113,7 @@ export default function StudentProfileForTutor() {
                         {profile.gradeLevel && (
                            <div className="flex items-center gap-2">
                               <GraduationCap className="h-4 w-4" />
-                              <span>Lớp {profile.gradeLevel}</span>
+                              <span>{getLevelLabelVi(profile.gradeLevel)}</span>
                            </div>
                         )}
                      </div>
@@ -156,7 +157,7 @@ export default function StudentProfileForTutor() {
                                     key={sub}
                                     className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 px-3 py-1"
                                  >
-                                    {sub}
+                                    {getSubjectLabelVi(sub)}
                                  </Badge>
                               ))}
                            </div>

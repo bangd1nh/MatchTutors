@@ -1,5 +1,4 @@
 import ProtectedRoute from "./ProtectedRoute";
-import OverviewPage from "../pages/dashboard/OverviewPage";
 
 import ProfilePage from "@/pages/Profilepage";
 import TutorProfile from "@/pages/TutorProfile/TutorProfile";
@@ -35,6 +34,7 @@ import ViewMCQHistory from "@/pages/MultipleChoice/ViewMCQHistory";
 import PaymentTutorPage from "@/pages/paymentTutor/paymentTutor";
 import ChatPage from "@/pages/chat/chatPage";
 import ViewSAQHistory from "@/pages/ShortAnswer/ViewSAQHistory";
+import DashboardTutorPage from "@/pages/dashboardTutor/dashboardTutorPage";
 
 export const tutorRoutes = {
    element: (
@@ -43,7 +43,7 @@ export const tutorRoutes = {
       </ProtectedRoute>
    ),
    children: [
-      { path: "/tutor/dashboard", element: <OverviewPage /> },
+      { path: "/tutor/dashboard", element: <DashboardTutorPage /> },
       { path: "/tutor/profile", element: <ProfilePage /> },
       { path: "/tutor/profile-page", element: <TutorProfile /> },
       { path: "/tutor/create-profile", element: <TutorProfilePage /> },

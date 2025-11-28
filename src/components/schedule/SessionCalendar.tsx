@@ -23,6 +23,7 @@ import { SessionFormDialog } from "./SessionFormDialog";
 import { SessionDetailDialog } from "./SessionDetailDialog";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { getSubjectLabelVi } from "@/utils/educationDisplay";
 
 const localizer = momentLocalizer(moment);
 
@@ -55,7 +56,9 @@ export function SessionCalendar() {
                .filter(Boolean)
                .join(" ") ||
             "Học sinh";
-         const subject = lc?.teachingRequest?.subject ?? "Môn học";
+         const subject = getSubjectLabelVi(
+            lc?.teachingRequest?.subject ?? "Môn học"
+         );
 
          // Tùy chỉnh màu sắc theo trạng thái
          let style = {};

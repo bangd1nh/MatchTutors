@@ -11,6 +11,7 @@ import {
    Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 
 export default function SessionHeader({
    session,
@@ -73,11 +74,13 @@ export default function SessionHeader({
                   <div>
                      <div className="flex items-center gap-3">
                         <h1 className="text-2xl font-semibold text-foreground">
-                           {learningCommitment?.teachingRequest?.subject ||
-                              "Môn học"}
+                           {learningCommitment?.teachingRequest?.subject
+                              ? getSubjectLabelVi(learningCommitment.teachingRequest.subject)
+                              : "Môn học"}
                            {" - "}
-                           {learningCommitment?.teachingRequest?.level ||
-                              "Cấp độ"}
+                           {learningCommitment?.teachingRequest?.level
+                              ? getLevelLabelVi(learningCommitment.teachingRequest.level)
+                              : "Cấp độ"}
                         </h1>
                         {/* >>> changed code: use mapped label + class */}
                         <Badge className={statusInfo.className}>

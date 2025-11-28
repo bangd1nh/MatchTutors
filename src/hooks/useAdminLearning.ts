@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
    getDisputedLearningCommitments,
+   getResolvedLearningCommitments,
    getLearningCommitmentDetail,
    approveCancellation,
    rejectCancellation,
@@ -12,6 +13,8 @@ export const useAdminLearning = (commitmentId?: string) => {
    const addToast = useToast();
 
    // Query to fetch disputed learning commitments
+   const isListingMode = !commitmentId;
+
    const {
       data: disputedCommitments,
       isLoading: isLoadingDisputes,
@@ -19,7 +22,17 @@ export const useAdminLearning = (commitmentId?: string) => {
    } = useQuery({
       queryKey: ["disputedLearningCommitments"],
       queryFn: () => getDisputedLearningCommitments(),
-      enabled: !commitmentId, // Only run if no specific ID is provided
+      enabled: isListingMode,
+   });
+
+   const {
+      data: resolvedCommitments,
+      isLoading: isLoadingResolved,
+      isError: isErrorResolved,
+   } = useQuery({
+      queryKey: ["resolvedLearningCommitments"],
+      queryFn: () => getResolvedLearningCommitments(),
+      enabled: isListingMode,
    });
 
    // Query to fetch a single learning commitment detail
@@ -36,6 +49,9 @@ export const useAdminLearning = (commitmentId?: string) => {
    const invalidateQueries = () => {
       queryClient.invalidateQueries({
          queryKey: ["disputedLearningCommitments"],
+      });
+      queryClient.invalidateQueries({
+         queryKey: ["resolvedLearningCommitments"],
       });
       if (commitmentId) {
          queryClient.invalidateQueries({
@@ -74,6 +90,9 @@ export const useAdminLearning = (commitmentId?: string) => {
       disputedCommitments,
       isLoadingDisputes,
       isErrorDisputes,
+      resolvedCommitments,
+      isLoadingResolved,
+      isErrorResolved,
       commitmentDetail,
       isLoadingDetail,
       isErrorDetail,

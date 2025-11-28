@@ -26,6 +26,7 @@ import type { Tutor } from "@/types/tutorListandDetail";
 import type { CreateTeachingRequestPayload } from "@/types/teachingRequest";
 import { Subject } from "@/enums/subject.enum";
 import { Level } from "@/enums/level.enum";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 
 const requestSchema = z.object({
    subject: z.string().min(1, "Vui lòng chọn môn học."),
@@ -102,7 +103,7 @@ export const TeachingRequestDialog = ({
                               <SelectContent>
                                  {(tutor.subjects ?? []).map((sub) => (
                                     <SelectItem key={sub} value={sub}>
-                                       {sub}
+                                       {getSubjectLabelVi(sub)}
                                     </SelectItem>
                                  ))}
                               </SelectContent>
@@ -131,7 +132,7 @@ export const TeachingRequestDialog = ({
                               <SelectContent>
                                  {(tutor.levels ?? []).map((lvl) => (
                                     <SelectItem key={lvl} value={lvl}>
-                                       {lvl}
+                                       {getLevelLabelVi(lvl)}
                                     </SelectItem>
                                  ))}
                               </SelectContent>
