@@ -17,18 +17,64 @@ import {
    Clock,
    CheckCircle,
    XCircle,
+   Flag,
 } from "lucide-react";
 import { TeachingRequestStatusBadge } from "@/components/common/TeachingRequestStatusBadge";
 import { Link } from "react-router-dom";
 import moment from "moment";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RequestDetailModal } from "@/components/tutor/teaching-request/RequestDetailModal";
 import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
+import { ReportModal } from "@/components/student/ReportModal";
+import { checkCanReport, submitViolationReport, CheckCanReportResponse } from "@/api/violationReport";
+import { useToast } from "@/hooks/useToast";
+import { ViolationTypeEnum } from "@/enums/violationReport.enum";
+import { Badge } from "@/components/ui/badge";
 
 const MyApplicationsPage = () => {
    const { data: requests, isLoading, isError } = useMyTeachingRequests();
    const [selectedRequest, setSelectedRequest] =
       useState<TeachingRequest | null>(null);
+   const [reportStatusMap, setReportStatusMap] = useState<Record<string, CheckCanReportResponse>>({});
+   const [reportModalOpen, setReportModalOpen] = useState(false);
+   const [selectedTutorId, setSelectedTutorId] = useState<string | null>(null);
+   const [selectedTutorName, setSelectedTutorName] = useState<string | null>(null);
+   const [selectedTeachingRequestId, setSelectedTeachingRequestId] = useState<string | null>(null);
+   const toast = useToast();
+
+   // Check report status for each tutor when requests load
+   useEffect(() => {
+      if (requests && requests.length > 0) {
+            const checkReports = async () => {
+               const newReportStatusMap: Record<string, CheckCanReportResponse> = {};
+               const checkedTutorIds = new Set<string>();
+
+               for (const request of requests) {
+                  const tutorId = typeof request.tutorId === "object" 
+                     ? request.tutorId._id 
+                     : request.tutorId;
+                  
+                  if (tutorId && !checkedTutorIds.has(tutorId)) {
+                     checkedTutorIds.add(tutorId);
+                     try {
+                        const reportStatus = await checkCanReport(tutorId);
+                        newReportStatusMap[tutorId] = reportStatus;
+                     } catch (error) {
+                        console.error(`Error checking reports for tutor ${tutorId}:`, error);
+                        newReportStatusMap[tutorId] = {
+                           canReport: false,
+                           hasReported: false,
+                        };
+                     }
+                  }
+               }
+
+               setReportStatusMap(newReportStatusMap);
+            };
+
+         checkReports();
+      }
+   }, [requests]);
 
    const handleViewRequest = (request: TeachingRequest) => {
       setSelectedRequest(request);
@@ -36,6 +82,76 @@ const MyApplicationsPage = () => {
 
    const handleCloseModal = () => {
       setSelectedRequest(null);
+   };
+
+   const handleOpenReportModal = (tutorId: string, tutorName: string, teachingRequestId?: string) => {
+      setSelectedTutorId(tutorId);
+      setSelectedTutorName(tutorName);
+      setSelectedTeachingRequestId(teachingRequestId || null);
+      setReportModalOpen(true);
+   };
+
+   const handleCloseReportModal = () => {
+      setReportModalOpen(false);
+      setSelectedTutorId(null);
+      setSelectedTutorName(null);
+      setSelectedTeachingRequestId(null);
+   };
+
+   const handleSubmitReport = async (data: {
+      type: ViolationTypeEnum;
+      reason: string;
+      evidenceFiles: File[];
+   }) => {
+      if (!selectedTutorId) return;
+
+      try {
+         console.log("Submitting report with data:", {
+            tutorId: selectedTutorId,
+            type: data.type,
+            reason: data.reason,
+            evidenceFilesCount: data.evidenceFiles.length,
+            relatedTeachingRequestId: selectedTeachingRequestId,
+         });
+
+         const result = await submitViolationReport({
+            tutorId: selectedTutorId,
+            type: data.type,
+            reason: data.reason,
+            evidenceFiles: data.evidenceFiles,
+            relatedTeachingRequestId: selectedTeachingRequestId || undefined,
+         });
+
+         console.log("Report submitted successfully:", result);
+         toast("success", "Báo cáo đã được gửi thành công");
+
+         // Refresh report status from API
+         if (selectedTutorId) {
+            try {
+               const reportStatus = await checkCanReport(selectedTutorId);
+               setReportStatusMap((prev) => ({
+                  ...prev,
+                  [selectedTutorId]: reportStatus,
+               }));
+            } catch (error) {
+               console.error("Error refreshing reports:", error);
+               // Fallback: set to default if API call fails
+               setReportStatusMap((prev) => ({
+                  ...prev,
+                  [selectedTutorId]: {
+                     canReport: false,
+                     hasReported: false,
+                  },
+               }));
+            }
+         }
+
+         handleCloseReportModal();
+      } catch (error: any) {
+         console.error("Error submitting report:", error);
+         toast("error", error?.response?.data?.message || "Gửi báo cáo thất bại. Vui lòng thử lại sau.");
+         throw error;
+      }
    };
 
    if (isLoading) {
@@ -171,13 +287,21 @@ const MyApplicationsPage = () => {
                      Yêu cầu chờ xử lý ({pendingRequests.length})
                   </h2>
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                     {pendingRequests.map((request) => (
-                        <ApplicationCard
-                           key={request._id}
-                           request={request}
-                           onViewDetail={handleViewRequest}
-                        />
-                     ))}
+                     {pendingRequests.map((request) => {
+                        const tutorId = typeof request.tutorId === "object" 
+                           ? request.tutorId._id 
+                           : request.tutorId;
+                        return (
+                           <ApplicationCard
+                              key={request._id}
+                              request={request}
+                              onViewDetail={handleViewRequest}
+                              hasReported={tutorId ? reportStatusMap[tutorId]?.hasReported : false}
+                              canReport={tutorId ? reportStatusMap[tutorId]?.canReport : false}
+                              onOpenReport={handleOpenReportModal}
+                           />
+                        );
+                     })}
                   </div>
                </div>
             )}
@@ -190,13 +314,21 @@ const MyApplicationsPage = () => {
                      Đã chấp nhận ({acceptedRequests.length})
                   </h2>
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                     {acceptedRequests.map((request) => (
-                        <ApplicationCard
-                           key={request._id}
-                           request={request}
-                           onViewDetail={handleViewRequest}
-                        />
-                     ))}
+                     {acceptedRequests.map((request) => {
+                        const tutorId = typeof request.tutorId === "object" 
+                           ? request.tutorId._id 
+                           : request.tutorId;
+                        return (
+                           <ApplicationCard
+                              key={request._id}
+                              request={request}
+                              onViewDetail={handleViewRequest}
+                              hasReported={tutorId ? reportStatusMap[tutorId]?.hasReported : false}
+                              canReport={tutorId ? reportStatusMap[tutorId]?.canReport : false}
+                              onOpenReport={handleOpenReportModal}
+                           />
+                        );
+                     })}
                   </div>
                </div>
             )}
@@ -209,13 +341,21 @@ const MyApplicationsPage = () => {
                      Từ chối ({rejectedRequests.length})
                   </h2>
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                     {rejectedRequests.map((request) => (
-                        <ApplicationCard
-                           key={request._id}
-                           request={request}
-                           onViewDetail={handleViewRequest}
-                        />
-                     ))}
+                     {rejectedRequests.map((request) => {
+                        const tutorId = typeof request.tutorId === "object" 
+                           ? request.tutorId._id 
+                           : request.tutorId;
+                        return (
+                           <ApplicationCard
+                              key={request._id}
+                              request={request}
+                              onViewDetail={handleViewRequest}
+                              hasReported={tutorId ? reportStatusMap[tutorId]?.hasReported : false}
+                              canReport={tutorId ? reportStatusMap[tutorId]?.canReport : false}
+                              onOpenReport={handleOpenReportModal}
+                           />
+                        );
+                     })}
                   </div>
                </div>
             )}
@@ -225,7 +365,38 @@ const MyApplicationsPage = () => {
             isOpen={!!selectedRequest}
             onClose={handleCloseModal}
             request={selectedRequest}
+            canReport={
+               selectedRequest
+                  ? (() => {
+                       const tutorId = typeof selectedRequest.tutorId === "object" 
+                          ? selectedRequest.tutorId._id 
+                          : selectedRequest.tutorId;
+                       return tutorId ? reportStatusMap[tutorId]?.canReport : false;
+                    })()
+                  : false
+            }
+            hasReported={
+               selectedRequest
+                  ? (() => {
+                       const tutorId = typeof selectedRequest.tutorId === "object" 
+                          ? selectedRequest.tutorId._id 
+                          : selectedRequest.tutorId;
+                       return tutorId ? reportStatusMap[tutorId]?.hasReported : false;
+                    })()
+                  : false
+            }
+            onOpenReport={handleOpenReportModal}
          />
+
+         {selectedTutorId && (
+            <ReportModal
+               isOpen={reportModalOpen}
+               onClose={handleCloseReportModal}
+               tutorId={selectedTutorId}
+               tutorName={selectedTutorName || undefined}
+               onSubmit={handleSubmitReport}
+            />
+         )}
       </div>
    );
 };
@@ -233,11 +404,28 @@ const MyApplicationsPage = () => {
 const ApplicationCard = ({
    request,
    onViewDetail,
+   canReport,
+   hasReported,
+   onOpenReport,
 }: {
    request: TeachingRequest;
    onViewDetail: (request: TeachingRequest) => void;
+   canReport?: boolean;
+   hasReported?: boolean;
+   onOpenReport?: (tutorId: string, tutorName: string, teachingRequestId: string) => void;
 }) => {
    const tutor = request.tutorId?.userId;
+   const tutorId = typeof request.tutorId === "object" 
+      ? request.tutorId._id 
+      : request.tutorId;
+
+   const handleReportClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (tutorId && tutor?.name && onOpenReport) {
+         onOpenReport(tutorId, tutor.name, request._id);
+      }
+   };
+
    return (
       <Card className="group flex flex-col h-full transition-all hover:shadow-lg hover:border-primary/50 overflow-hidden">
          <CardHeader className="pb-3">
@@ -269,6 +457,22 @@ const ApplicationCard = ({
                   </p>
                   <p className="text-xs text-slate-500">Gia sư</p>
                </div>
+               {hasReported ? (
+                  <Badge variant="outline" className="h-8 px-2 text-xs bg-blue-50 text-blue-700 border-blue-300">
+                     <Flag className="h-3 w-3 mr-1" />
+                     Đã báo cáo
+                  </Badge>
+               ) : canReport ? (
+                  <Button
+                     variant="outline"
+                     size="sm"
+                     onClick={handleReportClick}
+                     className="h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                  >
+                     <Flag className="h-3 w-3 mr-1" />
+                     Báo cáo
+                  </Button>
+               ) : null}
             </div>
 
             {/* Submitted Time */}

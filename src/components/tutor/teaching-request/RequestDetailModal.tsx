@@ -15,24 +15,42 @@ import { useUser } from "@/hooks/useUser";
 import { useRespondToRequest } from "@/hooks/useTeachingRequest";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
-import { Clock, BookOpen, BookMarked } from "lucide-react";
+import { Clock, BookOpen, BookMarked, Flag } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface RequestDetailModalProps {
    request: TeachingRequest | null;
    isOpen: boolean;
    onClose: () => void;
+   canReport?: boolean;
+   hasReported?: boolean;
+   onOpenReport?: (tutorId: string, tutorName: string, teachingRequestId: string) => void;
 }
 
 export const RequestDetailModal = ({
    request,
    isOpen,
    onClose,
+   canReport,
+   hasReported,
+   onOpenReport,
 }: RequestDetailModalProps) => {
    const { user } = useUser();
    const respond = useRespondToRequest();
    const navigate = useNavigate();
 
    if (!request) return null;
+
+   const tutor = request.tutorId?.userId;
+   const tutorId = typeof request.tutorId === "object" 
+      ? request.tutorId._id 
+      : request.tutorId;
+
+   const handleReportClick = () => {
+      if (tutorId && tutor?.name && onOpenReport) {
+         onOpenReport(tutorId, tutor.name, request._id);
+      }
+   };
 
    const handleRespond = (decision: "ACCEPTED" | "REJECTED") => {
       respond.mutate(
@@ -122,19 +140,50 @@ export const RequestDetailModal = ({
             </DialogHeader>
 
             <div className="space-y-6 py-4">
-               {/* Student Info */}
-               <div className="flex items-center gap-4 pb-4 border-b border-border">
-                  <Avatar className="h-14 w-14">
-                     <AvatarImage src={student?.avatarUrl} />
-                     <AvatarFallback className="bg-primary/10 text-primary">
-                        {student?.name?.charAt(0).toUpperCase() || "S"}
-                     </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                     <p className="font-semibold text-base">{student?.name}</p>
-                     <p className="text-xs text-muted-foreground">Học sinh</p>
+               {/* Student/Tutor Info */}
+               {user?.role === "STUDENT" && tutor ? (
+                  <div className="flex items-center gap-4 pb-4 border-b border-border">
+                     <Avatar className="h-14 w-14">
+                        <AvatarImage src={tutor?.avatarUrl} />
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                           {tutor?.name?.charAt(0).toUpperCase() || "T"}
+                        </AvatarFallback>
+                     </Avatar>
+                     <div className="flex-1">
+                        <p className="font-semibold text-base">{tutor?.name}</p>
+                        <p className="text-xs text-muted-foreground">Gia sư</p>
+                     </div>
+                     {hasReported ? (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
+                           <Flag className="h-4 w-4 mr-2" />
+                           Đã báo cáo
+                        </Badge>
+                     ) : canReport ? (
+                        <Button
+                           variant="outline"
+                           size="sm"
+                           onClick={handleReportClick}
+                           className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                        >
+                           <Flag className="h-4 w-4 mr-2" />
+                           Báo cáo gia sư
+                        </Button>
+                     ) : null}
                   </div>
-               </div>
+               ) : (
+                  <div className="flex items-center gap-4 pb-4 border-b border-border">
+                     <Avatar className="h-14 w-14">
+                        <AvatarImage src={student?.avatarUrl} />
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                           {student?.name?.charAt(0).toUpperCase() || "S"}
+                        </AvatarFallback>
+                     </Avatar>
+                     <div className="flex-1">
+                        <p className="font-semibold text-base">{student?.name}</p>
+                        <p className="text-xs text-muted-foreground">Học sinh</p>
+                     </div>
+                  </div>
+               )}
 
                {/* Course Info */}
                <div className="grid grid-cols-2 gap-4">

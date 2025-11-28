@@ -16,6 +16,7 @@ import {
    History,
    AlertTriangle,
    MessageCircle,
+   ShieldAlert,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -71,6 +72,11 @@ export const studentSidebarConfig: SidebarItem[] = [
       to: "/student/review-history",
       label: "Lịch sử đánh giá",
       icon: <Star className="h-4 w-4" />,
+   },
+   {
+      to: "/student/violation-reports",
+      label: "Báo cáo vi phạm của tôi",
+      icon: <ShieldAlert className="h-4 w-4" />,
    },
    {
       to: "/student/wallet",

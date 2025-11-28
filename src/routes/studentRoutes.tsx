@@ -17,6 +17,7 @@ import { StudentReviewHistory } from "@/pages/Review/StudentReviewHistory";
 import SessionDetailPage from "@/pages/SessionDetailPage";
 import { LearningCommitmentsPage } from "@/pages/Student/LearningCommitmentsPage";
 import WalletManagement from "@/pages/wallet/walletManagement";
+import MyViolationReportsPage from "@/pages/Student/MyViolationReportsPage";
 import DoMCQ from "@/pages/MultipleChoice/DoMCQ";
 import ViewMCQHistoryList from "@/pages/MultipleChoice/ViewMCQHistoryList";
 import ViewMCQHistory from "@/pages/MultipleChoice/ViewMCQHistory";
@@ -156,6 +157,10 @@ export const studentRoutes = {
       {
          path: "/student/chat",
          element: <ChatPage />,
+      },
+      {
+         path: "/student/violation-reports",
+         element: <MyViolationReportsPage />,
       },
    ],
 };
