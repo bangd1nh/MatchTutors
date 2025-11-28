@@ -29,6 +29,7 @@ import ViewSAQHistoryList from "@/pages/ShortAnswer/ViewSAQHistoryList";
 
 // import SessionDetailPage from "@/pages/SessionDetailPage"; // Moved to sharedRoutes
 import ChatPage from "@/pages/chat/chatPage";
+import StudentDashboardPage from "@/pages/Student/StudentDashboardPage";
 
 export const studentRoutes = {
    element: (
@@ -41,7 +42,7 @@ export const studentRoutes = {
          path: "/student/dashboard",
          element: (
             <IsCreatedProfileRoute>
-               <OverviewPage />
+               <StudentDashboardPage />,
             </IsCreatedProfileRoute>
          ),
       },
