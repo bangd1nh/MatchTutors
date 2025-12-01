@@ -21,7 +21,7 @@ import { Certification } from "@/types/tutorListandDetail";
 import { TutorProfileView } from "@/components/tutor/tutor-profile/TutorProfileView"
 import { EducationForm } from "@/components/tutor/tutor-profile/EducationForm"
 
-const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+const DAYS = ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"]
 
 export default function TutorProfile() {
     const { user } = useUser();
@@ -42,7 +42,7 @@ export default function TutorProfile() {
     const [removedImages, setRemovedImages] = useState<
         { certId?: string; certIndex: number; tempCertId?: string; imageIndex: number }[]
     >([]);
-    // console.log("Loaded tutor profile:", tutorProfile);
+    // console.log("Hồ sơ gia sư đã tải:", tutorProfile);
     const [isEditing, setIsEditing] = useState(!tutor);
     const { validateForm, getError, hasError, clearFieldError, validateField, clearErrors, scrollToFirstError } = useTutorFormValidation();
     const levelsRef = useRef<HTMLDivElement>(null);
@@ -70,7 +70,7 @@ export default function TutorProfile() {
         classType: [] as string[],
         levels: [],
     });
-    // Initialize form data when tutor profile is loaded
+    // Khởi tạo dữ liệu form khi hồ sơ gia sư được tải
     useEffect(() => {
         if (tutorProfile) {
             const user = typeof tutorProfile.userId === "object" ? tutorProfile.userId : null;
@@ -92,7 +92,7 @@ export default function TutorProfile() {
         }
     }, [tutorProfile, user]);
 
-    // Wait until data is loaded to decide editing state
+    // Đợi cho đến khi dữ liệu được tải xong để quyết định trạng thái chỉnh sửa
     useEffect(() => {
         if (!isLoading) {
             setIsEditing(!tutorProfile);
@@ -103,7 +103,7 @@ export default function TutorProfile() {
         return (
             <div className="flex items-center justify-center h-[80vh]">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                <span className="ml-2 text-lg">Loading profile...</span>
+                <span className="ml-2 text-lg">Đang tải hồ sơ...</span>
             </div>
         );
     }
@@ -111,21 +111,21 @@ export default function TutorProfile() {
     if (error) {
         return (
             <div className="flex items-center justify-center h-[80vh]">
-                <p className="text-red-500">Failed to load profile. Please try again.</p>
+                <p className="text-red-500">Không thể tải hồ sơ. Vui lòng thử lại.</p>
             </div>
         );
     }
 
     const showForm = !tutorProfile || isEditing
 
-    // Helper function to convert form data to FormData for file uploads
+    // Hàm helper để chuyển đổi dữ liệu form thành FormData để tải lên file
     const convertFormDataToFormData = (data: Tutor): FormData => {
         const formData = new FormData();
 
-        // Add all simple fields
+        // Thêm tất cả các trường đơn giản
         Object.entries(data).forEach(([key, value]) => {
             if (key === "education" && Array.isArray(value)) {
-                // Normalize startDate and endDate to YYYY-MM
+                // Chuẩn hóa startDate và endDate thành YYYY-MM
                 const normalizedEducation = value.map((edu: any) => ({
                     ...edu,
                     startDate: edu.startDate
@@ -160,7 +160,7 @@ export default function TutorProfile() {
             imageIndex?: number;
         }> = [];
 
-        // Handle uploads - collect ALL files first with proper indexing
+        // Xử lý upload - thu thập TẤT CẢ file trước với chỉ mục phù hợp
         const allFiles: File[] = [];
         Object.entries(certificationFiles).forEach(([_, files]) => {
             files.forEach(file => {
@@ -168,25 +168,25 @@ export default function TutorProfile() {
             });
         });
 
-        // Append all files to FormData with proper indexing
+        // Thêm tất cả file vào FormData với chỉ mục phù hợp
         allFiles.forEach((file) => {
             formData.append("certificationImages", file);
         });
 
-        // Now create mapping with correct global file indexes
+        // Tạo mapping với chỉ mục file toàn cục chính xác
         Object.entries(certificationFiles).forEach(([certIndexStr, files]) => {
             const certIndex = parseInt(certIndexStr);
             const cert = data.certifications?.[certIndex];
 
             files.forEach((file) => {
-                // Find the global index of this file
+                // Tìm chỉ mục toàn cục của file này
                 const globalIndex = allFiles.indexOf(file);
 
                 if (globalIndex !== -1) {
                     imageCertMapping.push({
                         action: "add",
                         certIndex,
-                        fileIndex: globalIndex, // Use global index
+                        fileIndex: globalIndex, // Sử dụng chỉ mục toàn cục
                         tempCertId: cert?.tempId,
                         certId: cert?._id,
                     });
@@ -194,7 +194,7 @@ export default function TutorProfile() {
             });
         });
 
-        // Handle removals
+        // Xử lý xóa ảnh
         removedImages.forEach(r => {
             imageCertMapping.push({
                 action: "remove",
@@ -205,7 +205,7 @@ export default function TutorProfile() {
             });
         });
 
-        // Add the mapping information
+        // Thêm thông tin mapping
         if (imageCertMapping.length > 0) {
             formData.append("imageCertMapping", JSON.stringify(imageCertMapping));
         }
@@ -232,8 +232,8 @@ export default function TutorProfile() {
         try {
             const formDataToSend = convertFormDataToFormData(formData as Tutor);
 
-            // Log the actual FormData contents
-            // console.log("📨 FormData contents:");
+            // Ghi nhật nội dung FormData thực tế
+            // console.log("📨 Nội dung FormData:");
             for (let [key, value] of formDataToSend.entries()) {
                 if (key === 'imageCertMapping') {
                     console.log(`  ${key}:`, JSON.parse(value as string));
@@ -254,16 +254,16 @@ export default function TutorProfile() {
             clearErrors();
             setIsEditing(false);
             refetch();
-            toast("success", "Profile saved successfully!");
+            toast("success", "Lưu hồ sơ thành công!");
         } catch (error: any) {
-            toast("error", error.response?.data?.message || "Failed to save profile");
+            toast("error", error.response?.data?.message || "Không thể lưu hồ sơ");
         }
     };
 
     const handleFieldChange = (field: string, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
 
-        // Real-time validation
+        // Xác thực thời gian thực
         validateField(field, value, !!tutorProfile);
     };
 
@@ -273,7 +273,7 @@ export default function TutorProfile() {
             address: { ...prev.address, [field]: value }
         }));
 
-        // Real-time validation for address fields
+        // Xác thực thời gian thực cho các trường địa chỉ
         validateField(`address.${field}`, value, !!tutorProfile);
     };
 
@@ -284,7 +284,7 @@ export default function TutorProfile() {
                 ? [...selected, type]
                 : selected.filter((t) => t !== type);
 
-            // Validate after update
+            // Xác thực sau khi cập nhật
             setTimeout(() => validateField("classType", newClassType, !!tutorProfile), 0);
 
             return { ...prev, classType: newClassType };
@@ -303,7 +303,7 @@ export default function TutorProfile() {
             return { ...prev, certifications };
         });
 
-        // Only validate if the value is not empty
+        // Chỉ xác thực nếu giá trị không rỗng
         if (value && value.trim() !== "") {
             validateField(`certifications.${index}.${String(field)}`, value, !!tutorProfile);
         } else {
@@ -313,7 +313,7 @@ export default function TutorProfile() {
 
     const handleEducationChange = (index: number, field: string, value: string) => {
         const newEducation = [...(formData.education || [])];
-        // Store as "YYYY-MM" directly
+        // Lưu trữ trực tiếp dưới dạng "YYYY-MM"
         newEducation[index] = { ...newEducation[index], [field]: value };
 
         setFormData((prev) => ({ ...prev, education: newEducation }));
@@ -336,7 +336,7 @@ export default function TutorProfile() {
     };
 
     const addCertification = () => {
-        const tempId = crypto.randomUUID(); // unique temporary ID
+        const tempId = crypto.randomUUID(); // ID tạm thời duy nhất
         setFormData((prev) => ({
             ...prev,
             certifications: [...(prev.certifications || []), { tempId, name: "", description: "" }],
@@ -374,7 +374,7 @@ export default function TutorProfile() {
     };
 
     const handleRemoveExistingImage = (cert: any, imageIndex: number, certIndex: number) => {
-        // console.log("🔄 handleRemoveExistingImage called with:", {
+        // console.log("🔄 handleRemoveExistingImage được gọi với:", {
         //     certIndex,
         //     imageIndex,
         //     certId: cert._id,
@@ -382,7 +382,7 @@ export default function TutorProfile() {
         //     currentImageUrls: cert.imageUrls
         // });
 
-        // Track for backend
+        // Theo dõi cho backend
         const removalData = {
             certId: cert._id,
             tempCertId: cert.tempId,
@@ -390,22 +390,22 @@ export default function TutorProfile() {
             imageIndex: imageIndex,
         };
 
-        // console.log("📝 Adding to removedImages:", removalData);
+        // console.log("📝 Thêm vào removedImages:", removalData);
 
         setRemovedImages(prev => {
             const newRemovedImages = [...prev, removalData];
-            console.log("📋 removedImages state updated:", newRemovedImages);
+            console.log("📋 Trạng thái removedImages đã cập nhật:", newRemovedImages);
             return newRemovedImages;
         });
 
-        // Optimistic UI update
+        // Cập nhật UI lạc quan
         setFormData(prev => {
             const updatedCertifications = prev.certifications?.map((c, idx) => {
                 if (idx === certIndex) {
                     const currentUrls = Array.isArray(c.imageUrls) ? c.imageUrls : [];
                     const updatedImageUrls = currentUrls.filter((_, i) => i !== imageIndex);
 
-                    // console.log(`🖼️ Cert ${idx}: removed image ${imageIndex}, from ${currentUrls.length} to ${updatedImageUrls.length} images`);
+                    // console.log(`🖼️ Chứng chỉ ${idx}: đã xóa ảnh ${imageIndex}, từ ${currentUrls.length} xuống ${updatedImageUrls.length} ảnh`);
 
                     return {
                         ...c,
@@ -415,7 +415,7 @@ export default function TutorProfile() {
                 return c;
             });
 
-            // console.log("✅ Form data updated with new certifications");
+            // console.log("✅ Dữ liệu form đã cập nhật với các chứng chỉ mới");
             return {
                 ...prev,
                 certifications: updatedCertifications
@@ -475,18 +475,18 @@ export default function TutorProfile() {
                 <div className="w-full h-full">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">{tutor ? "Edit Profile" : "Create Tutor Profile"}</h1>
+                            <h1 className="text-2xl font-bold text-gray-900">{tutor ? "Chỉnh sửa hồ sơ" : "Tạo hồ sơ gia sư"}</h1>
                             <p className="text-gray-600">
-                                {tutor ? "Update your tutor information" : "Complete the information below to create your profile"}
+                                {tutor ? "Cập nhật thông tin gia sư của bạn" : "Hoàn thành thông tin dưới đây để tạo hồ sơ của bạn"}
                             </p>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Avatar Section */}
+                        {/* Phần Avatar */}
                         <Card>
                             <CardHeader>
-                                <CardTitle>Profile Picture</CardTitle>
+                                <CardTitle>Ảnh đại diện</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <ProfileAvatar
@@ -498,10 +498,10 @@ export default function TutorProfile() {
                             </CardContent>
                         </Card>
 
-                        {/* Personal Information */}
+                        {/* Thông tin cá nhân */}
                         <Card className="lg:col-span-2">
                             <CardHeader>
-                                <CardTitle>Personal Information *</CardTitle>
+                                <CardTitle>Thông tin cá nhân *</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <PersonalInfoForm
@@ -514,7 +514,7 @@ export default function TutorProfile() {
                             </CardContent>
                         </Card>
 
-                        {/* Teaching Information */}
+                        {/* Thông tin giảng dạy */}
                         <TeachingInformationForm
                             formData={formData}
                             handleFieldChange={handleFieldChange}
@@ -524,10 +524,10 @@ export default function TutorProfile() {
                             getError={getError}
                         />
 
-                        {/* Subjects */}
+                        {/* Môn học */}
                         <Card className="lg:col-span-3">
                             <CardHeader>
-                                <CardTitle>Subjects Teaching *</CardTitle>
+                                <CardTitle>Môn học giảng dạy *</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <MultiSelectInput
@@ -540,18 +540,18 @@ export default function TutorProfile() {
                                     }}
                                     options={SUBJECT_VALUES}
                                     labels={SUBJECT_LABELS}
-                                    placeholder="Select subjects..."
-                                    searchPlaceholder="Search subjects..."
+                                    placeholder="Chọn môn học..."
+                                    searchPlaceholder="Tìm kiếm môn học..."
                                     className={hasError("subjects") ? "border-red-500 rounded-md" : ""}
                                 />
                                 <ValidationError message={getError("subjects")} />
                             </CardContent>
                         </Card>
 
-                        {/* Levels */}
+                        {/* Trình độ */}
                         <Card className="lg:col-span-3">
                             <CardHeader>
-                                <CardTitle>Levels *</CardTitle>
+                                <CardTitle>Trình độ *</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <MultiSelectInput
@@ -564,15 +564,15 @@ export default function TutorProfile() {
                                     }}
                                     options={LEVEL_VALUES}
                                     labels={LEVEL_LABELS}
-                                    placeholder="Select levels..."
-                                    searchPlaceholder="Search levels..."
+                                    placeholder="Chọn trình độ..."
+                                    searchPlaceholder="Tìm kiếm trình độ..."
                                     className={hasError("levels") ? "border-red-500 rounded-md" : ""}
                                 />
                                 <ValidationError message={getError("levels")} />
                             </CardContent>
                         </Card>
 
-                        {/* Education */}
+                        {/* Học vấn */}
                         <EducationForm
                             education={
                                 (formData.education || []).map(e => ({
@@ -594,14 +594,14 @@ export default function TutorProfile() {
                         />
 
 
-                        {/* Certifications */}
+                        {/* Chứng chỉ */}
                         <Card className="lg:col-span-3">
                             <CardHeader>
                                 <CardTitle className="flex items-center justify-between">
-                                    Certifications *
+                                    Chứng chỉ *
                                     <Button onClick={addCertification} size="sm" variant="outline">
                                         <Plus className="w-4 h-4 mr-2" />
-                                        Add Certification
+                                        Thêm chứng chỉ
                                     </Button>
                                 </CardTitle>
                             </CardHeader>
@@ -609,18 +609,18 @@ export default function TutorProfile() {
                                 {formData.certifications?.map((cert, index) => (
                                     <div key={index} className="border rounded-lg p-4 space-y-4">
                                         <div className="flex justify-between items-start">
-                                            <h4 className="font-medium">Certification {index + 1}</h4>
+                                            <h4 className="font-medium">Chứng chỉ {index + 1}</h4>
                                             <Button onClick={() => removeCertification(index)} size="sm" variant="ghost">
                                                 <X className="w-4 h-4" />
                                             </Button>
                                         </div>
                                         <div className="space-y-4">
                                             <div>
-                                                <Label htmlFor={`certifications.${index}.name`}>Certification Name *</Label>
+                                                <Label htmlFor={`certifications.${index}.name`}>Tên chứng chỉ *</Label>
                                                 <Input
                                                     id={`certifications.${index}.name`}
                                                     name={`certifications.${index}.name`}
-                                                    placeholder="Certification Name"
+                                                    placeholder="Tên chứng chỉ"
                                                     value={cert.name}
                                                     onChange={(e) => handleCertificationChange(index, "name", e.target.value)}
                                                     className={hasError(`certifications.${index}.name`) ? "border-red-500" : ""}
@@ -628,20 +628,20 @@ export default function TutorProfile() {
                                                 <ValidationError message={getError(`certifications.${index}.name`)} />
                                             </div>
                                             <div>
-                                                <Label htmlFor={`certifications.${index}.description`}>Description *</Label>
+                                                <Label htmlFor={`certifications.${index}.description`}>Mô tả *</Label>
                                                 <Textarea
                                                     id={`certifications.${index}.description`}
                                                     name={`certifications.${index}.description`}
-                                                    placeholder="Description"
+                                                    placeholder="Mô tả"
                                                     value={cert.description || ""}
                                                     onChange={(e) => handleCertificationChange(index, "description", e.target.value)}
                                                 />
                                                 <ValidationError message={getError(`certifications.${index}.description`)} />
                                             </div>
 
-                                            {/* Certification Images Upload */}
+                                            {/* Tải lên ảnh chứng chỉ */}
                                             <div>
-                                                <Label>Certification Images</Label>
+                                                <Label>Ảnh chứng chỉ</Label>
                                                 <div className="mt-2">
                                                     <input
                                                         type="file"
@@ -653,15 +653,15 @@ export default function TutorProfile() {
                                                     />
                                                     <label htmlFor={`certification-images-${index}`}>
                                                         <Button variant="outline" size="sm" asChild>
-                                                            <span>Add Images</span>
+                                                            <span>Thêm ảnh</span>
                                                         </Button>
                                                     </label>
                                                 </div>
 
-                                                {/* Display selected images */}
+                                                {/* Hiển thị ảnh đã chọn */}
                                                 {certificationFiles[index] && certificationFiles[index].length > 0 && (
                                                     <div className="mt-3">
-                                                        <p className="text-sm text-gray-600 mb-2">Selected images:</p>
+                                                        <p className="text-sm text-gray-600 mb-2">Ảnh đã chọn:</p>
                                                         <div className="flex flex-wrap gap-2">
                                                             {certificationFiles[index].map((file, fileIndex) => (
                                                                 <div key={fileIndex} className="relative">
@@ -687,23 +687,23 @@ export default function TutorProfile() {
                                                     </div>
                                                 )}
 
-                                                {/* Display existing images from server */}
+                                                {/* Hiển thị ảnh hiện có từ server */}
                                                 {cert.imageUrls && cert.imageUrls.length > 0 && (
                                                     <div className="mt-3">
-                                                        <p className="text-sm text-gray-600 mb-2">Existing images:</p>
+                                                        <p className="text-sm text-gray-600 mb-2">Ảnh hiện có:</p>
                                                         <div className="flex flex-wrap gap-2">
                                                             {cert.imageUrls?.map((url, urlIndex) => (
                                                                 <div key={urlIndex} className="relative group">
                                                                     <img
                                                                         src={url}
-                                                                        alt={`Certification image ${urlIndex + 1}`}
+                                                                        alt={`Ảnh chứng chỉ ${urlIndex + 1}`}
                                                                         className="w-16 h-16 object-cover rounded border"
                                                                     />
                                                                     <p className="text-xs text-gray-500 truncate w-16">
-                                                                        Image {urlIndex + 1}
+                                                                        Ảnh {urlIndex + 1}
                                                                     </p>
 
-                                                                    {/* Remove button */}
+                                                                    {/* Nút xóa */}
                                                                     <button
                                                                         type="button"
                                                                         onClick={() => handleRemoveExistingImage(cert, urlIndex, index)}
@@ -722,11 +722,11 @@ export default function TutorProfile() {
                             </CardContent>
                         </Card>
 
-                        {/* Availability */}
+                        {/* Lịch trình khả dụng */}
                         < Card className="lg:col-span-3" id="availability-section" >
                             <CardHeader>
-                                <CardTitle>Availability Schedule *</CardTitle>
-                                <p className="text-sm text-gray-600">Select the days and time slots when you're available to teach</p>
+                                <CardTitle>Lịch trình khả dụng *</CardTitle>
+                                <p className="text-sm text-gray-600">Chọn ngày và khung giờ khi bạn có thể giảng dạy</p>
                             </CardHeader>
                             <CardContent>
                                 <AvailabilityGrid
@@ -737,16 +737,16 @@ export default function TutorProfile() {
                             </CardContent>
                         </ Card>
 
-                        {/* Address */}
+                        {/* Địa chỉ */}
                         <Card className="lg:col-span-3">
                             <CardHeader>
-                                <CardTitle>Address *</CardTitle>
+                                <CardTitle>Địa chỉ *</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* City */}
+                                    {/* Thành phố */}
                                     <div>
-                                        <Label htmlFor="address.city">City *</Label>
+                                        <Label htmlFor="address.city">Thành phố *</Label>
                                         <Select
                                             value={formData.address?.city || ""}
                                             onValueChange={(value) => {
@@ -755,7 +755,7 @@ export default function TutorProfile() {
                                             }}
                                         >
                                             <SelectTrigger className={hasError("address.city") ? "border-red-500" : ""}>
-                                                <SelectValue placeholder="Select a city" />
+                                                <SelectValue placeholder="Chọn thành phố" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {CITY_TYPE_VALUES.map((city) => (
@@ -768,9 +768,9 @@ export default function TutorProfile() {
                                         <ValidationError message={getError("address.city")} />
                                     </div>
 
-                                    {/* Street */}
+                                    {/* Đường */}
                                     <div>
-                                        <Label htmlFor="address.street">Street Address *</Label>
+                                        <Label htmlFor="address.street">Địa chỉ đường *</Label>
                                         <Input
                                             id="address.street"
                                             name="address.street"
@@ -779,7 +779,7 @@ export default function TutorProfile() {
                                                 handleAddressChange("street", e.target.value);
                                                 clearFieldError("address.street");
                                             }}
-                                            placeholder="Enter street address"
+                                            placeholder="Nhập địa chỉ đường"
                                             className={hasError("address.street") ? "border-red-500" : ""}
                                         />
                                         <ValidationError message={getError("address.street")} />
@@ -788,7 +788,7 @@ export default function TutorProfile() {
                             </CardContent>
                         </Card>
 
-                        {/* Action Buttons */}
+                        {/* Nút hành động */}
                         <Card className="lg:col-span-3" >
                             <CardContent className="pt-6">
                                 <div className="mt-4 flex justify-end space-x-2">
@@ -797,7 +797,7 @@ export default function TutorProfile() {
                                         onClick={() => setIsEditing(false)}
                                         disabled={isCreating || isUpdating}
                                     >
-                                        Cancel
+                                        Hủy
                                     </Button>
 
                                     <Button
@@ -807,10 +807,10 @@ export default function TutorProfile() {
                                         {isCreating || isUpdating ? (
                                             <span className="flex items-center space-x-2">
                                                 <Loader2 className="h-5 w-5 animate-spin" />
-                                                <span>Saving...</span>
+                                                <span>Đang lưu...</span>
                                             </span>
                                         ) : (
-                                            "Save"
+                                            "Lưu"
                                         )}
                                     </Button>
                                 </div>
@@ -822,7 +822,7 @@ export default function TutorProfile() {
         )
     }
 
-    // Profile View
+    // Chế độ xem hồ sơ
     return (
         <TutorProfileView tutor={tutorProfile} onEdit={() => setIsEditing(true)} />
     )

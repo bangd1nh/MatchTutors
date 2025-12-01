@@ -1,6 +1,6 @@
 import { NextSessionCard } from "./NextSessionCard"
 import { QuickStats } from "./QuickStats"
-import { Timeline } from "./timeline"
+import { Timeline } from "./Timeline"
 import { TopCourses } from "./TopCourses"
 import type { StudentDashboardDTO } from "@/types/studentDashboard"
 

@@ -21,12 +21,12 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
             <div className="w-full h-full mx-auto">
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Tutor Profile</h1>
-                        <p className="text-gray-600">View and manage your tutor information</p>
+                        <h1 className="text-2xl font-bold text-gray-900">Hồ sơ Gia sư</h1>
+                        <p className="text-gray-600">Xem và quản lý thông tin hồ sơ của bạn</p>
                     </div>
                     <Button onClick={onEdit} className="bg-blue-600 hover:bg-blue-700">
                         <Edit className="w-4 h-4 mr-2" />
-                        Edit Profile
+                        Chỉnh sửa hồ sơ
                     </Button>
                 </div>
 
@@ -50,17 +50,17 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                                     <h2 className="text-xl font-bold">
                                         {typeof tutor?.userId === "object" && tutor?.userId?.name
                                             ? tutor.userId.name
-                                            : "Tutor"}
+                                            : "Gia sư"}
                                     </h2>
                                     <div className="flex items-center justify-center space-x-1 mt-2">
                                         <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                                         <span className="font-medium">{tutor?.ratings?.average ?? "-"}</span>
-                                        <span className="text-gray-500">({tutor?.ratings?.totalReviews ?? "-"} reviews)</span>
+                                        <span className="text-gray-500">({tutor?.ratings?.totalReviews ?? "-"} đánh giá)</span>
                                     </div>
                                     <Badge
                                         className={`mt-2 ${tutor?.isApproved ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}
                                     >
-                                        {tutor?.isApproved ? "Approved" : "Pending Approval"}
+                                        {tutor?.isApproved ? "Đã duyệt" : "Đang chờ duyệt"}
                                     </Badge>
                                 </div>
                             </div>
@@ -70,7 +70,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                     {/* Contact & Basic Info */}
                     <Card className="lg:col-span-2">
                         <CardHeader>
-                            <CardTitle>Contact Information</CardTitle>
+                            <CardTitle>Thông tin liên hệ</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {tutor && <ContactInfoDisplay tutor={tutor} />}
@@ -80,7 +80,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                     {/* Teaching Information */}
                     <Card className="lg:col-span-3">
                         <CardHeader>
-                            <CardTitle>Teaching Information</CardTitle>
+                            <CardTitle>Thông tin giảng dạy</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {tutor && <StatsOverview tutor={tutor} />}
@@ -92,7 +92,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                         <CardHeader>
                             <CardTitle className="flex items-center">
                                 <GraduationCap className="w-5 h-5 mr-2" />
-                                Education
+                                Học vấn
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -105,7 +105,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                         <CardHeader>
                             <CardTitle className="flex items-center">
                                 <Award className="w-5 h-5 mr-2" />
-                                Certifications
+                                Chứng chỉ
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -124,7 +124,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                                                     <div key={urlIndex} className="relative">
                                                         <img
                                                             src={url}
-                                                            alt={`Certification ${index + 1} - Image ${urlIndex + 1}`}
+                                                            alt={`Chứng chỉ ${index + 1} - Hình ${urlIndex + 1}`}
                                                             className="w-20 h-20 object-cover rounded cursor-pointer border hover:opacity-80"
                                                             onClick={() => setSelectedImage(url)}
                                                         />
@@ -140,7 +140,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                                     {selectedImage && (
                                         <img
                                             src={selectedImage}
-                                            alt="Certification enlarged"
+                                            alt="Chứng chỉ phóng to"
                                             className="max-h-[80vh] w-auto mx-auto rounded-lg"
                                         />
                                     )}
@@ -154,7 +154,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                         <CardHeader>
                             <CardTitle className="flex items-center">
                                 <Calendar className="w-5 h-5 mr-2" />
-                                Availability Schedule
+                                Lịch giảng dạy
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
