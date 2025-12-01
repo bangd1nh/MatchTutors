@@ -20,6 +20,7 @@ import {
    FormMessage,
 } from "@/components/ui/form";
 import { CheckCircle2, AlertCircle, Mail } from "lucide-react";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 
 import {
    useCreateLearningCommitment,
@@ -141,7 +142,11 @@ export const CreateLearningCommitmentForm = ({ onSuccess }: Props) => {
                                                          >
                                                             <div className="flex flex-col">
                                                                <span className="font-semibold text-slate-900">
-                                                                  {`${tr.subject} - ${tr.level}`}
+                                                                  {`${getSubjectLabelVi(
+                                                                     tr.subject
+                                                                  )} - ${getLevelLabelVi(
+                                                                     tr.level
+                                                                  )}`}
                                                                </span>
                                                                <span className="text-xs text-slate-500 flex items-center gap-1">
                                                                   <Mail className="w-3 h-3" />
@@ -181,8 +186,13 @@ export const CreateLearningCommitmentForm = ({ onSuccess }: Props) => {
                                                 Thông tin yêu cầu
                                              </p>
                                              <p className="text-sm font-semibold text-slate-900">
-                                                {selectedRequest.subject} -{" "}
-                                                {selectedRequest.level}
+                                                {getSubjectLabelVi(
+                                                   selectedRequest.subject
+                                                )}{" "}
+                                                -{" "}
+                                                {getLevelLabelVi(
+                                                   selectedRequest.level
+                                                )}
                                              </p>
                                           </div>
                                           <div className="border-t border-blue-200 pt-2">
@@ -350,10 +360,10 @@ export const CreateLearningCommitmentForm = ({ onSuccess }: Props) => {
                                  Yêu Cầu
                               </p>
                               <p className="font-semibold text-slate-900 mb-1">
-                                 {selectedRequest.subject}
+                                 {getSubjectLabelVi(selectedRequest.subject)}
                               </p>
                               <p className="text-sm text-slate-600 mb-2">
-                                 {selectedRequest.level}
+                                 {getLevelLabelVi(selectedRequest.level)}
                               </p>
                               <div className="border-t border-slate-200 pt-2">
                                  <p className="text-xs text-slate-600 mb-1">

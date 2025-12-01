@@ -22,6 +22,7 @@ import {
 import { useAddFav, useFetchFav, useRemoveFav } from "@/hooks/useFavTutor";
 import { useUser } from "@/hooks/useUser";
 import { useToast } from "@/hooks/useToast";
+import { getSubjectLabelVi } from "@/utils/educationDisplay";
 
 interface TutorCardProps {
    tutor: Tutor;
@@ -238,7 +239,7 @@ export function TutorCard({ tutor }: TutorCardProps) {
                            variant="secondary"
                            className="text-xs py-1.5 px-3 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
                         >
-                           {subject}
+                           {getSubjectLabelVi(subject)}
                         </Badge>
                      ))}
 
@@ -265,7 +266,7 @@ export function TutorCard({ tutor }: TutorCardProps) {
                                           variant="outline"
                                           className="text-xs py-1 px-2 rounded-md"
                                        >
-                                          {subject}
+                                          {getSubjectLabelVi(subject)}
                                        </Badge>
                                     ))}
                               </div>
