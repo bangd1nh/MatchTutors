@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,25 +24,16 @@ import {
    getAdminViolationReports,
    type ViolationReport,
 } from "@/api/violationReport";
-import { ViolationStatusEnum, ViolationTypeEnum } from "@/enums/violationReport.enum";
+import { 
+   ViolationStatusEnum, 
+   ViolationTypeEnum,
+   VIOLATION_TYPE_LABELS_VI,
+   VIOLATION_STATUS_LABELS_VI,
+} from "@/enums/violationReport.enum";
 import { useToast } from "@/hooks/useToast";
 import moment from "moment";
 
 const ITEMS_PER_PAGE = 20;
-
-const VIOLATION_TYPE_LABELS: Record<string, string> = {
-   [ViolationTypeEnum.SCAM_TUTOR]: "Gia sư lừa đảo",
-   [ViolationTypeEnum.FALSE_FEEDBACK]: "Đánh giá sai",
-   [ViolationTypeEnum.SCAM_STUDENT]: "Học sinh lừa đảo",
-   OTHER: "Khác",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-   [ViolationStatusEnum.PENDING]: "Đang chờ",
-   [ViolationStatusEnum.RESOLVED]: "Đã xử lý",
-   [ViolationStatusEnum.REJECTED]: "Đã từ chối",
-   [ViolationStatusEnum.REVIEWED]: "Đã xem",
-};
 
 const STATUS_COLORS: Record<string, string> = {
    [ViolationStatusEnum.PENDING]: "bg-yellow-100 text-yellow-800",
@@ -51,6 +43,10 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function AdminViolationReportManagement() {
+   const [searchParams, setSearchParams] = useSearchParams();
+   const tutorIdFromUrl = searchParams.get('tutorId');
+   const tutorProfileIdFromUrl = searchParams.get('tutorProfileId');
+   
    const [reports, setReports] = useState<ViolationReport[]>([]);
    const [isLoading, setIsLoading] = useState(false);
    const [selectedReport, setSelectedReport] = useState<ViolationReport | null>(null);
@@ -58,7 +54,8 @@ export default function AdminViolationReportManagement() {
    const [filters, setFilters] = useState({
       page: 1,
       limit: ITEMS_PER_PAGE,
-      status: "PENDING" as string | null,
+      // Nếu có filter theo tutor, mặc định hiển thị tất cả trạng thái
+      status: (tutorIdFromUrl || tutorProfileIdFromUrl) ? null : "PENDING" as string | null,
       type: null as string | null,
    });
    const [pagination, setPagination] = useState({
@@ -79,12 +76,28 @@ export default function AdminViolationReportManagement() {
             type: filters.type || undefined,
          });
          // Đảm bảo reports là array và pagination có đầy đủ fields
-         setReports(Array.isArray(result?.reports) ? result.reports : []);
+         let filteredReports = Array.isArray(result?.reports) ? result.reports : [];
+         
+         // Filter by tutorId if provided in URL
+         if (tutorIdFromUrl || tutorProfileIdFromUrl) {
+            filteredReports = filteredReports.filter((report: ViolationReport) => {
+               const reportedUserId = typeof report.reportedUserId === 'object' 
+                  ? report.reportedUserId?._id 
+                  : report.reportedUserId;
+               const reportTutorId = report.tutorId;
+               
+               // Match by userId (tutorIdFromUrl) or tutorId (tutorProfileIdFromUrl)
+               return (tutorIdFromUrl && reportedUserId === tutorIdFromUrl) ||
+                      (tutorProfileIdFromUrl && reportTutorId === tutorProfileIdFromUrl);
+            });
+         }
+         
+         setReports(filteredReports);
          setPagination({
             page: result?.pagination?.page || filters.page,
             limit: result?.pagination?.limit || filters.limit,
-            total: result?.pagination?.total || 0,
-            pages: result?.pagination?.pages || 1,
+            total: filteredReports.length, // Use filtered count
+            pages: Math.ceil(filteredReports.length / filters.limit),
          });
       } catch (error: any) {
          console.error("Error loading reports:", error);
@@ -105,11 +118,11 @@ export default function AdminViolationReportManagement() {
       } finally {
          setIsLoading(false);
       }
-   }, [filters, toast]);
+   }, [filters, toast, tutorIdFromUrl, tutorProfileIdFromUrl]);
 
    useEffect(() => {
       loadReports();
-   }, [loadReports]);
+   }, [loadReports, tutorIdFromUrl, tutorProfileIdFromUrl]);
 
    const handleViewDetail = (report: ViolationReport) => {
       setSelectedReport(report);
@@ -160,8 +173,20 @@ export default function AdminViolationReportManagement() {
             <div>
                <h1 className="text-3xl font-bold">Quản lý báo cáo vi phạm</h1>
                <p className="text-muted-foreground mt-1">
-                  Xem và xử lý các báo cáo vi phạm từ học sinh
+                  {tutorIdFromUrl || tutorProfileIdFromUrl 
+                     ? `Đang hiển thị báo cáo cho gia sư được chọn` 
+                     : 'Xem và xử lý các báo cáo vi phạm từ học sinh'}
                </p>
+               {(tutorIdFromUrl || tutorProfileIdFromUrl) && (
+                  <button
+                     onClick={() => {
+                        setSearchParams({});
+                     }}
+                     className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline"
+                  >
+                     Xóa bộ lọc
+                  </button>
+               )}
             </div>
          </div>
 
@@ -289,7 +314,7 @@ export default function AdminViolationReportManagement() {
                                           </div>
                                        </TableCell>
                                        <TableCell>
-                                          {VIOLATION_TYPE_LABELS[report.type] || report.type || "N/A"}
+                                          {VIOLATION_TYPE_LABELS_VI[report.type] || report.type || "N/A"}
                                        </TableCell>
                                        <TableCell className="max-w-xs truncate">
                                           {report.reason || "N/A"}
@@ -301,7 +326,7 @@ export default function AdminViolationReportManagement() {
                                                 "bg-gray-100 text-gray-800"
                                              }
                                           >
-                                             {STATUS_LABELS[report.status] || report.status || "N/A"}
+                                             {VIOLATION_STATUS_LABELS_VI[report.status] || report.status || "N/A"}
                                           </Badge>
                                        </TableCell>
                                        <TableCell>

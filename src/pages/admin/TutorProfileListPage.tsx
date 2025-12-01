@@ -23,6 +23,8 @@ import {
   useRejectTutor,
   useGetTutorMapping
 } from '@/hooks/useAdminTutors'
+import { SUBJECT_LABELS_VI } from '@/enums/subject.enum'
+import { LEVEL_LABELS_VI } from '@/enums/level.enum'
 import {
   Dialog,
   DialogContent,
@@ -53,58 +55,11 @@ const getApprovalStatusText = (isApproved: boolean) => {
 }
 
 const getSubjectDisplayName = (subject: string) => {
-  const subjectMap: { [key: string]: string } = {
-    'ACCOUNTING': 'Kế toán',
-    'ADDITIONAL_MATHS': 'Toán nâng cao',
-    'BIOLOGY': 'Sinh học',
-    'BUSINESS_STUDIES': 'Kinh doanh',
-    'CHEMISTRY': 'Hóa học',
-    'CHINESE': 'Tiếng Trung',
-    'COMPUTER_SCIENCE': 'Khoa học máy tính',
-    'ECONOMICS': 'Kinh tế học',
-    'ENGLISH': 'Tiếng Anh',
-    'FREE_CONSULTATION': 'Tư vấn miễn phí',
-    'FURTHER_MATHS': 'Toán nâng cao',
-    'GEOGRAPHY': 'Địa lý',
-    'GUITAR': 'Guitar',
-    'HISTORY': 'Lịch sử',
-    'MALAY': 'Tiếng Malay',
-    'MATHEMATICS': 'Toán học',
-    'ORGAN': 'Organ',
-    'PHONICS_ENGLISH': 'Phát âm tiếng Anh',
-    'PHYSICS': 'Vật lý',
-    'PIANO': 'Piano',
-    'RISE_PROGRAM': 'Chương trình RISE',
-    'SCIENCE': 'Khoa học',
-    'SWIMMING': 'Bơi lội',
-    'TAMIL': 'Tiếng Tamil',
-    'TENNIS': 'Tennis',
-    'WORLD_LITERATURE': 'Văn học thế giới',
-    'YOGA': 'Yoga',
-  }
-  return subjectMap[subject] || subject
+  return SUBJECT_LABELS_VI[subject] || subject
 }
 
 const getLevelDisplayName = (level: string) => {
-  const levelMap: { [key: string]: string } = {
-    'GRADE_1': 'Lớp 1',
-    'GRADE_2': 'Lớp 2',
-    'GRADE_3': 'Lớp 3',
-    'GRADE_4': 'Lớp 4',
-    'GRADE_5': 'Lớp 5',
-    'GRADE_6': 'Lớp 6',
-    'GRADE_7': 'Lớp 7',
-    'GRADE_8': 'Lớp 8',
-    'GRADE_9': 'Lớp 9',
-    'GRADE_10': 'Lớp 10',
-    'GRADE_11': 'Lớp 11',
-    'GRADE_12': 'Lớp 12',
-    'UNIVERSITY': 'Đại học',
-    'HIGH_SCHOOL': 'THPT',
-    'MIDDLE_SCHOOL': 'THCS',
-    'ELEMENTARY': 'Tiểu học',
-  }
-  return levelMap[level] || level
+  return LEVEL_LABELS_VI[level] || level
 }
 
 const TutorProfileListPage: React.FC = () => {

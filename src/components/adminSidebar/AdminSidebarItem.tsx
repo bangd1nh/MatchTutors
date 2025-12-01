@@ -14,6 +14,7 @@ import {
    Users,
    AlertCircle,
    AlertTriangle,
+   Wallet,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -24,12 +25,69 @@ export type SidebarItem = {
    icon?: React.ReactNode;
 };
 
-const personalItems: SidebarItem[] = [
+// Mục quan trọng nhất - ưu tiên cao
+const priorityItems: SidebarItem[] = [
    {
       to: "/admin/dashboard",
       label: "Tổng quan",
       icon: <LayoutDashboard className="h-5 w-5" />,
    },
+   {
+      to: "/admin/wallet",
+      label: "Ví Admin",
+      icon: <Wallet className="h-5 w-5" />,
+   },
+];
+
+// Mục cần xử lý ngay - ưu tiên cao
+const urgentItems: SidebarItem[] = [
+   {
+      to: "/admin/violation-reports",
+      label: "Báo cáo vi phạm",
+      icon: <AlertTriangle className="h-5 w-5" />,
+   },
+   {
+      to: "/admin/disputes",
+      label: "Tranh chấp buổi học",
+      icon: <AlertCircle className="h-5 w-5" />,
+   },
+   {
+      to: "/admin/learning",
+      label: "Tranh chấp học tập",
+      icon: <Users className="h-5 w-5" />,
+   },
+];
+
+// Quản lý người dùng
+const userManagementItems: SidebarItem[] = [
+   {
+      to: "/admin/tutors",
+      label: "Tài khoản Gia sư",
+      icon: <BookOpen className="h-5 w-5" />,
+   },
+   {
+      to: "/admin/tutor-profile",
+      label: "Hồ sơ Gia sư",
+      icon: <FileText className="h-5 w-5" />,
+   },
+   {
+      to: "/admin/students",
+      label: "Tài khoản Học sinh",
+      icon: <GraduationCap className="h-5 w-5" />,
+   },
+];
+
+// Quản lý dịch vụ
+const serviceItems: SidebarItem[] = [
+   {
+      to: "/admin/packages",
+      label: "Gói dịch vụ",
+      icon: <PackageIcon className="h-5 w-5" />,
+   },
+];
+
+// Cá nhân
+const personalItems: SidebarItem[] = [
    {
       to: "/admin/profile",
       label: "Hồ sơ cá nhân",
@@ -42,44 +100,6 @@ const personalItems: SidebarItem[] = [
    },
 ];
 
-const managementItems: SidebarItem[] = [
-   {
-      to: "/admin/tutor-profile",
-      label: "Hồ sơ Gia sư",
-      icon: <FileText className="h-5 w-5" />,
-   },
-   {
-      to: "/admin/tutors",
-      label: "Tài khoản Gia sư",
-      icon: <BookOpen className="h-5 w-5" />,
-   },
-   {
-      to: "/admin/students",
-      label: "Tài khoản Học sinh",
-      icon: <GraduationCap className="h-5 w-5" />,
-   },
-   {
-      to: "/admin/packages",
-      label: "Gói dịch vụ",
-      icon: <PackageIcon className="h-5 w-5" />,
-   },
-   {
-      to: "/admin/learning",
-      label: "Tranh chấp học tập",
-      icon: <Users className="h-4 w-4" />,
-   },
-   {
-      to: "/admin/disputes",
-      label: "Tranh chấp buổi học",
-      icon: <AlertCircle className="h-4 w-4" />,
-   },
-   {
-      to: "/admin/violation-reports",
-      label: "Báo cáo vi phạm",
-      icon: <AlertTriangle className="h-4 w-4" />,
-   },
-];
-
 const AdminSidebarItems: React.FC<{
    onLinkClick?: () => void;
    collapsed?: boolean;
@@ -89,8 +109,19 @@ const AdminSidebarItems: React.FC<{
    const navigate = useNavigate();
    const { logout } = useAuth();
 
-   const isActive = (path: string, exact = false) =>
-      exact ? location.pathname === path : location.pathname.startsWith(path);
+   const isActive = (path: string, exact = false) => {
+      if (exact) {
+         return location.pathname === path;
+      }
+      // Special case: /admin/tutors/:tutorId should match /admin/tutor-profile, not /admin/tutors
+      if (path === "/admin/tutors" && location.pathname.startsWith("/admin/tutors/") && location.pathname !== "/admin/tutors") {
+         return false;
+      }
+      if (path === "/admin/tutor-profile" && location.pathname.startsWith("/admin/tutors/") && location.pathname !== "/admin/tutors") {
+         return true;
+      }
+      return location.pathname.startsWith(path);
+   };
 
    const handleLogout = () => {
       logout();
@@ -173,13 +204,31 @@ const AdminSidebarItems: React.FC<{
                </span>
             </Link>
 
-            {renderGroup("Tài khoản cá nhân", personalItems)}
+            {renderGroup("Quan trọng", priorityItems)}
 
             <div className="px-3 py-2">
                <div className="h-px bg-gray-200 dark:bg-gray-800" />
             </div>
 
-            {renderGroup("Quản trị hệ thống", managementItems)}
+            {renderGroup("Cần xử lý", urgentItems)}
+
+            <div className="px-3 py-2">
+               <div className="h-px bg-gray-200 dark:bg-gray-800" />
+            </div>
+
+            {renderGroup("Quản lý người dùng", userManagementItems)}
+
+            <div className="px-3 py-2">
+               <div className="h-px bg-gray-200 dark:bg-gray-800" />
+            </div>
+
+            {renderGroup("Dịch vụ", serviceItems)}
+
+            <div className="px-3 py-2">
+               <div className="h-px bg-gray-200 dark:bg-gray-800" />
+            </div>
+
+            {renderGroup("Cá nhân", personalItems)}
          </div>
 
          <div className="mt-auto pt-2 border-t border-gray-200 dark:border-gray-800">
