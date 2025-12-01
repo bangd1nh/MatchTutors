@@ -9,7 +9,7 @@ export default function StudentDashboardPage() {
         return (
             <div className="flex items-center justify-center h-96">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="ml-4 text-lg">Loading dashboard...</p>
+                <p className="ml-4 text-lg">Đang tải bảng điều khiển...</p>
             </div>
         );
     }
@@ -17,7 +17,7 @@ export default function StudentDashboardPage() {
     if (error) {
         return (
             <div className="text-center py-8">
-                <p className="text-red-500">Error loading dashboard data: {error.message}</p>
+                <p className="text-red-500">Lỗi khi tải dữ liệu bảng điều khiển: {error.message}</p>
             </div>
         );
     }
@@ -25,7 +25,7 @@ export default function StudentDashboardPage() {
     if (!data) {
         return (
             <div className="text-center py-8">
-                <p className="text-gray-500">No dashboard data available.</p>
+                <p className="text-gray-500">Không có dữ liệu bảng điều khiển.</p>
             </div>
         );
     }
