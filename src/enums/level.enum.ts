@@ -24,3 +24,22 @@ export const LEVEL_LABELS: Record<string, string> = Object.fromEntries(
          .replace("UNIVERSITY", "University"),
    ])
 );
+
+export const LEVEL_LABELS_VI: Record<string, string> = {
+   [Level.GRADE_1]: "Lớp 1",
+   [Level.GRADE_2]: "Lớp 2",
+   [Level.GRADE_3]: "Lớp 3",
+   [Level.GRADE_4]: "Lớp 4",
+   [Level.GRADE_5]: "Lớp 5",
+   [Level.GRADE_6]: "Lớp 6",
+   [Level.GRADE_7]: "Lớp 7",
+   [Level.GRADE_8]: "Lớp 8",
+   [Level.GRADE_9]: "Lớp 9",
+   [Level.GRADE_10]: "Lớp 10",
+   [Level.GRADE_11]: "Lớp 11",
+   [Level.GRADE_12]: "Lớp 12",
+   [Level.UNIVERSITY]: "Đại học",
+   HIGH_SCHOOL: "THPT",
+   MIDDLE_SCHOOL: "THCS",
+   ELEMENTARY: "Tiểu học",
+};

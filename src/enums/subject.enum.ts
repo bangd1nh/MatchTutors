@@ -39,3 +39,33 @@ export const SUBJECT_LABELS: Record<string, string> = Object.fromEntries(
          .replace(/\b\w/g, (c) => c.toUpperCase()), // capitalize each word
    ])
 );
+
+export const SUBJECT_LABELS_VI: Record<string, string> = {
+   [Subject.ACCOUNTING]: "Kế toán",
+   [Subject.ADDITIONAL_MATHS]: "Toán nâng cao",
+   [Subject.BIOLOGY]: "Sinh học",
+   [Subject.BUSINESS_STUDIES]: "Kinh doanh",
+   [Subject.CHEMISTRY]: "Hóa học",
+   [Subject.CHINESE]: "Tiếng Trung",
+   [Subject.COMPUTER_SCIENCE]: "Khoa học máy tính",
+   [Subject.ECONOMICS]: "Kinh tế học",
+   [Subject.ENGLISH]: "Tiếng Anh",
+   [Subject.FREE_CONSULTATION]: "Tư vấn miễn phí",
+   [Subject.FURTHER_MATHS]: "Toán nâng cao",
+   [Subject.GEOGRAPHY]: "Địa lý",
+   [Subject.GUITAR]: "Guitar",
+   [Subject.HISTORY]: "Lịch sử",
+   [Subject.MALAY]: "Tiếng Malay",
+   [Subject.MATHEMATICS]: "Toán học",
+   [Subject.ORGAN]: "Organ",
+   [Subject.PHONICS_ENGLISH]: "Phát âm tiếng Anh",
+   [Subject.PHYSICS]: "Vật lý",
+   [Subject.PIANO]: "Piano",
+   [Subject.RISE_PROGRAM]: "Chương trình RISE",
+   [Subject.SCIENCE]: "Khoa học",
+   [Subject.SWIMMING]: "Bơi lội",
+   [Subject.TAMIL]: "Tiếng Tamil",
+   [Subject.TENNIS]: "Tennis",
+   [Subject.WORLD_LITERATURE]: "Văn học thế giới",
+   [Subject.YOGA]: "Yoga",
+};

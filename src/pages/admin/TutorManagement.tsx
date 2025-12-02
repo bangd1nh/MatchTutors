@@ -64,15 +64,46 @@ const TutorManagement = () => {
    }, [searchTerm]);
 
    // Memoized mappings
-   const { userIdToTutorId } = useMemo(() => {
+   const { userIdToTutorId, userIdToTutorData } = useMemo(() => {
       const mapping: Record<string, string> = {};
+      const tutorDataMapping: Record<string, any> = {};
       
       tutorMappingData?.data?.tutors?.forEach((item: any) => {
          if (item.tutorId) mapping[item.userId] = item.tutorId;
+         if (item.tutor) tutorDataMapping[item.userId] = item.tutor;
       });
       
-      return { userIdToTutorId: mapping };
+      return { userIdToTutorId: mapping, userIdToTutorData: tutorDataMapping };
    }, [tutorMappingData]);
+
+   // Helper function to get report info for a tutor
+   const getReportInfo = useCallback((tutor: AdminTutor) => {
+      // First try to get from tutor.reportInfo (from /admin/users API)
+      if (tutor.reportInfo) {
+         return {
+            hasBeenReported: tutor.reportInfo.hasBeenReported || false,
+            reportCount: tutor.reportInfo.reportCount || 0,
+            reportedAt: tutor.reportInfo.reportedAt || null,
+         };
+      }
+      
+      // Otherwise, try to get from tutorMappingData (from /admin/tutors/mapping API)
+      const tutorData = userIdToTutorData[tutor._id];
+      if (tutorData) {
+         return {
+            hasBeenReported: tutorData.hasBeenReported || false,
+            reportCount: tutorData.reportCount || 0,
+            reportedAt: tutorData.reportedAt || null,
+         };
+      }
+      
+      // Default values
+      return {
+         hasBeenReported: false,
+         reportCount: 0,
+         reportedAt: null,
+      };
+   }, [userIdToTutorData]);
 
    // Memoized filtered tutors
    const filteredTutors = useMemo(() => {
@@ -218,8 +249,8 @@ const TutorManagement = () => {
          </div>
 
          {/* Table */}
-         <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">
-            <table className="w-full divide-y divide-gray-100">
+         <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-x-auto">
+            <table className="w-full divide-y divide-gray-100 min-w-[800px]">
                <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                   <tr>
                      {['Gia sư', 'Liên hệ', 'Địa chỉ', 'Xác thực', 'Trạng thái tài khoản', 'Hành động'].map((header) => (
@@ -397,6 +428,24 @@ const TutorManagement = () => {
                                  }`}>
                                     {hasTutorProfile(tutor) ? 'Có hồ sơ' : 'Chưa có hồ sơ'}
                                  </span>
+                                 
+                                 {/* Violation Report Indicator */}
+                                 {(() => {
+                                    const reportInfo = getReportInfo(tutor);
+                                    const tutorId = userIdToTutorId[tutor._id];
+                                    return reportInfo.hasBeenReported && reportInfo.reportCount > 0 ? (
+                                       <button
+                                          onClick={(e) => {
+                                             e.stopPropagation();
+                                             navigate(`/admin/violation-reports?tutorId=${tutor._id}${tutorId ? `&tutorProfileId=${tutorId}` : ''}`);
+                                          }}
+                                          className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition-colors cursor-pointer"
+                                          title={`Có ${reportInfo.reportCount} báo cáo vi phạm${reportInfo.reportedAt ? ` (Lần cuối: ${new Date(reportInfo.reportedAt).toLocaleDateString('vi-VN')})` : ''}. Click để xem chi tiết`}
+                                       >
+                                          ⚠️ {reportInfo.reportCount} báo cáo
+                                       </button>
+                                    ) : null;
+                                 })()}
                               </div>
                            </td>
 

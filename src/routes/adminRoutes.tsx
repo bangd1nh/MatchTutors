@@ -16,6 +16,7 @@ import AdminLayout from "@/layouts/AdminLayout";
 import SessionDisputeManagement from "@/pages/admin/SessionDisputeManagement";
 import PackageManagement from "@/pages/admin/PackageManagement";
 import AdminViolationReportManagement from "@/pages/admin/AdminViolationReportManagement";
+import AdminWalletManagement from "@/pages/admin/AdminWalletManagement";
 
 export const adminRoutes = {
    element: (
@@ -53,6 +54,10 @@ export const adminRoutes = {
       {
          path: "/admin/violation-reports",
          element: <AdminViolationReportManagement />,
+      },
+      {
+         path: "/admin/wallet",
+         element: <AdminWalletManagement />,
       },
       { path: "/admin/profile", element: <ProfilePage /> },
       { path: "/profile/change-password", element: <ChangePasswordPage /> },

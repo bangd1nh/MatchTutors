@@ -24,6 +24,7 @@ import HighlightCard from "@/components/admin/dashboard/HighlightCard";
 
 import { useAdminDashboardSummary } from "@/hooks/useAdminDashboardSummary";
 import type { AdminDashboardData } from "@/api/adminDashboard";
+import { VIOLATION_STATUS_LABELS_VI } from "@/enums/violationReport.enum";
 
 const EMPTY_SUMMARY: AdminDashboardData = {
   users: { total: 0, active: 0, banned: 0, newLast7Days: 0, byRole: [] },
@@ -332,11 +333,13 @@ export default function AdminDashboard() {
 
   const userRolePieData = useMemo(
     () =>
-      (dashboard.users.byRole ?? []).map((r) => ({
-        name:
-          r.role === "TUTOR" ? "Gia sư" : r.role === "STUDENT" ? "Học sinh" : r.role === "ADMIN" ? "Quản trị" : "Phụ huynh",
-        value: r.total ?? 0,
-      })),
+      (dashboard.users.byRole ?? [])
+        .filter((r) => r.role === "TUTOR" || r.role === "STUDENT" || r.role === "ADMIN")
+        .map((r) => ({
+          name:
+            r.role === "TUTOR" ? "Gia sư" : r.role === "STUDENT" ? "Học sinh" : "Quản trị",
+          value: r.total ?? 0,
+        })),
     [dashboard.users.byRole]
   );
 
@@ -363,27 +366,34 @@ export default function AdminDashboard() {
     {
       header: "Vai trò",
       accessor: "role",
-      render: (value: string) => (
-        <span
-          className={`px-2 py-1 text-xs font-medium rounded-full ${
-            value === "TUTOR"
-              ? "bg-blue-100 text-blue-700"
-              : value === "STUDENT"
-              ? "bg-green-100 text-green-700"
-              : value === "ADMIN"
-              ? "bg-purple-100 text-purple-700"
-              : "bg-gray-100 text-gray-700"
-          }`}
-        >
-          {value === "TUTOR"
-            ? "Gia sư"
-            : value === "STUDENT"
-            ? "Học sinh"
-            : value === "ADMIN"
-            ? "Quản trị"
-            : "Phụ huynh"}
-        </span>
-      ),
+      render: (value: string) => {
+        if (value === "TUTOR") {
+          return (
+            <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
+              Gia sư
+            </span>
+          );
+        }
+        if (value === "STUDENT") {
+          return (
+            <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
+              Học sinh
+            </span>
+          );
+        }
+        if (value === "ADMIN") {
+          return (
+            <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-700">
+              Quản trị
+            </span>
+          );
+        }
+        return (
+          <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700">
+            {value}
+          </span>
+        );
+      },
     },
     {
       header: "Ngày tham gia",
@@ -547,14 +557,13 @@ export default function AdminDashboard() {
             value={formatNumber(dashboard.users.total)}
             subtitle={`${formatNumber(dashboard.users.active)} đang hoạt động`}
             icon={<Users size={32} />}
-            to="/admin/tutors"
           />
           <StatCard
             title="Doanh thu"
             value={formatCurrency(revenueCardValueAmount)}
             subtitle={revenueSubtitle}
             icon={<CircleDollarSign size={32} />}
-            to="/admin/packages"
+            to="/admin/wallet"
           />
           <StatCard
             title="Gia sư"
@@ -682,7 +691,9 @@ function IssuesSection({ totalDisputes, disputesOpen, disputesResolved, totalVio
                 {Object.entries(violationSummary).map(([status, count]) => (
                   <div key={status} className="p-3 bg-gray-50 rounded-lg text-center">
                     <p className="text-2xl font-bold text-gray-700">{count}</p>
-                    <p className="text-xs text-gray-600 mt-1">{status}</p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      {VIOLATION_STATUS_LABELS_VI[status] || status}
+                    </p>
                   </div>
                 ))}
               </div>

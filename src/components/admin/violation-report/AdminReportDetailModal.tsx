@@ -13,7 +13,11 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, AlertTriangle, X, XCircle, Link as LinkIcon, FileText, File, Download } from "lucide-react";
 import { ViolationReport, updateViolationReportStatus } from "@/api/violationReport";
 import { hideTutor, getTutorIdByUserId } from "@/api/adminTutors";
-import { ViolationStatusEnum, ViolationTypeEnum } from "@/enums/violationReport.enum";
+import { 
+   ViolationStatusEnum, 
+   VIOLATION_TYPE_LABELS_VI,
+   VIOLATION_STATUS_LABELS_VI,
+} from "@/enums/violationReport.enum";
 import { useToast } from "@/hooks/useToast";
 import { Link } from "react-router-dom";
 import moment from "moment";
@@ -24,20 +28,6 @@ interface AdminReportDetailModalProps {
    onClose: () => void;
    onSuccess: () => void;
 }
-
-const VIOLATION_TYPE_LABELS: Record<string, string> = {
-   [ViolationTypeEnum.SCAM_TUTOR]: "Gia sư lừa đảo",
-   [ViolationTypeEnum.FALSE_FEEDBACK]: "Đánh giá sai",
-   [ViolationTypeEnum.SCAM_STUDENT]: "Học sinh lừa đảo",
-   OTHER: "Khác",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-   [ViolationStatusEnum.PENDING]: "Đang chờ",
-   [ViolationStatusEnum.RESOLVED]: "Đã xử lý",
-   [ViolationStatusEnum.REJECTED]: "Đã từ chối",
-   [ViolationStatusEnum.REVIEWED]: "Đã xem",
-};
 
 const STATUS_COLORS: Record<string, string> = {
    [ViolationStatusEnum.PENDING]: "bg-yellow-100 text-yellow-800",
@@ -204,7 +194,7 @@ export const AdminReportDetailModal = ({
                         STATUS_COLORS[report.status] || "bg-gray-100 text-gray-800"
                      }
                   >
-                     {STATUS_LABELS[report.status] || report.status}
+                     {VIOLATION_STATUS_LABELS_VI[report.status] || report.status}
                   </Badge>
                </div>
 
@@ -268,7 +258,7 @@ export const AdminReportDetailModal = ({
                   <div>
                      <h3 className="font-semibold mb-2">Loại vi phạm</h3>
                      <Badge variant="outline" className="text-base px-3 py-1">
-                        {VIOLATION_TYPE_LABELS[report.type] || report.type}
+                        {VIOLATION_TYPE_LABELS_VI[report.type] || report.type}
                      </Badge>
                   </div>
 
