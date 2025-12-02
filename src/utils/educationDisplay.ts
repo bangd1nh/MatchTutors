@@ -1,7 +1,7 @@
 import { Level } from "@/enums/level.enum";
 import { Subject } from "@/enums/subject.enum";
 
-const LEVEL_LABELS_VI: Record<string, string> = {
+export const LEVEL_LABELS_VI: Record<string, string> = {
    [Level.GRADE_1]: "Lớp 1",
    [Level.GRADE_2]: "Lớp 2",
    [Level.GRADE_3]: "Lớp 3",
@@ -20,7 +20,7 @@ const LEVEL_LABELS_VI: Record<string, string> = {
    ELEMENTARY: "Tiểu học",
 };
 
-const SUBJECT_LABELS_VI: Record<string, string> = {
+export const SUBJECT_LABELS_VI: Record<string, string> = {
    [Subject.ACCOUNTING]: "Kế toán",
    [Subject.ADDITIONAL_MATHS]: "Toán nâng cao",
    [Subject.BIOLOGY]: "Sinh học",

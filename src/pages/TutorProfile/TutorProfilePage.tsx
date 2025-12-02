@@ -20,6 +20,7 @@ import { useUser } from "@/hooks/useUser"
 import { Certification } from "@/types/tutorListandDetail";
 import { TutorProfileView } from "@/components/tutor/tutor-profile/TutorProfileView"
 import { EducationForm } from "@/components/tutor/tutor-profile/EducationForm"
+import { LEVEL_LABELS_VI, SUBJECT_LABELS_VI } from "@/utils/educationDisplay"
 
 const DAYS = ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"]
 
@@ -539,7 +540,7 @@ export default function TutorProfile() {
                                         clearFieldError("subjects");
                                     }}
                                     options={SUBJECT_VALUES}
-                                    labels={SUBJECT_LABELS}
+                                    labels={SUBJECT_LABELS_VI}
                                     placeholder="Chọn môn học..."
                                     searchPlaceholder="Tìm kiếm môn học..."
                                     className={hasError("subjects") ? "border-red-500 rounded-md" : ""}
@@ -563,7 +564,7 @@ export default function TutorProfile() {
                                         clearFieldError("levels");
                                     }}
                                     options={LEVEL_VALUES}
-                                    labels={LEVEL_LABELS}
+                                    labels={LEVEL_LABELS_VI}
                                     placeholder="Chọn trình độ..."
                                     searchPlaceholder="Tìm kiếm trình độ..."
                                     className={hasError("levels") ? "border-red-500 rounded-md" : ""}

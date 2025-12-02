@@ -1,5 +1,6 @@
 // components/StatsOverview.tsx
 import { Badge } from "@/components/ui/badge"
+import { getLevelLabelVi, getSubjectLabelVi } from "@/utils/educationDisplay"
 
 interface StatsOverviewProps {
     tutor: any
@@ -30,7 +31,7 @@ export function StatsOverview({ tutor }: StatsOverviewProps) {
                 <div className="flex flex-wrap gap-2">
                     {(tutor.subjects ?? []).map((subject: string) => (
                         <Badge key={subject} variant="secondary">
-                            {subject.replace(/_/g, " ")}
+                            {getSubjectLabelVi(subject)}
                         </Badge>
                     ))}
                 </div>
@@ -41,7 +42,7 @@ export function StatsOverview({ tutor }: StatsOverviewProps) {
                 <div className="flex flex-wrap gap-2">
                     {(tutor.levels ?? []).map((level: string) => (
                         <Badge key={level} variant="outline">
-                            {level}
+                            {getLevelLabelVi(level)}
                         </Badge>
                     ))}
                 </div>
