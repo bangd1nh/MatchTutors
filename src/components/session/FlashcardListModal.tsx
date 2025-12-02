@@ -16,6 +16,7 @@ import {
    AsignFlashcard,
    useAsignFlashcardStore,
 } from "@/store/useAsignFlashcardStore";
+import { getQuizModeLabelVi } from "@/utils/quizTypeDisplay";
 
 interface FlashcardListModalProps {
    isOpen: boolean;
@@ -119,7 +120,7 @@ const FlashcardListModal = ({ isOpen, onClose }: FlashcardListModalProps) => {
                <DialogTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                      <BookOpen className="h-5 w-5" />
-                     Danh sách Flashcards ({filteredFlashcards.length})
+                     Danh sách Thẻ Ghi Nhớ ({filteredFlashcards.length})
                   </div>
                   <Badge variant="secondary" className="px-3 mt-10">
                      Đã chọn: {selectedFlashcards.length}
@@ -173,7 +174,7 @@ const FlashcardListModal = ({ isOpen, onClose }: FlashcardListModalProps) => {
                                        variant="outline"
                                        className="text-xs px-2 py-0.5"
                                     >
-                                       {flashcard.quizMode}
+                                       {getQuizModeLabelVi(flashcard.quizMode)}
                                     </Badge>
                                  </div>
                               </CardHeader>
@@ -301,8 +302,8 @@ const FlashcardListModal = ({ isOpen, onClose }: FlashcardListModalProps) => {
                                     }
                                  >
                                     {flashcard.isAsigned
-                                       ? "Bỏ chọn Flashcard"
-                                       : "Chọn Flashcard"}
+                                       ? "Bỏ chọn Thẻ Ghi Nhớ"
+                                       : "Chọn Thẻ Ghi Nhớ"}
                                  </Button>
                               </CardContent>
                            </Card>
@@ -315,7 +316,7 @@ const FlashcardListModal = ({ isOpen, onClose }: FlashcardListModalProps) => {
             {/* Footer with action buttons */}
             <div className="flex items-center justify-between pt-4 border-t bg-background">
                <div className="text-sm text-muted-foreground">
-                  <>Đã chọn {selectedFlashcards.length} flashcard(s)</>
+                  <>Đã chọn {selectedFlashcards.length} Thẻ Ghi Nhớ</>
                </div>
                <div className="flex gap-3">
                   <Button variant="outline" onClick={onClose}>

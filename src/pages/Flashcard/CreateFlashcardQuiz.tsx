@@ -186,7 +186,7 @@ const CreateFlashcardQuiz: React.FC = () => {
          <div className="min-h-[400px] flex flex-col items-center justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
             <div className="text-lg text-muted-foreground">
-               AI đang tạo flashcards từ tài liệu...
+               AI đang tạo Thẻ Ghi Nhớ từ tài liệu...
             </div>
          </div>
       );
@@ -197,7 +197,7 @@ const CreateFlashcardQuiz: React.FC = () => {
          <div className="min-h-[400px] flex flex-col items-center justify-center">
             <BookOpen className="h-16 w-16 text-red-400 mb-4" />
             <div className="text-lg text-red-400 mb-2">
-               AI không thể tạo flashcards
+               AI không thể tạo các thẻ ghi nhớ
             </div>
             <div className="text-sm text-muted-foreground mb-4">
                Vui lòng thử lại sau
@@ -213,10 +213,10 @@ const CreateFlashcardQuiz: React.FC = () => {
       <div className=" mx-auto my-6 p-4">
          <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-               <CardTitle>Tạo Flashcard Quiz</CardTitle>
+               <CardTitle>Tạo Thẻ Ghi Nhớ</CardTitle>
                <div className="flex gap-2">
                   <Button onClick={() => setShowMaterialModal(true)}>
-                     Tạo flashcard bằng AI
+                     Tạo Thẻ ghi nhớ bằng AI
                   </Button>
                   {aiData && (
                      <Button variant="outline" onClick={handleClearAIData}>
@@ -234,7 +234,7 @@ const CreateFlashcardQuiz: React.FC = () => {
                         📚 Dữ liệu từ AI
                      </h4>
                      <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
-                        Đã tạo {aiGeneratedQuestions.length} flashcards từ tài
+                        Đã tạo {aiGeneratedQuestions.length} các thẻ ghi nhớ từ tài
                         liệu
                      </p>
                      <p className="text-xs text-blue-700 dark:text-blue-300">

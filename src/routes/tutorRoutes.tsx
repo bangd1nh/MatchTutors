@@ -33,8 +33,8 @@ import ViewStudentMCQHistoryList from "@/pages/MultipleChoice/ViewStudentMCQHist
 import ViewMCQHistory from "@/pages/MultipleChoice/ViewMCQHistory";
 import PaymentTutorPage from "@/pages/paymentTutor/paymentTutor";
 import ChatPage from "@/pages/chat/chatPage";
-import ViewSAQHistory from "@/pages/ShortAnswer/ViewSAQHistory";
 import DashboardTutorPage from "@/pages/dashboardTutor/dashboardTutorPage";
+import ViewSAQHistory from "@/pages/ShortAnswer/ViewSAQHistory";
 
 export const tutorRoutes = {
    element: (

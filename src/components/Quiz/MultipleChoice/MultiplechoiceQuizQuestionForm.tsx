@@ -640,7 +640,7 @@ const MultipleChoiceQuizQuestionForm =
                                  })
                               }
                               disabled={true}
-                              placeholder="Points"
+                              placeholder="điểm"
                            />
                         </div>
                      </div>
@@ -654,7 +654,7 @@ const MultipleChoiceQuizQuestionForm =
                                  questionText: e.target.value,
                               })
                            }
-                           placeholder="Question text"
+                           placeholder="câu hỏi"
                         />
                         {errors[`${q._id}-question`] && (
                            <div className="text-xs text-red-400 mt-1">
@@ -665,7 +665,7 @@ const MultipleChoiceQuizQuestionForm =
 
                      <div className="mt-3">
                         <Label>
-                           Các lựa chọn (min 1, có thể chọn nhiều đáp án đúng)
+                           Các lựa chọn (tối thiểu 1, có thể chọn nhiều đáp án đúng)
                         </Label>
                         <div className="space-y-2">
                            {(q.options || []).map((option, optIdx) => (
@@ -694,7 +694,7 @@ const MultipleChoiceQuizQuestionForm =
                                           e.target.value
                                        )
                                     }
-                                    placeholder={`Option ${optIdx + 1}`}
+                                    placeholder={`lựa chọn ${optIdx + 1}`}
                                  />
 
                                  <Button
@@ -744,7 +744,7 @@ const MultipleChoiceQuizQuestionForm =
                      </div>
 
                      <div className="mt-3">
-                        <Label>giải thích (optional)</Label>
+                        <Label>giải thích </Label>
                         <Textarea
                            value={q.explanation || ""}
                            onChange={(e) =>
@@ -753,7 +753,7 @@ const MultipleChoiceQuizQuestionForm =
                               })
                            }
                            rows={3}
-                           placeholder="Explanation (optional)"
+                           placeholder="Giải thích (có thể bỏ trống)"
                         />
                      </div>
                   </CardContent>

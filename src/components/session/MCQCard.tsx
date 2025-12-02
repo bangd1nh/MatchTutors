@@ -18,6 +18,7 @@ import { Badge } from "../ui/badge";
 import { IQuizInfo } from "@/types/quiz";
 import MCQListModal from "./MCQListModal";
 import { useFetchAttempt } from "@/hooks/useMCQ";
+import { getQuestionTypeLabelVi, getQuizModeLabelVi } from "@/utils/quizTypeDisplay";
 
 const MCQCard = ({ session, canManage }: any) => {
    const {
@@ -101,10 +102,10 @@ const MCQCard = ({ session, canManage }: any) => {
                {mcq.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                      <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                     <p>Chưa có MCQ nào.</p>
+                     <p>Chưa có Bài Tập Trắc Nghiệm nào .</p>
                      {canManage && (
                         <p className="text-sm mt-2">
-                           Nhấn "Gắn bài tập trắc nghiệm mới" để thêm MCQ.
+                           Nhấn "Gắn bài tập trắc nghiệm mới" để thêm bài tập trắc nghiệm .
                         </p>
                      )}
                   </div>
@@ -132,7 +133,7 @@ const MCQCard = ({ session, canManage }: any) => {
                                                 variant="default"
                                                 className="text-xs shrink-0"
                                              >
-                                                MCQ
+                                                {getQuestionTypeLabelVi(quiz.quizType)}
                                              </Badge>
                                              {quizAttempts && (
                                                 <Badge
@@ -154,7 +155,7 @@ const MCQCard = ({ session, canManage }: any) => {
                                           variant="outline"
                                           className="ml-3 shrink-0 bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800"
                                        >
-                                          Multiple Choice
+                                          {getQuestionTypeLabelVi(quiz.quizType)}
                                        </Badge>
                                     </div>
 
@@ -180,9 +181,7 @@ const MCQCard = ({ session, canManage }: any) => {
                                           variant="outline"
                                           className="text-xs"
                                        >
-                                          {quiz.quizMode === "STUDY"
-                                             ? "HỌC TẬP"
-                                             : quiz.quizMode || "STUDY"}
+                                          {getQuizModeLabelVi(quiz.quizMode)}
                                        </Badge>
                                     </div>
 

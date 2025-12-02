@@ -195,10 +195,10 @@ const CreateMultipleChoiceQuiz = () => {
       <div className="mx-auto my-6 p-4">
          <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-               <CardTitle>Tạo Multiple Choice Quiz</CardTitle>
+               <CardTitle>Tạo Bài Tập Trắc Nghiệm</CardTitle>
                <div className="flex gap-2">
                   <Button onClick={() => setShowMaterialModal(true)}>
-                     Tạo MCQ bằng AI
+                     Tạo bài tập trắc nghiệm bằng AI
                   </Button>
                   {aiData && (
                      <Button variant="outline" onClick={handleClearAIData}>
@@ -244,7 +244,7 @@ const CreateMultipleChoiceQuiz = () => {
             isOpen={showMaterialModal}
             onClose={() => setShowMaterialModal(false)}
             onSelectMaterial={handleMaterialSelect}
-            type="mcq"
+            type="MULTIPLE_CHOICE"
          />
       </div>
    );

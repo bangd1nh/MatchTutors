@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowLeft, Clock, Tag, Info, CheckCircle2 } from "lucide-react";
+import { getQuestionTypeLabelVi, getQuizModeLabelVi } from "@/utils/quizTypeDisplay";
 
 const ViewMultipleChoiceQuiz = () => {
    const navigate = useNavigate();
@@ -86,10 +87,10 @@ const ViewMultipleChoiceQuiz = () => {
                         variant="outline"
                         className="self-start md:self-end"
                      >
-                        {quizInfo.quizMode}
+                        {getQuizModeLabelVi(quizInfo.quizMode)}
                      </Badge>
                      <Badge className="self-start md:self-end">
-                        {quizInfo.quizType}
+                        {getQuestionTypeLabelVi(quizInfo.quizType)}
                      </Badge>
                   </div>
                </div>
@@ -154,12 +155,19 @@ const ViewMultipleChoiceQuiz = () => {
                         </div>
                      )}
 
-                     {quizInfo.settings?.timeLimitMinutes && (
+                     {quizInfo.settings?.timeLimitMinutes ? (
                         <div className="flex items-center">
                            <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
                            <span>
                               Thời gian: {quizInfo.settings.timeLimitMinutes}{" "}
                               phút
+                           </span>
+                        </div>
+                     ) : (
+                        <div className="flex items-center">
+                           <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+                           <span>
+                              Thời gian: không giới hạn
                            </span>
                         </div>
                      )}

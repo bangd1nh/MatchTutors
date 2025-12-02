@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import DeleteFlashcardModal from "@/components/Quiz/FlashCard/DeleteFlashcardModal";
 import { useDeleteFlashcard } from "@/hooks/useQuiz";
+import { getQuestionTypeLabelVi, getQuizModeLabelVi } from "@/utils/quizTypeDisplay";
 
 const ViewMultipleQuizList: React.FC = () => {
    const { fetchList } = useMCQ();
@@ -63,13 +64,13 @@ const ViewMultipleQuizList: React.FC = () => {
          <div className="min-h-[400px] flex flex-col items-center justify-center">
             <BookOpen className="h-20 w-20 text-muted-foreground mb-6" />
             <div className="text-xl text-muted-foreground mb-2">
-               Chưa có multiple choice quiz nào
+               Chưa có bài tập trắc nghiệm nào
             </div>
             <div className="text-sm text-muted-foreground mb-4">
-               Tạo quiz đầu tiên của bạn
+               Tạo bài tập trắc nghiệm đầu tiên đầu tiên của bạn
             </div>
             <Button
-               onClick={() => navigate("/tutor/createMultipleChoice")}
+               onClick={() => navigate("/tutor/createMultipleChoiceQuiz")}
                className="px-6"
             >
                <Plus className="h-4 w-4 mr-2" />
@@ -113,13 +114,13 @@ const ViewMultipleQuizList: React.FC = () => {
                               variant="default"
                               className="bg-blue-500/10 text-blue-600 border-blue-500/20 font-medium"
                            >
-                              {String(q.quizType ?? "MULTIPLE_CHOICE")}
+                              {getQuestionTypeLabelVi(q.quizType)}
                            </Badge>
                            <Badge
                               variant="secondary"
                               className="bg-secondary/50"
                            >
-                              {String(q.quizMode ?? "STUDY")}
+                              {getQuizModeLabelVi(q.quizMode)}
                            </Badge>
                         </div>
                      </div>
@@ -212,7 +213,7 @@ const ViewMultipleQuizList: React.FC = () => {
                                           : "Không"}
                                     </Badge>
                                  </div>
-                                 {q.settings.timeLimitMinutes && (
+                                 {q.settings.timeLimitMinutes ? (
                                     <div className="flex items-center justify-between">
                                        <span>Thời gian giới hạn:</span>
                                        <Badge
@@ -221,6 +222,17 @@ const ViewMultipleQuizList: React.FC = () => {
                                        >
                                           <Clock className="h-3 w-3 mr-1" />
                                           {q.settings.timeLimitMinutes} phút
+                                       </Badge>
+                                    </div>
+                                 ): (
+                                    <div className="flex items-center justify-between">
+                                       <span>Thời gian giới hạn:</span>
+                                       <Badge
+                                          variant="outline"
+                                          className="text-xs"
+                                       >
+                                          <Clock className="h-3 w-3 mr-1" />
+                                          không giới hạn
                                        </Badge>
                                     </div>
                                  )}
