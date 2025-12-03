@@ -18,6 +18,9 @@ import {
    VIOLATION_TYPE_LABELS_VI,
    VIOLATION_STATUS_LABELS_VI,
 } from "@/enums/violationReport.enum";
+import { SUBJECT_LABELS_VI } from "@/enums/subject.enum";
+import { LEVEL_LABELS_VI } from "@/enums/level.enum";
+import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
 import { useToast } from "@/hooks/useToast";
 import { Link } from "react-router-dom";
 import moment from "moment";
@@ -34,6 +37,12 @@ const STATUS_COLORS: Record<string, string> = {
    [ViolationStatusEnum.RESOLVED]: "bg-green-100 text-green-800",
    [ViolationStatusEnum.REJECTED]: "bg-red-100 text-red-800",
    [ViolationStatusEnum.REVIEWED]: "bg-blue-100 text-blue-800",
+};
+
+const TEACHING_REQUEST_STATUS_LABELS_VI: Record<string, string> = {
+   [TeachingRequestStatus.PENDING]: "Chờ phản hồi",
+   [TeachingRequestStatus.ACCEPTED]: "Đã chấp nhận",
+   [TeachingRequestStatus.REJECTED]: "Đã từ chối",
 };
 
 export const AdminReportDetailModal = ({
@@ -111,7 +120,7 @@ export const AdminReportDetailModal = ({
          "Bạn có chắc muốn ẩn gia sư này? Hành động này sẽ:\n" +
             "- Hủy tất cả learning commitments đang active\n" +
             "- Hủy tất cả sessions chưa học\n" +
-            "- Từ chối tất cả teaching requests đang pending"
+            "- Từ chối tất cả yêu cầu dạy học đang pending"
       );
 
       if (!confirmed) return;
@@ -342,9 +351,9 @@ export const AdminReportDetailModal = ({
                                                    {fileName}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">
-                                                   {fileType === 'pdf' ? 'PDF Document' : 
-                                                    fileType === 'word' ? 'Word Document' : 
-                                                    'File'}
+                                                   {fileType === 'pdf' ? 'Tài liệu PDF' : 
+                                                    fileType === 'word' ? 'Tài liệu Word' : 
+                                                    'Tệp'}
                                                 </p>
                                              </div>
                                           </div>
@@ -372,24 +381,40 @@ export const AdminReportDetailModal = ({
                   {/* Related Teaching Request */}
                   {report.relatedTeachingRequestId && (
                      <div>
-                        <h3 className="font-semibold mb-2">Teaching Request liên quan</h3>
+                        <h3 className="font-semibold mb-2">Yêu cầu dạy học liên quan</h3>
                         <div className="bg-blue-50 p-4 rounded-lg">
                            {typeof report.relatedTeachingRequestId === "object" ? (
                               <div className="space-y-2">
                                  <p>
                                     <span className="font-medium">Môn học:</span>{" "}
-                                    {report.relatedTeachingRequestId.subject}
+                                    {SUBJECT_LABELS_VI[report.relatedTeachingRequestId.subject] || report.relatedTeachingRequestId.subject}
                                  </p>
                                  <p>
                                     <span className="font-medium">Trình độ:</span>{" "}
-                                    {report.relatedTeachingRequestId.level}
+                                    {LEVEL_LABELS_VI[report.relatedTeachingRequestId.level] || report.relatedTeachingRequestId.level}
+                                 </p>
+                                 <p>
+                                    <span className="font-medium">Trạng thái:</span>{" "}
+                                    <Badge
+                                       className={
+                                          report.relatedTeachingRequestId.status === TeachingRequestStatus.PENDING
+                                             ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                                             : report.relatedTeachingRequestId.status === TeachingRequestStatus.ACCEPTED
+                                             ? "bg-green-100 text-green-800 border-green-200"
+                                             : report.relatedTeachingRequestId.status === TeachingRequestStatus.REJECTED
+                                             ? "bg-red-100 text-red-800 border-red-200"
+                                             : "bg-gray-100 text-gray-800"
+                                       }
+                                    >
+                                       {TEACHING_REQUEST_STATUS_LABELS_VI[report.relatedTeachingRequestId.status] || report.relatedTeachingRequestId.status}
+                                    </Badge>
                                  </p>
                                  <Link
                                     to={`/admin/teaching-requests`}
                                     className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800"
                                  >
                                     <LinkIcon className="h-4 w-4" />
-                                    Xem chi tiết teaching request
+                                    Xem chi tiết yêu cầu dạy học
                                  </Link>
                               </div>
                            ) : (
