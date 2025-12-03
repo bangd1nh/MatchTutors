@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +26,7 @@ import {
 
 const LoginPageContent = () => {
    const { t } = useTranslation();
+   const [showPassword, setShowPassword] = useState(false);
 
    const loginSchema = z.object({
       email: z.string().email({ message: t("invalid_email_address") }),
@@ -88,12 +91,26 @@ const LoginPageContent = () => {
                            Quên mật khẩu?
                         </Link>
                      </div>
-                     <Input
-                        id="password"
-                        type="password"
-                        {...register("password")}
-                        disabled={isLoading}
-                     />
+                     <div className="relative">
+                        <Input
+                           id="password"
+                           type={showPassword ? "text" : "password"}
+                           {...register("password")}
+                           disabled={isLoading}
+                        />
+                        <button
+                           type="button"
+                           onClick={() => setShowPassword(!showPassword)}
+                           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                           disabled={isLoading}
+                        >
+                           {showPassword ? (
+                              <EyeOff className="w-4 h-4" />
+                           ) : (
+                              <Eye className="w-4 h-4" />
+                           )}
+                        </button>
+                     </div>
                      {errors.password && (
                         <p className="text-sm text-red-600">
                            {errors.password.message}

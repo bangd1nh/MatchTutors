@@ -80,6 +80,14 @@ export function TutorContactCard({ tutor }: TutorContactCardProps) {
       return `${local.slice(0, 2)}****@${domain}`;
    };
 
+   const handleUnlockContact = () => {
+      if (!isAuthenticated) {
+         navigate("/login");
+         return;
+      }
+      setShowContactDetails(true);
+   };
+
    return (
       <>
          <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
@@ -186,7 +194,7 @@ export function TutorContactCard({ tutor }: TutorContactCardProps) {
                      </div>
 
                      <Button
-                        onClick={() => setShowContactDetails(true)}
+                        onClick={handleUnlockContact}
                         className="w-full bg-sky-600 hover:bg-sky-700 text-white border-0 h-11"
                      >
                         <Lock className="w-4 h-4 mr-2" />

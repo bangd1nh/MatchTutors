@@ -12,10 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 import { useState } from "react";
 import { AlertTriangle, Calendar, Info, User } from "lucide-react";
-// If you have a central icon file re-exporting lucide icons:
-
-// Otherwise: import icons directly from lucide-react
-// import { Calendar, User, AlertTriangle, Info } from "lucide-react";
+import { translateSessionStatus } from "@/utils/statusTranslations";
 
 export default function DisputeDetailPage() {
    const { sessionId } = useParams<{ sessionId: string }>();
@@ -179,7 +176,7 @@ export default function DisputeDetailPage() {
                      <div>
                         <p className="text-sm text-slate-500">Trạng thái</p>
                         <p className="font-medium text-slate-800">
-                           {session.status}
+                           {translateSessionStatus(session.status)}
                         </p>
                      </div>
                   </div>
@@ -400,7 +397,7 @@ export default function DisputeDetailPage() {
                            <span>Trạng thái buổi học</span>
                         </p>
                         <p className="font-medium text-slate-800">
-                           {session.status}
+                           {translateSessionStatus(session.status)}
                         </p>
                      </div>
                   </div>

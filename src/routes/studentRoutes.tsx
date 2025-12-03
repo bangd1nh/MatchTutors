@@ -48,11 +48,19 @@ export const studentRoutes = {
       },
       {
          path: "/student/applications",
-         element: <MyApplicationsPage />,
+         element: (
+            <IsCreatedProfileRoute>
+               <MyApplicationsPage />
+            </IsCreatedProfileRoute>
+         ),
       },
       {
          path: "/student/applications/:id",
-         element: <TeachingRequestDetail />,
+         element: (
+            <IsCreatedProfileRoute>
+               <TeachingRequestDetail />
+            </IsCreatedProfileRoute>
+         ),
       },
       {
          path: "/student/schedule",
@@ -186,5 +194,6 @@ export const studentRoutes = {
          path: "/student/violation-reports",
          element: <MyViolationReportsPage />,
       },
+      { path: "/student/change-password", element: <ChangePasswordPage /> },
    ],
 };

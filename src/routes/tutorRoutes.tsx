@@ -37,6 +37,7 @@ import PaymentTutorPage from "@/pages/paymentTutor/paymentTutor";
 import ChatPage from "@/pages/chat/chatPage";
 import ViewSAQHistory from "@/pages/ShortAnswer/ViewSAQHistory";
 import DashboardTutorPage from "@/pages/dashboardTutor/dashboardTutorPage";
+import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
 
 export const tutorRoutes = {
    element: (
@@ -55,6 +56,7 @@ export const tutorRoutes = {
       },
       { path: "/tutor/profile", element: <ProfilePage /> },
       { path: "/tutor/create-profile", element: <TutorProfilePage /> },
+      { path: "/tutor/change-password", element: <ChangePasswordPage /> },
       {
          path: "/tutor/profile-page",
          element: (
