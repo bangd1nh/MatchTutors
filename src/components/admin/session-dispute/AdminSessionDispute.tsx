@@ -184,7 +184,7 @@ const AdminSessionDispute = () => {
                               value="OPEN"
                               className="rounded-none border-b-2 border-transparent px-4 py-4 text-sm font-medium text-gray-600 hover:text-gray-900 data-[state=active]:border-primary data-[state=active]:text-primary"
                            >
-                              Mở ({totalDisputes})
+                              Mở
                            </TabsTrigger>
                            <TabsTrigger
                               value="RESOLVED"
