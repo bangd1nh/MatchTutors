@@ -7,6 +7,8 @@ import {
    SlotInfo,
 } from "react-big-calendar";
 import moment from "moment";
+import "moment/locale/vi"; // <--- THÊM: Import ngôn ngữ tiếng Việt cho moment
+
 import withDragAndDrop, {
    EventInteractionArgs,
 } from "react-big-calendar/lib/addons/dragAndDrop";
@@ -17,7 +19,7 @@ import { useMySessions, useUpdateSession } from "@/hooks/useSessions";
 import { useUser } from "@/hooks/useUser";
 import { Session } from "@/types/session";
 import { Role } from "@/types/user";
-import { SessionStatus } from "@/enums/session.enum"; // THÊM DÒNG NÀY
+import { SessionStatus } from "@/enums/session.enum";
 
 import { SessionFormDialog } from "./SessionFormDialog";
 import { SessionDetailDialog } from "./SessionDetailDialog";
@@ -25,7 +27,27 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { getSubjectLabelVi } from "@/utils/educationDisplay";
 
+// <--- THÊM: Cấu hình mặc định tiếng Việt cho moment
+moment.locale("vi");
 const localizer = momentLocalizer(moment);
+
+// <--- THÊM: Định nghĩa các từ khóa tiếng Việt cho lịch
+const messages = {
+   allDay: "Cả ngày",
+   previous: "Trước",
+   next: "Sau",
+   today: "Hôm nay",
+   month: "Tháng",
+   week: "Tuần",
+   day: "Ngày",
+   agenda: "Lịch biểu",
+   date: "Ngày",
+   time: "Thời gian",
+   event: "Sự kiện",
+   noEventsInRange: "Không có sự kiện nào trong khoảng thời gian này.",
+   work_week: "Tuần làm việc",
+   showMore: (total: number) => `+${total} sự kiện khác`,
+};
 
 interface CalendarEvent extends BigCalendarEvent {
    resource: Session;
@@ -89,7 +111,6 @@ export function SessionCalendar() {
       });
    }, [sessions]);
 
-   // SỬA Ở ĐÂY: Cập nhật chữ ký của hàm để khớp với yêu cầu của onSelectEvent
    const handleSelectEvent = useCallback((event: CalendarEvent) => {
       setSelectedSession(event.resource);
       setIsDetailOpen(true);
@@ -172,6 +193,9 @@ export function SessionCalendar() {
             <DnDCalendar
                localizer={localizer}
                events={events}
+               // <--- THÊM: Truyền prop ngôn ngữ và messages vào đây
+               culture="vi"
+               messages={messages}
                onSelectEvent={handleSelectEvent}
                onSelectSlot={handleSelectSlot}
                onEventDrop={handleEventDrop}

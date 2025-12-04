@@ -1,4 +1,6 @@
 import ProtectedRoute from "./ProtectedRoute";
+import ProtectedCommitmentRoute from "./ProtectedCommitmentRoute";
+import ProtectedTutorProfileRoute from "./ProtectedTutorProfileRoute";
 
 import ProfilePage from "@/pages/Profilepage";
 import TutorProfile from "@/pages/TutorProfile/TutorProfile";
@@ -35,6 +37,7 @@ import PaymentTutorPage from "@/pages/paymentTutor/paymentTutor";
 import ChatPage from "@/pages/chat/chatPage";
 import ViewSAQHistory from "@/pages/ShortAnswer/ViewSAQHistory";
 import DashboardTutorPage from "@/pages/dashboardTutor/dashboardTutorPage";
+import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
 
 export const tutorRoutes = {
    element: (
@@ -43,126 +46,266 @@ export const tutorRoutes = {
       </ProtectedRoute>
    ),
    children: [
-      { path: "/tutor/dashboard", element: <DashboardTutorPage /> },
+      {
+         path: "/tutor/dashboard",
+         element: (
+            <ProtectedTutorProfileRoute>
+               <DashboardTutorPage />
+            </ProtectedTutorProfileRoute>
+         ),
+      },
       { path: "/tutor/profile", element: <ProfilePage /> },
-      { path: "/tutor/profile-page", element: <TutorProfile /> },
       { path: "/tutor/create-profile", element: <TutorProfilePage /> },
-      { path: "/tutor/teaching-requests", element: <TeachingRequestsList /> },
+      { path: "/tutor/change-password", element: <ChangePasswordPage /> },
+      {
+         path: "/tutor/profile-page",
+         element: (
+            <ProtectedTutorProfileRoute>
+               <TutorProfile />
+            </ProtectedTutorProfileRoute>
+         ),
+      },
+      {
+         path: "/tutor/teaching-requests",
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <TeachingRequestsList />
+            </ProtectedTutorProfileRoute>
+         ),
+      },
       {
          path: "/tutor/teaching-requests/:id",
-         element: <TeachingRequestDetail />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <TeachingRequestDetail />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/student-profile/:studentUserId",
-         element: <StudentProfileForTutor />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <StudentProfileForTutor />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/schedule",
-         element: <SchedulePage />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <SchedulePage />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/learning-commitments",
-         element: <LearningCommitmentsPage />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <LearningCommitmentsPage />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/createFlashcardQuiz",
-         element: <CreateFlashcardQuiz />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <CreateFlashcardQuiz />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/createMultipleChoiceQuiz",
-         element: <CreateMultipleChoiceQuiz />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <CreateMultipleChoiceQuiz />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/createShortAnswerQuiz",
-         element: <CreateShortAnswerQuiz />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <CreateShortAnswerQuiz />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/flashcardList",
-         element: <FlashcardQuizList />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <FlashcardQuizList />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/flashcard",
-         element: <ViewFlashcardQuizQuestion />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <ViewFlashcardQuizQuestion />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/editFlashcard",
-         element: <EditFlashcardQuiz />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <EditFlashcardQuiz />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/rejected-sessions",
-         element: <RejectedSessionsPage />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <RejectedSessionsPage />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/absence-sessions",
-         element: <AbsenceSessionPage />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <AbsenceSessionPage />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/MultipleChoiceList",
-         element: <ViewMultipleQuizList />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <ViewMultipleQuizList />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/multipleChoice",
-         element: <ViewMultipleChoiceQuiz />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <ViewMultipleChoiceQuiz />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/editMultipleChoice",
-         element: <EditMultipleChoiceQuiz />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <EditMultipleChoiceQuiz />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/shortAnswerList",
-         element: <ViewShortAnswerQuizList />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <ViewShortAnswerQuizList />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/shortAnswer",
-         element: <ViewShortAnswerQuiz />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <ViewShortAnswerQuiz />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/editShortAnswer",
-         element: <EditShortAnswerQuiz />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <EditShortAnswerQuiz />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/review-list",
-         element: <ReviewList />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <ReviewList />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/commitments/create",
-         element: <CreateLearningCommitmentPage />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <ProtectedCommitmentRoute>
+                  <CreateLearningCommitmentPage />
+               </ProtectedCommitmentRoute>
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/wallet",
-         element: <WalletManagement />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <WalletManagement />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/session/:id",
-         element: <SessionDetailPage />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <SessionDetailPage />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/create-material",
-         element: <CreateMaterialPage />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <CreateMaterialPage />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/material-management",
-         element: <MaterialManagementPage />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <MaterialManagementPage />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/payment-history",
-         element: <PaymentTutorPage />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <PaymentTutorPage />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/studentMCQHistoryList",
-         element: <ViewStudentMCQHistoryList />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <ViewStudentMCQHistoryList />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/MCQHistory",
-         element: <ViewMCQHistory />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <ViewMCQHistory />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/tutor/SAQHistory",
-         element: <ViewSAQHistory />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <ViewSAQHistory />
+            </ProtectedTutorProfileRoute>
+         ),
       },
       {
          path: "/chat",
-         element: <ChatPage />,
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <ChatPage />,
+            </ProtectedTutorProfileRoute>
+         ),
       },
    ],
 };

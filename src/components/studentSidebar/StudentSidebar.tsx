@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const StudentSidebar: React.FC = () => {
    const { user } = useUser();
 
-   const name = user?.name ?? "Student";
+   const name = user?.name ?? "Học sinh";
    const email = user?.email ?? "student@example.com";
    const avatarUrl = (user as any)?.avatarUrl; // Giả sử user object có avatarUrl
 

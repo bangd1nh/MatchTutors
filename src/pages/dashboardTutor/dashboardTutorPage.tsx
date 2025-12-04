@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Users, UserPlus, Clipboard, Inbox } from "lucide-react";
 import {
    useFetchDashboardOverview,
    useFetchDashboardCharts,
@@ -45,25 +46,37 @@ export default function DashboardTutorPage() {
       <div className="p-6 space-y-6">
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded shadow">
-               <div className="text-sm text-gray-500">Active students</div>
+               <div className="text-sm text-gray-500 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-gray-400" />
+                  Học sinh đang học
+               </div>
                <div className="text-2xl font-semibold">
                   {overview?.activeStudents ?? 0}
                </div>
             </div>
             <div className="bg-white p-4 rounded shadow">
-               <div className="text-sm text-gray-500">Max students</div>
+               <div className="text-sm text-gray-500 flex items-center gap-2">
+                  <UserPlus className="w-4 h-4 text-gray-400" />
+                  Số lượng lời mời dạy học còn lại
+               </div>
                <div className="text-2xl font-semibold">
                   {overview?.maxStudents ?? 0}
                </div>
             </div>
             <div className="bg-white p-4 rounded shadow">
-               <div className="text-sm text-gray-500">Max quiz</div>
+               <div className="text-sm text-gray-500 flex items-center gap-2">
+                  <Clipboard className="w-4 h-4 text-gray-400" />
+                  Số lượng quiz được tạo còn lại
+               </div>
                <div className="text-2xl font-semibold">
                   {overview?.maxQuiz ?? 0}
                </div>
             </div>
             <div className="bg-white p-4 rounded shadow">
-               <div className="text-sm text-gray-500">Requests received</div>
+               <div className="text-sm text-gray-500 flex items-center gap-2">
+                  <Inbox className="w-4 h-4 text-gray-400" />
+                  Số lượng lời mời nhận được
+               </div>
                <div className="text-2xl font-semibold">
                   {overview?.teachingRequestsReceived ?? 0}
                </div>
@@ -75,7 +88,7 @@ export default function DashboardTutorPage() {
                {/* Week (chọn trước) */}
                <div>
                   <label className="text-sm text-gray-600 mr-3">
-                     Week (chọn trước)
+                     Tuần (chọn trước)
                   </label>
                   <div className="inline-flex rounded-md bg-gray-100 p-1">
                      {[1, 2, 3, 4].map((w) => {
@@ -102,7 +115,7 @@ export default function DashboardTutorPage() {
                {/* Month picker disabled until week selected */}
                <div className="flex items-center gap-3">
                   <label className="text-sm text-gray-600">
-                     Choose month
+                     Chọn tháng
                      <span className="ml-2 text-xs text-gray-400">
                         (chỉ sau khi chọn tuần)
                      </span>

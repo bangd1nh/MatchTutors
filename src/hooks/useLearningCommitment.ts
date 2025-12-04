@@ -42,13 +42,12 @@ export const useCreateLearningCommitment = () => {
          learningCommitmentApi.create(data),
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: ["learningCommitment"] });
-         addToast("success", "Learning commitment created successfully");
+         addToast("success", "Tạo cam kết học tập thành công");
       },
       onError: (error: any) => {
          addToast(
             "error",
-            error.response?.data?.message ||
-               "Failed to create learning commitment"
+            error.response?.data?.message || "Lỗi khi tạo cam kết"
          );
       },
    });
@@ -61,12 +60,12 @@ export const useInitiatePayment = () => {
       mutationFn: (id: string) => learningCommitmentApi.initiatePayment(id),
       onSuccess: (data) => {
          window.open(data.paymentLink, "_blank");
-         addToast("success", "Payment initiated successfully");
+         addToast("success", "Tạo link thanh toán thành công");
       },
       onError: (error: any) => {
          addToast(
             "error",
-            error.response?.data?.message || "Failed to initiate payment"
+            error.response?.data?.message || "Thất bại khi tạo link thanh toán"
          );
       },
    });
@@ -81,12 +80,12 @@ export const useRequestCancellation = () => {
          learningCommitmentApi.requestCancellation(id, reason),
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: ["learningCommitment"] });
-         addToast("success", "Cancellation request submitted successfully");
+         addToast("success", "Nộp yêu cầu huỷ thành công");
       },
       onError: (error: any) => {
          addToast(
             "error",
-            error.response?.data?.message || "Failed to request cancellation"
+            error.response?.data?.message || "Thất bại khi gửi yêu cầu huỷ"
          );
       },
    });
@@ -101,12 +100,15 @@ export const useRejectCancellation = () => {
          learningCommitmentApi.rejectCancellation(id, reason),
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: ["learningCommitment"] });
-         addToast("success", "Cancellation rejected and escalated to admin");
+         addToast(
+            "success",
+            "Từ chối yêu cầu huỷ và gửi quản trị viên xem xét thành công"
+         );
       },
       onError: (error: any) => {
          addToast(
             "error",
-            error.response?.data?.message || "Failed to reject cancellation"
+            error.response?.data?.message || "Thất bại khi từ chối yêu cầu huỷ"
          );
       },
    });
@@ -121,13 +123,12 @@ export const useRejectLearningCommitment = () => {
          learningCommitmentApi.rejectLearningCommitment(id),
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: ["learningCommitment"] });
-         addToast("success", "Learning commitment rejected successfully");
+         addToast("success", "Từ chối cam kết học thành công");
       },
       onError: (error: any) => {
          addToast(
             "error",
-            error.response?.data?.message ||
-               "Failed to reject learning commitment"
+            error.response?.data?.message || "thất bại khi từ chối cam kết học"
          );
       },
    });

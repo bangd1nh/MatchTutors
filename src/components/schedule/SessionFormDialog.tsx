@@ -27,6 +27,7 @@ import { Session } from "@/types/session";
 import { SessionStatus } from "@/enums/session.enum";
 import { useEffect } from "react";
 import { Loader2, Calendar, MapPin, BookOpen } from "lucide-react";
+import { getSubjectLabelVi } from "@/utils/educationDisplay";
 
 const sessionFormSchema = z
    .object({
@@ -195,8 +196,10 @@ export const SessionFormDialog = ({
                                     >
                                        <div className="flex flex-col">
                                           <span className="font-medium text-gray-800">
-                                             {c.teachingRequest?.subject ??
-                                                "Môn học"}
+                                             {getSubjectLabelVi(
+                                                c.teachingRequest?.subject ??
+                                                   "Môn học"
+                                             )}
                                           </span>
                                           <span className="text-xs text-gray-500">
                                              {c.student?.userId?.email ??

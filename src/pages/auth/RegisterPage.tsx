@@ -44,7 +44,7 @@ export default function RegisterPage() {
       resolver: zodResolver(registerSchema),
       mode: "onChange",
       defaultValues: {
-         name: "",
+         // name: "",
          email: "",
          password: "",
          confirmPassword: "",
@@ -138,7 +138,7 @@ export default function RegisterPage() {
                      className="space-y-4"
                      noValidate
                   >
-                     <FormField
+                     {/* <FormField
                         control={form.control}
                         name="name"
                         render={() => (
@@ -168,7 +168,7 @@ export default function RegisterPage() {
                               </FormMessage>
                            </FormItem>
                         )}
-                     />
+                     /> */}
 
                      <FormField
                         control={form.control}

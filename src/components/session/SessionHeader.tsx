@@ -24,13 +24,10 @@ export default function SessionHeader({
 }: any) {
    const navigate = useNavigate();
 
-   // Debug log
-   console.log("SessionHeader canEdit:", canEdit);
-
    // Use learningCommitment for subject/level
    const learningCommitment = (session as any).learningCommitmentId;
 
-   // >>> changed code: map status -> label + classes
+   //  map status -> label + classes
    const statusMap: Record<string, { label: string; className: string }> = {
       SCHEDULED: {
          label: "Đã lên lịch",
@@ -57,7 +54,6 @@ export default function SessionHeader({
       label: session.status,
       className: "bg-gray-100 text-gray-800",
    };
-   // <<< changed code
 
    return (
       <div className="border-b bg-card">
@@ -75,18 +71,21 @@ export default function SessionHeader({
                      <div className="flex items-center gap-3">
                         <h1 className="text-2xl font-semibold text-foreground">
                            {learningCommitment?.teachingRequest?.subject
-                              ? getSubjectLabelVi(learningCommitment.teachingRequest.subject)
+                              ? getSubjectLabelVi(
+                                   learningCommitment.teachingRequest.subject
+                                )
                               : "Môn học"}
                            {" - "}
                            {learningCommitment?.teachingRequest?.level
-                              ? getLevelLabelVi(learningCommitment.teachingRequest.level)
+                              ? getLevelLabelVi(
+                                   learningCommitment.teachingRequest.level
+                                )
                               : "Cấp độ"}
                         </h1>
-                        {/* >>> changed code: use mapped label + class */}
+                        {/*  use mapped label + class */}
                         <Badge className={statusInfo.className}>
                            {statusInfo.label}
                         </Badge>
-                        {/* <<< changed code */}
                      </div>
                      <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                         <div className="flex items-center gap-1">
@@ -120,7 +119,6 @@ export default function SessionHeader({
                   </div>
                </div>
                <div className="flex items-center gap-2">
-                  {/* Force hiển thị để test */}
                   {canEdit && session.status === "SCHEDULED" && (
                      <>
                         {isEditing ? (

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { ViolationTypeEnum, VIOLATION_TYPE_VALUES } from "@/enums/violationReport.enum";
+import { ViolationTypeEnum, VIOLATION_TYPE_VALUES, VIOLATION_TYPE_LABELS_VI } from "@/enums/violationReport.enum";
 import { Loader2, X, Upload } from "lucide-react";
 
 interface ReportModalProps {
@@ -32,12 +32,6 @@ interface ReportModalProps {
       evidenceFiles: File[];
    }) => Promise<void>;
 }
-
-const VIOLATION_TYPE_LABELS: Record<ViolationTypeEnum, string> = {
-   [ViolationTypeEnum.SCAM_TUTOR]: "Gia sư lừa đảo",
-   [ViolationTypeEnum.FALSE_FEEDBACK]: "Đánh giá sai sự thật",
-   [ViolationTypeEnum.SCAM_STUDENT]: "Gia sư lừa đảo học sinh",
-};
 
 export const ReportModal = ({
    isOpen,
@@ -125,7 +119,7 @@ export const ReportModal = ({
                      <SelectContent>
                         {VIOLATION_TYPE_VALUES.map((violationType) => (
                            <SelectItem key={violationType} value={violationType}>
-                              {VIOLATION_TYPE_LABELS[violationType]}
+                              {VIOLATION_TYPE_LABELS_VI[violationType] || violationType}
                            </SelectItem>
                         ))}
                      </SelectContent>

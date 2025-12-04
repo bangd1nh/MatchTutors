@@ -35,9 +35,19 @@ import {
 import { useToast } from "@/hooks/useToast";
 import { ViolationTypeEnum } from "@/enums/violationReport.enum";
 import { Badge } from "@/components/ui/badge";
+import { Pagination } from "@/components/common/Pagination";
 
 const MyApplicationsPage = () => {
-   const { data: requests, isLoading, isError } = useMyTeachingRequests();
+   const [page, setPage] = useState(1);
+   const [limit] = useState(9);
+   const {
+      data: listData,
+      isLoading,
+      isError,
+   } = useMyTeachingRequests(page, limit);
+   const requests = listData?.data ?? [];
+   const pagination = listData?.pagination;
+
    const [selectedRequest, setSelectedRequest] =
       useState<TeachingRequest | null>(null);
    const [reportStatusMap, setReportStatusMap] = useState<
@@ -408,6 +418,18 @@ const MyApplicationsPage = () => {
                         );
                      })}
                   </div>
+               </div>
+            )}
+
+            {/* Pagination */}
+            {pagination && pagination.totalPages >= 1 && (
+               <div className="mt-6 flex items-center justify-center">
+                  <Pagination
+                     currentPage={pagination.page}
+                     totalPages={pagination.totalPages}
+                     onPageChange={(p) => setPage(p)}
+                     maxVisiblePages={5}
+                  />
                </div>
             )}
          </div>

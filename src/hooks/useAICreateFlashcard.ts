@@ -1,6 +1,6 @@
 import { fetchAIFlashcard, fetchAIMCQ, fetchAISAQ } from "@/api/aiCreateQuiz";
-import { getMaterials } from "@/api/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { getMaterials } from "@/api/material";
 
 export const useAICreateFlashcard = (materialId?: string) => {
    const fetchFL = useQuery({
@@ -10,8 +10,12 @@ export const useAICreateFlashcard = (materialId?: string) => {
    });
 
    const fetchMaterial = useQuery({
-      queryKey: ["TUTORMATERIALFORAI"],
-      queryFn: getMaterials,
+      queryKey: ["TUTORMATERIALFORAI", 1, 10],
+      queryFn: ({ queryKey }) => {
+         const [, pageFromKey = 1, limitFromKey = 10] = queryKey as any;
+         return getMaterials(Number(pageFromKey), Number(limitFromKey));
+      },
+      enabled: true,
    });
 
    return {
@@ -22,8 +26,12 @@ export const useAICreateFlashcard = (materialId?: string) => {
 
 export const useAICreateFlashcardMutation = () => {
    const fetchMaterial = useQuery({
-      queryKey: ["TUTORMATERIALFORAI"],
-      queryFn: getMaterials,
+      queryKey: ["TUTORMATERIALFORAI", 1, 10],
+      queryFn: ({ queryKey }) => {
+         const [, pageFromKey = 1, limitFromKey = 10] = queryKey as any;
+         return getMaterials(Number(pageFromKey), Number(limitFromKey));
+      },
+      enabled: true,
    });
 
    const generateFlashcard = useMutation({

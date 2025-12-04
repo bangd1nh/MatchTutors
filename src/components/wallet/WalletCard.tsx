@@ -39,7 +39,7 @@ export const WalletCard: React.FC = () => {
          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
             <div className="text-xs text-gray-500 dark:text-gray-400">
                Cập nhật lần cuối:{" "}
-               {new Date(wallet.updatedAt).toLocaleDateString("vi-VN")}
+               {new Date(wallet.updatedAt).toLocaleString("vi-VN")}
             </div>
          </div>
       </div>

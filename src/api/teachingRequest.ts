@@ -2,24 +2,74 @@ import apiClient from "@/lib/api";
 import {
    CreateTeachingRequestPayload,
    TeachingRequest,
+   TeachingRequestList,
 } from "@/types/teachingRequest";
 
 /**
  * Lấy danh sách các yêu cầu dạy học của học sinh hiện tại.
  */
-export const getMyTeachingRequests = async (): Promise<TeachingRequest[]> => {
-   const response = await apiClient.get("/teachingRequest/student/me");
-   const data = response.data;
-   if (Array.isArray(data.metadata)) {
-      return data.metadata;
+export const getMyTeachingRequests = async (
+   page?: number,
+   limit?: number
+): Promise<TeachingRequestList> => {
+   const response = await apiClient.get("/teachingRequest/student/me", {
+      params: { page, limit },
+   });
+
+   const raw = response.data ?? {};
+
+   const payload =
+      raw?.data?.data ??
+      raw?.data ??
+      raw?.metadata?.data ??
+      raw?.metadata ??
+      raw;
+
+   if (payload && Array.isArray(payload.data)) {
+      return {
+         data: payload.data,
+         pagination: payload.pagination ?? {
+            page: page ?? 1,
+            limit: limit ?? payload.data.length,
+            total: payload.pagination?.total ?? payload.data.length,
+            totalPages: payload.pagination?.totalPages ?? 1,
+         },
+      };
    }
-   if (Array.isArray(data.data)) {
-      return data.data;
+
+   if (Array.isArray(payload)) {
+      return {
+         data: payload,
+         pagination: {
+            page: page ?? 1,
+            limit: limit ?? payload.length,
+            total: payload.length,
+            totalPages: 1,
+         },
+      };
    }
-   if (Array.isArray(data)) {
-      return data;
+
+   if (raw?.data && Array.isArray(raw.data)) {
+      return {
+         data: raw.data,
+         pagination: raw.pagination ?? {
+            page: page ?? 1,
+            limit: limit ?? raw.data.length,
+            total: raw.total ?? raw.data.length,
+            totalPages: raw.totalPages ?? 1,
+         },
+      };
    }
-   return []; // Trả về mảng rỗng nếu không tìm thấy dữ liệu
+
+   return {
+      data: [],
+      pagination: {
+         page: page ?? 1,
+         limit: limit ?? 10,
+         total: 0,
+         totalPages: 1,
+      },
+   };
 };
 
 /**
@@ -49,22 +99,79 @@ export const getTeachingRequestById = async (
    return null;
 };
 
-// Lấy requests của tutor hiện tại
-export const getTutorTeachingRequests = async (): Promise<
-   TeachingRequest[]
-> => {
-   const response = await apiClient.get("/teachingRequest/tutor/me");
-   const data = response.data;
-   if (Array.isArray(data.metadata)) {
-      return data.metadata;
+/**
+ * Lấy requests của tutor hiện tại (hỗ trợ phân trang)
+ */
+export const getTutorTeachingRequests = async (
+   page?: number,
+   limit?: number
+): Promise<TeachingRequestList> => {
+   const response = await apiClient.get("/teachingRequest/tutor/me", {
+      params: { page, limit },
+   });
+
+   const raw = response.data ?? {};
+
+   // Giải cấu trúc các biến thể response:
+   // - { data: { data: [...], pagination: {...} } }
+   // - { metadata: { data: [...], pagination: {...} } }
+   // - hoặc trả thẳng array
+   const payload =
+      raw?.data?.data ??
+      raw?.data ??
+      raw?.metadata?.data ??
+      raw?.metadata ??
+      raw;
+
+   // Nếu payload có field data (mặc định backend điền vào), dùng đó
+   if (payload && Array.isArray(payload.data)) {
+      return {
+         data: payload.data,
+         pagination: payload.pagination || {
+            page: page ?? 1,
+            limit: limit ?? payload.data.length,
+            total: payload.pagination?.total ?? payload.data.length,
+            totalPages: payload.pagination?.totalPages ?? 1,
+         },
+      };
    }
-   if (Array.isArray(data.data)) {
-      return data.data;
+
+   // Nếu payload chính là mảng
+   if (Array.isArray(payload)) {
+      return {
+         data: payload,
+         pagination: {
+            page: page ?? 1,
+            limit: limit ?? payload.length,
+            total: payload.length,
+            totalPages: 1,
+         },
+      };
    }
-   if (Array.isArray(data)) {
-      return data;
+
+   // Nếu payload có dạng { data: [...], pagination: {...} } (raw.data)
+   if (raw?.data && Array.isArray(raw.data)) {
+      return {
+         data: raw.data,
+         pagination: raw.pagination || {
+            page: page ?? 1,
+            limit: limit ?? raw.data.length,
+            total: raw.total ?? raw.data.length,
+            totalPages: raw.totalPages ?? 1,
+         },
+      };
    }
-   return []; // Luôn trả về một mảng
+
+   // Fallback: trả rỗng với pagination mặc định
+   return {
+      data: [],
+      pagination: {
+         page: page ?? 1,
+         limit: limit ?? 10,
+         total: 0,
+         totalPages: 1,
+      },
+   };
 };
 
 // Tutor respond (ACCEPTED | REJECTED)

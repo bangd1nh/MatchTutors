@@ -10,6 +10,8 @@ import {
    Line,
    Legend,
 } from "recharts";
+import { Activity, TrendingUp } from "lucide-react";
+import { getSessionStatusLabel } from "@/utils/session-status-translation";
 
 type DayItem = {
    date: string;
@@ -84,8 +86,9 @@ export default function StatisticChartTutor(props: {
    return (
       <div className="space-y-6">
          <div className="bg-white p-6 rounded shadow">
-            <h4 className="font-medium mb-4 text-lg">
-               Sessions per day (bubble)
+            <h4 className="font-medium mb-4 text-lg flex items-center gap-2">
+               <Activity className="w-5 h-5 text-gray-500" />
+               Số lượng buổi học hoàn thành theo ngày
             </h4>
             <div style={{ width: "100%", height: 480 }}>
                <ResponsiveContainer>
@@ -125,7 +128,10 @@ export default function StatisticChartTutor(props: {
                         width={70}
                      />
                      <Tooltip
-                        formatter={(value: any, name: any) => [value, name]}
+                        formatter={(value: any, name: any) => [
+                           value,
+                           name === "day" ? "ngày" : name,
+                        ]}
                         labelFormatter={(label) => {
                            const idx = Number(label) - 1;
                            return bubblePoints[idx]?.labelFull || String(label);
@@ -139,8 +145,9 @@ export default function StatisticChartTutor(props: {
          </div>
 
          <div className="bg-white p-6 rounded shadow">
-            <h4 className="font-medium mb-4 text-lg">
-               Sessions by status (line)
+            <h4 className="font-medium mb-4 text-lg flex items-center gap-2">
+               <TrendingUp className="w-5 h-5 text-gray-500" />
+               Số lượng buổi học theo các trạng thái theo ngày
             </h4>
             <div style={{ width: "100%", height: 480 }}>
                <ResponsiveContainer>
@@ -168,11 +175,18 @@ export default function StatisticChartTutor(props: {
                         }}
                         width={70}
                      />
-                     <Tooltip labelFormatter={(label) => label} />
+                     <Tooltip
+                        formatter={(value: number, name: string) => [
+                           value,
+                           getSessionStatusLabel(name),
+                        ]}
+                        labelFormatter={(label) => label}
+                     />
                      <Legend />
                      {(sessions?.statuses || []).map((s, idx) => (
                         <Line
                            key={s}
+                           name={getSessionStatusLabel(s)}
                            type="monotone"
                            dataKey={s}
                            stroke={["#8884d8", "#ff7300"][idx % 2]}

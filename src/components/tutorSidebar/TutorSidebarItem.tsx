@@ -18,6 +18,8 @@ import {
    CreditCard,
    AlertTriangle,
    MessageSquare,
+   Star,
+   Key,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -28,109 +30,147 @@ export type SidebarItem = {
    icon?: React.ReactNode;
 };
 
-export const tutorSidebarConfig: SidebarItem[] = [
-   {
-      to: "/tutor/dashboard",
-      label: "Bảng điều khiển",
-      icon: <LayoutDashboard className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/profile-page",
-      label: "Hồ sơ của tôi",
-      icon: <User className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/teaching-requests",
-      label: "Yêu cầu dạy học",
-      icon: <BookHeart className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/schedule",
-      label: "Lịch dạy",
-      icon: <Calendar className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/learning-commitments",
-      label: "Learning Commitments",
-      icon: <BookCopy className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/createFlashcardQuiz",
-      label: "Tạo bộ câu hỏi Flashcard",
-      icon: <BookPlus className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/createMultipleChoiceQuiz",
-      label: "Tạo bộ câu hỏi Trắc nghiệm",
-      icon: <BookPlus className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/createShortAnswerQuiz",
-      label: "Tạo bộ câu hỏi Short Answer",
-      icon: <BookPlus className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/flashcardList",
-      label: "Xem bộ câu hỏi Flashcard",
-      icon: <BookCopy className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/MultipleChoiceList",
-      label: "Xem bộ câu hỏi Trắc nghiệm",
-      icon: <BookCopy className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/ShortAnswerList",
-      label: "Xem bộ câu hỏi Short Answer",
-      icon: <BookCopy className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/rejected-sessions",
-      label: "Buổi học bị từ chối",
-      icon: <XCircle className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/absence-sessions",
-      label: "Buổi học vắng",
-      icon: <AlertTriangle className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/review-list",
-      label: "Quản lý đánh giá",
-      icon: <BookCopy className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/create-material",
-      label: "Tải lên tài liệu",
-      icon: <FileUp className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/material-management",
-      label: "Quản lý tài liệu",
-      icon: <FolderKanban className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/wallet",
-      label: "Ví của tôi",
-      icon: <Wallet className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/payment-history",
-      label: "Lịch sử thanh toán",
-      icon: <CreditCard className="h-4 w-4" />,
-   },
-   {
-      to: "/tutor/studentMCQHistoryList",
-      label: "Lịch sử làm bài",
-      icon: <History className="h-4 w-4" />,
-   },
-   {
-      to: "/chat",
-      label: "Tin nhắn",
-      icon: <MessageSquare className="h-4 w-4" />,
-   },
+export type SidebarSection = {
+   title: string;
+   items: SidebarItem[];
+};
 
-   // Thêm các mục khác ở đây
+export const tutorSidebarConfig: SidebarSection[] = [
+   {
+      title: "Chính",
+      items: [
+         {
+            to: "/tutor/dashboard",
+            label: "Bảng điều khiển",
+            icon: <LayoutDashboard className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/profile-page",
+            label: "Hồ sơ của tôi",
+            icon: <User className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/change-password",
+            label: "Đổi mật khẩu",
+            icon: <Key className="h-4 w-4" />,
+         },
+         {
+            to: "/chat",
+            label: "Tin nhắn",
+            icon: <MessageSquare className="h-4 w-4" />,
+         },
+      ],
+   },
+   {
+      title: "Yêu cầu & Lịch dạy",
+      items: [
+         {
+            to: "/tutor/teaching-requests",
+            label: "Lời mời dạy học",
+            icon: <BookHeart className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/schedule",
+            label: "Lịch dạy",
+            icon: <Calendar className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/rejected-sessions",
+            label: "Buổi học bị từ chối",
+            icon: <XCircle className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/absence-sessions",
+            label: "Buổi học vắng",
+            icon: <AlertTriangle className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/learning-commitments",
+            label: "Cam kết học tập",
+            icon: <BookCopy className="h-4 w-4" />,
+         },
+      ],
+   },
+   {
+      title: "Bộ câu hỏi",
+      items: [
+         {
+            to: "/tutor/createFlashcardQuiz",
+            label: "Tạo Flashcard",
+            icon: <BookPlus className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/createMultipleChoiceQuiz",
+            label: "Tạo Trắc nghiệm",
+            icon: <BookPlus className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/createShortAnswerQuiz",
+            label: "Tạo Short Answer",
+            icon: <BookPlus className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/flashcardList",
+            label: "Xem Flashcard",
+            icon: <BookCopy className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/MultipleChoiceList",
+            label: "Xem Trắc nghiệm",
+            icon: <BookCopy className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/ShortAnswerList",
+            label: "Xem Short Answer",
+            icon: <BookCopy className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/studentMCQHistoryList",
+            label: "Lịch sử làm bài",
+            icon: <History className="h-4 w-4" />,
+         },
+      ],
+   },
+   {
+      title: "Tài liệu",
+      items: [
+         {
+            to: "/tutor/create-material",
+            label: "Tải lên tài liệu",
+            icon: <FileUp className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/material-management",
+            label: "Quản lý tài liệu",
+            icon: <FolderKanban className="h-4 w-4" />,
+         },
+      ],
+   },
+   {
+      title: "Tài chính",
+      items: [
+         {
+            to: "/tutor/wallet",
+            label: "Ví của tôi",
+            icon: <Wallet className="h-4 w-4" />,
+         },
+         {
+            to: "/tutor/payment-history",
+            label: "Lịch sử thanh toán",
+            icon: <CreditCard className="h-4 w-4" />,
+         },
+      ],
+   },
+   {
+      title: "Đánh giá",
+      items: [
+         {
+            to: "/tutor/review-list",
+            label: "Quản lý đánh giá",
+            icon: <Star className="h-4 w-4" />,
+         },
+      ],
+   },
 ];
 
 const TutorSidebarItems: React.FC<{
@@ -166,33 +206,46 @@ const TutorSidebarItems: React.FC<{
                </span>
             </Link>
 
-            {tutorSidebarConfig.map((item) => {
-               const active = isActive(item.to, item.exact);
-               return (
-                  <Link
-                     key={item.to}
-                     to={item.to}
-                     onClick={() => onLinkClick?.()}
-                     className={`flex items-center gap-3 p-2 rounded-md text-sm font-medium transition-colors duration-200
-                        ${
-                           active
-                              ? "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300"
-                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        }
-                     `}
-                     title={item.label}
-                  >
-                     {item.icon && (
-                        <span className="flex-none">{item.icon}</span>
-                     )}
-                     <span
-                        className={`${collapsed ? "sr-only" : "inline-block"}`}
-                     >
-                        {item.label}
-                     </span>
-                  </Link>
-               );
-            })}
+            {tutorSidebarConfig.map((section) => (
+               <div key={section.title} className="mt-4">
+                  {!collapsed && (
+                     <h3 className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent dark:from-sky-400 dark:to-blue-400">
+                        {section.title}
+                     </h3>
+                  )}
+                  <div className="space-y-1">
+                     {section.items.map((item) => {
+                        const active = isActive(item.to, item.exact);
+                        return (
+                           <Link
+                              key={item.to}
+                              to={item.to}
+                              onClick={() => onLinkClick?.()}
+                              className={`flex items-center gap-3 p-2 rounded-md text-sm font-medium transition-colors duration-200
+                                 ${
+                                    active
+                                       ? "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300"
+                                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                 }
+                              `}
+                              title={item.label}
+                           >
+                              {item.icon && (
+                                 <span className="flex-none">{item.icon}</span>
+                              )}
+                              <span
+                                 className={`${
+                                    collapsed ? "sr-only" : "inline-block"
+                                 }`}
+                              >
+                                 {item.label}
+                              </span>
+                           </Link>
+                        );
+                     })}
+                  </div>
+               </div>
+            ))}
          </div>
 
          <div className="mt-auto pt-2 border-t border-gray-200 dark:border-gray-800">

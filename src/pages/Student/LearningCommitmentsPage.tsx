@@ -1,4 +1,5 @@
 import { useLearningCommitments } from "@/hooks/useLearningCommitment";
+import { useTutorProfile } from "@/hooks/useTutorProfile";
 import { LearningCommitmentCard } from "@/components/learning-commitment/LearningCommitmentCard";
 import { Button } from "@/components/ui/button";
 import { Plus, BookOpen } from "lucide-react";
@@ -38,6 +39,12 @@ export const LearningCommitmentsPage = () => {
    const isTutor = String(user?.role).toLowerCase() === "tutor";
    const [page, setPage] = useState(1);
    const [activeTab, setActiveTab] = useState<CommitmentStatus>("all");
+
+   // Add this hook to get tutor profile
+   const { tutorProfile } = useTutorProfile();
+
+   // Check if tutor is approved
+   const isTutorApproved = tutorProfile?.isApproved === true;
 
    const {
       data: paginatedData,
@@ -118,7 +125,7 @@ export const LearningCommitmentsPage = () => {
                      </p>
                   </div>
 
-                  {isTutor && (
+                  {isTutor && isTutorApproved && (
                      <Link
                         to="/tutor/commitments/create"
                         className="flex-shrink-0"
@@ -204,7 +211,7 @@ export const LearningCommitmentsPage = () => {
                            ? "Bắt đầu bằng cách tạo cam kết học tập mới"
                            : "Thử chọn một trạng thái khác"}
                      </p>
-                     {isTutor && activeTab === "all" && (
+                     {isTutor && isTutorApproved && activeTab === "all" && (
                         <Link
                            to="/tutor/commitments/create"
                            className="inline-block"

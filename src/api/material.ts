@@ -1,9 +1,22 @@
 import apiClient from "@/lib/api";
 import { Material } from "@/types/material";
 
-// Lấy danh sách tài liệu của gia sư
-export const getMaterials = async (): Promise<Material[]> => {
-   const response = await apiClient.get("/material");
+export interface PaginatedMaterials {
+   items: Material[];
+   total: number;
+   page: number;
+   totalPages: number;
+   limit: number;
+}
+
+// Lấy danh sách tài liệu của gia sư (hỗ trợ phân trang)
+export const getMaterials = async (
+   page = 1,
+   limit = 10
+): Promise<PaginatedMaterials> => {
+   const response = await apiClient.get("/material", {
+      params: { page, limit },
+   });
    return response.data.data;
 };
 
@@ -45,4 +58,10 @@ export const getMaterialsBySessionId = async (sessionId: string) => {
       `/material/sessions/${sessionId}/materials`
    );
    return response.data?.data || [];
+};
+
+//  deleteMaterial -->
+export const deleteMaterial = async (materialId: string) => {
+   const response = await apiClient.delete(`/material/${materialId}`);
+   return response.data.data;
 };

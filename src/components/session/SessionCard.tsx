@@ -1,11 +1,10 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
    Calendar,
    Clock,
-   User,
    BookOpen,
    XCircle,
    AlertTriangle,
@@ -75,6 +74,14 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, type }) => {
    const participant = getParticipantInfo(session);
    const subjectInfo = getSubjectInfo(session);
 
+   // route prefix based on role: TUTOR -> /tutor, STUDENT -> /student, fallback -> ''
+   const routePrefix =
+      user?.role === "TUTOR"
+         ? "/tutor"
+         : user?.role === "STUDENT"
+         ? "/student"
+         : "";
+
    const getStatusBadge = () => {
       if (type === "rejected") {
          return <Badge variant="destructive">Đã từ chối</Badge>;
@@ -94,38 +101,53 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, type }) => {
    };
 
    return (
-      <Card className="hover:shadow-md transition-shadow">
-         <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-               <CardTitle className="text-lg">
-                  {getSubjectLabelVi(subjectInfo.subject)} - {getLevelLabelVi(subjectInfo.level)}
-               </CardTitle>
-               {getStatusBadge()}
-            </div>
-         </CardHeader>
-         <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                     <Calendar className="h-4 w-4" />
-                     <span>{formatDate(session.startTime)}</span>
+      <Card className="overflow-hidden rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-transparent dark:border-neutral-800">
+         <div className="bg-gradient-to-r from-rose-50 via-amber-50 to-amber-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-800 p-4">
+            <div className="flex items-center justify-between gap-4">
+               <div className="flex items-center gap-3">
+                  <div className="leading-tight">
+                     <div className="text-sm font-semibold text-rose-700 dark:text-rose-300">
+                        {getSubjectLabelVi(subjectInfo.subject)}
+                     </div>
+                     <div className="text-xs text-amber-800 dark:text-amber-300">
+                        {getLevelLabelVi(subjectInfo.level)}
+                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                     <Clock className="h-4 w-4" />
-                     <span>
-                        {formatTime(session.startTime)} -{" "}
+               </div>
+
+               <div className="flex items-center gap-2">
+                  <div className="text-xs text-neutral-600 dark:text-neutral-400 mr-2">
+                     {getStatusBadge()}
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <CardContent className="p-4 bg-white dark:bg-neutral-900">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-sm text-neutral-600 dark:text-neutral-300">
+                     <Calendar className="h-4 w-4 text-rose-400" />
+                     <span className="font-medium">
+                        {formatDate(session.startTime)}
+                     </span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-neutral-600 dark:text-neutral-300">
+                     <Clock className="h-4 w-4 text-amber-400" />
+                     <span className="font-medium">
+                        {formatTime(session.startTime)} —{" "}
                         {formatTime(session.endTime)}
                      </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                     <User className="h-4 w-4" />
-                     <span>
-                        {participant.name} ({participant.role})
+                  <div className="flex items-center gap-3 text-sm text-neutral-600 dark:text-neutral-300">
+                     <span className="font-medium">{participant.name}</span>{" "}
+                     <span className="text-xs text-neutral-500">
+                        ({participant.role})
                      </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                     <BookOpen className="h-4 w-4" />
-                     <span>
+                  <div className="flex items-center gap-3 text-sm text-neutral-600 dark:text-neutral-300">
+                     <BookOpen className="h-4 w-4 text-sky-400" />
+                     <span className="italic text-sm">
                         {session.isTrial
                            ? "Buổi học thử"
                            : "Buổi học chính thức"}
@@ -133,48 +155,57 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, type }) => {
                   </div>
                </div>
 
-               <div className="space-y-2">
+               <div className="space-y-3 text-sm text-neutral-600 dark:text-neutral-300">
                   {type === "rejected" && session.studentConfirmation && (
-                     <div className="text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
-                           Xác nhận của học sinh:{" "}
-                        </span>
-                        <Badge
-                           variant={
-                              session.studentConfirmation.status === "REJECTED"
-                                 ? "destructive"
-                                 : "default"
-                           }
-                        >
-                           {session.studentConfirmation.status === "REJECTED"
-                              ? "Từ chối"
-                              : "Chấp nhận"}
-                        </Badge>
+                     <div className="flex flex-col gap-2 bg-rose-50/60 dark:bg-neutral-800 p-3 rounded-lg">
+                        <div className="flex items-center justify-between">
+                           <div className="text-xs text-neutral-600">
+                              Xác nhận của học sinh
+                           </div>
+                           <Badge
+                              variant={
+                                 session.studentConfirmation.status ===
+                                 "REJECTED"
+                                    ? "destructive"
+                                    : "default"
+                              }
+                           >
+                              {session.studentConfirmation.status === "REJECTED"
+                                 ? "Từ chối"
+                                 : "Chấp nhận"}
+                           </Badge>
+                        </div>
                      </div>
                   )}
 
                   {type === "rejected" && session.deletedAt && (
-                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                        <span>Xóa lúc: {formatDate(session.deletedAt)}</span>
+                     <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                        <span className="text-xs">Xóa lúc: </span>
+                        <span className="font-medium">
+                           {formatDate(session.deletedAt)}
+                        </span>
                      </div>
                   )}
 
                   {type === "cancelled" && session.cancellation && (
-                     <div className="text-sm text-gray-600 dark:text-gray-400">
+                     <div className="flex flex-col gap-2 bg-amber-50/50 dark:bg-neutral-800 p-3 rounded-lg">
                         <div className="flex items-center gap-2">
                            {getStatusIcon()}
-                           <span>Lý do hủy: {session.cancellation.reason}</span>
+                           <span className="font-medium">Lý do hủy:</span>
+                           <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200 ml-2">
+                              {session.cancellation.reason}
+                           </span>
                         </div>
-                        <div className="mt-1">
-                           <span>
-                              Hủy lúc:{" "}
+                        <div className="text-xs text-neutral-500">
+                           Hủy lúc:{" "}
+                           <span className="font-medium">
                               {formatDate(session.cancellation.cancelledAt)}
                            </span>
                         </div>
                         {session.cancellation.cancelledBy && (
-                           <div className="mt-1">
-                              <span>
-                                 Hủy bởi:{" "}
+                           <div className="text-xs text-neutral-500">
+                              Hủy bởi:{" "}
+                              <span className="font-medium">
                                  {(session.cancellation.cancelledBy as any)
                                     ?.name || "Người dùng"}
                               </span>
@@ -184,10 +215,10 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, type }) => {
                   )}
 
                   {type === "absence" && session.absence && (
-                     <div className="text-sm text-gray-600 dark:text-gray-400">
+                     <div className="flex flex-col gap-2 bg-sky-50/40 dark:bg-neutral-800 p-3 rounded-lg">
                         <div className="flex items-center gap-2">
-                           <AlertTriangle className="h-4 w-4" />
-                           <span>
+                           <AlertTriangle className="h-4 w-4 text-sky-500" />
+                           <span className="font-medium">
                               {session.absence.tutorAbsent && "Gia sư vắng"}
                               {session.absence.tutorAbsent &&
                                  session.absence.studentAbsent &&
@@ -196,17 +227,20 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, type }) => {
                            </span>
                         </div>
                         {session.absence.reason && (
-                           <div className="mt-1">
-                              <span>Lý do: {session.absence.reason}</span>
+                           <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
+                              Lý do:{" "}
+                              <span className="font-medium">
+                                 {session.absence.reason}
+                              </span>
                            </div>
                         )}
                      </div>
                   )}
 
                   {session.createdBy && (
-                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                        <span>
-                           Tạo bởi:{" "}
+                     <div className="text-xs text-neutral-500">
+                        Tạo bởi:{" "}
+                        <span className="font-medium">
                            {(session.createdBy as any)?.name || "Người dùng"}
                         </span>
                      </div>
@@ -214,12 +248,14 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, type }) => {
                </div>
             </div>
 
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-800">
                <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => navigate(`/session/${session._id}`)}
-                  className="w-full"
+                  onClick={() =>
+                     navigate(`${routePrefix}/session/${session._id}`)
+                  }
+                  className="w-full rounded-xl"
                >
                   Xem chi tiết
                </Button>

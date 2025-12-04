@@ -58,31 +58,42 @@ const MaterialModal: React.FC<MaterialModalProps> = ({
       null
    );
 
-   const filterPDF = (obj: AIMaterial[]): AIMaterial[] => {
-      const pdfUrls = [];
-      for (let o of obj) {
-         if (o.fileUrl.toLowerCase().endsWith(".pdf")) {
-            pdfUrls.push(o);
-         }
+   const filterPDF = (obj: any): AIMaterial[] => {
+      if (!obj) return [];
+      // Normalize common shapes: array, paginated { items: [...] } or { data: [...] }, or object map
+      let list: any[] = [];
+      if (Array.isArray(obj)) {
+         list = obj;
+      } else if (obj && Array.isArray((obj as any).items)) {
+         list = (obj as any).items;
+      } else if (obj && Array.isArray((obj as any).data)) {
+         list = (obj as any).data;
+      } else if (obj && typeof obj === "object") {
+         list = Object.values(obj);
       }
-      return pdfUrls;
+      // Flatten if first element is an array (defensive)
+      if (list.length === 1 && Array.isArray(list[0])) {
+         list = list[0];
+      }
+      return list.filter(
+         (o): o is AIMaterial =>
+            !!o &&
+            typeof (o as any).fileUrl === "string" &&
+            (o as any).fileUrl.toLowerCase().endsWith(".pdf")
+      );
    };
 
-   const materials = filterPDF(
-      (fetchMaterial.data || []) as unknown as AIMaterial[]
-   );
+   const materials = filterPDF(fetchMaterial.data);
 
    // Filter materials based on search term
-   const filteredMaterials = materials.filter(
-      (material) =>
-         material.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         material.description
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-         material.uploadedBy.name
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())
-   );
+   const filteredMaterials = materials.filter((material) => {
+      const term = searchTerm.toLowerCase();
+      return (
+         (material.title || "").toLowerCase().includes(term) ||
+         (material.description || "").toLowerCase().includes(term) ||
+         (material.uploadedBy?.name || "").toLowerCase().includes(term)
+      );
+   });
 
    const formatDate = (dateString: string) => {
       return format(new Date(dateString), "dd/MM/yyyy HH:mm", { locale: vi });
