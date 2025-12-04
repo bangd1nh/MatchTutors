@@ -46,8 +46,9 @@ const ViewMCQHistoryList = () => {
       );
    }
 
-   const submissionHistory = (fetchMCQSubmitHistoryList.data?.data ??
-      []) as any[];
+   const submissionHistory = (
+      fetchMCQSubmitHistoryList.data?.data ?? []
+   ).filter((item: any) => item.quizId?.quizType === "MULTIPLE_CHOICE");
 
    if (submissionHistory.length === 0) {
       return (
@@ -215,15 +216,15 @@ const ViewMCQHistoryList = () => {
                               </Badge>
                               {submission.quizSnapshot.settings
                                  .timeLimitMinutes && (
-                                 <Badge variant="outline">
-                                    Giới hạn:{" "}
-                                    {
-                                       submission.quizSnapshot.settings
-                                          .timeLimitMinutes
-                                    }{" "}
-                                    phút
-                                 </Badge>
-                              )}
+                                    <Badge variant="outline">
+                                       Giới hạn:{" "}
+                                       {
+                                          submission.quizSnapshot.settings
+                                             .timeLimitMinutes
+                                       }{" "}
+                                       phút
+                                    </Badge>
+                                 )}
                            </div>
                         </div>
 
