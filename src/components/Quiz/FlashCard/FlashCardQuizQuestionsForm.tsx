@@ -357,7 +357,7 @@ const FlashCardQuizQuestionsForm = forwardRef<QuizQuestionsHandle, Props>(
                   <CardContent className="p-4">
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                           <Label>Front</Label>
+                           <Label>Mặt trước</Label>
                            <Input
                               value={q.frontText}
                               onChange={(e) =>
@@ -373,7 +373,7 @@ const FlashCardQuizQuestionsForm = forwardRef<QuizQuestionsHandle, Props>(
                         </div>
 
                         <div>
-                           <Label>Back</Label>
+                           <Label>Mặt sau</Label>
                            <Input
                               value={q.backText}
                               onChange={(e) =>
@@ -390,14 +390,14 @@ const FlashCardQuizQuestionsForm = forwardRef<QuizQuestionsHandle, Props>(
                      </div>
 
                      <div className="mt-3">
-                        <Label>Explanation (optional)</Label>
+                        <Label>Giải thích</Label>
                         <Textarea
                            value={q.explanation ?? ""}
                            onChange={(e) =>
                               update(q._id, { explanation: e.target.value })
                            }
                            rows={3}
-                           placeholder="Giải thích, ghi chú..."
+                           placeholder="Giải thích, ghi chú... (có thể bỏ trống)"
                         />
                      </div>
                   </CardContent>

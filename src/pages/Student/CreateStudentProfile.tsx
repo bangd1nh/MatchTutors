@@ -30,6 +30,7 @@ import { TimeSlot } from "@/enums/timeSlot.enum";
 import { City } from "@/enums/city.enum";
 import { useUser } from "@/hooks/useUser";
 import { studentProfileSchema } from "@/validation/studentProfileSchema";
+import { getSubjectLabelVi } from "@/utils/educationDisplay";
 
 const DAYS_OF_WEEK = [
    { value: 1, label: "Thứ 2" },
@@ -331,7 +332,7 @@ const CreateStudentProfile = () => {
                                           }}
                                           className="hidden"
                                        />
-                                       {subject}
+                                       {getSubjectLabelVi(subject)}
                                     </label>
                                  ))}
                               </div>

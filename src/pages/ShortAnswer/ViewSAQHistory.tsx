@@ -1,4 +1,4 @@
-import { useDoSAQ } from "@/hooks/useDoSAQ";
+import { fetchSAQHistory } from "@/hooks/useDoSAQ";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,18 +25,20 @@ const ViewSAQHistory = () => {
     const quizId = searchParams.get("quizId") || "";
     const navigate = useNavigate();
 
-    const { fetchSAQHistory } = useDoSAQ();
-    const submissions = fetchSAQHistory.data?.data;
+    const fetch = fetchSAQHistory(quizId);
+    const submissions = fetch.data?.data;
     const submission = Array.isArray(submissions)
         ? submissions.find((sub: any) => sub._id === quizId)
         : (submissions as any)?._id === quizId
             ? submissions
             : undefined;
 
+    console.log(submissions)
+
     const submissionQuery = {
         data: submission,
-        isLoading: fetchSAQHistory.isLoading,
-        isError: fetchSAQHistory.isError
+        isLoading: fetch.isLoading,
+        isError: fetch.isError
     };
 
     if (submissionQuery.isLoading) {

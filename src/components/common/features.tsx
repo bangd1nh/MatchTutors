@@ -1,3 +1,6 @@
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
 interface Feature {
    id: string;
    label: string;
@@ -110,30 +113,28 @@ export default function Features() {
    ];
 
    return (
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4 bg-background">
          <div className="max-w-7xl mx-auto">
             {/* Header */}
             <div className="text-center mb-16">
-               <h2 className="text-4xl font-bold text-gray-900 mb-4">
+               <h2 className="text-4xl font-bold text-foreground mb-4">
                   Tính Năng Nổi Bật
                </h2>
-               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                   Nền tảng dạy học trực tuyến toàn diện với các công cụ hiện đại
                </p>
             </div>
 
             {/* Features Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
-               {features.map((feature, index) => (
-                  <div
+               {features.map((feature) => (
+                  <Card
                      key={feature.id}
-                     className={`flex flex-col ${
-                        index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                     } items-center gap-8`}
+                     className="flex flex-col md:flex-row items-center gap-8 overflow-hidden bg-card text-card-foreground"
                   >
                      {/* Image */}
-                     <div className="flex-1 flex justify-center">
-                        <div className="relative w-full h-64 md:h-80 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+                     <div className="flex-1 flex justify-center w-full md:w-1/2">
+                        <div className="relative w-full h-64 md:h-80 rounded-2xl overflow-hidden">
                            <img
                               src={feature.image}
                               alt={feature.imageAlt}
@@ -143,32 +144,32 @@ export default function Features() {
                      </div>
 
                      {/* Content */}
-                     <div className="flex-1 flex flex-col justify-center">
+                     <div className="flex-1 flex flex-col justify-center w-full md:w-1/2 p-6">
                         <div className="inline-flex items-center mb-3">
-                           <div className="w-1 h-8 bg-blue-500 rounded mr-3"></div>
-                           <span className="text-sm font-semibold text-blue-500 uppercase tracking-wider">
+                           <span className="w-1 h-8 bg-primary rounded mr-3"></span>
+                           <Badge variant="outline" className="uppercase tracking-wider">
                               {feature.label}
-                           </span>
+                           </Badge>
                         </div>
 
-                        <h3 className="text-3xl font-bold text-gray-900 mb-4">
+                        <h3 className="text-3xl font-bold text-foreground mb-4">
                            {feature.title}
                         </h3>
 
-                        <p className="text-gray-600 leading-relaxed mb-6">
+                        <p className="text-muted-foreground leading-relaxed mb-6">
                            {feature.description}
                         </p>
 
-                        <ul className="space-y-2 text-gray-600">
+                        <ul className="space-y-2 text-muted-foreground">
                            {feature.benefits.map((b, i) => (
                               <li key={i} className="flex items-center text-sm">
-                                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-3"></span>
+                                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-3"></span>
                                  {b}
                               </li>
                            ))}
                         </ul>
                      </div>
-                  </div>
+                  </Card>
                ))}
             </div>
          </div>

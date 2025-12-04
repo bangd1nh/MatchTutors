@@ -9,6 +9,7 @@ import FlashcardListModal from "./FlashcardListModal";
 import { useQuizzesAssignedToSession } from "@/hooks/useQuiz";
 import { IQuizInfo } from "@/types/quiz";
 import { useAsignFlashcardStore } from "@/store/useAsignFlashcardStore";
+import { getQuestionTypeLabelVi, getQuizModeLabelVi } from "@/utils/quizTypeDisplay";
 
 export default function QuizzesCard({ session, canManage }: any) {
    const {
@@ -62,12 +63,12 @@ export default function QuizzesCard({ session, canManage }: any) {
             <CardHeader className="flex flex-row items-center justify-between">
                <CardTitle className="flex items-center gap-2">
                   <BookOpen className="h-5 w-5" />
-                  Flashcard ({flashcards.length})
+                  Thẻ Ghi Nhớ ({flashcards.length})
                </CardTitle>
                {canManage && (
                   <Button size="sm" onClick={() => setIsShowingModal(true)}>
                      <Plus className="h-4 w-4 mr-2" />
-                     Gắn Flashcard mới
+                     Gắn Thẻ Ghi Nhớ mới
                   </Button>
                )}
             </CardHeader>
@@ -78,7 +79,7 @@ export default function QuizzesCard({ session, canManage }: any) {
                      <p>Chưa có flashcard nào.</p>
                      {canManage && (
                         <p className="text-sm mt-2">
-                           Nhấn "Gắn Flashcard mới" để thêm flashcard.
+                           Nhấn "Gắn Thẻ Ghi Nhớ mới" để thêm Thẻ Ghi Nhớ.
                         </p>
                      )}
                   </div>
@@ -151,9 +152,7 @@ export default function QuizzesCard({ session, canManage }: any) {
                                              variant="outline"
                                              className="text-xs"
                                           >
-                                             {quiz.quizMode === "STUDY"
-                                                ? "HỌC TẬP"
-                                                : "   "}
+                                             {getQuizModeLabelVi(quiz.quizMode)}
                                           </Badge>
                                        </div>
 
@@ -235,7 +234,7 @@ export default function QuizzesCard({ session, canManage }: any) {
 
                                     <div className="flex items-center gap-2 ml-4">
                                        <Badge variant="outline">
-                                          Flashcard
+                                          {getQuestionTypeLabelVi(quiz.quizType)}
                                        </Badge>
 
                                        {/* Nút Xem: dẫn tới /viewQuizz */}

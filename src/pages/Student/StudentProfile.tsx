@@ -34,6 +34,10 @@ import { useToast } from "@/hooks/useToast";
 import { Badge } from "@/components/ui/badge";
 import { City } from "@/enums/city.enum";
 import { studentProfileSchema } from "@/validation/studentProfileSchema";
+import {
+   getLevelLabelVi,
+   getSubjectLabelVi,
+} from "@/utils/educationDisplay";
 
 const DAYS_OF_WEEK = [
    { value: 1, label: "Thứ 2" },
@@ -428,7 +432,7 @@ const StudentProfile = () => {
                                  <SelectContent>
                                     {GRADE_LEVELS.map((level) => (
                                        <SelectItem key={level} value={level}>
-                                          {level.replace("GRADE_", "Lớp ")}
+                                          {getLevelLabelVi(level)}
                                        </SelectItem>
                                     ))}
                                  </SelectContent>
@@ -479,7 +483,7 @@ const StudentProfile = () => {
                                              }}
                                              className="hidden"
                                           />
-                                          {subject}
+                                          {getSubjectLabelVi(subject)}
                                        </label>
                                     ))}
                                  </div>
@@ -493,7 +497,7 @@ const StudentProfile = () => {
                                        key={subject}
                                        className="flex items-center gap-1 px-3 py-1 rounded-full border bg-sky-600 text-white border-sky-600"
                                     >
-                                       {subject}
+                                       {getSubjectLabelVi(subject)}
                                     </div>
                                  ))
                               ) : (

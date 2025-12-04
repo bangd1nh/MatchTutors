@@ -39,13 +39,8 @@ export default function TeachingRequestsList() {
    const [selectedRequest, setSelectedRequest] =
       useState<TeachingRequest | null>(null);
 
-   const handleViewRequest = (request: TeachingRequest) => {
-      setSelectedRequest(request);
-   };
-
-   const handleCloseModal = () => {
-      setSelectedRequest(null);
-   };
+   const handleViewRequest = (request: TeachingRequest) => setSelectedRequest(request);
+   const handleCloseModal = () => setSelectedRequest(null);
 
    if (isLoading)
       return (
@@ -60,27 +55,19 @@ export default function TeachingRequestsList() {
    if (isError)
       return (
          <div className="p-8 text-center">
-            <div className="inline-block p-4 bg-red-50 rounded-lg">
-               <p className="text-red-600 font-medium">
-                  Không thể tải yêu cầu dạy học
-               </p>
-               <p className="text-red-500 text-sm mt-1">Vui lòng thử lại sau</p>
+            <div className="inline-block p-4 bg-destructive/10 rounded-lg border border-destructive/30">
+               <p className="text-destructive font-medium">Không thể tải yêu cầu dạy học</p>
+               <p className="text-muted-foreground text-sm mt-1">Vui lòng thử lại sau</p>
             </div>
          </div>
       );
 
-   const pendingRequests = (requests || []).filter(
-      (r) => r.status === TeachingRequestStatus.PENDING
-   );
-   const acceptedRequests = (requests || []).filter(
-      (r) => r.status === TeachingRequestStatus.ACCEPTED
-   );
-   const rejectedRequests = (requests || []).filter(
-      (r) => r.status === TeachingRequestStatus.REJECTED
-   );
+   const pendingRequests = (requests || []).filter((r) => r.status === TeachingRequestStatus.PENDING);
+   const acceptedRequests = (requests || []).filter((r) => r.status === TeachingRequestStatus.ACCEPTED);
+   const rejectedRequests = (requests || []).filter((r) => r.status === TeachingRequestStatus.REJECTED);
 
    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6 md:p-8">
+      <div className="min-h-screen bg-background p-6 md:p-8 text-foreground">
          <div className="max-w-6xl mx-auto">
             {/* Header Section */}
             <div className="mb-8">
@@ -88,11 +75,9 @@ export default function TeachingRequestsList() {
                   <div className="p-2 bg-primary/10 rounded-lg">
                      <BookOpen className="h-6 w-6 text-primary" />
                   </div>
-                  <h1 className="text-3xl font-bold text-slate-900">
-                     Yêu cầu dạy học
-                  </h1>
+                  <h1 className="text-3xl font-bold">Yêu cầu dạy học</h1>
                </div>
-               <p className="text-slate-600 ml-11">
+               <p className="text-muted-foreground ml-11">
                   Quản lý và phản hồi các yêu cầu từ học sinh của bạn
                </p>
             </div>
@@ -100,7 +85,7 @@ export default function TeachingRequestsList() {
             {/* Stats Section */}
             {(requests || []).length > 0 && (
                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                  <div className="bg-white rounded-lg p-4 border border-slate-200 hover:border-slate-300 transition-colors">
+                  <Card className="p-4 bg-card text-card-foreground border border-border">
                      <div className="flex items-center justify-between">
                         <div>
                            <p className="text-sm text-slate-600">
@@ -110,64 +95,58 @@ export default function TeachingRequestsList() {
                               {pagination?.total ?? requests.length}
                            </p>
                         </div>
-                        <Users className="h-8 w-8 text-slate-300" />
+                        <Users className="h-8 w-8 text-muted-foreground" />
                      </div>
-                  </div>
+                  </Card>
 
-                  <div className="bg-white rounded-lg p-4 border border-slate-200 hover:border-amber-300 transition-colors">
+                  <Card className="p-4 bg-card text-card-foreground border border-border">
                      <div className="flex items-center justify-between">
                         <div>
-                           <p className="text-sm text-slate-600">Chờ xử lý</p>
-                           <p className="text-2xl font-bold text-amber-600 mt-1">
+                           <p className="text-sm text-muted-foreground">Chờ xử lý</p>
+                           <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">
                               {pendingRequests.length}
                            </p>
                         </div>
-                        <Clock className="h-8 w-8 text-amber-300" />
+                        <Clock className="h-8 w-8 text-amber-500/70" />
                      </div>
-                  </div>
+                  </Card>
 
-                  <div className="bg-white rounded-lg p-4 border border-slate-200 hover:border-green-300 transition-colors">
+                  <Card className="p-4 bg-card text-card-foreground border border-border">
                      <div className="flex items-center justify-between">
                         <div>
-                           <p className="text-sm text-slate-600">
-                              Đã chấp nhận
-                           </p>
-                           <p className="text-2xl font-bold text-green-600 mt-1">
+                           <p className="text-sm text-muted-foreground">Đã chấp nhận</p>
+                           <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
                               {acceptedRequests.length}
                            </p>
                         </div>
-                        <CheckCircle className="h-8 w-8 text-green-300" />
+                        <CheckCircle className="h-8 w-8 text-emerald-500/70" />
                      </div>
-                  </div>
+                  </Card>
 
-                  <div className="bg-white rounded-lg p-4 border border-slate-200 hover:border-red-300 transition-colors">
+                  <Card className="p-4 bg-card text-card-foreground border border-border">
                      <div className="flex items-center justify-between">
                         <div>
-                           <p className="text-sm text-slate-600">Từ chối</p>
-                           <p className="text-2xl font-bold text-red-600 mt-1">
+                           <p className="text-sm text-muted-foreground">Từ chối</p>
+                           <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
                               {rejectedRequests.length}
                            </p>
                         </div>
-                        <XCircle className="h-8 w-8 text-red-300" />
+                        <XCircle className="h-8 w-8 text-red-500/70" />
                      </div>
-                  </div>
+                  </Card>
                </div>
             )}
 
             {/* Pending Requests Section */}
             {pendingRequests.length > 0 && (
                <div className="mb-8">
-                  <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                      <Clock className="h-5 w-5 text-amber-500" />
                      Yêu cầu chưa xử lý ({pendingRequests.length})
                   </h2>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                      {pendingRequests.map((r) => (
-                        <RequestCard
-                           key={r._id}
-                           request={r}
-                           onViewRequest={handleViewRequest}
-                        />
+                        <RequestCard key={r._id} request={r} onViewRequest={handleViewRequest} />
                      ))}
                   </div>
                </div>
@@ -176,17 +155,13 @@ export default function TeachingRequestsList() {
             {/* Accepted Requests Section */}
             {acceptedRequests.length > 0 && (
                <div className="mb-8">
-                  <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                     <CheckCircle className="h-5 w-5 text-green-500" />
+                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                     <CheckCircle className="h-5 w-5 text-emerald-500" />
                      Đã chấp nhận ({acceptedRequests.length})
                   </h2>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                      {acceptedRequests.map((r) => (
-                        <RequestCard
-                           key={r._id}
-                           request={r}
-                           onViewRequest={handleViewRequest}
-                        />
+                        <RequestCard key={r._id} request={r} onViewRequest={handleViewRequest} />
                      ))}
                   </div>
                </div>
@@ -195,17 +170,13 @@ export default function TeachingRequestsList() {
             {/* Rejected Requests Section */}
             {rejectedRequests.length > 0 && (
                <div className="mb-8">
-                  <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                      <XCircle className="h-5 w-5 text-red-500" />
                      Từ chối ({rejectedRequests.length})
                   </h2>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                      {rejectedRequests.map((r) => (
-                        <RequestCard
-                           key={r._id}
-                           request={r}
-                           onViewRequest={handleViewRequest}
-                        />
+                        <RequestCard key={r._id} request={r} onViewRequest={handleViewRequest} />
                      ))}
                   </div>
                </div>
@@ -213,15 +184,15 @@ export default function TeachingRequestsList() {
 
             {/* Empty State */}
             {(requests || []).length === 0 && (
-               <div className="text-center py-16 bg-white rounded-lg border border-slate-200">
-                  <BookOpen className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-slate-900 mb-2">
-                     Không có yêu cầu nào
-                  </h3>
-                  <p className="text-slate-600">
-                     Bạn sẽ nhận được thông báo khi học sinh gửi yêu cầu dạy học
-                  </p>
-               </div>
+               <Card className="text-center py-16 bg-card text-card-foreground border border-border">
+                  <CardContent className="flex flex-col items-center">
+                     <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                     <h3 className="text-lg font-medium mb-2">Không có yêu cầu nào</h3>
+                     <p className="text-muted-foreground">
+                        Bạn sẽ nhận được thông báo khi học sinh gửi yêu cầu dạy học
+                     </p>
+                  </CardContent>
+               </Card>
             )}
 
             {/* Pagination */}
@@ -238,33 +209,22 @@ export default function TeachingRequestsList() {
          </div>
 
          {/* Render Modal */}
-         <RequestDetailModal
-            isOpen={!!selectedRequest}
-            onClose={handleCloseModal}
-            request={selectedRequest}
-         />
+         <RequestDetailModal isOpen={!!selectedRequest} onClose={handleCloseModal} request={selectedRequest} />
       </div>
    );
 }
 
 // Component con để render từng card yêu cầu
-interface RequestCardProps {
-   request: TeachingRequest;
-   onViewRequest: (request: TeachingRequest) => void;
-}
-
-function RequestCard({ request: r, onViewRequest }: RequestCardProps) {
+function RequestCard({ request: r, onViewRequest }: { request: TeachingRequest; onViewRequest: (request: TeachingRequest) => void; }) {
    return (
-      <Card className="group hover:shadow-lg hover:border-primary/50 transition-all duration-300 overflow-hidden">
+      <Card className="group hover:shadow-lg hover:border-primary/50 transition-all duration-300 overflow-hidden bg-card text-card-foreground border border-border">
          <CardHeader className="pb-3">
             <div className="flex items-start justify-between gap-3">
                <div className="flex-1">
-                  <CardTitle className="text-base text-slate-900 line-clamp-1">
+                  <CardTitle className="text-base line-clamp-1">
                      Môn học - {getSubjectLabelVi(r.subject)}
                   </CardTitle>
-                  <p className="text-xs text-slate-500 mt-1">
-                     Lớp - {getLevelLabelVi(r.level)}
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Lớp - {getLevelLabelVi(r.level)}</p>
                </div>
                <TeachingRequestStatusBadge status={r.status} />
             </div>
@@ -273,32 +233,24 @@ function RequestCard({ request: r, onViewRequest }: RequestCardProps) {
          <CardContent className="pb-4">
             {/* Student Info */}
             <div className="flex items-center gap-3 mb-4">
-               <Avatar className="h-10 w-10 ring-2 ring-slate-100">
+               <Avatar className="h-10 w-10 ring-2 ring-border">
                   <AvatarImage
                      src={
-                        typeof r.studentId === "object"
-                           ? r.studentId.userId.avatarUrl
-                           : "/placeholder.svg"
+                        typeof r.studentId === "object" ? r.studentId.userId.avatarUrl : "/placeholder.svg"
                      }
                   />
                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                     {typeof r.studentId === "object"
-                        ? r.studentId.userId.name?.charAt(0)
-                        : "S"}
+                     {typeof r.studentId === "object" ? r.studentId.userId.name?.charAt(0) : "S"}
                   </AvatarFallback>
                </Avatar>
                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-slate-900 text-sm truncate">
-                     {typeof r.studentId === "object"
-                        ? r.studentId.userId.name
-                        : "Student"}
-                  </p>
-                  <p className="text-xs text-slate-500">Học sinh</p>
+                  <p className="font-medium text-sm truncate">{typeof r.studentId === "object" ? r.studentId.userId.name : "Student"}</p>
+                  <p className="text-xs text-muted-foreground">Học sinh</p>
                </div>
             </div>
 
             {/* Description */}
-            <p className="text-sm text-slate-600 line-clamp-2 bg-slate-50 p-3 rounded-md">
+            <p className="text-sm text-muted-foreground line-clamp-2 bg-muted p-3 rounded-md">
                {r.description || "Không có mô tả"}
             </p>
          </CardContent>
@@ -306,7 +258,7 @@ function RequestCard({ request: r, onViewRequest }: RequestCardProps) {
          <CardFooter>
             <Button
                onClick={() => onViewRequest(r)}
-               className="w-full bg-primary hover:bg-primary/90 text-white group-hover:gap-2 transition-all"
+               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground group-hover:gap-2 transition-all"
             >
                Xem chi tiết <ArrowRight className="ml-2 w-4 h-4" />
             </Button>

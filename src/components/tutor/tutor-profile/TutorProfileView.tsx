@@ -17,22 +17,22 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-background text-foreground">
             <div className="w-full h-full mx-auto">
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Hồ sơ Gia sư</h1>
-                        <p className="text-gray-600">Xem và quản lý thông tin hồ sơ của bạn</p>
+                        <h1 className="text-2xl font-bold">Tutor Profile</h1>
+                        <p className="text-muted-foreground">View and manage your tutor information</p>
                     </div>
-                    <Button onClick={onEdit} className="bg-blue-600 hover:bg-blue-700">
-                        <Edit className="w-4 h-4 mr-2" />
-                        Chỉnh sửa hồ sơ
+                    <Button onClick={onEdit} className="gap-2">
+                        <Edit className="w-4 h-4" />
+                        Edit Profile
                     </Button>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Profile Overview */}
-                    <Card className="lg:col-span-1">
+                    <Card className="lg:col-span-1 bg-card text-card-foreground">
                         <CardContent className="pt-6">
                             <div className="flex flex-col items-center space-y-4">
                                 <Avatar className="w-32 h-32">
@@ -53,12 +53,13 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                                             : "Gia sư"}
                                     </h2>
                                     <div className="flex items-center justify-center space-x-1 mt-2">
-                                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                        <Star className="w-4 h-4 text-yellow-500" />
                                         <span className="font-medium">{tutor?.ratings?.average ?? "-"}</span>
-                                        <span className="text-gray-500">({tutor?.ratings?.totalReviews ?? "-"} đánh giá)</span>
+                                        <span className="text-muted-foreground">({tutor?.ratings?.totalReviews ?? "-"} reviews)</span>
                                     </div>
                                     <Badge
-                                        className={`mt-2 ${tutor?.isApproved ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}
+                                        variant={tutor?.isApproved ? "default" : "secondary"}
+                                        className={tutor?.isApproved ? "bg-emerald-600 text-primary-foreground dark:bg-emerald-500" : ""}
                                     >
                                         {tutor?.isApproved ? "Đã duyệt" : "Đang chờ duyệt"}
                                     </Badge>
@@ -68,7 +69,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                     </Card>
 
                     {/* Contact & Basic Info */}
-                    <Card className="lg:col-span-2">
+                    <Card className="lg:col-span-2 bg-card text-card-foreground">
                         <CardHeader>
                             <CardTitle>Thông tin liên hệ</CardTitle>
                         </CardHeader>
@@ -78,7 +79,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                     </Card>
 
                     {/* Teaching Information */}
-                    <Card className="lg:col-span-3">
+                    <Card className="lg:col-span-3 bg-card text-card-foreground">
                         <CardHeader>
                             <CardTitle>Thông tin giảng dạy</CardTitle>
                         </CardHeader>
@@ -88,7 +89,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                     </Card>
 
                     {/* Education */}
-                    <Card className="lg:col-span-3">
+                    <Card className="lg:col-span-3 bg-card text-card-foreground">
                         <CardHeader>
                             <CardTitle className="flex items-center">
                                 <GraduationCap className="w-5 h-5 mr-2" />
@@ -101,7 +102,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                     </Card>
 
                     {/* Certifications */}
-                    <Card className="lg:col-span-3">
+                    <Card className="lg:col-span-3 bg-card text-card-foreground">
                         <CardHeader>
                             <CardTitle className="flex items-center">
                                 <Award className="w-5 h-5 mr-2" />
@@ -110,10 +111,10 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {(tutor?.certifications ?? []).map((cert, index) => (
-                                <div key={index} className="border rounded-lg p-4">
-                                    <h4 className="font-medium">{cert.name}</h4>
+                                <div key={index} className="border border-border rounded-lg p-4 bg-muted/40">
+                                    <h4 className="font-medium text-foreground">{cert.name}</h4>
                                     {cert.description && (
-                                        <p className="text-gray-600 mt-2 whitespace-pre-line break-words">{cert.description}</p>
+                                        <p className="text-muted-foreground mt-2">{cert.description}</p>
                                     )}
 
                                     {/* Images */}
@@ -124,8 +125,8 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                                                     <div key={urlIndex} className="relative">
                                                         <img
                                                             src={url}
-                                                            alt={`Chứng chỉ ${index + 1} - Hình ${urlIndex + 1}`}
-                                                            className="w-20 h-20 object-cover rounded cursor-pointer border hover:opacity-80"
+                                                            alt={`Certification ${index + 1} - Image ${urlIndex + 1}`}
+                                                            className="w-20 h-20 object-cover rounded cursor-pointer border border-border hover:opacity-80"
                                                             onClick={() => setSelectedImage(url)}
                                                         />
                                                     </div>
@@ -136,7 +137,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                                 </div>
                             ))}
                             <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-                                <DialogContent className="max-w-2xl max-h-screen bg-white border-none shadow-none">
+                                <DialogContent className="max-w-2xl max-h-screen bg-card text-card-foreground border border-border">
                                     {selectedImage && (
                                         <img
                                             src={selectedImage}
@@ -150,7 +151,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                     </Card>
 
                     {/* Availability */}
-                    <Card className="lg:col-span-3">
+                    <Card className="lg:col-span-3 bg-card text-card-foreground">
                         <CardHeader>
                             <CardTitle className="flex items-center">
                                 <Calendar className="w-5 h-5 mr-2" />

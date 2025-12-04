@@ -189,10 +189,10 @@ const ViewMCQHistoryList = () => {
                               </span>
                            </div>
                            <Badge variant="outline">
-                              {submission.quizId.quizMode}
+                              {submission.quizId?.quizMode}
                            </Badge>
                            <Badge variant="outline">
-                              {submission.quizId.quizType}
+                              {submission?.quizId?.quizType}
                            </Badge>
                         </div>
 

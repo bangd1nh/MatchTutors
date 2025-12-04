@@ -24,12 +24,13 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import { getQuestionTypeLabelVi } from "@/utils/quizTypeDisplay";
 
 interface MaterialModalProps {
    isOpen?: boolean;
    onClose?: () => void;
    onSelectMaterial?: (materialId: string) => void;
-   type?: "flashcard" | "mcq" | "saq";
+   type?: "FLASHCARD" | "MULTIPLE_CHOICE" | "SHORT_ANSWER";
 }
 
 export interface AIMaterial {
@@ -50,7 +51,7 @@ const MaterialModal: React.FC<MaterialModalProps> = ({
    isOpen = false,
    onClose,
    onSelectMaterial,
-   type = "flashcard",
+   type = "FLASHCARD",
 }) => {
    const { fetchMaterial } = useAICreateFlashcard();
    const [searchTerm, setSearchTerm] = useState("");
@@ -157,10 +158,10 @@ const MaterialModal: React.FC<MaterialModalProps> = ({
             <DialogHeader>
                <DialogTitle className="flex items-center gap-2">
                   <Wand2 className="h-5 w-5 text-primary" />
-                  {`Tạo Quiz ${type.toUpperCase()} bằng AI`}
+                  {`Tạo bài ${getQuestionTypeLabelVi(type)} bằng AI`}
                </DialogTitle>
                <DialogDescription>
-                  Chọn tài liệu để AI tạo {type.toUpperCase()} tự động. Tìm thấy{" "}
+                  Chọn tài liệu để AI tạo bài {getQuestionTypeLabelVi(type)} tự động. Tìm thấy{" "}
                   {materials.length} tài liệu.
                </DialogDescription>
             </DialogHeader>
@@ -293,7 +294,7 @@ const MaterialModal: React.FC<MaterialModalProps> = ({
                      className="min-w-[120px]"
                   >
                      <Wand2 className="h-4 w-4 mr-2" />
-                     {`Tạo ${type.toUpperCase()}`}
+                     {`Tạo bài ${getQuestionTypeLabelVi(type)}`}
                   </Button>
                </div>
             </DialogFooter>
