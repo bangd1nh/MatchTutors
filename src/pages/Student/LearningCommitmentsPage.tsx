@@ -9,6 +9,7 @@ import { Pagination } from "@/components/common/Pagination";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { TutorCommitmentActions } from "@/components/learning-commitment/TutorCommitmentActions";
 
 type CommitmentStatus =
    | "all"
@@ -149,14 +150,7 @@ export const LearningCommitmentsPage = () => {
                      </p>
                   </div>
 
-                  {isTutor && (
-                     <Link to="/tutor/commitments/create" className="flex-shrink-0">
-                        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-md hover:shadow-lg">
-                           <Plus className="w-5 h-5 mr-2" />
-                           Tạo Cam Kết
-                        </Button>
-                     </Link>
-                  )}
+                  {isTutor && <TutorCommitmentActions />}
                </div>
             </div>
          </Card>
@@ -223,6 +217,7 @@ export const LearningCommitmentsPage = () => {
                            ? "Bắt đầu bằng cách tạo cam kết học tập mới"
                            : "Thử chọn một trạng thái khác"}
                      </p>
+                     {/* Nút này cũng nên được xử lý bên trong component con nếu cần */}
                      {isTutor && activeTab === "all" && (
                         <Link to="/tutor/commitments/create" className="inline-block">
                            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium">

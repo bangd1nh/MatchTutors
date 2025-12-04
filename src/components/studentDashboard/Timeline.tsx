@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, FileText, Star, UserPlus, Clock } from "lucide-react"
 import type { TimelineItemDTO } from "@/types/studentDashboard"
+import { translateType, translateStatus } from "@/utils/studentDashboard"
 
 interface TimelineProps {
   items: TimelineItemDTO[]
@@ -65,6 +66,10 @@ export function Timeline({ items }: TimelineProps) {
     })
   }
 
+  sortedItems.forEach((item) => {
+    console.log(item)
+  })
+
   return (
     <Card className="border border-border shadow-sm">
       <CardHeader>
@@ -104,17 +109,12 @@ export function Timeline({ items }: TimelineProps) {
                         <div className={getTypeColor(item.type)}>
                           {getTypeIcon(item.type)}
                         </div>
-                        <span className="text-sm capitalize">
-                          {item.type.toLowerCase().replace(/_/g, " ")}
-                        </span>
+                        <span className="text-sm capitalize">{translateType(item.type)}</span>
                       </div>
                     </td>
                     <td className="py-3 px-4">
-                      <Badge
-                        variant="secondary"
-                        className={`text-xs ${getStatusColor(item.status)}`}
-                      >
-                        {item.status}
+                      <Badge className={`text-xs ${getStatusColor(item.status)}`}>
+                        {translateStatus(item.type, item.status)}
                       </Badge>
                     </td>
                     <td className="py-3 px-4">

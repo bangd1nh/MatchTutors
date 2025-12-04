@@ -23,10 +23,21 @@ import { TeachingRequest } from "@/types/teachingRequest";
 import { RequestDetailModal } from "@/components/tutor/teaching-request/RequestDetailModal";
 import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
 import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
+import { Pagination } from "@/components/common/Pagination";
 
 export default function TeachingRequestsList() {
-   const { data: requests, isLoading, isError } = useTutorTeachingRequests();
-   const [selectedRequest, setSelectedRequest] = useState<TeachingRequest | null>(null);
+   const [page, setPage] = useState(1);
+   const [limit] = useState(9); // thay đổi nếu muốn
+   const {
+      data: listData,
+      isLoading,
+      isError,
+   } = useTutorTeachingRequests(page, limit);
+   const requests = listData?.data ?? [];
+   const pagination = listData?.pagination;
+
+   const [selectedRequest, setSelectedRequest] =
+      useState<TeachingRequest | null>(null);
 
    const handleViewRequest = (request: TeachingRequest) => setSelectedRequest(request);
    const handleCloseModal = () => setSelectedRequest(null);
@@ -77,8 +88,12 @@ export default function TeachingRequestsList() {
                   <Card className="p-4 bg-card text-card-foreground border border-border">
                      <div className="flex items-center justify-between">
                         <div>
-                           <p className="text-sm text-muted-foreground">Tổng yêu cầu</p>
-                           <p className="text-2xl font-bold mt-1">{requests?.length || 0}</p>
+                           <p className="text-sm text-slate-600">
+                              Tổng yêu cầu
+                           </p>
+                           <p className="text-2xl font-bold text-slate-900 mt-1">
+                              {pagination?.total ?? requests.length}
+                           </p>
                         </div>
                         <Users className="h-8 w-8 text-muted-foreground" />
                      </div>
@@ -178,6 +193,18 @@ export default function TeachingRequestsList() {
                      </p>
                   </CardContent>
                </Card>
+            )}
+
+            {/* Pagination */}
+            {pagination && pagination.totalPages >= 1 && (
+               <div className="mt-6 flex items-center justify-center">
+                  <Pagination
+                     currentPage={pagination.page}
+                     totalPages={pagination.totalPages}
+                     onPageChange={(p) => setPage(p)}
+                     maxVisiblePages={5}
+                  />
+               </div>
             )}
          </div>
 

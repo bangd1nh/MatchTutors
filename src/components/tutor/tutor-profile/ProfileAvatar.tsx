@@ -18,12 +18,12 @@ export function ProfileAvatar({ avatarUrl, name, onAvatarChange, isEditing }: Pr
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             const objectUrl = URL.createObjectURL(file);
-            setPreview(objectUrl); // Set preview immediately
+            setPreview(objectUrl); // Hiển thị trước ảnh ngay lập tức
             onAvatarChange?.(file);
         }
     };
 
-    // Clean up object URL when component unmounts or file changes
+    // Dọn dẹp object URL khi component unmount hoặc khi file thay đổi
     useEffect(() => {
         return () => {
             if (preview && preview !== avatarUrl) {
@@ -32,7 +32,7 @@ export function ProfileAvatar({ avatarUrl, name, onAvatarChange, isEditing }: Pr
         };
     }, [preview, avatarUrl]);
 
-    // Keep preview in sync with avatarUrl prop
+    // Đồng bộ preview khi avatarUrl thay đổi
     useEffect(() => {
         setPreview(avatarUrl);
     }, [avatarUrl]);
@@ -45,6 +45,7 @@ export function ProfileAvatar({ avatarUrl, name, onAvatarChange, isEditing }: Pr
                     {name?.split(" ").map((n: string) => n[0]).join("") || "TU"}
                 </AvatarFallback>
             </Avatar>
+
             {isEditing && (
                 <>
                     <input
@@ -56,10 +57,13 @@ export function ProfileAvatar({ avatarUrl, name, onAvatarChange, isEditing }: Pr
                     />
                     <label htmlFor={fileInputId}>
                         <Button variant="outline" size="sm" asChild>
-                            <span>Choose Photo</span>
+                            <span>Chọn ảnh</span>
                         </Button>
                     </label>
-                    <p className="text-sm text-gray-500 text-center">Upload a professional photo</p>
+
+                    <p className="text-sm text-gray-500 text-center">
+                        Hãy tải lên một ảnh đại diện chuyên nghiệp
+                    </p>
                 </>
             )}
         </div>

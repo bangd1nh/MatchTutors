@@ -78,7 +78,7 @@ const ViewShortAnswerQuizList: React.FC = () => {
                Tạo quiz đầu tiên của bạn
             </div>
             <Button
-               onClick={() => navigate("/tutor/createShortAnswer")}
+               onClick={() => navigate("/tutor/createShortAnswerQuiz")}
                className="px-6"
             >
                <Plus className="h-4 w-4 mr-2" />

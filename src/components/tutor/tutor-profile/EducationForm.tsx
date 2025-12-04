@@ -38,10 +38,10 @@ export function EducationForm({
         <Card className="lg:col-span-3">
             <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                    Education *
+                    Học vấn *
                     <Button onClick={addEducation} size="sm" variant="outline">
                         <Plus className="w-4 h-4 mr-2" />
-                        Add Education
+                        Thêm học vấn
                     </Button>
                 </CardTitle>
             </CardHeader>
@@ -50,7 +50,7 @@ export function EducationForm({
                 {education?.map((edu, index) => (
                     <div key={index} className="border rounded-lg p-4 space-y-4">
                         <div className="flex justify-between items-start">
-                            <h4 className="font-medium">Education {index + 1}</h4>
+                            <h4 className="font-medium">Học vấn {index + 1}</h4>
                             <Button
                                 onClick={() => removeEducation(index)}
                                 size="sm"
@@ -64,54 +64,42 @@ export function EducationForm({
                             {/* Institution */}
                             <div>
                                 <Label htmlFor={`education.${index}.institution`}>
-                                    Institution *
+                                    Tên trường *
                                 </Label>
                                 <Input
                                     id={`education.${index}.institution`}
                                     name={`education.${index}.institution`}
-                                    placeholder="Institution"
+                                    placeholder="Tên trường"
                                     value={edu.institution}
                                     onChange={(e) =>
                                         handleEducationChange(index, "institution", e.target.value)
                                     }
-                                    className={
-                                        hasError(`education.${index}.institution`)
-                                            ? "border-red-500"
-                                            : ""
-                                    }
+                                    className={hasError(`education.${index}.institution`) ? "border-red-500" : ""}
                                 />
-                                <ValidationError
-                                    message={getError(`education.${index}.institution`)}
-                                />
+                                <ValidationError message={getError(`education.${index}.institution`)} />
                             </div>
 
                             {/* Degree */}
                             <div>
-                                <Label htmlFor={`education.${index}.degree`}>Degree *</Label>
+                                <Label htmlFor={`education.${index}.degree`}>Bằng cấp *</Label>
                                 <Input
                                     id={`education.${index}.degree`}
                                     name={`education.${index}.degree`}
-                                    placeholder="Degree"
+                                    placeholder="Bằng cấp"
                                     value={edu.degree}
                                     onChange={(e) =>
                                         handleEducationChange(index, "degree", e.target.value)
                                     }
-                                    className={
-                                        hasError(`education.${index}.degree`)
-                                            ? "border-red-500"
-                                            : ""
-                                    }
+                                    className={hasError(`education.${index}.degree`) ? "border-red-500" : ""}
                                 />
-                                <ValidationError
-                                    message={getError(`education.${index}.degree`)}
-                                />
+                                <ValidationError message={getError(`education.${index}.degree`)} />
                             </div>
 
                             {/* Field of Study */}
                             <div>
-                                <Label>Field of Study *</Label>
+                                <Label>Ngành học *</Label>
                                 <Input
-                                    placeholder="Field of Study"
+                                    placeholder="Ngành học"
                                     id={`education.${index}.fieldOfStudy`}
                                     name={`education.${index}.fieldOfStudy`}
                                     value={edu.fieldOfStudy || ""}
@@ -119,15 +107,13 @@ export function EducationForm({
                                         handleEducationChange(index, "fieldOfStudy", e.target.value)
                                     }
                                 />
-                                <ValidationError
-                                    message={getError(`education.${index}.fieldOfStudy`)}
-                                />
+                                <ValidationError message={getError(`education.${index}.fieldOfStudy`)} />
                             </div>
 
                             {/* Dates */}
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <Label>Start Date *</Label>
+                                    <Label>Ngày bắt đầu *</Label>
                                     <Input
                                         type="month"
                                         value={getDateDisplayValue(edu.startDate)}
@@ -136,19 +122,14 @@ export function EducationForm({
                                         onChange={(e) =>
                                             handleEducationChange(index, "startDate", e.target.value)
                                         }
-                                        className={`w-full ${hasError(`education.${index}.startDate`)
-                                            ? "border-red-500"
-                                            : ""
-                                            }`}
-                                        max={new Date().toISOString().slice(0, 7)} // Prevent future dates in UI
+                                        className={`w-full ${hasError(`education.${index}.startDate`) ? "border-red-500" : ""}`}
+                                        max={new Date().toISOString().slice(0, 7)}
                                     />
-                                    <ValidationError
-                                        message={getError(`education.${index}.startDate`)}
-                                    />
+                                    <ValidationError message={getError(`education.${index}.startDate`)} />
                                 </div>
 
                                 <div>
-                                    <Label>End Date</Label>
+                                    <Label>Ngày kết thúc</Label>
                                     <Input
                                         type="month"
                                         value={getDateDisplayValue(edu.endDate)}
@@ -157,25 +138,20 @@ export function EducationForm({
                                         onChange={(e) =>
                                             handleEducationChange(index, "endDate", e.target.value)
                                         }
-                                        className={`w-full ${hasError(`education.${index}.endDate`)
-                                            ? "border-red-500"
-                                            : ""
-                                            }`}
-                                        max={new Date().toISOString().slice(0, 7)} // Prevent future dates in UI
-                                        min={edu.startDate} // End date cannot be before start date
+                                        className={`w-full ${hasError(`education.${index}.endDate`) ? "border-red-500" : ""}`}
+                                        max={new Date().toISOString().slice(0, 7)}
+                                        min={edu.startDate}
                                     />
-                                    <ValidationError
-                                        message={getError(`education.${index}.endDate`)}
-                                    />
+                                    <ValidationError message={getError(`education.${index}.endDate`)} />
                                 </div>
                             </div>
                         </div>
 
                         {/* Description */}
                         <div>
-                            <Label>Description *</Label>
+                            <Label>Mô tả *</Label>
                             <Textarea
-                                placeholder="Description"
+                                placeholder="Mô tả"
                                 id={`education.${index}.description`}
                                 name={`education.${index}.description`}
                                 value={edu.description || ""}
@@ -183,9 +159,7 @@ export function EducationForm({
                                     handleEducationChange(index, "description", e.target.value)
                                 }
                             />
-                            <ValidationError
-                                message={getError(`education.${index}.description`)}
-                            />
+                            <ValidationError message={getError(`education.${index}.description`)} />
                         </div>
                     </div>
                 ))}

@@ -1,5 +1,5 @@
 import ProtectedRoute from "./ProtectedRoute";
-import OverviewPage from "../pages/dashboard/OverviewPage";
+
 import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
 import StudentLayout from "@/layouts/StudentLayout";
 import ProfileForm from "@/components/user/ProfileForm";
@@ -48,11 +48,19 @@ export const studentRoutes = {
       },
       {
          path: "/student/applications",
-         element: <MyApplicationsPage />,
+         element: (
+            <IsCreatedProfileRoute>
+               <MyApplicationsPage />
+            </IsCreatedProfileRoute>
+         ),
       },
       {
          path: "/student/applications/:id",
-         element: <TeachingRequestDetail />,
+         element: (
+            <IsCreatedProfileRoute>
+               <TeachingRequestDetail />
+            </IsCreatedProfileRoute>
+         ),
       },
       {
          path: "/student/schedule",
@@ -186,5 +194,6 @@ export const studentRoutes = {
          path: "/student/violation-reports",
          element: <MyViolationReportsPage />,
       },
+      { path: "/student/change-password", element: <ChangePasswordPage /> },
    ],
 };

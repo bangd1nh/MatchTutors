@@ -64,7 +64,7 @@ const FlashcardQuizList: React.FC = () => {
                Tạo flashcard đầu tiên của bạn
             </div>
             <Button
-               onClick={() => navigate("/tutor/createFlashcard")}
+               onClick={() => navigate("/tutor/createFlashcardQuiz")}
                className="px-6"
             >
                Tạo Flashcard mới

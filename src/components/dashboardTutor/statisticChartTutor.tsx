@@ -10,7 +10,8 @@ import {
    Line,
    Legend,
 } from "recharts";
-import { Card } from "@/components/ui/card";
+import { Activity, TrendingUp } from "lucide-react";
+import { getSessionStatusLabel } from "@/utils/session-status-translation";
 
 type DayItem = {
    date: string;
@@ -92,9 +93,10 @@ export default function StatisticChartTutor(props: {
 
    return (
       <div className="space-y-6">
-         <Card className="p-6 bg-card text-card-foreground border border-border">
-            <h4 className="font-medium mb-4 text-lg text-foreground">
-               Sessions per day (bubble)
+         <div className="bg-white p-6 rounded shadow">
+            <h4 className="font-medium mb-4 text-lg flex items-center gap-2">
+               <Activity className="w-5 h-5 text-gray-500" />
+               Số lượng buổi học hoàn thành theo ngày
             </h4>
             <div style={{ width: "100%", height: 480 }}>
                <ResponsiveContainer>
@@ -137,7 +139,10 @@ export default function StatisticChartTutor(props: {
                         width={70}
                      />
                      <Tooltip
-                        formatter={(value: any, name: any) => [value, name]}
+                        formatter={(value: any, name: any) => [
+                           value,
+                           name === "day" ? "ngày" : name,
+                        ]}
                         labelFormatter={(label) => {
                            const idx = Number(label) - 1;
                            return bubblePoints[idx]?.labelFull || String(label);
@@ -159,70 +164,70 @@ export default function StatisticChartTutor(props: {
                   </ScatterChart>
                </ResponsiveContainer>
             </div>
-         </Card>
 
-         <Card className="p-6 bg-card text-card-foreground border border-border">
-            <h4 className="font-medium mb-4 text-lg text-foreground">
-               Sessions by status (line)
-            </h4>
-            <div style={{ width: "100%", height: 480 }}>
-               <ResponsiveContainer>
-                  <LineChart
-                     data={sessionDays}
-                     margin={{ bottom: 100, left: 40 }}
-                  >
-                     <CartesianGrid stroke="hsl(var(--border))" />
-                     <XAxis
-                        dataKey="dateLabel"
-                        tick={{ fontSize: 13, fill: "hsl(var(--foreground))" }}
-                        interval={0}
-                        height={100}
-                     />
-                     <YAxis
-                        ticks={ticks}
-                        domain={[0, top]}
-                        tick={{ fontSize: 14, fill: "hsl(var(--foreground))" }}
-                        label={{
-                           value: "Số lượng",
-                           angle: -90,
-                           position: "insideLeft",
-                           offset: -10,
-                           style: {
+            <div className="bg-white p-6 rounded shadow">
+               <h4 className="font-medium mb-4 text-lg flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-gray-500" />
+                  Số lượng buổi học theo các trạng thái theo ngày
+               </h4>
+               <div style={{ width: "100%", height: 480 }}>
+                  <ResponsiveContainer>
+                     <LineChart
+                        data={sessionDays}
+                        margin={{ bottom: 100, left: 40 }}
+                     >
+                        <CartesianGrid stroke="hsl(var(--border))" />
+                        <XAxis
+                           dataKey="dateLabel"
+                           tick={{
+                              fontSize: 13,
+                              fill: "hsl(var(--foreground))",
+                           }}
+                           interval={0}
+                           height={100}
+                        />
+                        <YAxis
+                           ticks={ticks}
+                           domain={[0, top]}
+                           tick={{
                               fontSize: 14,
                               fill: "hsl(var(--foreground))",
-                           },
-                        }}
-                        width={70}
-                     />
-                     <Tooltip
-                        labelFormatter={(label) => label}
-                        wrapperStyle={{
-                           zIndex: 1000,
-                           fontSize: 13,
-                           background: "hsl(var(--popover))",
-                           color: "hsl(var(--popover-foreground))",
-                           border: "1px solid hsl(var(--border))",
-                           boxShadow: "0 8px 24px hsla(0,0%,0%,0.15)",
-                        }}
-                     />
-                     <Legend
-                        wrapperStyle={{
-                           color: "hsl(var(--foreground))",
-                        }}
-                     />
-                     {(sessions?.statuses || []).map((s, idx) => (
-                        <Line
-                           key={s}
-                           type="monotone"
-                           dataKey={s}
-                           stroke={linePalette[idx % linePalette.length]}
-                           strokeWidth={3}
+                           }}
+                           label={{
+                              value: "Số lượng",
+                              angle: -90,
+                              position: "insideLeft",
+                              offset: -10,
+                              style: {
+                                 fontSize: 14,
+                                 fill: "hsl(var(--foreground))",
+                              },
+                           }}
+                           width={70}
                         />
-                     ))}
-                  </LineChart>
-               </ResponsiveContainer>
+                        <Tooltip
+                           formatter={(value: number, name: string) => [
+                              value,
+                              getSessionStatusLabel(name),
+                           ]}
+                           labelFormatter={(label) => label}
+                        />
+                        <Legend />
+                        {(sessions?.statuses || []).map((s, idx) => (
+                           <Line
+                              key={s}
+                              name={getSessionStatusLabel(s)}
+                              type="monotone"
+                              dataKey={s}
+                              stroke={linePalette[idx % linePalette.length]}
+                              strokeWidth={3}
+                           />
+                        ))}
+                     </LineChart>
+                  </ResponsiveContainer>
+               </div>
             </div>
-         </Card>
+         </div>
       </div>
    );
 }

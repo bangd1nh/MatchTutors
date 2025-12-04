@@ -1,27 +1,35 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getMaterials, uploadMaterial } from "@/api/material";
+import { getMaterials, uploadMaterial, deleteMaterial } from "@/api/material";
 import { useToast } from "./useToast";
 
-export const useMaterial = () => {
+export const useMaterial = (page = 1, limit = 10) => {
    const queryClient = useQueryClient();
    const toast = useToast();
 
-   // Get all materials for current user
    const {
-      data: materials = [],
+      data: paginatedData,
       isLoading: isLoadingMaterials,
       refetch,
    } = useQuery({
-      queryKey: ["materials"],
-      queryFn: getMaterials,
+      queryKey: ["materials", page, limit],
+      queryFn: () => getMaterials(page, limit),
    });
 
-   // Upload material mutation
+   const materials = paginatedData?.items || [];
+   const total = paginatedData?.total || 0;
+   const totalPages = paginatedData?.totalPages ?? 1;
+   const currentPage = paginatedData?.page ?? page;
+   const currentLimit = paginatedData?.limit ?? limit;
+
+   // Upload mutation
    const uploadMutation = useMutation({
       mutationFn: (formData: FormData) => uploadMaterial(formData),
       onSuccess: () => {
          toast("success", "Tải lên tài liệu thành công!");
-         queryClient.invalidateQueries({ queryKey: ["materials"] });
+         queryClient.invalidateQueries({
+            queryKey: ["materials"],
+            exact: false,
+         });
       },
       onError: (error: any) => {
          toast(
@@ -31,11 +39,35 @@ export const useMaterial = () => {
       },
    });
 
+   // Delete mutation
+   const deleteMutation = useMutation({
+      mutationFn: (materialId: string) => deleteMaterial(materialId),
+      onSuccess: () => {
+         toast("success", "Xóa tài liệu thành công!");
+         queryClient.invalidateQueries({
+            queryKey: ["materials"],
+            exact: false,
+         });
+      },
+      onError: (error: any) => {
+         toast(
+            "error",
+            `Xóa tài liệu thất bại: ${error.message || "Đã có lỗi xảy ra"}`
+         );
+      },
+   });
+
    return {
       materials,
+      total,
+      totalPages,
+      currentPage,
+      currentLimit,
       isLoadingMaterials,
       upload: uploadMutation.mutate,
       isUploading: uploadMutation.isPending,
+      deleteMaterial: deleteMutation.mutate,
+      isDeleting: deleteMutation.isPending,
       refetch,
    };
 };

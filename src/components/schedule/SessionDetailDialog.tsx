@@ -336,7 +336,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                  Gia sư
                               </span>
                               <Badge variant="outline" className="text-xs">
-                                 TUTOR
+                                 GIA SƯ
                               </Badge>
                            </div>
                            <div className="space-y-1">
@@ -365,7 +365,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                  Học sinh
                               </span>
                               <Badge variant="outline" className="text-xs">
-                                 STUDENT
+                                 HỌC SINH
                               </Badge>
                            </div>
                            <div className="space-y-1">

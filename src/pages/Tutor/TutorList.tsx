@@ -35,66 +35,64 @@ export default function TutorListPage({
    // Only fetch from API if not using AI results
    const shouldFetchFromAPI = !aiTutors && filters;
 
-   const { data, isLoading, isError } = useSearchTutors(
-      {
-         keyword: (shouldFetchFromAPI && filters.searchQuery) || undefined,
-         subjects:
-            shouldFetchFromAPI && filters.selectedSubjects.length
-               ? filters.selectedSubjects
-               : undefined,
-         levels:
-            shouldFetchFromAPI && filters.selectedLevels.length
-               ? filters.selectedLevels
-               : undefined,
-         cities:
-            shouldFetchFromAPI && filters.selectedCities.length
-               ? filters.selectedCities
-               : undefined,
-         minRate:
-            shouldFetchFromAPI && filters.priceRange?.[0] > 0
-               ? filters.priceRange[0]
-               : undefined,
-         maxRate:
-            shouldFetchFromAPI && filters.priceRange?.[1] < 2000000
-               ? filters.priceRange[1]
-               : undefined,
-         minExperience:
-            shouldFetchFromAPI && filters.experienceYears?.[0] > 0
-               ? filters.experienceYears[0]
-               : undefined,
-         maxExperience:
-            shouldFetchFromAPI && filters.experienceYears?.[1] < 20
-               ? filters.experienceYears[1]
-               : undefined,
-         classType:
-            shouldFetchFromAPI && filters.selectedClassTypes.length
-               ? filters.selectedClassTypes
-               : undefined,
-         availability:
-            shouldFetchFromAPI &&
-            (filters.selectedDays.length > 0 ||
-               filters.selectedTimeSlots.length > 0)
-               ? {
-                    dayOfWeek: filters.selectedDays.length
-                       ? filters.selectedDays.map((d: string) => dayMap[d])
-                       : undefined,
-                    slots: filters.selectedTimeSlots.length
-                       ? filters.selectedTimeSlots
-                       : undefined,
-                 }
-               : undefined,
-         minRating:
-            shouldFetchFromAPI && filters.ratingRange?.[0] > 0
-               ? filters.ratingRange[0]
-               : undefined,
-         maxRating:
-            shouldFetchFromAPI && filters.ratingRange?.[1] < 5
-               ? filters.ratingRange[1]
-               : undefined,
-         page: shouldFetchFromAPI ? currentPage : undefined,
-         limit: shouldFetchFromAPI ? tutorsPerPage : undefined,
-      }
-   );
+   const { data, isLoading, isError } = useSearchTutors({
+      keyword: (shouldFetchFromAPI && filters.searchQuery) || undefined,
+      subjects:
+         shouldFetchFromAPI && filters.selectedSubjects.length
+            ? filters.selectedSubjects
+            : undefined,
+      levels:
+         shouldFetchFromAPI && filters.selectedLevels.length
+            ? filters.selectedLevels
+            : undefined,
+      cities:
+         shouldFetchFromAPI && filters.selectedCities.length
+            ? filters.selectedCities
+            : undefined,
+      minRate:
+         shouldFetchFromAPI && filters.priceRange?.[0] > 0
+            ? filters.priceRange[0]
+            : undefined,
+      maxRate:
+         shouldFetchFromAPI && filters.priceRange?.[1] < 2000000
+            ? filters.priceRange[1]
+            : undefined,
+      minExperience:
+         shouldFetchFromAPI && filters.experienceYears?.[0] > 0
+            ? filters.experienceYears[0]
+            : undefined,
+      maxExperience:
+         shouldFetchFromAPI && filters.experienceYears?.[1] < 20
+            ? filters.experienceYears[1]
+            : undefined,
+      classType:
+         shouldFetchFromAPI && filters.selectedClassTypes.length
+            ? filters.selectedClassTypes
+            : undefined,
+      availability:
+         shouldFetchFromAPI &&
+         (filters.selectedDays.length > 0 ||
+            filters.selectedTimeSlots.length > 0)
+            ? {
+                 dayOfWeek: filters.selectedDays.length
+                    ? filters.selectedDays.map((d: string) => dayMap[d])
+                    : undefined,
+                 slots: filters.selectedTimeSlots.length
+                    ? filters.selectedTimeSlots
+                    : undefined,
+              }
+            : undefined,
+      minRating:
+         shouldFetchFromAPI && filters.ratingRange?.[0] > 0
+            ? filters.ratingRange[0]
+            : undefined,
+      maxRating:
+         shouldFetchFromAPI && filters.ratingRange?.[1] < 5
+            ? filters.ratingRange[1]
+            : undefined,
+      page: shouldFetchFromAPI ? currentPage : undefined,
+      limit: shouldFetchFromAPI ? tutorsPerPage : undefined,
+   });
 
    // Use AI results if available, otherwise use API results
    let tutors: Tutor[] = [];
@@ -169,15 +167,14 @@ export default function TutorListPage({
             ))}
          </div>
 
-         {totalPages > 1 && (
-            <div className="mt-8 flex justify-center">
-               <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-               />
-            </div>
-         )}
+         {/* Always show pagination */}
+         <div className="mt-8 flex justify-center">
+            <Pagination
+               currentPage={currentPage}
+               totalPages={totalPages}
+               onPageChange={handlePageChange}
+            />
+         </div>
       </div>
    );
 }

@@ -36,7 +36,7 @@ export function ReviewModalForm({ isOpen, onClose, onSubmit, initialData, isEdit
         setError("")
 
         if (rating === 0) {
-            setError("Please select a rating")
+            setError("Vui lòng chọn số sao")
             return
         }
 
@@ -47,7 +47,7 @@ export function ReviewModalForm({ isOpen, onClose, onSubmit, initialData, isEdit
                 comment: comment.trim(),
             })
         } catch (err) {
-            setError("Failed to submit review. Please try again.")
+            setError("Gửi đánh giá thất bại. Vui lòng thử lại.")
         } finally {
             setIsSubmitting(false)
         }
@@ -65,7 +65,9 @@ export function ReviewModalForm({ isOpen, onClose, onSubmit, initialData, isEdit
                 <div className="rounded-2xl border border-border bg-card p-6 shadow-2xl">
                     {/* Header */}
                     <div className="mb-6 flex items-center justify-between">
-                        <h2 className="text-2xl font-bold text-foreground">{isEditing ? "Edit Review" : "Write a Review"}</h2>
+                        <h2 className="text-2xl font-bold text-foreground">
+                            {isEditing ? "Chỉnh sửa đánh giá" : "Viết đánh giá"}
+                        </h2>
                         <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
                             <X className="h-5 w-5" />
                         </Button>
@@ -76,7 +78,7 @@ export function ReviewModalForm({ isOpen, onClose, onSubmit, initialData, isEdit
                         {/* Star Rating Selector */}
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-foreground">
-                                Rating <span className="text-destructive">*</span>
+                                Số sao <span className="text-destructive">*</span>
                             </label>
                             <div className="flex items-center gap-2">
                                 {[1, 2, 3, 4, 5].map((star) => (
@@ -89,29 +91,39 @@ export function ReviewModalForm({ isOpen, onClose, onSubmit, initialData, isEdit
                                         className="transition-transform hover:scale-110 active:scale-95"
                                     >
                                         <Star
-                                            className={`h-10 w-10 ${star <= (hoveredRating || rating) ? "fill-[#FACC15] text-[#FACC15]" : "fill-muted text-muted"
+                                            className={`h-10 w-10 ${star <= (hoveredRating || rating)
+                                                    ? "fill-[#FACC15] text-[#FACC15]"
+                                                    : "fill-muted text-muted"
                                                 }`}
                                         />
                                     </button>
                                 ))}
-                                {rating > 0 && <span className="ml-2 text-sm font-medium text-foreground">{rating} / 5</span>}
+                                {rating > 0 && (
+                                    <span className="ml-2 text-sm font-medium text-foreground">
+                                        {rating} / 5
+                                    </span>
+                                )}
                             </div>
                         </div>
 
                         {/* Comment Textarea */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-foreground">Your Review</label>
+                            <label className="text-sm font-medium text-foreground">Đánh giá của bạn</label>
                             <Textarea
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
-                                placeholder="Share your experience with this tutor…"
+                                placeholder="Hãy chia sẻ trải nghiệm của bạn với gia sư này…"
                                 rows={5}
                                 className="resize-none rounded-lg"
                             />
                         </div>
 
                         {/* Error Message */}
-                        {error && <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{error}</div>}
+                        {error && (
+                            <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+                                {error}
+                            </div>
+                        )}
 
                         {/* Action Buttons */}
                         <div className="flex gap-3">
@@ -122,10 +134,18 @@ export function ReviewModalForm({ isOpen, onClose, onSubmit, initialData, isEdit
                                 className="flex-1 bg-transparent"
                                 disabled={isSubmitting}
                             >
-                                Cancel
+                                Hủy
                             </Button>
-                            <Button type="submit" className="flex-1 bg-[#3B82F6] hover:bg-[#2563EB]" disabled={isSubmitting}>
-                                {isSubmitting ? "Submitting..." : isEditing ? "Update Review" : "Submit Review"}
+                            <Button
+                                type="submit"
+                                className="flex-1 bg-[#3B82F6] hover:bg-[#2563EB]"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting
+                                    ? "Đang gửi..."
+                                    : isEditing
+                                        ? "Cập nhật đánh giá"
+                                        : "Gửi đánh giá"}
                             </Button>
                         </div>
                     </form>

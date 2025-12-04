@@ -29,11 +29,14 @@ export default function MaterialListModal({
    const toast = useToast();
    const { addMaterial: addMaterialToStore } = useSessionMaterialsStore();
 
-   const { data: availableMaterials = [], isLoading } = useQuery({
+   const { data, isLoading } = useQuery({
       queryKey: ["materials"],
-      queryFn: getMaterials,
+      queryFn: () => getMaterials(),
       enabled: isOpen,
    });
+
+   // Normalize query result to always be an array for consistent usage (find/map/length)
+   const availableMaterials = Array.isArray(data) ? data : data?.items ?? [];
 
    const { addMaterial, isAddingMaterial } = useSessionMaterials(sessionId);
 

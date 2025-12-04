@@ -1,7 +1,8 @@
 import { Level } from "@/enums/level.enum";
 import { Subject } from "@/enums/subject.enum";
+import { CLASS_TYPE_VALUES, ClassType, } from '../enums/classType.enum';
 
-const LEVEL_LABELS_VI: Record<string, string> = {
+export const LEVEL_LABELS_VI: Record<string, string> = {
    [Level.GRADE_1]: "Lớp 1",
    [Level.GRADE_2]: "Lớp 2",
    [Level.GRADE_3]: "Lớp 3",
@@ -20,7 +21,7 @@ const LEVEL_LABELS_VI: Record<string, string> = {
    ELEMENTARY: "Tiểu học",
 };
 
-const SUBJECT_LABELS_VI: Record<string, string> = {
+export const SUBJECT_LABELS_VI: Record<string, string> = {
    [Subject.ACCOUNTING]: "Kế toán",
    [Subject.ADDITIONAL_MATHS]: "Toán nâng cao",
    [Subject.BIOLOGY]: "Sinh học",
@@ -50,6 +51,11 @@ const SUBJECT_LABELS_VI: Record<string, string> = {
    [Subject.YOGA]: "Yoga",
 };
 
+export const CLASS_TYPE_VALUES_VI: Record<string, string> = {
+   [ClassType.IN_PERSON]: "Trực tiếp",
+   [ClassType.ONLINE]: "Trực tuyến",
+}
+
 export const getLevelLabelVi = (level: Level | string): string => {
    const key = String(level);
    return LEVEL_LABELS_VI[key] || key.replace(/_/g, " ");
@@ -59,3 +65,8 @@ export const getSubjectLabelVi = (subject: Subject | string): string => {
    const key = String(subject);
    return SUBJECT_LABELS_VI[key] || key.replace(/_/g, " ");
 };
+
+export const getClassTypeLabelVi = (classType: ClassType | string): string => {
+   const key = String(classType);
+   return CLASS_TYPE_VALUES_VI[key] || key.replace(/_/g, " ");
+}

@@ -24,13 +24,13 @@ export const TeachingInformationForm: React.FC<TeachingInformationFormProps> = (
     return (
         <Card className="lg:col-span-3">
             <CardHeader>
-                <CardTitle>Teaching Information *</CardTitle>
+                <CardTitle>Thông tin giảng dạy *</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Experience Years */}
+                    {/* Kinh nghiệm */}
                     <div>
-                        <Label htmlFor="experienceYears">Experience (Years) *</Label>
+                        <Label htmlFor="experienceYears">Kinh nghiệm (Năm) *</Label>
                         <Input
                             id="experienceYears"
                             name="experienceYears"
@@ -46,9 +46,9 @@ export const TeachingInformationForm: React.FC<TeachingInformationFormProps> = (
                         <ValidationError message={getError("experienceYears")} />
                     </div>
 
-                    {/* Hourly Rate */}
+                    {/* Mức phí theo giờ */}
                     <div>
-                        <Label htmlFor="hourlyRate">Hourly Rate (vnd) *</Label>
+                        <Label htmlFor="hourlyRate">Mức phí theo giờ (VND) *</Label>
                         <Input
                             id="hourlyRate"
                             name="hourlyRate"
@@ -64,9 +64,9 @@ export const TeachingInformationForm: React.FC<TeachingInformationFormProps> = (
                         <ValidationError message={getError("hourlyRate")} />
                     </div>
 
-                    {/* Class Type */}
+                    {/* Loại lớp */}
                     <div>
-                        <Label>Class Type *</Label>
+                        <Label>Loại lớp *</Label>
                         <div className="mt-2 flex flex-col space-y-2">
                             {["ONLINE", "IN_PERSON"].map((type) => (
                                 <div key={type} className="flex items-center space-x-2">
@@ -82,7 +82,7 @@ export const TeachingInformationForm: React.FC<TeachingInformationFormProps> = (
                                         className="h-4 w-4 text-blue-600 border-gray-300 rounded"
                                     />
                                     <Label htmlFor={type}>
-                                        {type === "ONLINE" ? "Online" : "In Person"}
+                                        {type === "ONLINE" ? "Trực tuyến" : "Trực tiếp"}
                                     </Label>
                                 </div>
                             ))}
@@ -91,9 +91,9 @@ export const TeachingInformationForm: React.FC<TeachingInformationFormProps> = (
                     </div>
                 </div>
 
-                {/* Bio */}
+                {/* Tiểu sử / Bio */}
                 <div>
-                    <Label htmlFor="bio">Bio *</Label>
+                    <Label htmlFor="bio">Tiểu sử *</Label>
                     <ReactQuill
                         id="bio"
                         theme="snow"
@@ -102,7 +102,7 @@ export const TeachingInformationForm: React.FC<TeachingInformationFormProps> = (
                             handleFieldChange("bio", content)
                             clearFieldError("bio")
                         }}
-                        placeholder="Tell students about yourself, your teaching style, and experience..."
+                        placeholder="Giới thiệu bản thân, phong cách giảng dạy và kinh nghiệm..."
                         className={`mt-2 ${hasError("bio") ? "border-red-500" : ""}`}
                     />
                     <ValidationError message={getError("bio")} />

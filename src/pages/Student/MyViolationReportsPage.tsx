@@ -20,20 +20,21 @@ import {
    ExternalLink,
 } from "lucide-react";
 import moment from "moment";
-import { ViolationTypeEnum, ViolationStatusEnum } from "@/enums/violationReport.enum";
+import { 
+   ViolationTypeEnum, 
+   ViolationStatusEnum,
+   VIOLATION_TYPE_LABELS_VI,
+   VIOLATION_STATUS_LABELS_VI,
+} from "@/enums/violationReport.enum";
+import { SUBJECT_LABELS_VI } from "@/enums/subject.enum";
+import { LEVEL_LABELS_VI } from "@/enums/level.enum";
+import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
 import { Pagination } from "@/components/common/Pagination";
 
-const VIOLATION_TYPE_LABELS: Record<ViolationTypeEnum, string> = {
-   [ViolationTypeEnum.SCAM_TUTOR]: "Gia sư lừa đảo",
-   [ViolationTypeEnum.FALSE_FEEDBACK]: "Đánh giá sai sự thật",
-   [ViolationTypeEnum.SCAM_STUDENT]: "Gia sư lừa đảo học sinh",
-};
-
-const STATUS_LABELS: Record<ViolationStatusEnum, string> = {
-   [ViolationStatusEnum.PENDING]: "Chờ xử lý",
-   [ViolationStatusEnum.REVIEWED]: "Đã xem xét",
-   [ViolationStatusEnum.RESOLVED]: "Đã giải quyết",
-   [ViolationStatusEnum.REJECTED]: "Đã từ chối",
+const TEACHING_REQUEST_STATUS_LABELS_VI: Record<string, string> = {
+   [TeachingRequestStatus.PENDING]: "Chờ phản hồi",
+   [TeachingRequestStatus.ACCEPTED]: "Đã chấp nhận",
+   [TeachingRequestStatus.REJECTED]: "Đã từ chối",
 };
 
 const STATUS_COLORS: Record<ViolationStatusEnum, string> = {
@@ -153,7 +154,7 @@ function ViolationReportCard({ report }: ViolationReportCardProps) {
       : null;
 
    const status = report.status as ViolationStatusEnum;
-   const statusLabel = STATUS_LABELS[status] || report.status;
+   const statusLabel = VIOLATION_STATUS_LABELS_VI[status] || report.status;
    const statusColor = STATUS_COLORS[status] || "bg-gray-100 text-gray-700 border-gray-300";
 
    return (
@@ -164,7 +165,7 @@ function ViolationReportCard({ report }: ViolationReportCardProps) {
                   <div className="flex items-center gap-3 mb-2">
                      <Flag className="h-5 w-5 text-red-600" />
                      <CardTitle className="text-lg">
-                        {VIOLATION_TYPE_LABELS[report.type as ViolationTypeEnum] || report.type}
+                        {VIOLATION_TYPE_LABELS_VI[report.type as ViolationTypeEnum] || report.type || "Khác"}
                      </CardTitle>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-slate-600">
@@ -203,13 +204,16 @@ function ViolationReportCard({ report }: ViolationReportCardProps) {
                   </div>
                   <div className="text-sm text-blue-800">
                      <p>
-                        <span className="font-medium">Môn:</span> {teachingRequest.subject}
+                        <span className="font-medium">Môn:</span> {SUBJECT_LABELS_VI[teachingRequest.subject] || teachingRequest.subject}
                      </p>
                      <p>
-                        <span className="font-medium">Lớp:</span> {teachingRequest.level}
+                        <span className="font-medium">Lớp:</span> {LEVEL_LABELS_VI[teachingRequest.level] || teachingRequest.level}
                      </p>
                      <p>
-                        <span className="font-medium">Trạng thái:</span> {teachingRequest.status}
+                        <span className="font-medium">Trạng thái:</span>{" "}
+                        <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-white/50">
+                           {TEACHING_REQUEST_STATUS_LABELS_VI[teachingRequest.status] || teachingRequest.status}
+                        </span>
                      </p>
                   </div>
                </div>

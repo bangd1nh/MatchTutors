@@ -20,8 +20,9 @@ import { useUser } from "@/hooks/useUser"
 import { Certification } from "@/types/tutorListandDetail";
 import { TutorProfileView } from "@/components/tutor/tutor-profile/TutorProfileView"
 import { EducationForm } from "@/components/tutor/tutor-profile/EducationForm"
+import { LEVEL_LABELS_VI, SUBJECT_LABELS_VI } from "@/utils/educationDisplay"
 
-const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+const DAYS = ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"]
 
 export default function TutorProfile() {
     const { user } = useUser();
@@ -42,7 +43,7 @@ export default function TutorProfile() {
     const [removedImages, setRemovedImages] = useState<
         { certId?: string; certIndex: number; tempCertId?: string; imageIndex: number }[]
     >([]);
-    // console.log("Loaded tutor profile:", tutorProfile);
+    // console.log("Hồ sơ gia sư đã tải:", tutorProfile);
     const [isEditing, setIsEditing] = useState(!tutor);
     const { validateForm, getError, hasError, clearFieldError, validateField, clearErrors, scrollToFirstError } = useTutorFormValidation();
     const levelsRef = useRef<HTMLDivElement>(null);
@@ -70,7 +71,7 @@ export default function TutorProfile() {
         classType: [] as string[],
         levels: [],
     });
-    // Initialize form data when tutor profile is loaded
+    // Khởi tạo dữ liệu form khi hồ sơ gia sư được tải
     useEffect(() => {
         if (tutorProfile) {
             const user = typeof tutorProfile.userId === "object" ? tutorProfile.userId : null;
@@ -92,7 +93,7 @@ export default function TutorProfile() {
         }
     }, [tutorProfile, user]);
 
-    // Wait until data is loaded to decide editing state
+    // Đợi cho đến khi dữ liệu được tải xong để quyết định trạng thái chỉnh sửa
     useEffect(() => {
         if (!isLoading) {
             setIsEditing(!tutorProfile);
@@ -118,14 +119,14 @@ export default function TutorProfile() {
 
     const showForm = !tutorProfile || isEditing
 
-    // Helper function to convert form data to FormData for file uploads
+    // Hàm helper để chuyển đổi dữ liệu form thành FormData để tải lên file
     const convertFormDataToFormData = (data: Tutor): FormData => {
         const formData = new FormData();
 
-        // Add all simple fields
+        // Thêm tất cả các trường đơn giản
         Object.entries(data).forEach(([key, value]) => {
             if (key === "education" && Array.isArray(value)) {
-                // Normalize startDate and endDate to YYYY-MM
+                // Chuẩn hóa startDate và endDate thành YYYY-MM
                 const normalizedEducation = value.map((edu: any) => ({
                     ...edu,
                     startDate: edu.startDate
@@ -160,7 +161,7 @@ export default function TutorProfile() {
             imageIndex?: number;
         }> = [];
 
-        // Handle uploads - collect ALL files first with proper indexing
+        // Xử lý upload - thu thập TẤT CẢ file trước với chỉ mục phù hợp
         const allFiles: File[] = [];
         Object.entries(certificationFiles).forEach(([_, files]) => {
             files.forEach(file => {
@@ -168,25 +169,25 @@ export default function TutorProfile() {
             });
         });
 
-        // Append all files to FormData with proper indexing
+        // Thêm tất cả file vào FormData với chỉ mục phù hợp
         allFiles.forEach((file) => {
             formData.append("certificationImages", file);
         });
 
-        // Now create mapping with correct global file indexes
+        // Tạo mapping với chỉ mục file toàn cục chính xác
         Object.entries(certificationFiles).forEach(([certIndexStr, files]) => {
             const certIndex = parseInt(certIndexStr);
             const cert = data.certifications?.[certIndex];
 
             files.forEach((file) => {
-                // Find the global index of this file
+                // Tìm chỉ mục toàn cục của file này
                 const globalIndex = allFiles.indexOf(file);
 
                 if (globalIndex !== -1) {
                     imageCertMapping.push({
                         action: "add",
                         certIndex,
-                        fileIndex: globalIndex, // Use global index
+                        fileIndex: globalIndex, // Sử dụng chỉ mục toàn cục
                         tempCertId: cert?.tempId,
                         certId: cert?._id,
                     });
@@ -194,7 +195,7 @@ export default function TutorProfile() {
             });
         });
 
-        // Handle removals
+        // Xử lý xóa ảnh
         removedImages.forEach(r => {
             imageCertMapping.push({
                 action: "remove",
@@ -205,7 +206,7 @@ export default function TutorProfile() {
             });
         });
 
-        // Add the mapping information
+        // Thêm thông tin mapping
         if (imageCertMapping.length > 0) {
             formData.append("imageCertMapping", JSON.stringify(imageCertMapping));
         }
@@ -232,8 +233,8 @@ export default function TutorProfile() {
         try {
             const formDataToSend = convertFormDataToFormData(formData as Tutor);
 
-            // Log the actual FormData contents
-            // console.log("📨 FormData contents:");
+            // Ghi nhật nội dung FormData thực tế
+            // console.log("📨 Nội dung FormData:");
             for (let [key, value] of formDataToSend.entries()) {
                 if (key === 'imageCertMapping') {
                     console.log(`  ${key}:`, JSON.parse(value as string));
@@ -254,16 +255,16 @@ export default function TutorProfile() {
             clearErrors();
             setIsEditing(false);
             refetch();
-            toast("success", "Profile saved successfully!");
+            toast("success", "Lưu hồ sơ thành công!");
         } catch (error: any) {
-            toast("error", error.response?.data?.message || "Failed to save profile");
+            toast("error", error.response?.data?.message || "Không thể lưu hồ sơ");
         }
     };
 
     const handleFieldChange = (field: string, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
 
-        // Real-time validation
+        // Xác thực thời gian thực
         validateField(field, value, !!tutorProfile);
     };
 
@@ -273,7 +274,7 @@ export default function TutorProfile() {
             address: { ...prev.address, [field]: value }
         }));
 
-        // Real-time validation for address fields
+        // Xác thực thời gian thực cho các trường địa chỉ
         validateField(`address.${field}`, value, !!tutorProfile);
     };
 
@@ -284,7 +285,7 @@ export default function TutorProfile() {
                 ? [...selected, type]
                 : selected.filter((t) => t !== type);
 
-            // Validate after update
+            // Xác thực sau khi cập nhật
             setTimeout(() => validateField("classType", newClassType, !!tutorProfile), 0);
 
             return { ...prev, classType: newClassType };
@@ -303,7 +304,7 @@ export default function TutorProfile() {
             return { ...prev, certifications };
         });
 
-        // Only validate if the value is not empty
+        // Chỉ xác thực nếu giá trị không rỗng
         if (value && value.trim() !== "") {
             validateField(`certifications.${index}.${String(field)}`, value, !!tutorProfile);
         } else {
@@ -313,7 +314,7 @@ export default function TutorProfile() {
 
     const handleEducationChange = (index: number, field: string, value: string) => {
         const newEducation = [...(formData.education || [])];
-        // Store as "YYYY-MM" directly
+        // Lưu trữ trực tiếp dưới dạng "YYYY-MM"
         newEducation[index] = { ...newEducation[index], [field]: value };
 
         setFormData((prev) => ({ ...prev, education: newEducation }));
@@ -336,7 +337,7 @@ export default function TutorProfile() {
     };
 
     const addCertification = () => {
-        const tempId = crypto.randomUUID(); // unique temporary ID
+        const tempId = crypto.randomUUID(); // ID tạm thời duy nhất
         setFormData((prev) => ({
             ...prev,
             certifications: [...(prev.certifications || []), { tempId, name: "", description: "" }],
@@ -374,7 +375,7 @@ export default function TutorProfile() {
     };
 
     const handleRemoveExistingImage = (cert: any, imageIndex: number, certIndex: number) => {
-        // console.log("🔄 handleRemoveExistingImage called with:", {
+        // console.log("🔄 handleRemoveExistingImage được gọi với:", {
         //     certIndex,
         //     imageIndex,
         //     certId: cert._id,
@@ -382,7 +383,7 @@ export default function TutorProfile() {
         //     currentImageUrls: cert.imageUrls
         // });
 
-        // Track for backend
+        // Theo dõi cho backend
         const removalData = {
             certId: cert._id,
             tempCertId: cert.tempId,
@@ -390,22 +391,22 @@ export default function TutorProfile() {
             imageIndex: imageIndex,
         };
 
-        // console.log("📝 Adding to removedImages:", removalData);
+        // console.log("📝 Thêm vào removedImages:", removalData);
 
         setRemovedImages(prev => {
             const newRemovedImages = [...prev, removalData];
-            console.log("📋 removedImages state updated:", newRemovedImages);
+            console.log("📋 Trạng thái removedImages đã cập nhật:", newRemovedImages);
             return newRemovedImages;
         });
 
-        // Optimistic UI update
+        // Cập nhật UI lạc quan
         setFormData(prev => {
             const updatedCertifications = prev.certifications?.map((c, idx) => {
                 if (idx === certIndex) {
                     const currentUrls = Array.isArray(c.imageUrls) ? c.imageUrls : [];
                     const updatedImageUrls = currentUrls.filter((_, i) => i !== imageIndex);
 
-                    // console.log(`🖼️ Cert ${idx}: removed image ${imageIndex}, from ${currentUrls.length} to ${updatedImageUrls.length} images`);
+                    // console.log(`🖼️ Chứng chỉ ${idx}: đã xóa ảnh ${imageIndex}, từ ${currentUrls.length} xuống ${updatedImageUrls.length} ảnh`);
 
                     return {
                         ...c,
@@ -415,7 +416,7 @@ export default function TutorProfile() {
                 return c;
             });
 
-            // console.log("✅ Form data updated with new certifications");
+            // console.log("✅ Dữ liệu form đã cập nhật với các chứng chỉ mới");
             return {
                 ...prev,
                 certifications: updatedCertifications
@@ -518,7 +519,7 @@ export default function TutorProfile() {
                             </CardContent>
                         </Card>
 
-                        {/* Teaching Information */}
+                        {/* Thông tin giảng dạy */}
                         <TeachingInformationForm
                            formData={formData}
                            handleFieldChange={handleFieldChange}
@@ -576,7 +577,7 @@ export default function TutorProfile() {
                             </CardContent>
                         </Card>
 
-                        {/* Education */}
+                        {/* Học vấn */}
                         <EducationForm
                            education={(formData.education || []).map((e) => ({
                               degree: e.degree ?? "",
@@ -603,7 +604,7 @@ export default function TutorProfile() {
                                     Certifications *
                                     <Button onClick={addCertification} size="sm" variant="outline">
                                         <Plus className="w-4 h-4 mr-2" />
-                                        Add Certification
+                                        Thêm chứng chỉ
                                     </Button>
                                 </CardTitle>
                             </CardHeader>
@@ -649,7 +650,7 @@ export default function TutorProfile() {
                                                 <ValidationError message={getError(`certifications.${index}.description`)} />
                                             </div>
 
-                                            {/* Certification Images Upload */}
+                                            {/* Tải lên ảnh chứng chỉ */}
                                             <div>
                                                 <Label className="text-foreground">Certification Images</Label>
                                                 <div className="mt-2">
@@ -670,7 +671,7 @@ export default function TutorProfile() {
                                                    </label>
                                                 </div>
 
-                                                {/* Display selected images */}
+                                                {/* Hiển thị ảnh đã chọn */}
                                                 {certificationFiles[index] && certificationFiles[index].length > 0 && (
                                                    <div className="mt-3">
                                                       <p className="text-sm text-muted-foreground mb-2">Selected images:</p>
@@ -699,7 +700,7 @@ export default function TutorProfile() {
                                                    </div>
                                                 )}
 
-                                                {/* Display existing images from server */}
+                                                {/* Hiển thị ảnh hiện có từ server */}
                                                 {cert.imageUrls && cert.imageUrls.length > 0 && (
                                                    <div className="mt-3">
                                                       <p className="text-sm text-muted-foreground mb-2">Existing images:</p>

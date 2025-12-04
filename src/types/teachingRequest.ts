@@ -29,3 +29,14 @@ export interface CreateTeachingRequestPayload {
    hourlyRate: number;
    description?: string;
 }
+
+// Thêm interface cho response phân trang
+export interface TeachingRequestList {
+   data: TeachingRequest[];
+   pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+   };
+}

@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card } from "@/components/ui/card"
 import { formatDistanceToNow } from "date-fns"
 import { Review } from "@/types/review"
+import { getLevelLabelVi, getSubjectLabelVi } from "@/utils/educationDisplay"
 
 interface ReviewCardProps {
     review: Review
@@ -82,8 +83,8 @@ export function ReviewCard({ review }: ReviewCardProps) {
 
                 {/* Teaching Request Info */}
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span className="rounded-full bg-muted px-3 py-1">{subject}</span>
-                    <span className="rounded-full bg-muted px-3 py-1">{level}</span>
+                    <span className="rounded-full bg-muted px-3 py-1">{getSubjectLabelVi(subject)}</span>
+                    <span className="rounded-full bg-muted px-3 py-1">{getLevelLabelVi(level)}</span>
                 </div>
             </div>
         </Card>

@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import {
    getDisputedLearningCommitments,
    getResolvedLearningCommitments,
@@ -8,9 +9,26 @@ import {
 } from "@/api/adminLearning";
 import { useToast } from "@/hooks/useToast";
 
-export const useAdminLearning = (commitmentId?: string) => {
+export const useAdminLearning = (
+   commitmentId?: string,
+   options?: {
+      disputedPage?: number;
+      disputedLimit?: number;
+      resolvedPage?: number;
+      resolvedLimit?: number;
+   }
+) => {
    const queryClient = useQueryClient();
    const addToast = useToast();
+   const navigate = useNavigate();
+
+   // Pagination options (defaults)
+   const {
+      disputedPage = 1,
+      disputedLimit = 10,
+      resolvedPage = 1,
+      resolvedLimit = 10,
+   } = options ?? {};
 
    // Query to fetch disputed learning commitments
    const isListingMode = !commitmentId;
@@ -20,8 +38,9 @@ export const useAdminLearning = (commitmentId?: string) => {
       isLoading: isLoadingDisputes,
       isError: isErrorDisputes,
    } = useQuery({
-      queryKey: ["disputedLearningCommitments"],
-      queryFn: () => getDisputedLearningCommitments(),
+      queryKey: ["disputedLearningCommitments", disputedPage, disputedLimit],
+      queryFn: () =>
+         getDisputedLearningCommitments(disputedPage, disputedLimit),
       enabled: isListingMode,
    });
 
@@ -30,8 +49,9 @@ export const useAdminLearning = (commitmentId?: string) => {
       isLoading: isLoadingResolved,
       isError: isErrorResolved,
    } = useQuery({
-      queryKey: ["resolvedLearningCommitments"],
-      queryFn: () => getResolvedLearningCommitments(),
+      queryKey: ["resolvedLearningCommitments", resolvedPage, resolvedLimit],
+      queryFn: () =>
+         getResolvedLearningCommitments(resolvedPage, resolvedLimit),
       enabled: isListingMode,
    });
 
@@ -67,6 +87,9 @@ export const useAdminLearning = (commitmentId?: string) => {
       onSuccess: (data) => {
          addToast("success", data.message);
          invalidateQueries();
+         setTimeout(() => {
+            navigate("/admin/learning");
+         }, 500);
       },
       onError: (error: any) => {
          addToast("error", error.message || "Failed to approve cancellation.");
@@ -80,6 +103,9 @@ export const useAdminLearning = (commitmentId?: string) => {
       onSuccess: (data) => {
          addToast("success", data.message);
          invalidateQueries();
+         setTimeout(() => {
+            navigate("/admin/learning");
+         }, 500);
       },
       onError: (error: any) => {
          addToast("error", error.message || "Failed to reject cancellation.");

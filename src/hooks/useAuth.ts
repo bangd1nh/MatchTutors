@@ -15,6 +15,12 @@ export const useAuth = () => {
    const queryClient = useQueryClient();
    const toast = useToast();
 
+   // helper to extract server message from axios-like errors
+   const getServerMessage = (error: any) =>
+      error?.response?.data?.message ||
+      error?.response?.data?.metadata?.message ||
+      error?.message;
+
    const loginMutation = useMutation({
       mutationFn: loginUser,
       onSuccess: (responseBody) => {
@@ -30,7 +36,11 @@ export const useAuth = () => {
          }
       },
       onError: (error: any) => {
-         toast("error", error.message || "Đăng nhập thất bại.");
+         const serverMessage =
+            error?.response?.data?.message ||
+            error?.response?.data?.metadata?.message ||
+            error?.message;
+         toast("error", serverMessage || "Đăng nhập thất bại.");
       },
    });
 
@@ -49,7 +59,11 @@ export const useAuth = () => {
          }
       },
       onError: (error: any) => {
-         toast("error", error.message || "Đăng nhập bằng Google thất bại.");
+         const serverMessage =
+            error?.response?.data?.message ||
+            error?.response?.data?.metadata?.message ||
+            error?.message;
+         toast("error", serverMessage || "Đăng nhập bằng Google thất bại.");
       },
    });
 
@@ -62,7 +76,7 @@ export const useAuth = () => {
          );
       },
       onError: (error: any) => {
-         toast("error", error.message || "Gửi yêu cầu thất bại.");
+         toast("error", getServerMessage(error) || "Gửi yêu cầu thất bại.");
       },
    });
 
@@ -79,7 +93,10 @@ export const useAuth = () => {
          navigate("/login");
       },
       onError: (error: any) => {
-         toast("error", error.message || "Đặt lại mật khẩu thất bại.");
+         toast(
+            "error",
+            getServerMessage(error) || "Đặt lại mật khẩu thất bại."
+         );
       },
    });
 
@@ -91,7 +108,7 @@ export const useAuth = () => {
       onError: (error: any) => {
          toast(
             "error",
-            error.message ||
+            getServerMessage(error) ||
                "Đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu cũ."
          );
       },

@@ -27,6 +27,7 @@ import { Session } from "@/types/session";
 import { SessionStatus } from "@/enums/session.enum";
 import { useEffect } from "react";
 import { Loader2, Calendar, MapPin, BookOpen } from "lucide-react";
+import { getSubjectLabelVi } from "@/utils/educationDisplay";
 
 const sessionFormSchema = z
    .object({
@@ -192,8 +193,11 @@ export const SessionFormDialog = ({
                                  validCommitments.map((c: any) => (
                                     <SelectItem key={c._id} value={c._id}>
                                        <div className="flex flex-col">
-                                          <span className="font-medium text-foreground">
-                                             {c.teachingRequest?.subject ?? "Môn học"}
+                                          <span className="font-medium text-gray-800">
+                                             {getSubjectLabelVi(
+                                                c.teachingRequest?.subject ??
+                                                   "Môn học"
+                                             )}
                                           </span>
                                           <span className="text-xs text-muted-foreground">
                                              {c.student?.userId?.email ?? "Email"}

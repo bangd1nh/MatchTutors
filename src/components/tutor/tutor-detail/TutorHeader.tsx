@@ -40,7 +40,7 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
 
    const handleSave = () => {
       if (!isAuthenticated) {
-         toast("warning", "Please login to favorite this tutor");
+         toast("warning", "Vui lòng đăng nhập để thêm gia sư vào danh sách yêu thích");
          return;
       }
 
@@ -96,7 +96,7 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                         </AvatarFallback>
                      </Avatar>
                   </div>
-                  
+
                   {/* Rating */}
                   <div className="mt-4 text-center lg:text-left">
                      <div className="flex items-center justify-center lg:justify-start gap-1 mb-1">
@@ -154,8 +154,8 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                            {tutor.languages
                               .slice(0, 4)
                               .map((lang: string, index: number) => (
-                                 <Badge 
-                                    key={index} 
+                                 <Badge
+                                    key={index}
                                     variant="secondary"
                                     className="bg-gray-100 text-gray-700 hover:bg-gray-200 border-0 px-3 py-1 text-sm font-normal"
                                  >
@@ -209,15 +209,15 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                         />
                         {isFav?.isFav ? "Bỏ lưu" : "Lưu"}
                      </Button>
-                     <Button 
+                     <Button
                         size="default"
                         className="bg-sky-600 hover:bg-sky-700 text-white border-0"
                      >
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Nhắn tin ngay
                      </Button>
-                     <Button 
-                        variant="secondary" 
+                     <Button
+                        variant="secondary"
                         size="default"
                         className="bg-gray-100 hover:bg-gray-200 text-gray-900 border-0"
                      >

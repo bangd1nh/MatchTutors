@@ -137,13 +137,13 @@ export default function MaterialsCard({ session, canEdit }: any) {
                            key={material._id}
                            className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                         >
-                           <div className="flex items-center gap-3 flex-1">
+                           <div className="flex items-center gap-3 flex-1 min-w-0 max-w-full">
                               <FileText className="h-5 w-5 text-blue-500 flex-shrink-0" />
                               <div className="flex-1 min-w-0">
                                  <p className="font-medium truncate">
                                     {material.title}
                                  </p>
-                                 <p className="text-sm text-muted-foreground truncate">
+                                 <p className="text-sm text-muted-foreground whitespace-pre-wrap break-words break-all overflow-hidden">
                                     {material.description || "Không có mô tả"}
                                  </p>
                               </div>

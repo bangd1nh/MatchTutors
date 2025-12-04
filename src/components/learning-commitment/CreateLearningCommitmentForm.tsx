@@ -30,15 +30,21 @@ import { CreateLearningCommitmentRequest } from "@/types/learningCommitment";
 
 const formSchema = z
    .object({
-      teachingRequest: z.string().min(1, "Teaching request is required"),
-      totalSessions: z.number().min(1, "Total sessions must be at least 1"),
-      startDate: z.string().min(1, "Start date is required"),
-      endDate: z.string().min(1, "End date is required"),
-      totalAmount: z.number().min(0, "Total amount must be positive"),
+      teachingRequest: z.string().min(1, "Yêu cầu dạy học là bắt buộc"),
+      totalSessions: z.number().min(1, "Tổng số buổi học ít nhất là 1"),
+      startDate: z.string().min(1, "Ngày bắt đầu là bắt buộc"),
+      endDate: z.string().min(1, "Ngày kết thúc là bắt buộc"),
+      totalAmount: z
+         .number()
+         .min(1000, "Tổng số tiền nạp vào phải lớn 1000 VND"),
    })
    .refine((data) => new Date(data.startDate) < new Date(data.endDate), {
-      message: "End date must be after start date",
+      message: "Ngày kết thúc phải sau ngày bắt đầu",
       path: ["endDate"],
+   })
+   .refine((data) => new Date(data.startDate) > new Date(), {
+      message: "Ngày bắt đầu phải sau ngày hôm nay",
+      path: ["startDate"],
    });
 
 interface Props {

@@ -28,31 +28,32 @@ import { TimeSlot } from "@/enums/timeSlot.enum";
 import { AnimatePresence, motion } from "framer-motion";
 import { MultiSelectPopover } from "./MultiSelectPopover";
 import { CITY_TYPE_VALUES } from "@/enums/city.enum";
+import { getSubjectLabelVi } from "@/utils/educationDisplay";
 
 const getLevelDisplayName = (level: Level): string => {
    const levelMap: Record<Level, string> = {
-      [Level.GRADE_1]: "Grade 1",
-      [Level.GRADE_2]: "Grade 2",
-      [Level.GRADE_3]: "Grade 3",
-      [Level.GRADE_4]: "Grade 4",
-      [Level.GRADE_5]: "Grade 5",
-      [Level.GRADE_6]: "Grade 6",
-      [Level.GRADE_7]: "Grade 7",
-      [Level.GRADE_8]: "Grade 8",
-      [Level.GRADE_9]: "Grade 9",
-      [Level.GRADE_10]: "Grade 10",
-      [Level.GRADE_11]: "Grade 11",
-      [Level.GRADE_12]: "Grade 12",
-      [Level.UNIVERSITY]: "University",
+      [Level.GRADE_1]: "Lớp 1",
+      [Level.GRADE_2]: "Lớp 2",
+      [Level.GRADE_3]: "Lớp 3",
+      [Level.GRADE_4]: "Lớp 4",
+      [Level.GRADE_5]: "Lớp 5",
+      [Level.GRADE_6]: "Lớp 6",
+      [Level.GRADE_7]: "Lớp 7",
+      [Level.GRADE_8]: "Lớp 8",
+      [Level.GRADE_9]: "Lớp 9",
+      [Level.GRADE_10]: "Lớp 10",
+      [Level.GRADE_11]: "Lớp 11",
+      [Level.GRADE_12]: "Lớp 12",
+      [Level.UNIVERSITY]: "Đại học",
    };
    return levelMap[level];
 };
 
 const getTimeSlotDisplayName = (slot: string): string => {
    const slotMap: Record<string, string> = {
-      [TimeSlot.PRE_12]: "Morning",
-      [TimeSlot.MID_12_17]: "Afternoon",
-      [TimeSlot.AFTER_17]: "Evening",
+      [TimeSlot.PRE_12]: "Sáng",
+      [TimeSlot.MID_12_17]: "Chiều",
+      [TimeSlot.AFTER_17]: "Tối",
    };
    return slotMap[slot] || slot;
 };
@@ -165,10 +166,10 @@ export default function TutorFilterBar({
    return (
       <div className="sticky top-16 z-40 bg-white border-b border-gray-200 shadow-sm">
          <div className="px-6 py-4 space-y-3">
-            {/* Search Bar - Full width */}
+            {/* Thanh tìm kiếm - Chiều rộng đầy đủ */}
             <div className="flex w-full max-w-2xl">
                <Input
-                  placeholder="Search by name, bio..."
+                  placeholder="Tìm kiếm theo tên, giới thiệu..."
                   value={currentFilters.searchQuery}
                   onChange={(e) =>
                      onFilterChange({ searchQuery: e.target.value })
@@ -183,7 +184,7 @@ export default function TutorFilterBar({
                </Button>
             </div>
 
-            {/* Active Filter Badges - Between search and filter buttons */}
+            {/* Badge bộ lọc đang hoạt động - Giữa thanh tìm kiếm và nút lọc */}
             <AnimatePresence>
                {hasActiveFilters() && (
                   <motion.div
@@ -194,7 +195,7 @@ export default function TutorFilterBar({
                      transition={{ duration: 0.35 }}
                   >
                      <div className="flex flex-wrap gap-2 py-2">
-                        {/* Level Badges */}
+                        {/* Badge trình độ */}
                         {currentFilters.selectedLevels.map((level) => (
                            <Badge
                               key={level}
@@ -210,7 +211,7 @@ export default function TutorFilterBar({
                            </Badge>
                         ))}
 
-                        {/* Subject Badges */}
+                        {/* Badge môn học */}
                         {currentFilters.selectedSubjects.map((subject) => (
                            <Badge
                               key={subject}
@@ -226,7 +227,7 @@ export default function TutorFilterBar({
                            </Badge>
                         ))}
 
-                        {/* Class Type Badges */}
+                        {/* Badge loại lớp học */}
                         {currentFilters.selectedClassTypes.map((classType) => (
                            <Badge
                               key={classType}
@@ -234,7 +235,7 @@ export default function TutorFilterBar({
                               className="flex items-center gap-1 py-1"
                            >
                               <BookOpen className="h-3 w-3" />
-                              {classType === "ONLINE" ? "Online" : "In Person"}
+                              {classType === "ONLINE" ? "Trực tuyến" : "Trực tiếp"}
                               <X
                                  className="h-3 w-3 cursor-pointer hover:text-destructive"
                                  onClick={() =>
@@ -244,7 +245,7 @@ export default function TutorFilterBar({
                            </Badge>
                         ))}
 
-                        {/* City Badges */}
+                        {/* Badge thành phố */}
                         {currentFilters.selectedCities.map((city) => (
                            <Badge
                               key={city}
@@ -260,59 +261,59 @@ export default function TutorFilterBar({
                            </Badge>
                         ))}
 
-                        {/* Rating Badge */}
+                        {/* Badge đánh giá */}
                         {(currentFilters.ratingRange[0] > 0 ||
                            currentFilters.ratingRange[1] < 5) && (
-                           <Badge
-                              variant="secondary"
-                              className="flex items-center gap-1 py-1"
-                           >
-                              <Star className="h-3 w-3" />
-                              {currentFilters.ratingRange[0]} -{" "}
-                              {currentFilters.ratingRange[1]} stars
-                              <X
-                                 className="h-3 w-3 cursor-pointer hover:text-destructive"
-                                 onClick={removeRatingFilter}
-                              />
-                           </Badge>
-                        )}
+                              <Badge
+                                 variant="secondary"
+                                 className="flex items-center gap-1 py-1"
+                              >
+                                 <Star className="h-3 w-3" />
+                                 {currentFilters.ratingRange[0]} -{" "}
+                                 {currentFilters.ratingRange[1]} sao
+                                 <X
+                                    className="h-3 w-3 cursor-pointer hover:text-destructive"
+                                    onClick={removeRatingFilter}
+                                 />
+                              </Badge>
+                           )}
 
-                        {/* Price Badge */}
+                        {/* Badge giá */}
                         {(currentFilters.priceRange[0] > 0 ||
                            currentFilters.priceRange[1] < 2000000) && (
-                           <Badge
-                              variant="secondary"
-                              className="flex items-center gap-1 py-1"
-                           >
-                              <DollarSign className="h-3 w-3" />
-                              {currentFilters.priceRange[0].toLocaleString()} -{" "}
-                              {currentFilters.priceRange[1].toLocaleString()}{" "}
-                              vnd
-                              <X
-                                 className="h-3 w-3 cursor-pointer hover:text-destructive"
-                                 onClick={removePriceFilter}
-                              />
-                           </Badge>
-                        )}
+                              <Badge
+                                 variant="secondary"
+                                 className="flex items-center gap-1 py-1"
+                              >
+                                 <DollarSign className="h-3 w-3" />
+                                 {currentFilters.priceRange[0].toLocaleString()} -{" "}
+                                 {currentFilters.priceRange[1].toLocaleString()}{" "}
+                                 vnd
+                                 <X
+                                    className="h-3 w-3 cursor-pointer hover:text-destructive"
+                                    onClick={removePriceFilter}
+                                 />
+                              </Badge>
+                           )}
 
-                        {/* Experience Badge */}
+                        {/* Badge kinh nghiệm */}
                         {(currentFilters.experienceYears[0] > 0 ||
                            currentFilters.experienceYears[1] < 20) && (
-                           <Badge
-                              variant="secondary"
-                              className="flex items-center gap-1 py-1"
-                           >
-                              <Users className="h-3 w-3" />
-                              {currentFilters.experienceYears[0]} -{" "}
-                              {currentFilters.experienceYears[1]} years
-                              <X
-                                 className="h-3 w-3 cursor-pointer hover:text-destructive"
-                                 onClick={removeExperienceFilter}
-                              />
-                           </Badge>
-                        )}
+                              <Badge
+                                 variant="secondary"
+                                 className="flex items-center gap-1 py-1"
+                              >
+                                 <Users className="h-3 w-3" />
+                                 {currentFilters.experienceYears[0]} -{" "}
+                                 {currentFilters.experienceYears[1]} năm
+                                 <X
+                                    className="h-3 w-3 cursor-pointer hover:text-destructive"
+                                    onClick={removeExperienceFilter}
+                                 />
+                              </Badge>
+                           )}
 
-                        {/* Time Slot Badges */}
+                        {/* Badge khung giờ */}
                         {currentFilters.selectedTimeSlots.map((slot) => (
                            <Badge
                               key={slot}
@@ -328,7 +329,7 @@ export default function TutorFilterBar({
                            </Badge>
                         ))}
 
-                        {/* Day Badges */}
+                        {/* Badge ngày trong tuần */}
                         {currentFilters.selectedDays.map((day) => (
                            <Badge
                               key={day}
@@ -348,10 +349,10 @@ export default function TutorFilterBar({
                )}
             </AnimatePresence>
 
-            {/* Filter Buttons Row - Larger buttons that fit the width */}
+            {/* Hàng nút lọc - Nút lớn hơn vừa với chiều rộng */}
             <div className="flex w-full overflow-x-auto pb-2">
                <div className="flex items-center gap-2 flex-nowrap min-w-max w-full justify-between">
-                  {/* Levels Filter */}
+                  {/* Bộ lọc trình độ */}
                   <Popover>
                      <PopoverTrigger asChild>
                         <Button
@@ -359,7 +360,7 @@ export default function TutorFilterBar({
                            className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24"
                         >
                            <Layers className="h-4 w-4" />
-                           Levels
+                           Trình độ
                            {currentFilters.selectedLevels.length > 0 && (
                               <Badge
                                  variant="secondary"
@@ -376,7 +377,7 @@ export default function TutorFilterBar({
                      >
                         <div className="space-y-4">
                            <h4 className="font-medium text-sm">
-                              Education Levels
+                              Trình độ học vấn
                            </h4>
                            <div className="space-y-2">
                               {LEVEL_VALUES.map((level) => (
@@ -393,12 +394,12 @@ export default function TutorFilterBar({
                                           onFilterChange({
                                              selectedLevels: checked
                                                 ? [
-                                                     ...currentFilters.selectedLevels,
-                                                     level,
-                                                  ]
+                                                   ...currentFilters.selectedLevels,
+                                                   level,
+                                                ]
                                                 : currentFilters.selectedLevels.filter(
-                                                     (l) => l !== level
-                                                  ),
+                                                   (l) => l !== level
+                                                ),
                                           });
                                        }}
                                     />
@@ -415,19 +416,20 @@ export default function TutorFilterBar({
                      </PopoverContent>
                   </Popover>
 
-                  {/* Subjects Filter */}
+                  {/* Bộ lọc môn học */}
                   <MultiSelectPopover
-                     label="Subjects"
+                     label="Môn học"
                      icon={<GraduationCap className="h-4 w-4" />}
                      options={SUBJECT_VALUES}
                      selected={currentFilters.selectedSubjects ?? []}
                      onChange={(newSelected) =>
                         onFilterChange({ selectedSubjects: newSelected })
                      }
-                     placeholder="Search subject..."
+                     placeholder="Tìm môn học..."
+                     getLabel={getSubjectLabelVi}
                   />
 
-                  {/* Class Type Filter */}
+                  {/* Bộ lọc loại lớp học */}
                   <Popover>
                      <PopoverTrigger asChild>
                         <Button
@@ -435,7 +437,7 @@ export default function TutorFilterBar({
                            className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24"
                         >
                            <BookOpen className="h-4 w-4" />
-                           Class Type
+                           Loại lớp học
                            {currentFilters.selectedClassTypes.length > 0 && (
                               <Badge
                                  variant="secondary"
@@ -448,11 +450,11 @@ export default function TutorFilterBar({
                      </PopoverTrigger>
                      <PopoverContent className="w-60" align="start">
                         <div className="space-y-4">
-                           <h4 className="font-medium text-sm">Class Type</h4>
+                           <h4 className="font-medium text-sm">Loại lớp học</h4>
                            <div className="space-y-2">
                               {[
-                                 { value: "ONLINE", label: "Online" },
-                                 { value: "IN_PERSON", label: "In Person" },
+                                 { value: "ONLINE", label: "Trực tuyến" },
+                                 { value: "IN_PERSON", label: "Trực tiếp" },
                               ].map((classType) => (
                                  <div
                                     key={classType.value}
@@ -467,13 +469,13 @@ export default function TutorFilterBar({
                                           onFilterChange({
                                              selectedClassTypes: checked
                                                 ? [
-                                                     ...currentFilters.selectedClassTypes,
-                                                     classType.value,
-                                                  ]
+                                                   ...currentFilters.selectedClassTypes,
+                                                   classType.value,
+                                                ]
                                                 : currentFilters.selectedClassTypes.filter(
-                                                     (c) =>
-                                                        c !== classType.value
-                                                  ),
+                                                   (c) =>
+                                                      c !== classType.value
+                                                ),
                                           });
                                        }}
                                     />
@@ -490,19 +492,19 @@ export default function TutorFilterBar({
                      </PopoverContent>
                   </Popover>
 
-                  {/* City Filter */}
+                  {/* Bộ lọc thành phố */}
                   <MultiSelectPopover
-                     label="Location"
+                     label="Địa điểm"
                      icon={<MapPin className="h-4 w-4" />}
                      options={CITY_TYPE_VALUES}
                      selected={currentFilters.selectedCities ?? []}
                      onChange={(newSelected) =>
                         onFilterChange({ selectedCities: newSelected })
                      }
-                     placeholder="Search city..."
+                     placeholder="Tìm thành phố..."
                   />
 
-                  {/* Rating Filter */}
+                  {/* Bộ lọc đánh giá */}
                   <Popover>
                      <PopoverTrigger asChild>
                         <Button
@@ -510,24 +512,24 @@ export default function TutorFilterBar({
                            className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24"
                         >
                            <Star className="h-4 w-4" />
-                           Rating
+                           Đánh giá
                            {(currentFilters.ratingRange[0] > 0 ||
                               currentFilters.ratingRange[1] < 5) && (
-                              <Badge
-                                 variant="secondary"
-                                 className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center"
-                              >
-                                 1
-                              </Badge>
-                           )}
+                                 <Badge
+                                    variant="secondary"
+                                    className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center"
+                                 >
+                                    1
+                                 </Badge>
+                              )}
                         </Button>
                      </PopoverTrigger>
                      <PopoverContent className="w-80" align="start">
                         <div className="space-y-6">
                            <div>
                               <Label className="text-sm font-medium mb-3 block">
-                                 Rating: {currentFilters.ratingRange[0]} -{" "}
-                                 {currentFilters.ratingRange[1]} stars
+                                 Đánh giá: {currentFilters.ratingRange[0]} -{" "}
+                                 {currentFilters.ratingRange[1]} sao
                               </Label>
                               <Slider
                                  value={currentFilters.ratingRange}
@@ -553,7 +555,7 @@ export default function TutorFilterBar({
                      </PopoverContent>
                   </Popover>
 
-                  {/* Price & Experience Filter */}
+                  {/* Bộ lọc giá & kinh nghiệm */}
                   <Popover>
                      <PopoverTrigger asChild>
                         <Button
@@ -561,29 +563,29 @@ export default function TutorFilterBar({
                            className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24"
                         >
                            <DollarSign className="h-4 w-4" />
-                           Price & Exp
+                           Giá & Kinh nghiệm
                            {(currentFilters.priceRange[0] > 0 ||
                               currentFilters.priceRange[1] < 2000000 ||
                               currentFilters.experienceYears[0] > 0 ||
                               currentFilters.experienceYears[1] < 20) && (
-                              <Badge
-                                 variant="secondary"
-                                 className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center"
-                              >
-                                 1
-                              </Badge>
-                           )}
+                                 <Badge
+                                    variant="secondary"
+                                    className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center"
+                                 >
+                                    1
+                                 </Badge>
+                              )}
                         </Button>
                      </PopoverTrigger>
                      <PopoverContent className="w-80" align="start">
                         <div className="space-y-6">
                            <div>
                               <Label className="text-sm font-medium mb-3 block">
-                                 Price Range:{" "}
+                                 Khoảng giá:{" "}
                                  {currentFilters.priceRange[0].toLocaleString()}{" "}
                                  vnd -{" "}
                                  {currentFilters.priceRange[1].toLocaleString()}{" "}
-                                 vnd/hr
+                                 vnd/giờ
                               </Label>
                               <Slider
                                  value={currentFilters.priceRange}
@@ -599,8 +601,8 @@ export default function TutorFilterBar({
                            </div>
                            <div>
                               <Label className="text-sm font-medium mb-3 block">
-                                 Experience: {currentFilters.experienceYears[0]}{" "}
-                                 - {currentFilters.experienceYears[1]} years
+                                 Kinh nghiệm: {currentFilters.experienceYears[0]}{" "}
+                                 - {currentFilters.experienceYears[1]} năm
                               </Label>
                               <Slider
                                  value={currentFilters.experienceYears}
@@ -621,7 +623,7 @@ export default function TutorFilterBar({
                      </PopoverContent>
                   </Popover>
 
-                  {/* Schedule Filter */}
+                  {/* Bộ lọc lịch trình */}
                   <Popover>
                      <PopoverTrigger asChild>
                         <Button
@@ -629,24 +631,24 @@ export default function TutorFilterBar({
                            className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24"
                         >
                            <Clock className="h-4 w-4" />
-                           Schedule
+                           Lịch trình
                            {(currentFilters.selectedTimeSlots.length > 0 ||
                               currentFilters.selectedDays.length > 0) && (
-                              <Badge
-                                 variant="secondary"
-                                 className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center"
-                              >
-                                 {currentFilters.selectedTimeSlots.length +
-                                    currentFilters.selectedDays.length}
-                              </Badge>
-                           )}
+                                 <Badge
+                                    variant="secondary"
+                                    className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center"
+                                 >
+                                    {currentFilters.selectedTimeSlots.length +
+                                       currentFilters.selectedDays.length}
+                                 </Badge>
+                              )}
                         </Button>
                      </PopoverTrigger>
                      <PopoverContent className="w-80" align="start">
                         <div className="space-y-6">
                            <div>
                               <Label className="text-sm font-medium mb-3 block">
-                                 Time of Day
+                                 Thời gian trong ngày
                               </Label>
                               <div className="space-y-2">
                                  {[
@@ -667,12 +669,12 @@ export default function TutorFilterBar({
                                              onFilterChange({
                                                 selectedTimeSlots: checked
                                                    ? [
-                                                        ...currentFilters.selectedTimeSlots,
-                                                        slot,
-                                                     ]
+                                                      ...currentFilters.selectedTimeSlots,
+                                                      slot,
+                                                   ]
                                                    : currentFilters.selectedTimeSlots.filter(
-                                                        (s) => s !== slot
-                                                     ),
+                                                      (s) => s !== slot
+                                                   ),
                                              })
                                           }
                                        />
@@ -685,17 +687,17 @@ export default function TutorFilterBar({
                            </div>
                            <div>
                               <Label className="text-sm font-medium mb-3 block">
-                                 Days of Week
+                                 Ngày trong tuần
                               </Label>
                               <div className="grid grid-cols-2 gap-2">
                                  {[
-                                    "Monday",
-                                    "Tuesday",
-                                    "Wednesday",
-                                    "Thursday",
-                                    "Friday",
-                                    "Saturday",
-                                    "Sunday",
+                                    "Thứ Hai",
+                                    "Thứ Ba",
+                                    "Thứ Tư",
+                                    "Thứ Năm",
+                                    "Thứ Sáu",
+                                    "Thứ Bảy",
+                                    "Chủ Nhật",
                                  ].map((day) => (
                                     <div
                                        key={day}
@@ -710,12 +712,12 @@ export default function TutorFilterBar({
                                              onFilterChange({
                                                 selectedDays: checked
                                                    ? [
-                                                        ...currentFilters.selectedDays,
-                                                        day,
-                                                     ]
+                                                      ...currentFilters.selectedDays,
+                                                      day,
+                                                   ]
                                                    : currentFilters.selectedDays.filter(
-                                                        (d) => d !== day
-                                                     ),
+                                                      (d) => d !== day
+                                                   ),
                                              })
                                           }
                                        />
@@ -723,7 +725,7 @@ export default function TutorFilterBar({
                                           htmlFor={day.toLowerCase()}
                                           className="text-xs"
                                        >
-                                          {day.slice(0, 3)}
+                                          {day}
                                        </Label>
                                     </div>
                                  ))}
@@ -733,22 +735,21 @@ export default function TutorFilterBar({
                      </PopoverContent>
                   </Popover>
 
-                  {/* Action Buttons */}
+                  {/* Nút hành động */}
                   <div className="flex items-center gap-2 ml-2 pl-2 border-l border-gray-200 shrink-0">
                      <Button
                         onClick={onApplyFilters}
                         className="h-10 text-sm whitespace-nowrap px-4"
                      >
-                        Apply
+                        Áp dụng
                      </Button>
                      <Button
                         variant="ghost"
                         onClick={onClearFilters}
-                        className={`h-10 px-3 shrink-0 transition-opacity ${
-                           hasActiveFilters()
-                              ? "opacity-100"
-                              : "opacity-0 pointer-events-none"
-                        }`}
+                        className={`h-10 px-3 shrink-0 transition-opacity ${hasActiveFilters()
+                           ? "opacity-100"
+                           : "opacity-0 pointer-events-none"
+                           }`}
                      >
                         <X className="h-4 w-4" />
                      </Button>

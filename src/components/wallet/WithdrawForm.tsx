@@ -153,7 +153,7 @@ export const WithdrawForm: React.FC = () => {
                   Số tài khoản
                </label>
                <Input
-                  type="text"
+                  type="number"
                   placeholder="Nhập số tài khoản"
                   value={formData.toAccountNumber}
                   onChange={(e) =>
@@ -211,8 +211,7 @@ export const WithdrawForm: React.FC = () => {
          </form>
 
          <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-            💡 Lưu ý: Số tiền tối thiểu là 10.000 VNĐ. Phí rút tiền sẽ được tính
-            tự động.
+            💡 Lưu ý: Số tiền tối thiểu là 2.000 VNĐ.
          </p>
       </div>
    );
