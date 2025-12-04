@@ -1,5 +1,4 @@
 import { useLearningCommitments } from "@/hooks/useLearningCommitment";
-import { useTutorProfile } from "@/hooks/useTutorProfile";
 import { LearningCommitmentCard } from "@/components/learning-commitment/LearningCommitmentCard";
 import { Button } from "@/components/ui/button";
 import { Plus, BookOpen } from "lucide-react";
@@ -7,6 +6,7 @@ import { Link } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
 import { useState } from "react";
 import { Pagination } from "@/components/common/Pagination";
+import { TutorCommitmentActions } from "@/components/learning-commitment/TutorCommitmentActions";
 
 type CommitmentStatus =
    | "all"
@@ -39,12 +39,6 @@ export const LearningCommitmentsPage = () => {
    const isTutor = String(user?.role).toLowerCase() === "tutor";
    const [page, setPage] = useState(1);
    const [activeTab, setActiveTab] = useState<CommitmentStatus>("all");
-
-   // Add this hook to get tutor profile
-   const { tutorProfile } = useTutorProfile();
-
-   // Check if tutor is approved
-   const isTutorApproved = tutorProfile?.isApproved === true;
 
    const {
       data: paginatedData,
@@ -125,17 +119,7 @@ export const LearningCommitmentsPage = () => {
                      </p>
                   </div>
 
-                  {isTutor && isTutorApproved && (
-                     <Link
-                        to="/tutor/commitments/create"
-                        className="flex-shrink-0"
-                     >
-                        <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md hover:shadow-lg transition-all">
-                           <Plus className="w-5 h-5 mr-2" />
-                           Tạo Cam Kết
-                        </Button>
-                     </Link>
-                  )}
+                  {isTutor && <TutorCommitmentActions />}
                </div>
             </div>
          </div>
@@ -211,7 +195,8 @@ export const LearningCommitmentsPage = () => {
                            ? "Bắt đầu bằng cách tạo cam kết học tập mới"
                            : "Thử chọn một trạng thái khác"}
                      </p>
-                     {isTutor && isTutorApproved && activeTab === "all" && (
+                     {/* Nút này cũng nên được xử lý bên trong component con nếu cần */}
+                     {isTutor && activeTab === "all" && (
                         <Link
                            to="/tutor/commitments/create"
                            className="inline-block"
