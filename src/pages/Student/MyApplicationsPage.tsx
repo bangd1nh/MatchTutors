@@ -1,5 +1,25 @@
-import { useMyTeachingRequests } from "@/hooks/useTeachingRequest";
-import { TeachingRequest } from "@/types/teachingRequest";
+import {
+   AlertCircle,
+   ArrowRight,
+   BookOpen,
+   CheckCircle,
+   Clock,
+   Flag,
+   Loader2,
+   XCircle,
+} from "lucide-react";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
+import { checkCanReport, CheckCanReportResponse, submitViolationReport } from "@/api/violationReport";
+import {
+   Avatar,
+   AvatarFallback,
+   AvatarImage,
+} from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
    Card,
    CardContent,
@@ -7,35 +27,17 @@ import {
    CardHeader,
    CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-   Loader2,
-   AlertCircle,
-   ArrowRight,
-   BookOpen,
-   Clock,
-   CheckCircle,
-   XCircle,
-   Flag,
-} from "lucide-react";
-import { TeachingRequestStatusBadge } from "@/components/common/TeachingRequestStatusBadge";
-import { Link } from "react-router-dom";
-import moment from "moment";
-import { useState, useEffect } from "react";
-import { RequestDetailModal } from "@/components/tutor/teaching-request/RequestDetailModal";
-import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
-import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
-import { ReportModal } from "@/components/student/ReportModal";
-import {
-   checkCanReport,
-   submitViolationReport,
-   CheckCanReportResponse,
-} from "@/api/violationReport";
 import { useToast } from "@/hooks/useToast";
+import { useMyTeachingRequests } from "@/hooks/useTeachingRequest";
+
+import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
 import { ViolationTypeEnum } from "@/enums/violationReport.enum";
-import { Badge } from "@/components/ui/badge";
+import { TeachingRequest } from "@/types/teachingRequest";
 import { Pagination } from "@/components/common/Pagination";
+import { RequestDetailModal } from "@/components/tutor/teaching-request/RequestDetailModal";
+import { ReportModal } from "@/components/student/ReportModal";
+import { getLevelLabelVi, getSubjectLabelVi } from "@/utils/educationDisplay";
+import { TeachingRequestStatusBadge } from "@/components/common/TeachingRequestStatusBadge";
 
 const MyApplicationsPage = () => {
    const [page, setPage] = useState(1);
@@ -201,30 +203,32 @@ const MyApplicationsPage = () => {
 
    if (isError) {
       return (
-         <div className="flex flex-col items-center justify-center h-64 bg-red-50 border border-red-200 rounded-lg p-6">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <p className="mt-4 text-red-700 font-semibold">
+         <div className="flex flex-col items-center justify-center h-64 bg-red-50 dark:bg-destructive/10 border border-red-200 dark:border-destructive/20 rounded-lg p-6">
+            <AlertCircle className="h-8 w-8 text-red-500 dark:text-red-400" />
+            <p className="mt-4 text-red-700 dark:text-red-300 font-semibold">
                Đã xảy ra lỗi khi tải dữ liệu.
             </p>
-            <p className="mt-1 text-sm text-red-600">Vui lòng thử lại sau.</p>
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+               Vui lòng thử lại sau.
+            </p>
          </div>
       );
    }
 
    if (!requests || requests.length === 0) {
       return (
-         <div className="text-center py-16 bg-white rounded-lg border border-slate-200">
-            <BookOpen className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-slate-900">
+         <Card className="text-center py-16">
+            <BookOpen className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold text-card-foreground">
                Chưa có lớp học nào
             </h2>
             <p className="mt-2 text-muted-foreground">
                Bạn chưa gửi yêu cầu học cho gia sư nào.
             </p>
-            <Button asChild className="mt-6 bg-primary hover:bg-primary/90">
+            <Button asChild className="mt-6">
                <Link to="/tutor-list">Tìm gia sư ngay</Link>
             </Button>
-         </div>
+         </Card>
       );
    }
 
@@ -239,7 +243,7 @@ const MyApplicationsPage = () => {
    );
 
    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6 md:p-8">
+      <div className="min-h-screen bg-background p-6 md:p-8">
          <div className="max-w-6xl mx-auto">
             {/* Header Section */}
             <div className="mb-8">
@@ -247,11 +251,11 @@ const MyApplicationsPage = () => {
                   <div className="p-2 bg-primary/10 rounded-lg">
                      <BookOpen className="h-6 w-6 text-primary" />
                   </div>
-                  <h1 className="text-3xl font-bold text-slate-900">
+                  <h1 className="text-3xl font-bold text-foreground">
                      Lớp học của tôi
                   </h1>
                </div>
-               <p className="text-slate-600 ml-11">
+               <p className="text-muted-foreground ml-11">
                   Quản lý tất cả các yêu cầu dạy học bạn đã gửi
                </p>
             </div>
@@ -259,64 +263,76 @@ const MyApplicationsPage = () => {
             {/* Stats Section */}
             {requests.length > 0 && (
                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                  <div className="bg-white rounded-lg p-4 border border-slate-200 hover:border-slate-300 transition-colors">
-                     <div className="flex items-center justify-between">
-                        <div>
-                           <p className="text-sm text-slate-600">
-                              Tổng yêu cầu
-                           </p>
-                           <p className="text-2xl font-bold text-slate-900 mt-1">
-                              {requests.length}
-                           </p>
+                  <Card className="hover:border-muted-foreground/50 transition-colors">
+                     <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                           <div>
+                              <p className="text-sm text-muted-foreground">
+                                 Tổng yêu cầu
+                              </p>
+                              <p className="text-2xl font-bold">
+                                 {requests.length}
+                              </p>
+                           </div>
+                           <BookOpen className="h-8 w-8 text-muted-foreground/30" />
                         </div>
-                        <BookOpen className="h-8 w-8 text-slate-300" />
-                     </div>
-                  </div>
+                     </CardContent>
+                  </Card>
 
-                  <div className="bg-white rounded-lg p-4 border border-slate-200 hover:border-amber-300 transition-colors">
-                     <div className="flex items-center justify-between">
-                        <div>
-                           <p className="text-sm text-slate-600">Chờ xử lý</p>
-                           <p className="text-2xl font-bold text-amber-600 mt-1">
-                              {pendingRequests.length}
-                           </p>
+                  <Card className="hover:border-amber-400 dark:hover:border-amber-500/50 transition-colors">
+                     <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                           <div>
+                              <p className="text-sm text-muted-foreground">
+                                 Đang chờ
+                              </p>
+                              <p className="text-2xl font-bold text-amber-500 dark:text-amber-400">
+                                 {pendingRequests.length}
+                              </p>
+                           </div>
+                           <Clock className="h-8 w-8 text-amber-400 dark:text-amber-500/50" />
                         </div>
-                        <Clock className="h-8 w-8 text-amber-300" />
-                     </div>
-                  </div>
+                     </CardContent>
+                  </Card>
 
-                  <div className="bg-white rounded-lg p-4 border border-slate-200 hover:border-green-300 transition-colors">
-                     <div className="flex items-center justify-between">
-                        <div>
-                           <p className="text-sm text-slate-600">
-                              Đã chấp nhận
-                           </p>
-                           <p className="text-2xl font-bold text-green-600 mt-1">
-                              {acceptedRequests.length}
-                           </p>
+                  <Card className="hover:border-green-400 dark:hover:border-green-500/50 transition-colors">
+                     <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                           <div>
+                              <p className="text-sm text-muted-foreground">
+                                 Chấp nhận
+                              </p>
+                              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                                 {acceptedRequests.length}
+                              </p>
+                           </div>
+                           <CheckCircle className="h-8 w-8 text-green-400 dark:text-green-500/50" />
                         </div>
-                        <CheckCircle className="h-8 w-8 text-green-300" />
-                     </div>
-                  </div>
+                     </CardContent>
+                  </Card>
 
-                  <div className="bg-white rounded-lg p-4 border border-slate-200 hover:border-red-300 transition-colors">
-                     <div className="flex items-center justify-between">
-                        <div>
-                           <p className="text-sm text-slate-600">Từ chối</p>
-                           <p className="text-2xl font-bold text-red-600 mt-1">
-                              {rejectedRequests.length}
-                           </p>
+                  <Card className="hover:border-red-400 dark:hover:border-red-500/50 transition-colors">
+                     <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                           <div>
+                              <p className="text-sm text-muted-foreground">
+                                 Từ chối
+                              </p>
+                              <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                                 {rejectedRequests.length}
+                              </p>
+                           </div>
+                           <XCircle className="h-8 w-8 text-red-400 dark:text-red-500/50" />
                         </div>
-                        <XCircle className="h-8 w-8 text-red-300" />
-                     </div>
-                  </div>
+                     </CardContent>
+                  </Card>
                </div>
             )}
 
             {/* Pending Requests Section */}
             {pendingRequests.length > 0 && (
                <div className="mb-8">
-                  <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                      <Clock className="h-5 w-5 text-amber-500" />
                      Yêu cầu chờ xử lý ({pendingRequests.length})
                   </h2>
@@ -352,7 +368,7 @@ const MyApplicationsPage = () => {
             {/* Accepted Requests Section */}
             {acceptedRequests.length > 0 && (
                <div className="mb-8">
-                  <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                      <CheckCircle className="h-5 w-5 text-green-500" />
                      Đã chấp nhận ({acceptedRequests.length})
                   </h2>
@@ -388,7 +404,7 @@ const MyApplicationsPage = () => {
             {/* Rejected Requests Section */}
             {rejectedRequests.length > 0 && (
                <div className="mb-8">
-                  <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                      <XCircle className="h-5 w-5 text-red-500" />
                      Từ chối ({rejectedRequests.length})
                   </h2>
@@ -515,10 +531,10 @@ const ApplicationCard = ({
          <CardHeader className="pb-3">
             <div className="flex items-start justify-between gap-3">
                <div className="flex-1">
-                  <CardTitle className="text-base text-slate-900 line-clamp-1">
+                  <CardTitle className="text-base text-card-foreground line-clamp-1">
                      {getSubjectLabelVi(request.subject)}
                   </CardTitle>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                      {getLevelLabelVi(request.level)}
                   </p>
                </div>
@@ -529,22 +545,22 @@ const ApplicationCard = ({
          <CardContent className="flex-grow pb-4">
             {/* Tutor Info */}
             <div className="flex items-center gap-3 mb-4">
-               <Avatar className="h-10 w-10 ring-2 ring-slate-100">
+               <Avatar className="h-10 w-10 ring-2 ring-background">
                   <AvatarImage src={tutor?.avatarUrl} alt={tutor?.name} />
                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                      {tutor?.name?.charAt(0).toUpperCase() || "T"}
                   </AvatarFallback>
                </Avatar>
                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-slate-900 text-sm truncate">
+                  <p className="font-medium text-card-foreground text-sm truncate">
                      {tutor?.name || "Gia sư"}
                   </p>
-                  <p className="text-xs text-slate-500">Gia sư</p>
+                  <p className="text-xs text-muted-foreground">Gia sư</p>
                </div>
                {hasReported ? (
                   <Badge
                      variant="outline"
-                     className="h-8 px-2 text-xs bg-blue-50 text-blue-700 border-blue-300"
+                     className="h-8 px-2 text-xs bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700/50"
                   >
                      <Flag className="h-3 w-3 mr-1" />
                      Đã báo cáo
@@ -554,7 +570,7 @@ const ApplicationCard = ({
                      variant="outline"
                      size="sm"
                      onClick={handleReportClick}
-                     className="h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                     className="h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 dark:text-red-400 dark:border-red-400/50 dark:hover:bg-red-900/30 dark:hover:text-red-300"
                   >
                      <Flag className="h-3 w-3 mr-1" />
                      Báo cáo
@@ -563,7 +579,7 @@ const ApplicationCard = ({
             </div>
 
             {/* Submitted Time */}
-            <div className="text-xs text-slate-500 bg-slate-50 p-2.5 rounded-md">
+            <div className="text-xs text-muted-foreground bg-muted/50 p-2.5 rounded-md">
                Gửi lúc: {moment(request.createdAt).format("HH:mm DD/MM/YYYY")}
             </div>
          </CardContent>
@@ -571,7 +587,7 @@ const ApplicationCard = ({
          <CardFooter className="pt-4">
             <Button
                onClick={() => onViewDetail(request)}
-               className="w-full relative h-10 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group/btn"
+               className="w-full relative h-10 group/btn"
             >
                <span className="relative z-10 flex items-center justify-center gap-2">
                   Xem chi tiết

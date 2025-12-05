@@ -45,7 +45,7 @@ export const REVIEW_STATUS_TRANSLATIONS: Record<string, string> = {
 };
 
 // Unified helper for timeline item status
-export const translateStatus = (type: string, status: string, field?: string) => {
+export const translateStatus = (type: string, status: string) => {
     const s = status?.toUpperCase?.() || status;
 
     switch (type) {

@@ -27,9 +27,11 @@ const MCQCard = ({ session, canManage }: any) => {
       isError,
    } = useMCQAssignedToSession(session._id);
 
+   console.log(quizzesAssignedData?.data)
+
    const { attempts } = useFetchAttempt(session._id);
 
-   const { initMCQ, mcq, setSessionId } = useAsignMCQStore();
+   const { initMCQ, mcq, setSessionId, reset } = useAsignMCQStore();
    const navigate = useNavigate();
 
    const quizzes = Array.isArray(quizzesAssignedData?.data)
@@ -39,6 +41,7 @@ const MCQCard = ({ session, canManage }: any) => {
    const [isShowingModal, setIsShowingModal] = useState(false);
 
    useEffect(() => {
+      reset();
       if (
          !isLoading &&
          !attempts.isLoading &&

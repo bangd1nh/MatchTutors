@@ -532,7 +532,7 @@ export default function TutorProfile() {
                         {/* Subjects */}
                         <Card className="lg:col-span-3 bg-card text-card-foreground">
                           <CardHeader>
-                            <CardTitle className="text-foreground">Subjects Teaching *</CardTitle>
+                            <CardTitle className="text-foreground">Môn Dạy *</CardTitle>
                           </CardHeader>
                           <CardContent>
                             <MultiSelectInput
@@ -557,7 +557,7 @@ export default function TutorProfile() {
                         {/* Levels */}
                         <Card className="lg:col-span-3 bg-card text-card-foreground">
                           <CardHeader>
-                            <CardTitle className="text-foreground">Levels *</CardTitle>
+                            <CardTitle className="text-foreground">Cấp bậc *</CardTitle>
                           </CardHeader>
                           <CardContent>
                             <MultiSelectInput
@@ -603,7 +603,7 @@ export default function TutorProfile() {
                         <Card className="lg:col-span-3 bg-card text-card-foreground">
                             <CardHeader>
                                 <CardTitle className="flex items-center justify-between text-foreground">
-                                    Certifications *
+                                    Chứng chỉ *
                                     <Button onClick={addCertification} size="sm" variant="outline">
                                         <Plus className="w-4 h-4 mr-2" />
                                         Thêm chứng chỉ
@@ -614,7 +614,7 @@ export default function TutorProfile() {
                                 {formData.certifications?.map((cert, index) => (
                                     <div key={index} className="border border-border rounded-lg p-4 space-y-4 bg-muted/40">
                                         <div className="flex justify-between items-start">
-                                            <h4 className="font-medium text-foreground">Certification {index + 1}</h4>
+                                            <h4 className="font-medium text-foreground">Chứng chỉ {index + 1}</h4>
                                             <Button onClick={() => removeCertification(index)} size="sm" variant="ghost">
                                                 <X className="w-4 h-4" />
                                             </Button>
@@ -622,7 +622,7 @@ export default function TutorProfile() {
                                         <div className="space-y-4">
                                             <div>
                                                 <Label htmlFor={`certifications.${index}.name`} className="text-foreground">
-                                                   Certification Name *
+                                                    Tên Chứng chỉ *
                                                 </Label>
                                                 <Input
                                                    id={`certifications.${index}.name`}
@@ -638,7 +638,7 @@ export default function TutorProfile() {
                                             </div>
                                             <div>
                                                 <Label htmlFor={`certifications.${index}.description`} className="text-foreground">
-                                                   Description *
+                                                   Mô tả *
                                                 </Label>
                                                 <Textarea
                                                    id={`certifications.${index}.description`}
@@ -654,7 +654,7 @@ export default function TutorProfile() {
 
                                             {/* Tải lên ảnh chứng chỉ */}
                                             <div>
-                                                <Label className="text-foreground">Certification Images</Label>
+                                                <Label className="text-foreground">Ảnh chứng chỉ</Label>
                                                 <div className="mt-2">
                                                    <input
                                                       type="file"
@@ -668,7 +668,7 @@ export default function TutorProfile() {
                                                    />
                                                    <label htmlFor={`certification-images-${index}`}>
                                                       <Button variant="outline" size="sm" asChild>
-                                                         <span>Add Images</span>
+                                                         <span>Thêm ảnh</span>
                                                       </Button>
                                                    </label>
                                                 </div>
@@ -676,7 +676,7 @@ export default function TutorProfile() {
                                                 {/* Hiển thị ảnh đã chọn */}
                                                 {certificationFiles[index] && certificationFiles[index].length > 0 && (
                                                    <div className="mt-3">
-                                                      <p className="text-sm text-muted-foreground mb-2">Selected images:</p>
+                                                      <p className="text-sm text-muted-foreground mb-2">Chọn ảnh: </p>
                                                       <div className="flex flex-wrap gap-2">
                                                          {certificationFiles[index].map((file, fileIndex) => (
                                                             <div key={fileIndex} className="relative">
@@ -705,7 +705,7 @@ export default function TutorProfile() {
                                                 {/* Hiển thị ảnh hiện có từ server */}
                                                 {cert.imageUrls && cert.imageUrls.length > 0 && (
                                                    <div className="mt-3">
-                                                      <p className="text-sm text-muted-foreground mb-2">Existing images:</p>
+                                                      <p className="text-sm text-muted-foreground mb-2">Ảnh tồn Tại: </p>
                                                       <div className="flex flex-wrap gap-2">
                                                          {cert.imageUrls?.map((url, urlIndex) => (
                                                             <div key={urlIndex} className="relative group">
@@ -715,7 +715,7 @@ export default function TutorProfile() {
                                                                   className="w-16 h-16 object-cover rounded border border-border"
                                                                />
                                                                <p className="text-xs text-muted-foreground truncate w-16">
-                                                                  Image {urlIndex + 1}
+                                                                  Ảnh {urlIndex + 1}
                                                                </p>
 
                                                                {/* Remove button */}
@@ -743,9 +743,9 @@ export default function TutorProfile() {
                               {/* Availability */}
                               <Card className="lg:col-span-3 bg-card text-card-foreground" id="availability-section">
                                  <CardHeader>
-                                    <CardTitle className="text-foreground">Availability Schedule *</CardTitle>
+                                    <CardTitle className="text-foreground">Lịch Rảnh *</CardTitle>
                                     <p className="text-sm text-muted-foreground">
-                                       Select the days and time slots when you're available to teach
+                                        Chọn Ngày và khung giờ có thể nhận việc dạy học
                                     </p>
                                  </CardHeader>
                                  <CardContent>
@@ -760,13 +760,13 @@ export default function TutorProfile() {
                               {/* Address */}
                               <Card className="lg:col-span-3 bg-card text-card-foreground">
                                  <CardHeader>
-                                    <CardTitle className="text-foreground">Address *</CardTitle>
+                                    <CardTitle className="text-foreground">Địa chỉ *</CardTitle>
                                  </CardHeader>
                                  <CardContent>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                        {/* City */}
                                        <div>
-                                          <Label htmlFor="address.city" className="text-foreground">City *</Label>
+                                          <Label htmlFor="address.city" className="text-foreground">Thành Phố *</Label>
                                           <Select
                                              value={formData.address?.city || ""}
                                              onValueChange={(value) => {
@@ -790,7 +790,7 @@ export default function TutorProfile() {
 
                                        {/* Street */}
                                        <div>
-                                          <Label htmlFor="address.street" className="text-foreground">Street Address *</Label>
+                                          <Label htmlFor="address.street" className="text-foreground">Địa chỉ *</Label>
                                           <Input
                                              id="address.street"
                                              name="address.street"
@@ -817,17 +817,17 @@ export default function TutorProfile() {
                                           onClick={() => setIsEditing(false)}
                                           disabled={isCreating || isUpdating}
                                        >
-                                          Cancel
+                                          Hủy
                                        </Button>
 
                                        <Button onClick={handleSave} disabled={isCreating || isUpdating}>
                                           {isCreating || isUpdating ? (
                                              <span className="flex items-center space-x-2">
                                                 <Loader2 className="h-5 w-5 animate-spin" />
-                                                <span>Saving...</span>
+                                                <span>Đang lưu...</span>
                                              </span>
                                           ) : (
-                                             "Save"
+                                             "Lưu"
                                           )}
                                        </Button>
                                     </div>

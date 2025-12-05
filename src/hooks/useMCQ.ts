@@ -11,6 +11,7 @@ import { IQuizQuestionResponse } from "@/types/quizQuestion";
 import { getAttempt, submitMCQtoServer } from "@/api/quiz";
 import {
    IAttemptSubmissionResponse,
+   IQuizSubmissionListResponse,
    IQuizSubmissionResponse,
 } from "@/types/quizSubmission";
 import {
@@ -73,7 +74,7 @@ export const useMCQ = (quizId?: string) => {
       },
    });
 
-   const fetchMCQSubmitHistoryList = useQuery<IQuizSubmissionResponse>({
+   const fetchMCQSubmitHistoryList = useQuery<IQuizSubmissionListResponse>({
       queryKey: ["MCQSUBMITHISTORYLIST"],
       queryFn: fetchMCQHistoryList,
    });
