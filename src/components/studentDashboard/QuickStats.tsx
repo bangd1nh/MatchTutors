@@ -45,25 +45,28 @@ export function QuickStats({ stats, sessionStats }: QuickStatsProps) {
     },
   ]
 
-  // Dữ liệu biểu đồ cho thống kê phiên học
+  // Dữ liệu biểu đồ cho thống kê phiên học - CHỈ THÁNG HIỆN TẠI
   const chartData = [
     {
-      name: "Buổi Học Hoàn thành",
+      name: "Buổi Học",
       value: sessionStats.completedSessions,
       color: "#10B981", // Xanh lá
-      icon: Calendar
+      icon: Calendar,
+      description: "Buổi học đã hoàn thành trong tháng này"
     },
     {
       name: "Vắng mặt",
       value: sessionStats.absentSessions,
       color: "#F59E0B", // Vàng
-      icon: CalendarX
+      icon: CalendarX,
+      description: "Buổi học vắng mặt trong tháng này"
     },
     {
       name: "Bài kiểm tra",
       value: sessionStats.quizzesCompleted,
       color: "#8B5CF6", // Tím
-      icon: FileText
+      icon: FileText,
+      description: "Bài kiểm tra đã hoàn thành trong tháng này"
     },
   ]
 
@@ -73,13 +76,25 @@ export function QuickStats({ stats, sessionStats }: QuickStatsProps) {
         <div className="bg-white border border-gray-200 rounded-lg p-3 shadow-lg">
           <p className="font-semibold text-gray-900">{label}</p>
           <p className="text-gray-700">
-            Số lượng: <span className="font-bold">{payload[0].value}</span>
+            Số lượng tháng này: <span className="font-bold">{payload[0].value}</span>
           </p>
         </div>
       )
     }
     return null
   }
+
+  // Get current month name in Vietnamese
+  const getCurrentMonthName = () => {
+    const months = [
+      "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
+      "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
+    ];
+    const now = new Date();
+    return months[now.getMonth()];
+  };
+
+  const currentMonth = getCurrentMonthName();
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -115,10 +130,13 @@ export function QuickStats({ stats, sessionStats }: QuickStatsProps) {
         </CardContent>
       </Card>
 
-      {/* Biểu đồ thống kê phiên học */}
+      {/* Biểu đồ thống kê phiên học THÁNG HIỆN TẠI */}
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg">Tổng quan buổi học & bài kiểm tra</CardTitle>
+          <div>
+            <CardTitle className="text-lg">Thống kê tháng hiện tại</CardTitle>
+            <p className="text-sm text-gray-500 mt-1">Số liệu trong {currentMonth}</p>
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
@@ -148,18 +166,25 @@ export function QuickStats({ stats, sessionStats }: QuickStatsProps) {
             </BarChart>
           </ResponsiveContainer>
 
-          {/* Chú thích */}
-          <div className="flex justify-center gap-6 mt-4">
+          {/* Chú thích với mô tả */}
+          <div className="space-y-2 mt-4">
             {chartData.map((item, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="text-sm text-gray-600">{item.name}</span>
+              <div key={index} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <span className="text-sm text-gray-700">{item.name}</span>
+                </div>
+                <div className="text-right">
+                  <span className="font-semibold text-gray-900">{item.value}</span>
+                  <span className="text-xs text-gray-500 ml-1">trong tháng</span>
+                </div>
               </div>
             ))}
           </div>
+
         </CardContent>
       </Card>
     </div>

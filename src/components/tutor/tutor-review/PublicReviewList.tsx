@@ -15,7 +15,7 @@ export function PublicReviewList({ reviews, onEditReview }: PublicReviewListProp
     if (reviewsWithComments.length === 0) {
         return (
             <div className="rounded-2xl border border-border bg-card p-12 text-center shadow-sm">
-                <p className="text-muted-foreground">No reviews yet.</p>
+                <p className="text-muted-foreground">Chưa có đánh giá nào.</p>
             </div>
         )
     }
@@ -39,7 +39,7 @@ export function PublicReviewList({ reviews, onEditReview }: PublicReviewListProp
                         onClick={() => setVisibleCount((prev) => prev + 5)}
                         className="rounded-full px-6"
                     >
-                        Load more reviews
+                        Xem thêm đánh giá
                     </Button>
                 </div>
             )}

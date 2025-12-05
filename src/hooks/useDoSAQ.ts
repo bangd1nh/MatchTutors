@@ -3,7 +3,8 @@ import {
     submitShortAnswer,
     fetchShortAnswerHistoryList,
     fetchStudentShortAnswerHistoryList,
-    fetchShortAnswerQuizForAttempt // Add this import
+    fetchShortAnswerQuizForAttempt, // Add this import
+    fetchShortAnswerHistory
 } from "@/api/doQuiz";
 import { IQuizSubmissionBody } from "@/types/quizSubmission";
 import { useToast } from "./useToast";
@@ -33,11 +34,7 @@ export const useDoSAQ = (quizId?: string) => {
         },
     });
 
-    // Fetch student's short answer quiz history (submissions)
-    const fetchSAQHistory = useQuery({
-        queryKey: ["shortAnswerHistory"],
-        queryFn: fetchShortAnswerHistoryList,
-    });
+
 
     // Fetch tutor's view of student submissions (for tutors)
     const fetchStudentSAQSubmissions = useQuery({
@@ -48,7 +45,6 @@ export const useDoSAQ = (quizId?: string) => {
     return {
         // Queries
         fetchSAQForAttempt,
-        fetchSAQHistory,
         fetchStudentSAQSubmissions,
 
         // Mutations
@@ -60,6 +56,13 @@ export const useDoSAQ = (quizId?: string) => {
         isError: fetchSAQForAttempt.isError,
     };
 };
+
+    // Fetch student's short answer quiz history (submissions)
+    export const  fetchSAQHistory = (quizId:string) => { return useQuery({
+        queryKey: ["shortAnswerHistory"],
+        queryFn: () => fetchShortAnswerHistory(quizId!),
+        enabled: !!quizId
+    }); }
 
 // Simple hook for just submitting
 export const useSubmitSAQ = () => {
@@ -88,22 +91,22 @@ export const useSAQHistory = () => {
     });
 };
 
-export const useSAQHistoryDetail = (quizId: string) => {
-    const { fetchSAQHistory } = useDoSAQ();
+// export const useSAQHistoryDetail = (quizId: string) => {
+//     const { fetchSAQHistory } = useDoSAQ();
 
-    const submissions = fetchSAQHistory.data?.data;
-    const submission = Array.isArray(submissions)
-        ? submissions.find((sub: any) => sub._id === quizId)
-        : (submissions as any)?._id === quizId
-            ? submissions
-            : undefined;
+//     const submissions = fetchSAQHistory.data?.data;
+//     const submission = Array.isArray(submissions)
+//         ? submissions.find((sub: any) => sub._id === quizId)
+//         : (submissions as any)?._id === quizId
+//             ? submissions
+//             : undefined;
 
-    return {
-        data: submission,
-        isLoading: fetchSAQHistory.isLoading,
-        isError: fetchSAQHistory.isError,
-    };
-};
+//     return {
+//         data: submission,
+//         isLoading: fetchSAQHistory.isLoading,
+//         isError: fetchSAQHistory.isError,
+//     };
+// };
 
 
 // Hook for tutors to view student submissions

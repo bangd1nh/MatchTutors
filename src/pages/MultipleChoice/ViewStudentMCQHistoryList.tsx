@@ -21,6 +21,10 @@ import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
 import { useState, useMemo } from "react";
+import {
+   getQuestionTypeLabelVi,
+   getQuizModeLabelVi,
+} from "@/utils/quizTypeDisplay";
 
 interface StudentMCQHistoryItem {
    _id: string;
@@ -346,10 +350,12 @@ const ViewStudentMCQHistoryList = () => {
                               </span>
                            </div>
                            <Badge variant="outline">
-                              {submission.quizId.quizMode}
+                              {getQuizModeLabelVi(submission.quizId.quizMode)}
                            </Badge>
                            <Badge variant="outline">
-                              {submission.quizId.quizType}
+                              {getQuestionTypeLabelVi(
+                                 submission.quizId.quizType
+                              )}
                            </Badge>
                         </div>
 

@@ -28,6 +28,8 @@ import {
 import { AvailabilityGrid } from '@/components/tutor/tutor-profile/AvailabilityGrid'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { SUBJECT_LABELS_VI } from '@/enums/subject.enum'
+import { LEVEL_LABELS_VI } from '@/enums/level.enum'
 
 const TutorProfilePage: React.FC = () => {
   const { tutorId } = useParams<{ tutorId: string }>()
@@ -146,43 +148,11 @@ const TutorProfilePage: React.FC = () => {
 
   // Helper functions
   const getSubjectDisplayName = (subject: string) => {
-    const subjectMap: { [key: string]: string } = {
-      'ADDITIONAL_MATHS': 'Toán nâng cao',
-      'BUSINESS_STUDIES': 'Kinh doanh',
-      'CHINESE': 'Tiếng Trung',
-      'ECONOMICS': 'Kinh tế học',
-      'MATHEMATICS': 'Toán học',
-      'PHYSICS': 'Vật lý',
-      'CHEMISTRY': 'Hóa học',
-      'BIOLOGY': 'Sinh học',
-      'ENGLISH': 'Tiếng Anh',
-      'LITERATURE': 'Văn học',
-      'HISTORY': 'Lịch sử',
-      'GEOGRAPHY': 'Địa lý',
-    }
-    return subjectMap[subject] || subject
+    return SUBJECT_LABELS_VI[subject] || subject
   }
 
   const getLevelDisplayName = (level: string) => {
-    const levelMap: { [key: string]: string } = {
-      'GRADE_1': 'Lớp 1',
-      'GRADE_2': 'Lớp 2',
-      'GRADE_3': 'Lớp 3',
-      'GRADE_4': 'Lớp 4',
-      'GRADE_5': 'Lớp 5',
-      'GRADE_6': 'Lớp 6',
-      'GRADE_7': 'Lớp 7',
-      'GRADE_8': 'Lớp 8',
-      'GRADE_9': 'Lớp 9',
-      'GRADE_10': 'Lớp 10',
-      'GRADE_11': 'Lớp 11',
-      'GRADE_12': 'Lớp 12',
-      'UNIVERSITY': 'Đại học',
-      'HIGH_SCHOOL': 'THPT',
-      'MIDDLE_SCHOOL': 'THCS',
-      'ELEMENTARY': 'Tiểu học',
-    }
-    return levelMap[level] || level
+    return LEVEL_LABELS_VI[level] || level
   }
 
   const renderHTML = (htmlString: string) => {
@@ -221,7 +191,7 @@ const TutorProfilePage: React.FC = () => {
             {error.message || 'Có lỗi xảy ra khi tải thông tin gia sư'}
           </p>
           <button
-            onClick={() => navigate('/admin/tutors')}
+            onClick={() => navigate('/admin/tutor-profile')}
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
           >
             Quay lại danh sách
@@ -255,7 +225,7 @@ const TutorProfilePage: React.FC = () => {
               Từ chối
             </button>
             <button
-              onClick={() => navigate('/admin/tutors')}
+              onClick={() => navigate('/admin/tutor-profile')}
               className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
             >
               Quay lại
@@ -377,7 +347,7 @@ const TutorProfilePage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => navigate('/admin/tutors')}
+              onClick={() => navigate('/admin/tutor-profile')}
                 className="flex items-center text-gray-600 hover:text-gray-900 transition-colors group"
             >
                 <ArrowLeftIcon className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />

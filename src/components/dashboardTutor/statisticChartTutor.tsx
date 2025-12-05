@@ -83,6 +83,14 @@ export default function StatisticChartTutor(props: {
    const top = 10;
    const ticks = [0, 2, 4, 6, 8, 10];
 
+   // dark-aware colors for lines
+   const linePalette = [
+      "hsl(var(--primary))",
+      "hsl(0 84% 60%)", // red-ish
+      "hsl(25 95% 53%)", // orange
+      "hsl(200 98% 39%)", // blue
+   ];
+
    return (
       <div className="space-y-6">
          <div className="bg-white p-6 rounded shadow">
@@ -95,7 +103,7 @@ export default function StatisticChartTutor(props: {
                   <ScatterChart
                      margin={{ top: 24, right: 20, bottom: 110, left: 40 }}
                   >
-                     <CartesianGrid stroke="#e6e6e6" />
+                     <CartesianGrid stroke="hsl(var(--border))" />
                      <XAxis
                         dataKey="x"
                         name="day"
@@ -107,7 +115,7 @@ export default function StatisticChartTutor(props: {
                         type="number"
                         allowDecimals={false}
                         domain={[1, 7]}
-                        tick={{ fontSize: 13 }}
+                        tick={{ fontSize: 13, fill: "hsl(var(--foreground))" }}
                         interval={0}
                         angle={-40}
                         textAnchor="end"
@@ -117,13 +125,16 @@ export default function StatisticChartTutor(props: {
                      <YAxis
                         ticks={ticks}
                         domain={[0, top]}
-                        tick={{ fontSize: 14 }}
+                        tick={{ fontSize: 14, fill: "hsl(var(--foreground))" }}
                         label={{
                            value: "Số lượng",
                            angle: -90,
                            position: "insideLeft",
                            offset: -10,
-                           style: { fontSize: 14 },
+                           style: {
+                              fontSize: 14,
+                              fill: "hsl(var(--foreground))",
+                           },
                         }}
                         width={70}
                      />
@@ -136,65 +147,85 @@ export default function StatisticChartTutor(props: {
                            const idx = Number(label) - 1;
                            return bubblePoints[idx]?.labelFull || String(label);
                         }}
-                        wrapperStyle={{ zIndex: 1000, fontSize: 13 }}
+                        wrapperStyle={{
+                           zIndex: 1000,
+                           fontSize: 13,
+                           background: "hsl(var(--popover))",
+                           color: "hsl(var(--popover-foreground))",
+                           border: "1px solid hsl(var(--border))",
+                           boxShadow: "0 8px 24px hsla(0,0%,0%,0.15)",
+                        }}
                      />
-                     <Scatter dataKey="z" data={bubblePoints} fill="#7c3aed" />
+                     <Scatter
+                        dataKey="z"
+                        data={bubblePoints}
+                        fill="hsl(var(--primary))"
+                     />
                   </ScatterChart>
                </ResponsiveContainer>
             </div>
-         </div>
 
-         <div className="bg-white p-6 rounded shadow">
-            <h4 className="font-medium mb-4 text-lg flex items-center gap-2">
-               <TrendingUp className="w-5 h-5 text-gray-500" />
-               Số lượng buổi học theo các trạng thái theo ngày
-            </h4>
-            <div style={{ width: "100%", height: 480 }}>
-               <ResponsiveContainer>
-                  <LineChart
-                     data={sessionDays}
-                     margin={{ bottom: 100, left: 40 }}
-                  >
-                     <CartesianGrid stroke="#e6e6e6" />
-                     <XAxis
-                        dataKey="dateLabel"
-                        tick={{ fontSize: 13 }}
-                        interval={0}
-                        height={100}
-                     />
-                     <YAxis
-                        ticks={ticks}
-                        domain={[0, top]}
-                        tick={{ fontSize: 14 }}
-                        label={{
-                           value: "Số lượng",
-                           angle: -90,
-                           position: "insideLeft",
-                           offset: -10,
-                           style: { fontSize: 14 },
-                        }}
-                        width={70}
-                     />
-                     <Tooltip
-                        formatter={(value: number, name: string) => [
-                           value,
-                           getSessionStatusLabel(name),
-                        ]}
-                        labelFormatter={(label) => label}
-                     />
-                     <Legend />
-                     {(sessions?.statuses || []).map((s, idx) => (
-                        <Line
-                           key={s}
-                           name={getSessionStatusLabel(s)}
-                           type="monotone"
-                           dataKey={s}
-                           stroke={["#8884d8", "#ff7300"][idx % 2]}
-                           strokeWidth={3}
+            <div className="bg-white p-6 rounded shadow">
+               <h4 className="font-medium mb-4 text-lg flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-gray-500" />
+                  Số lượng buổi học theo các trạng thái theo ngày
+               </h4>
+               <div style={{ width: "100%", height: 480 }}>
+                  <ResponsiveContainer>
+                     <LineChart
+                        data={sessionDays}
+                        margin={{ bottom: 100, left: 40 }}
+                     >
+                        <CartesianGrid stroke="hsl(var(--border))" />
+                        <XAxis
+                           dataKey="dateLabel"
+                           tick={{
+                              fontSize: 13,
+                              fill: "hsl(var(--foreground))",
+                           }}
+                           interval={0}
+                           height={100}
                         />
-                     ))}
-                  </LineChart>
-               </ResponsiveContainer>
+                        <YAxis
+                           ticks={ticks}
+                           domain={[0, top]}
+                           tick={{
+                              fontSize: 14,
+                              fill: "hsl(var(--foreground))",
+                           }}
+                           label={{
+                              value: "Số lượng",
+                              angle: -90,
+                              position: "insideLeft",
+                              offset: -10,
+                              style: {
+                                 fontSize: 14,
+                                 fill: "hsl(var(--foreground))",
+                              },
+                           }}
+                           width={70}
+                        />
+                        <Tooltip
+                           formatter={(value: number, name: string) => [
+                              value,
+                              getSessionStatusLabel(name),
+                           ]}
+                           labelFormatter={(label) => label}
+                        />
+                        <Legend />
+                        {(sessions?.statuses || []).map((s, idx) => (
+                           <Line
+                              key={s}
+                              name={getSessionStatusLabel(s)}
+                              type="monotone"
+                              dataKey={s}
+                              stroke={linePalette[idx % linePalette.length]}
+                              strokeWidth={3}
+                           />
+                        ))}
+                     </LineChart>
+                  </ResponsiveContainer>
+               </div>
             </div>
          </div>
       </div>

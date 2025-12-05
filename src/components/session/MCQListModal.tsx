@@ -14,6 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useState, useMemo, useEffect } from "react";
 import { asignMCQ, useAsignMCQStore } from "@/store/useAsignMCQStore";
+import { getQuizModeLabelVi } from "@/utils/quizTypeDisplay";
 
 interface MCQListModalProps {
    isOpen: boolean;
@@ -89,7 +90,9 @@ const MCQListModal = ({ isOpen, onClose, sessionId }: MCQListModalProps) => {
             <DialogContent className="max-w-5xl max-h-[85vh]">
                <div className="flex items-center justify-center h-96">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p className="ml-4 text-lg">Đang tải danh sách MCQ...</p>
+                  <p className="ml-4 text-lg">
+                     Đang tải danh sách bài tập trắc nghiệm...
+                  </p>
                </div>
             </DialogContent>
          </Dialog>
@@ -103,7 +106,10 @@ const MCQListModal = ({ isOpen, onClose, sessionId }: MCQListModalProps) => {
                <div className="text-center h-96 flex items-center justify-center">
                   <div className="text-red-500">
                      <p className="text-lg font-medium">Lỗi!</p>
-                     <p>Không thể tải dữ liệu MCQ. Vui lòng thử lại.</p>
+                     <p>
+                        Không thể tải dữ liệu bài tập trắc nghiệm. Vui lòng thử
+                        lại.
+                     </p>
                      <Button
                         variant="outline"
                         className="mt-4"
@@ -125,7 +131,7 @@ const MCQListModal = ({ isOpen, onClose, sessionId }: MCQListModalProps) => {
                <DialogTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                      <BookOpen className="h-5 w-5" />
-                     Danh sách Multiple Choice Quiz ({filteredMCQs.length})
+                     Danh sách Bài Tập Trắc Nghiệm ({filteredMCQs.length})
                   </div>
                   <Badge variant="secondary" className="px-3 mt-10">
                      Đã chọn: {selectedMCQs.length}
@@ -150,8 +156,8 @@ const MCQListModal = ({ isOpen, onClose, sessionId }: MCQListModalProps) => {
                      <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                      <p className="text-muted-foreground text-lg">
                         {searchTerm
-                           ? "Không tìm thấy MCQ nào phù hợp"
-                           : "Chưa có MCQ nào được tạo"}
+                           ? "Không tìm thấy bài tập trắc nghiệm nào phù hợp"
+                           : "Chưa có bài tập trắc nghiệm nào được tạo"}
                      </p>
                   </div>
                ) : (
@@ -179,7 +185,7 @@ const MCQListModal = ({ isOpen, onClose, sessionId }: MCQListModalProps) => {
                                        variant="outline"
                                        className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 border-blue-200"
                                     >
-                                       {mcq.quizMode || "STUDY"}
+                                       {getQuizModeLabelVi(mcq.quizMode)}
                                     </Badge>
                                  </div>
                               </CardHeader>
@@ -294,12 +300,19 @@ const MCQListModal = ({ isOpen, onClose, sessionId }: MCQListModalProps) => {
                                              Hiện đáp án
                                           </Badge>
                                        )}
-                                       {mcq.settings?.timeLimitMinutes && (
+                                       {mcq.settings?.timeLimitMinutes ? (
                                           <Badge
                                              variant="outline"
                                              className="text-xs px-2 py-0.5 h-5"
                                           >
-                                             {mcq.settings.timeLimitMinutes}p
+                                             {mcq.settings.timeLimitMinutes} p
+                                          </Badge>
+                                       ) : (
+                                          <Badge
+                                             variant="outline"
+                                             className="text-xs px-2 py-2 h-5"
+                                          >
+                                             ∞ p
                                           </Badge>
                                        )}
                                     </div>
@@ -309,12 +322,14 @@ const MCQListModal = ({ isOpen, onClose, sessionId }: MCQListModalProps) => {
                                     variant={
                                        mcq.isAsigned ? "outline" : "default"
                                     }
-                                    className="mt-0.5 flex-shrink-0 h-[90%]"
+                                    className="mt-0.5 flex-shrink-0 h-[90%] text-wrap"
                                     onClick={() =>
                                        toggleMCQ(mcq, !mcq.isAsigned)
                                     }
                                  >
-                                    {mcq.isAsigned ? "Bỏ chọn MCQ" : "Chọn MCQ"}
+                                    {mcq.isAsigned
+                                       ? "Bỏ chọn bài tập trắc nghiệm"
+                                       : "Chọn bài tập trắc nghiệm"}
                                  </Button>
                               </CardContent>
                            </Card>
@@ -327,7 +342,7 @@ const MCQListModal = ({ isOpen, onClose, sessionId }: MCQListModalProps) => {
             {/* Footer with action buttons */}
             <div className="flex items-center justify-between pt-4 border-t bg-background">
                <div className="text-sm text-muted-foreground">
-                  Đã chọn {selectedMCQs.length} MCQ(s)
+                  Đã chọn {selectedMCQs.length} bài tập trắc nghiệm
                </div>
                <div className="flex gap-3">
                   <Button variant="outline" onClick={onClose}>

@@ -1,5 +1,12 @@
 import apiClient from "@/lib/api";
 
+// Interface cho report info
+export interface ReportInfo {
+  hasBeenReported: boolean;
+  reportedAt: string | null;
+  reportCount: number;
+}
+
 // Interface cho tutor trong admin (dựa trên response thực tế)
 export interface AdminTutor {
   _id: string;
@@ -21,6 +28,7 @@ export interface AdminTutor {
   phone?: string;
   banReason?: string;
   bannedAt?: string;
+  reportInfo?: ReportInfo;
 }
 
 // Interface cho ban history
@@ -98,7 +106,12 @@ export interface TutorMapping {
     isBanned: boolean;
     createdAt: string;
   };
-  tutor: any | null; // Tutor profile data if hasProfile is true
+  tutor: {
+    hasBeenReported?: boolean;
+    reportedAt?: string | null;
+    reportCount?: number;
+    [key: string]: any; // Tutor profile data if hasProfile is true
+  } | null;
 }
 
 // Interface cho response mapping

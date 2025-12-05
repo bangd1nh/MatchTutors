@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { Review } from "@/types/review"
+import { getLevelLabelVi, getSubjectLabelVi } from "@/utils/educationDisplay"
 
 interface StudentReviewCardProps {
     review: Review
@@ -35,20 +36,20 @@ export function StudentReviewCard({ review, onUpdate }: StudentReviewCardProps) 
     }
 
     const formatDate = (dateString: string) =>
-        new Date(dateString).toLocaleDateString("en-US", {
+        new Date(dateString).toLocaleDateString("vi-VN", {
             year: "numeric",
             month: "long",
             day: "numeric",
         })
 
-    const tutorName = review.revieweeId?.name ?? "Unknown Tutor"
+    const tutorName = review.revieweeId?.name ?? "Gia sư chưa xác định"
     const tutorAvatar = review.revieweeId?.avatarUrl ?? "/placeholder.svg"
-    const subject = review.teachingRequestId?.subject ?? "Unknown Subject"
-    const level = review.teachingRequestId?.level ?? "Unknown Level"
+    const subject = review.teachingRequestId?.subject ?? "Môn học chưa xác định"
+    const level = review.teachingRequestId?.level ?? "Trình độ chưa xác định"
 
     return (
         <div className="w-full rounded-2xl border border-border bg-white p-6 shadow-md hover:shadow-lg transition-all duration-300">
-            {/* Header: Tutor Info */}
+            {/* Header: Thông tin gia sư */}
             <div className="flex items-center gap-4 mb-4">
                 <Avatar className="h-14 w-14 border-2 border-gray-200 shadow-sm">
                     <AvatarImage src={tutorAvatar} alt={tutorName} />
@@ -63,7 +64,7 @@ export function StudentReviewCard({ review, onUpdate }: StudentReviewCardProps) 
                     <h3 className="text-lg font-semibold text-gray-900">{tutorName}</h3>
                     <p className="text-sm text-gray-500">{formatDate(review.createdAt)}</p>
                     <p className="text-sm text-gray-600">
-                        <span className="font-medium">Subject:</span> {subject} | <span className="font-medium">Level:</span> {level}
+                        <span className="font-medium">Môn học:</span> {getSubjectLabelVi(subject)} | <span className="font-medium">Trình độ:</span> {getLevelLabelVi(level)}
                     </p>
                 </div>
             </div>
@@ -71,9 +72,9 @@ export function StudentReviewCard({ review, onUpdate }: StudentReviewCardProps) 
             {/* Body */}
             {isEditing ? (
                 <div className="space-y-4">
-                    {/* Rating */}
+                    {/* Đánh giá */}
                     <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Rating</label>
+                        <label className="text-sm font-medium text-gray-700">Đánh giá</label>
                         <div className="flex items-center gap-1">
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <button
@@ -86,8 +87,8 @@ export function StudentReviewCard({ review, onUpdate }: StudentReviewCardProps) 
                                 >
                                     <Star
                                         className={`h-8 w-8 ${star <= (hoveredRating || rating)
-                                                ? "fill-yellow-400 text-yellow-400"
-                                                : "fill-gray-300 text-gray-300"
+                                            ? "fill-yellow-400 text-yellow-400"
+                                            : "fill-gray-300 text-gray-300"
                                             }`}
                                     />
                                 </button>
@@ -95,19 +96,19 @@ export function StudentReviewCard({ review, onUpdate }: StudentReviewCardProps) 
                         </div>
                     </div>
 
-                    {/* Comment */}
+                    {/* Nhận xét */}
                     <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Your Review</label>
+                        <label className="text-sm font-medium text-gray-700">Nhận xét của bạn</label>
                         <Textarea
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
-                            placeholder="Share your experience..."
+                            placeholder="Chia sẻ trải nghiệm của bạn..."
                             rows={4}
                             className="resize-none rounded-lg border-gray-200 shadow-sm focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
                         />
                     </div>
 
-                    {/* Actions */}
+                    {/* Hành động */}
                     <div className="flex gap-3">
                         <Button
                             variant="outline"
@@ -116,7 +117,7 @@ export function StudentReviewCard({ review, onUpdate }: StudentReviewCardProps) 
                             disabled={isSaving}
                             size="sm"
                         >
-                            Cancel
+                            Hủy
                         </Button>
                         <Button
                             onClick={handleSave}
@@ -124,36 +125,36 @@ export function StudentReviewCard({ review, onUpdate }: StudentReviewCardProps) 
                             disabled={isSaving || rating === 0}
                             size="sm"
                         >
-                            {isSaving ? "Saving..." : "Save"}
+                            {isSaving ? "Đang lưu..." : "Lưu"}
                         </Button>
                     </div>
                 </div>
             ) : (
                 <div className="space-y-3">
-                    {/* Display Rating */}
+                    {/* Hiển thị đánh giá */}
                     <div className="flex items-center gap-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                                 key={star}
                                 className={`h-6 w-6 ${star <= review.rating
-                                        ? "fill-yellow-400 text-yellow-400"
-                                        : "fill-gray-300 text-gray-300"
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "fill-gray-300 text-gray-300"
                                     }`}
                             />
                         ))}
                     </div>
 
-                    {/* Comment Display */}
-                    <p className="text-gray-700 leading-relaxed">{review.comment || "No comment provided."}</p>
+                    {/* Hiển thị nhận xét */}
+                    <p className="text-gray-700 leading-relaxed">{review.comment || "Chưa có nhận xét."}</p>
 
-                    {/* Edit Button */}
+                    {/* Nút chỉnh sửa */}
                     <Button
                         onClick={() => setIsEditing(true)}
                         variant="outline"
                         size="sm"
                         className="w-full border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
                     >
-                        Edit Review
+                        Chỉnh sửa nhận xét
                     </Button>
                 </div>
             )}

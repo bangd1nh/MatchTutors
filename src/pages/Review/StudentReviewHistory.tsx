@@ -12,6 +12,7 @@ import { useState, useMemo, useEffect } from "react";
 import { SUBJECT_VALUES } from "@/enums/subject.enum";
 import { LEVEL_VALUES } from "@/enums/level.enum";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { getLevelLabelVi, getSubjectLabelVi } from "@/utils/educationDisplay";
 
 export function StudentReviewHistory() {
     const toast = useToast();
@@ -33,7 +34,6 @@ export function StudentReviewHistory() {
     const availableSubjects = SUBJECT_VALUES;
     const availableLevels = LEVEL_VALUES;
 
-    // Build filters for backend
     const filters = useMemo(() => {
         const filterParams: any = {
             page: currentPage,
@@ -68,17 +68,18 @@ export function StudentReviewHistory() {
         refetchHistory,
     } = useReview(undefined, filters);
 
-    // Handle updating review
     const handleUpdateReview = async (reviewId: string, data: { rating: number; comment: string }) => {
         try {
             await updateReview({ reviewId, data });
-            toast("success", "Your review has been updated successfully!");
+            toast("success", "Cập nhật đánh giá thành công!");
             refetchHistory();
         } catch (error) {
             console.error(error);
             toast(
                 "error",
-                (error as any)?.response?.data?.message || (error as any)?.message || "Failed to submit review"
+                (error as any)?.response?.data?.message ||
+                (error as any)?.message ||
+                "Không thể gửi đánh giá"
             );
         }
     };
@@ -88,7 +89,6 @@ export function StudentReviewHistory() {
     const totalReviews = mr.total ?? 0;
     const totalPages = mr.totalPages ?? 1;
 
-    // Initialize temp filters when component mounts
     useEffect(() => {
         setTempFilters({
             searchQuery,
@@ -126,65 +126,48 @@ export function StudentReviewHistory() {
         setCurrentPage(1);
     };
 
-    // Check if there are active filters to show reset button
-    const hasActiveFilters = searchQuery ||
+    const hasActiveFilters =
+        searchQuery ||
         ratingRange[0] !== 0 ||
         ratingRange[1] !== 5 ||
         subjectsFilter.length > 0 ||
         levelsFilter.length > 0;
 
-    // Check if there are applied filters to show in the active filters display
-    const hasAppliedFilters = tempFilters.searchQuery ||
+    const hasAppliedFilters =
+        tempFilters.searchQuery ||
         tempFilters.ratingRange[0] !== 0 ||
         tempFilters.ratingRange[1] !== 5 ||
         tempFilters.subjectsFilter.length > 0 ||
         tempFilters.levelsFilter.length > 0;
 
-    // Format rating display for the popover trigger
     const getRatingDisplay = () => {
-        if (ratingRange[0] === 0 && ratingRange[1] === 5) {
-            return "All Ratings";
-        } else if (ratingRange[0] === 0) {
-            return `Up to ${ratingRange[1]}★`;
-        } else if (ratingRange[1] === 5) {
-            return `${ratingRange[0]}+★`;
-        } else {
-            return `${ratingRange[0]}-${ratingRange[1]}★`;
-        }
+        if (ratingRange[0] === 0 && ratingRange[1] === 5) return "Tất cả đánh giá";
+        if (ratingRange[0] === 0) return `Tối đa ${ratingRange[1]}★`;
+        if (ratingRange[1] === 5) return `Từ ${ratingRange[0]}★ trở lên`;
+        return `${ratingRange[0]} - ${ratingRange[1]}★`;
     };
 
-    // Format subjects display for the popover trigger
     const getSubjectsDisplay = () => {
-        if (subjectsFilter.length === 0) {
-            return "All Subjects";
-        } else if (subjectsFilter.length === 1) {
-            return subjectsFilter[0];
-        } else {
-            return `${subjectsFilter.length} Subjects`;
-        }
+        if (subjectsFilter.length === 0) return "Tất cả môn học";
+        if (subjectsFilter.length === 1) return subjectsFilter[0];
+        return `${subjectsFilter.length} môn`;
     };
 
-    // Format levels display for the popover trigger
     const getLevelsDisplay = () => {
-        if (levelsFilter.length === 0) {
-            return "All Levels";
-        } else if (levelsFilter.length === 1) {
-            return levelsFilter[0];
-        } else {
-            return `${levelsFilter.length} Levels`;
-        }
+        if (levelsFilter.length === 0) return "Tất cả trình độ";
+        if (levelsFilter.length === 1) return levelsFilter[0];
+        return `${levelsFilter.length} trình độ`;
     };
 
-    // Format sort display for the popover trigger
     const getSortDisplay = () => {
-        return sortOrder === "newest" ? "Newest First" : "Oldest First";
+        return sortOrder === "newest" ? "Mới nhất" : "Cũ nhất";
     };
 
     if (isHistoryLoading) {
         return (
             <div className="min-h-screen bg-background p-6">
                 <div className="mx-auto max-w-7xl">
-                    <h1 className="mb-8 text-3xl font-bold text-foreground">My Reviews</h1>
+                    <h1 className="mb-8 text-3xl font-bold text-foreground">Đánh giá của tôi</h1>
                     <div className="space-y-4">
                         {[1, 2, 3].map((i) => (
                             <div key={i} className="h-40 animate-pulse rounded-2xl bg-muted" />
@@ -200,19 +183,21 @@ export function StudentReviewHistory() {
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-balance text-4xl font-bold text-foreground">My Reviews</h1>
-                    <p className="mt-2 text-pretty text-muted-foreground">View and manage all reviews you've written</p>
+                    <h1 className="text-4xl font-bold text-foreground">Đánh giá của tôi</h1>
+                    <p className="mt-2 text-muted-foreground">
+                        Xem và quản lý tất cả đánh giá bạn đã viết
+                    </p>
                 </div>
 
                 {/* Filters */}
                 <Card className="mb-6 rounded-2xl border border-border bg-card p-6 shadow-sm">
-                    {/* Search Row - full width */}
+                    {/* Search */}
                     <div className="mb-6">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                             <Input
                                 type="text"
-                                placeholder="Search by tutor name or review content"
+                                placeholder="Tìm theo tên gia sư hoặc nội dung đánh giá"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="pl-12 h-12 text-base"
@@ -220,10 +205,11 @@ export function StudentReviewHistory() {
                         </div>
                     </div>
 
-                    {/* Filter Bar Row */}
+                    {/* Filter Bar */}
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex flex-1 flex-wrap items-center gap-4">
-                            {/* Rating Range Popover */}
+
+                            {/* Rating */}
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button variant="outline" className="w-[180px] h-12 justify-start text-base">
@@ -231,16 +217,15 @@ export function StudentReviewHistory() {
                                         {getRatingDisplay()}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-[320px] p-6" align="start">
+                                <PopoverContent className="w-[320px] p-6">
                                     <div className="space-y-4">
-                                        <div className="text-base font-medium">Rating Range</div>
+                                        <div className="text-base font-medium">Khoảng đánh giá</div>
                                         <Slider
                                             value={ratingRange}
                                             onValueChange={(val) => setRatingRange(val as [number, number])}
                                             max={5}
                                             min={0}
                                             step={1}
-                                            className="w-full"
                                         />
                                         <div className="flex justify-between text-base text-muted-foreground">
                                             <span>Min: {ratingRange[0]}★</span>
@@ -248,17 +233,16 @@ export function StudentReviewHistory() {
                                         </div>
                                         <Button
                                             variant="outline"
-                                            size="lg"
                                             onClick={() => setRatingRange([0, 5])}
                                             className="w-full"
                                         >
-                                            Reset Range
+                                            Đặt lại
                                         </Button>
                                     </div>
                                 </PopoverContent>
                             </Popover>
 
-                            {/* Subjects Popover */}
+                            {/* Subjects */}
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button variant="outline" className="w-[180px] h-12 justify-start text-base">
@@ -266,30 +250,26 @@ export function StudentReviewHistory() {
                                         {getSubjectsDisplay()}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-[320px] p-6" align="start">
+                                <PopoverContent className="w-[320px] p-6">
                                     <div className="space-y-4">
-                                        <div className="text-base font-medium">Filter by Subjects</div>
+                                        <div className="text-base font-medium">Lọc theo môn học</div>
                                         <div className="max-h-64 space-y-3 overflow-y-auto">
                                             {availableSubjects.map((subject) => (
                                                 <div key={subject} className="flex items-center space-x-3">
                                                     <input
                                                         type="checkbox"
-                                                        id={`subject-${subject}`}
                                                         checked={subjectsFilter.includes(subject)}
                                                         onChange={(e) => {
                                                             if (e.target.checked) {
                                                                 setSubjectsFilter([...subjectsFilter, subject]);
                                                             } else {
-                                                                setSubjectsFilter(subjectsFilter.filter(s => s !== subject));
+                                                                setSubjectsFilter(subjectsFilter.filter((s) => s !== subject));
                                                             }
                                                         }}
-                                                        className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
+                                                        className="h-5 w-5"
                                                     />
-                                                    <label
-                                                        htmlFor={`subject-${subject}`}
-                                                        className="flex-1 cursor-pointer text-base"
-                                                    >
-                                                        {subject}
+                                                    <label className="flex-1 cursor-pointer text-base">
+                                                        {getSubjectLabelVi(subject)}
                                                     </label>
                                                 </div>
                                             ))}
@@ -298,7 +278,7 @@ export function StudentReviewHistory() {
                                 </PopoverContent>
                             </Popover>
 
-                            {/* Levels Popover */}
+                            {/* Levels */}
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button variant="outline" className="w-[180px] h-12 justify-start text-base">
@@ -306,30 +286,26 @@ export function StudentReviewHistory() {
                                         {getLevelsDisplay()}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-[320px] p-6" align="start">
+                                <PopoverContent className="w-[320px] p-6">
                                     <div className="space-y-4">
-                                        <div className="text-base font-medium">Filter by Levels</div>
+                                        <div className="text-base font-medium">Lọc theo trình độ</div>
                                         <div className="max-h-64 space-y-3 overflow-y-auto">
                                             {availableLevels.map((level) => (
                                                 <div key={level} className="flex items-center space-x-3">
                                                     <input
                                                         type="checkbox"
-                                                        id={`level-${level}`}
                                                         checked={levelsFilter.includes(level)}
                                                         onChange={(e) => {
                                                             if (e.target.checked) {
                                                                 setLevelsFilter([...levelsFilter, level]);
                                                             } else {
-                                                                setLevelsFilter(levelsFilter.filter(l => l !== level));
+                                                                setLevelsFilter(levelsFilter.filter((l) => l !== level));
                                                             }
                                                         }}
-                                                        className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
+                                                        className="h-5 w-5"
                                                     />
-                                                    <label
-                                                        htmlFor={`level-${level}`}
-                                                        className="flex-1 cursor-pointer text-base"
-                                                    >
-                                                        {level}
+                                                    <label className="flex-1 cursor-pointer text-base">
+                                                        {getLevelLabelVi(level)}
                                                     </label>
                                                 </div>
                                             ))}
@@ -338,7 +314,7 @@ export function StudentReviewHistory() {
                                 </PopoverContent>
                             </Popover>
 
-                            {/* Sort Popover */}
+                            {/* Sort */}
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button variant="outline" className="w-[180px] h-12 justify-start text-base">
@@ -346,90 +322,83 @@ export function StudentReviewHistory() {
                                         {getSortDisplay()}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-[240px] p-4" align="start">
+                                <PopoverContent className="w-[240px] p-4">
                                     <div className="space-y-2">
                                         <Button
                                             variant={sortOrder === "newest" ? "secondary" : "ghost"}
                                             className="w-full justify-start h-12 text-base"
                                             onClick={() => setSortOrder("newest")}
                                         >
-                                            Newest First
+                                            Mới nhất
                                         </Button>
                                         <Button
                                             variant={sortOrder === "oldest" ? "secondary" : "ghost"}
                                             className="w-full justify-start h-12 text-base"
                                             onClick={() => setSortOrder("oldest")}
                                         >
-                                            Oldest First
+                                            Cũ nhất
                                         </Button>
                                     </div>
                                 </PopoverContent>
                             </Popover>
 
-                            <Button
-                                onClick={handleApplyFilters}
-                                className="flex items-center gap-2 h-12 px-6 text-base"
-                                size="lg"
-                            >
-                                <Filter className="h-5 w-5" />
-                                Apply
+                            <Button onClick={handleApplyFilters} className="h-12 px-6 text-base">
+                                <Filter className="h-5 w-5 mr-2" />
+                                Áp dụng
                             </Button>
 
-                            {/* Reset button */}
                             <div className="w-[100px]">
                                 <Button
                                     variant="outline"
                                     onClick={handleResetFilters}
-                                    className={`flex items-center gap-2 whitespace-nowrap transition-opacity duration-200 h-12 text-base ${hasActiveFilters ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-                                        }`}
+                                    className={`h-12 text-base transition-opacity ${hasActiveFilters ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                                 >
-                                    <X className="h-5 w-5" />
-                                    Reset
+                                    <X className="h-5 w-5 mr-2" />
+                                    Xóa
                                 </Button>
                             </div>
                         </div>
                     </div>
 
-                    {/* Active filters display */}
+                    {/* Active Filters */}
                     {hasAppliedFilters && (
                         <div className="mt-6 flex flex-wrap gap-3">
                             {tempFilters.searchQuery && (
-                                <span className="inline-flex items-center rounded-full bg-blue-100 px-4 py-2 text-base text-blue-800">
-                                    Search: "{tempFilters.searchQuery}"
+                                <span className="inline-flex items-center rounded-full bg-blue-100 px-4 py-2 text-blue-800 text-base">
+                                    Tìm kiếm: "{tempFilters.searchQuery}"
                                 </span>
                             )}
                             {(tempFilters.ratingRange[0] !== 0 || tempFilters.ratingRange[1] !== 5) && (
-                                <span className="inline-flex items-center rounded-full bg-green-100 px-4 py-2 text-base text-green-800">
-                                    Rating: {tempFilters.ratingRange[0] === 0 ? "Any" : `${tempFilters.ratingRange[0]}+`}
-                                    {tempFilters.ratingRange[1] !== 5 && ` to ${tempFilters.ratingRange[1]}`} stars
+                                <span className="inline-flex items-center rounded-full bg-green-100 px-4 py-2 text-green-800 text-base">
+                                    Đánh giá: {tempFilters.ratingRange[0]} - {tempFilters.ratingRange[1]}★
                                 </span>
                             )}
                             {tempFilters.subjectsFilter.length > 0 && (
-                                <span className="inline-flex items-center rounded-full bg-purple-100 px-4 py-2 text-base text-purple-800">
-                                    Subjects: {tempFilters.subjectsFilter.join(", ")}
+                                <span className="inline-flex items-center rounded-full bg-purple-100 px-4 py-2 text-purple-800 text-base">
+                                    Môn học: {tempFilters.subjectsFilter.join(", ")}
                                 </span>
                             )}
                             {tempFilters.levelsFilter.length > 0 && (
-                                <span className="inline-flex items-center rounded-full bg-orange-100 px-4 py-2 text-base text-orange-800">
-                                    Levels: {tempFilters.levelsFilter.join(", ")}
+                                <span className="inline-flex items-center rounded-full bg-orange-100 px-4 py-2 text-orange-800 text-base">
+                                    Trình độ: {tempFilters.levelsFilter.join(", ")}
                                 </span>
                             )}
                         </div>
                     )}
 
                     <div className="mt-6 text-base text-muted-foreground">
-                        Showing {reviews.length} of {totalReviews} reviews
+                        Hiển thị {reviews.length} trên tổng số {totalReviews} đánh giá
                     </div>
                 </Card>
 
-                {/* Reviews List */}
+                {/* Reviews */}
                 <div className="space-y-4">
                     {reviews.length === 0 ? (
-                        <Card className="rounded-2xl border border-border bg-card p-12 text-center shadow-sm">
+                        <Card className="rounded-2xl p-12 text-center bg-card">
                             <p className="text-muted-foreground">
                                 {hasAppliedFilters
-                                    ? "No reviews found matching your filters."
-                                    : "You haven't written any reviews yet. Start learning with a tutor and share your experience!"
+                                    ? "Không tìm thấy đánh giá nào phù hợp với bộ lọc."
+                                    : "Bạn chưa viết đánh giá nào. Hãy học với gia sư và chia sẻ trải nghiệm!"
                                 }
                             </p>
                         </Card>

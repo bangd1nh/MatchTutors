@@ -214,12 +214,12 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
    return (
       <>
          <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="w-full sm:max-w-3xl h-[100dvh] sm:h-auto sm:max-h-[90vh] overflow-y-auto p-0 sm:p-6 rounded-none sm:rounded-lg">
-               <DialogHeader className="pb-4 border-b">
-                  <DialogTitle className="text-xl font-semibold">
+            <DialogContent className="w-full sm:max-w-3xl h-[100dvh] sm:h-auto sm:max-h-[90vh] overflow-y-auto p-0 sm:p-6 rounded-none sm:rounded-lg bg-card text-card-foreground border border-border">
+               <DialogHeader className="pb-4 border-b border-border">
+                  <DialogTitle className="text-xl font-semibold text-foreground">
                      Chi tiết buổi học
                   </DialogTitle>
-                  <DialogDescription className="text-base">
+                  <DialogDescription className="text-base text-muted-foreground">
                      {getSubjectLabelVi(
                         learningCommitment?.teachingRequest?.subject ??
                            "Môn học không xác định"
@@ -229,8 +229,8 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
                <div className="py-6 space-y-6">
                   {/* Status Section */}
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                     <span className="text-sm font-medium text-gray-700">
+                  <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
+                     <span className="text-sm font-medium text-muted-foreground">
                         Trạng thái
                      </span>
                      {getStatusBadge(session.status as SessionStatus)}
@@ -239,21 +239,21 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                   {/* Dispute Info */}
                   {session.dispute &&
                      session.status === SessionStatus.DISPUTED && (
-                        <div className="border-t pt-6">
-                           <h3 className="text-lg font-semibold text-yellow-700 mb-4">
+                        <div className="border-t border-border pt-6">
+                           <h3 className="text-lg font-semibold text-foreground mb-4">
                               Thông tin Tranh chấp
                            </h3>
-                           <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg space-y-3">
+                           <div className="p-4 rounded-lg space-y-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
                               <div>
-                                 <span className="text-sm font-medium text-yellow-800">
+                                 <span className="text-sm font-medium text-foreground">
                                     Lý do:
                                  </span>
-                                 <p className="text-sm text-gray-800 mt-1">
+                                 <p className="text-sm text-foreground mt-1">
                                     {session.dispute.reason}
                                  </p>
                               </div>
                               <div>
-                                 <span className="text-sm font-medium text-yellow-800">
+                                 <span className="text-sm font-medium text-foreground">
                                     Bằng chứng:
                                  </span>
                                  <ul className="list-disc list-inside mt-1">
@@ -264,7 +264,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                                 href={url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-blue-600 hover:underline"
+                                                className="text-primary hover:underline"
                                              >
                                                 Link {index + 1}
                                              </a>
@@ -273,7 +273,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                     )}
                                  </ul>
                               </div>
-                              <p className="text-xs text-gray-500 pt-2 border-t border-yellow-100">
+                              <p className="text-xs text-muted-foreground pt-2 border-t border-border">
                                  Tranh chấp đang chờ quản trị viên xem xét.
                               </p>
                            </div>
@@ -283,11 +283,11 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                   {/* Basic Info Section */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      <div className="space-y-3">
-                        <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                           <span className="text-sm font-medium text-gray-600">
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                           <span className="text-sm font-medium text-muted-foreground">
                               Môn học
                            </span>
-                           <span className="text-sm font-semibold text-gray-900">
+                           <span className="text-sm font-semibold text-foreground">
                               {getSubjectLabelVi(
                                  learningCommitment?.teachingRequest?.subject ??
                                     "Môn học không xác định"
@@ -295,29 +295,29 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                            </span>
                         </div>
 
-                        <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                           <span className="text-sm font-medium text-gray-600">
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                           <span className="text-sm font-medium text-muted-foreground">
                               Thời gian
                            </span>
-                           <span className="text-sm text-gray-900">
+                           <span className="text-sm text-foreground">
                               {moment(session.startTime).format(
                                  "HH:mm, DD/MM/YYYY"
                               )}
                            </span>
                         </div>
 
-                        <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                           <span className="text-sm font-medium text-gray-600">
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                           <span className="text-sm font-medium text-muted-foreground">
                               Địa điểm
                            </span>
-                           <span className="text-sm text-gray-900">
+                           <span className="text-sm text-foreground">
                               {session.location || "Chưa có"}
                            </span>
                         </div>
 
                         {session.isTrial && (
-                           <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                              <span className="text-sm font-medium text-gray-600">
+                           <div className="flex items-center justify-between py-2 border-b border-border">
+                              <span className="text-sm font-medium text-muted-foreground">
                                  Loại
                               </span>
                               <Badge variant="outline" className="text-xs">
@@ -330,9 +330,9 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                      {/* Participants Section */}
                      <div className="space-y-3">
                         {/* Tutor Info */}
-                        <div className="p-3 border border-gray-200 rounded-lg">
+                        <div className="p-3 border border-border rounded-lg bg-muted/40">
                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-gray-600">
+                              <span className="text-sm font-medium text-muted-foreground">
                                  Gia sư
                               </span>
                               <Badge variant="outline" className="text-xs">
@@ -340,7 +340,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                               </Badge>
                            </div>
                            <div className="space-y-1">
-                              <div className="text-sm font-semibold text-gray-900">
+                              <div className="text-sm font-semibold text-foreground">
                                  {learningCommitment?.tutor?.userId?.name ||
                                     [
                                        learningCommitment?.tutor?.firstName,
@@ -350,7 +350,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                        .join(" ") ||
                                     "Chưa có"}
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-muted-foreground">
                                  {learningCommitment?.tutor?.userId?.email ||
                                     learningCommitment?.tutor?.email ||
                                     "N/A"}
@@ -359,9 +359,9 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                         </div>
 
                         {/* Student Info */}
-                        <div className="p-3 border border-gray-200 rounded-lg">
+                        <div className="p-3 border border-border rounded-lg bg-muted/40">
                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-gray-600">
+                              <span className="text-sm font-medium text-muted-foreground">
                                  Học sinh
                               </span>
                               <Badge variant="outline" className="text-xs">
@@ -369,7 +369,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                               </Badge>
                            </div>
                            <div className="space-y-1">
-                              <div className="text-sm font-semibold text-gray-900">
+                              <div className="text-sm font-semibold text-foreground">
                                  {learningCommitment?.student?.userId?.name ||
                                     [
                                        learningCommitment?.student?.firstName,
@@ -379,7 +379,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                        .join(" ") ||
                                     "Chưa có"}
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-muted-foreground">
                                  {learningCommitment?.student?.userId?.email ||
                                     learningCommitment?.student?.email ||
                                     "N/A"}
@@ -391,34 +391,34 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
                   {/* Cancellation Info */}
                   {session.cancellation && (
-                     <div className="border-t pt-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                     <div className="border-t border-border pt-6">
+                        <h3 className="text-lg font-semibold text-foreground mb-4">
                            Thông tin hủy buổi học
                         </h3>
-                        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/30">
                            {/* Cancelled By User Info */}
                            <div className="mb-4">
-                              <span className="text-sm font-medium text-red-600 block mb-2">
+                              <span className="text-sm font-medium text-destructive block mb-2">
                                  Người hủy:
                               </span>
                               {typeof session.cancellation.cancelledBy ===
                                  "object" &&
                               session.cancellation.cancelledBy ? (
-                                 <div className="p-3 bg-white rounded-lg border border-red-100">
+                                 <div className="p-3 rounded-lg border bg-card text-card-foreground border-destructive/20">
                                     <div className="space-y-1">
-                                       <div className="text-sm font-semibold text-red-800">
+                                       <div className="text-sm font-semibold text-foreground">
                                           {session.cancellation.cancelledBy
                                              .name || "Người dùng"}
                                        </div>
-                                       <div className="text-xs text-red-600">
+                                       <div className="text-xs text-muted-foreground">
                                           {session.cancellation.cancelledBy
                                              .email || "N/A"}
                                        </div>
                                     </div>
                                  </div>
                               ) : (
-                                 <div className="p-3 bg-white rounded-lg border border-red-100">
-                                    <span className="text-sm text-red-800">
+                                 <div className="p-3 rounded-lg border bg-card text-card-foreground border-destructive/20">
+                                    <span className="text-sm text-foreground">
                                        Người dùng (ID:{" "}
                                        {session.cancellation.cancelledBy})
                                     </span>
@@ -428,20 +428,20 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
-                                 <span className="text-sm font-medium text-red-600">
+                                 <span className="text-sm font-medium text-destructive">
                                     Thời gian hủy:
                                  </span>
-                                 <p className="text-sm text-red-800">
+                                 <p className="text-sm text-foreground">
                                     {moment(
                                        session.cancellation.cancelledAt
                                     ).format("HH:mm DD/MM/YYYY")}
                                  </p>
                               </div>
                               <div>
-                                 <span className="text-sm font-medium text-red-600">
+                                 <span className="text-sm font-medium text-destructive">
                                     Thời gian hủy (chi tiết):
                                  </span>
-                                 <p className="text-sm text-red-800">
+                                 <p className="text-sm text-foreground">
                                     {moment(
                                        session.cancellation.cancelledAt
                                     ).format("dddd, DD/MM/YYYY [lúc] HH:mm")}
@@ -450,11 +450,11 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                            </div>
 
                            <div className="mt-4">
-                              <span className="text-sm font-medium text-red-600">
+                              <span className="text-sm font-medium text-destructive">
                                  Lý do hủy:
                               </span>
-                              <div className="mt-2 p-3 bg-white rounded-lg border border-red-100">
-                                 <p className="text-sm text-red-800">
+                              <div className="mt-2 p-3 rounded-lg border bg-card text-card-foreground border-destructive/20">
+                                 <p className="text-sm text-foreground">
                                     {session.cancellation.reason}
                                  </p>
                               </div>
@@ -465,8 +465,8 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
                   {/* Confirmation Status */}
                   {session.studentConfirmation && (
-                     <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                        <span className="text-sm font-medium text-blue-700">
+                     <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
+                        <span className="text-sm font-medium text-muted-foreground">
                            Xác nhận tham gia
                         </span>
                         <Badge
@@ -491,16 +491,16 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
                   {/* Attendance Section */}
                   {session.attendanceConfirmation && (
-                     <div className="border-t pt-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                     <div className="border-t border-border pt-6">
+                        <h3 className="text-lg font-semibold text-foreground mb-4">
                            Thông tin điểm danh
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                            {/* Tutor Attendance */}
-                           <div className="p-4 border border-gray-200 rounded-lg">
+                           <div className="p-4 border border-border rounded-lg bg-muted/40">
                               <div className="flex items-center justify-between mb-3">
-                                 <span className="text-sm font-medium text-gray-600">
+                                 <span className="text-sm font-medium text-muted-foreground">
                                     Gia sư
                                  </span>
                                  <Badge
@@ -525,7 +525,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                               </div>
                               {session.attendanceConfirmation.tutor
                                  .decidedAt && (
-                                 <div className="text-xs text-gray-500">
+                                 <div className="text-xs text-muted-foreground">
                                     Lúc:{" "}
                                     {moment(
                                        session.attendanceConfirmation.tutor
@@ -536,9 +536,9 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                            </div>
 
                            {/* Student Attendance */}
-                           <div className="p-4 border border-gray-200 rounded-lg">
+                           <div className="p-4 border border-border rounded-lg bg-muted/40">
                               <div className="flex items-center justify-between mb-3">
-                                 <span className="text-sm font-medium text-gray-600">
+                                 <span className="text-sm font-medium text-muted-foreground">
                                     Học sinh
                                  </span>
                                  <Badge
@@ -563,7 +563,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                               </div>
                               {session.attendanceConfirmation.student
                                  .decidedAt && (
-                                 <div className="text-xs text-gray-500">
+                                 <div className="text-xs text-muted-foreground">
                                     Lúc:{" "}
                                     {moment(
                                        session.attendanceConfirmation.student
@@ -578,21 +578,21 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                         <div className="text-center">
                            {session.attendanceConfirmation.finalizedAt ? (
                               session.attendanceConfirmation.isAttended ? (
-                                 <div className="inline-flex items-center px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
-                                    <span className="text-sm font-medium text-green-800">
+                                 <div className="inline-flex items-center px-4 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                                    <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
                                        🎉 Buổi học đã được xác nhận thành công
                                     </span>
                                  </div>
                               ) : (
-                                 <div className="inline-flex items-center px-4 py-2 bg-red-50 border border-red-200 rounded-lg">
-                                    <span className="text-sm font-medium text-red-800">
+                                 <div className="inline-flex items-center px-4 py-2 rounded-lg bg-destructive/10 border border-destructive/30">
+                                    <span className="text-sm font-medium text-destructive">
                                        Buổi học được ghi nhận là không diễn ra
                                     </span>
                                  </div>
                               )
                            ) : (
-                              <div className="inline-flex items-center px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                 <span className="text-sm font-medium text-yellow-800">
+                              <div className="inline-flex items-center px-4 py-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                                 <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
                                     ⏳ Chờ cả hai bên xác nhận điểm danh
                                  </span>
                               </div>
@@ -605,12 +605,12 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                   {!session.attendanceConfirmation &&
                      (session.status === SessionStatus.COMPLETED ||
                         isSessionEnded) && (
-                        <div className="border-t pt-6">
-                           <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        <div className="border-t border-border pt-6">
+                           <h3 className="text-lg font-semibold text-foreground mb-4">
                               Thông tin điểm danh
                            </h3>
-                           <div className="text-center p-4 bg-gray-50 rounded-lg">
-                              <span className="text-sm text-gray-600">
+                           <div className="text-center p-4 bg-muted rounded-lg border border-border">
+                              <span className="text-sm text-muted-foreground">
                                  Chưa có thông tin điểm danh
                               </span>
                            </div>
@@ -618,7 +618,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                      )}
                </div>
 
-               <DialogFooter className="border-t pt-6">
+               <DialogFooter className="border-t border-border pt-6">
                   <div className="w-full space-y-3">
                      {/* Action Buttons Section */}
                      <div className="space-y-3">
@@ -711,7 +711,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                      </div>
 
                      {/* Secondary Actions */}
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-border">
                         <Link
                            to={
                               user.role === "TUTOR"
@@ -745,16 +745,16 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
          {/* Cancel Session Dialog */}
          <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-            <DialogContent className="w-full sm:max-w-lg h-[100dvh] sm:h-auto sm:max-h-[85vh] overflow-y-auto p-0 sm:p-6 rounded-none sm:rounded-lg">
+            <DialogContent className="w-full sm:max-w-lg h-[100dvh] sm:h-auto sm:max-h-[85vh] overflow-y-auto p-0 sm:p-6 rounded-none sm:rounded-lg bg-card text-card-foreground border border-border">
                <DialogHeader>
-                  <DialogTitle>Hủy buổi học</DialogTitle>
-                  <DialogDescription>
+                  <DialogTitle className="text-foreground">Hủy buổi học</DialogTitle>
+                  <DialogDescription className="text-muted-foreground">
                      Vui lòng nhập lý do hủy buổi học. Lý do phải có ít nhất 10
                      ký tự.
                   </DialogDescription>
                </DialogHeader>
                <div className="py-4">
-                  <Label htmlFor="cancelReason">Lý do hủy</Label>
+                  <Label htmlFor="cancelReason" className="text-foreground">Lý do hủy</Label>
                   <Textarea
                      id="cancelReason"
                      placeholder="Nhập lý do hủy buổi học..."
@@ -763,7 +763,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                      rows={4}
                      className="mt-2"
                   />
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-sm text-muted-foreground mt-2">
                      Đã nhập: {cancelReason.length}/500 ký tự (tối thiểu 10 ký
                      tự)
                   </p>
@@ -796,17 +796,17 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
          {/* Dispute/Absence Dialog */}
          <Dialog open={showDisputeDialog} onOpenChange={setShowDisputeDialog}>
-            <DialogContent className="w-full sm:max-w-lg h-[100dvh] sm:h-auto sm:max-h-[85vh] overflow-y-auto p-0 sm:p-6 rounded-none sm:rounded-lg">
+            <DialogContent className="w-full sm:max-w-lg h-[100dvh] sm:h-auto sm:max-h-[85vh] overflow-y-auto p-0 sm:p-6 rounded-none sm:rounded-lg bg-card text-card-foreground border border-border">
                <DialogHeader>
-                  <DialogTitle>Báo vắng / Khiếu nại Điểm danh</DialogTitle>
-                  <DialogDescription>
+                  <DialogTitle className="text-foreground">Báo vắng / Khiếu nại Điểm danh</DialogTitle>
+                  <DialogDescription className="text-muted-foreground">
                      Vui lòng cung cấp lý do và bằng chứng cho quản trị viên xem
                      xét.
                   </DialogDescription>
                </DialogHeader>
                <div className="py-4 space-y-4">
                   <div>
-                     <Label htmlFor="disputeReason">Lý do báo vắng</Label>
+                     <Label htmlFor="disputeReason" className="text-foreground">Lý do báo vắng</Label>
                      <Textarea
                         id="disputeReason"
                         placeholder="Ví dụ: Gia sư không đến, buổi học kết thúc sớm, học sinh vắng mặt..."
@@ -815,12 +815,12 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                         rows={4}
                         className="mt-2"
                      />
-                     <p className="text-sm text-gray-500 mt-2">
+                     <p className="text-sm text-muted-foreground mt-2">
                         Yêu cầu tối thiểu 10 ký tự.
                      </p>
                   </div>
                   <div>
-                     <Label htmlFor="evidenceUrls">
+                     <Label htmlFor="evidenceUrls" className="text-foreground">
                         Link bằng chứng (bắt buộc)
                      </Label>
                      <Input
@@ -830,7 +830,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                         onChange={(e) => setEvidenceUrls(e.target.value)}
                         className="mt-2"
                      />
-                     <p className="text-sm text-gray-500 mt-2">
+                     <p className="text-sm text-muted-foreground mt-2">
                         Cung cấp link Google Drive, Imgur, YouTube, etc.
                      </p>
                   </div>

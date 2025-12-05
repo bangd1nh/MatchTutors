@@ -62,7 +62,7 @@ export function NextSessionCard({ session }: NextSessionCardProps) {
                <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${statusColor}`} />
                   <span className="text-sm text-gray-600 capitalize">
-                     {session.status}
+                     {translateStatus("SESSION", session.status)}
                   </span>
                </div>
             </div>

@@ -41,7 +41,7 @@ export function TutorCard({ tutor }: TutorCardProps) {
 
    const handleFav = (tutorId: string) => {
       if (!isAuthenticated) {
-         toast("warning", "Please login to favorite this tutor");
+         toast("warning", "Vui lòng đăng nhập để thêm gia sư này vào danh sách yêu thích");
          return;
       }
       if (isFav?.isFav) {
@@ -182,14 +182,14 @@ export function TutorCard({ tutor }: TutorCardProps) {
                      <span className="text-sm font-medium text-blue-700">
                         {Array.isArray(tutor.classType)
                            ? tutor.classType
-                                .map((type) =>
-                                   type === "ONLINE"
-                                      ? "Trực tuyến"
-                                      : type === "IN_PERSON"
-                                      ? "Tại nhà"
-                                      : type
-                                )
-                                .join(" • ")
+                              .map((type) =>
+                                 type === "ONLINE"
+                                    ? "Trực tuyến"
+                                    : type === "IN_PERSON"
+                                       ? "Tại nhà"
+                                       : type
+                              )
+                              .join(" • ")
                            : tutor.classType ?? ""}
                      </span>
                   </div>
@@ -213,11 +213,10 @@ export function TutorCard({ tutor }: TutorCardProps) {
                                  ? "bg-primary text-white shadow-md transform scale-105"
                                  : "bg-gray-100 text-gray-400"
                            )}
-                           title={`${day}${
-                              availableDaysWithSlots.includes(index)
-                                 ? " - Có lịch"
-                                 : " - Không có lịch"
-                           }`}
+                           title={`${day}${availableDaysWithSlots.includes(index)
+                              ? " - Có lịch"
+                              : " - Không có lịch"
+                              }`}
                         >
                            {day}
                         </div>

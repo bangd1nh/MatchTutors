@@ -81,16 +81,17 @@ const QuizInfo: React.FC<Props> = ({ quizInfo }) => {
                <div className="text-xs text-muted-foreground">Settings</div>
                <div className="mt-1 text-sm">
                   <div>
-                     Shuffle: {settings?.shuffleQuestions ? "Có" : "Không"}
+                     Xáo trộn câu hỏi:{" "}
+                     {settings?.shuffleQuestions ? "Có" : "Không"}
                   </div>
                   <div>
-                     Show answers after submit:{" "}
+                     hiển thị đáp án sau khi nộp:{" "}
                      {settings?.showCorrectAnswersAfterSubmit ? "Có" : "Không"}
                   </div>
                   <div>
-                     Time limit:{" "}
-                     {settings?.timeLimitMinutes != null
-                        ? `${settings.timeLimitMinutes} phút`
+                     Giới hạn thời gian:{" "}
+                     {settings?.timeLimitMinutes != 0
+                        ? `${settings?.timeLimitMinutes} phút`
                         : "Không giới hạn"}
                   </div>
                </div>

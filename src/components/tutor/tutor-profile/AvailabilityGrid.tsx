@@ -1,11 +1,13 @@
-// components/AvailabilityGrid.tsx
 import { Checkbox } from "@/components/ui/checkbox"
 
-const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+// Ngày trong tuần bằng tiếng Việt
+const DAYS = ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"]
+
+// Các khung giờ
 const TIME_SLOTS = [
-    { value: "PRE_12", label: "Before 12 PM" },
-    { value: "MID_12_17", label: "12 PM - 5 PM" },
-    { value: "AFTER_17", label: "After 5 PM" },
+    { value: "PRE_12", label: "Trước 12 giờ trưa" },
+    { value: "MID_12_17", label: "12 giờ trưa - 5 giờ chiều" },
+    { value: "AFTER_17", label: "Sau 5 giờ chiều" },
 ]
 
 interface AvailabilityGridProps {
@@ -20,7 +22,7 @@ export function AvailabilityGrid({ availability, onAvailabilityChange, isViewMod
             <table className="w-full border-collapse">
                 <thead>
                     <tr>
-                        <th className="text-left p-2 border-b">Day</th>
+                        <th className="text-left p-2 border-b">Ngày</th>
                         {TIME_SLOTS.map((slot) => (
                             <th key={slot.value} className="text-center p-2 border-b min-w-[120px]">
                                 {slot.label}

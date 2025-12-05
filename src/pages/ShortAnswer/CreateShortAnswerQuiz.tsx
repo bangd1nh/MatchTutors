@@ -246,7 +246,7 @@ const CreateShortAnswerQuiz = () => {
                 isOpen={showMaterialModal}
                 onClose={() => setShowMaterialModal(false)}
                 onSelectMaterial={handleMaterialSelect}
-                type="saq"
+                type="SHORT_ANSWER"
             />
         </div>
     );

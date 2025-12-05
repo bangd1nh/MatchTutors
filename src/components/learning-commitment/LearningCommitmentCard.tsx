@@ -33,6 +33,7 @@ import {
    ChevronDown,
    ChevronUp,
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 interface Props {
    commitment: LearningCommitment;
@@ -53,23 +54,24 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
    >(null);
 
    const getStatusColor = (status: string) => {
+      // use semantic classes that adapt to dark mode via tokens
       switch (status) {
          case "pending_agreement":
-            return "bg-amber-50 text-amber-700 border border-amber-200";
+            return "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800";
          case "active":
-            return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+            return "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800";
          case "completed":
-            return "bg-blue-50 text-blue-700 border border-blue-200";
+            return "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800";
          case "cancelled":
-            return "bg-red-50 text-red-700 border border-red-200";
+            return "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800";
          case "cancellation_pending":
-            return "bg-orange-50 text-orange-700 border border-orange-200";
+            return "bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800";
          case "admin_review":
-            return "bg-purple-50 text-purple-700 border border-purple-200";
+            return "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800";
          case "rejected":
-            return "bg-red-50 text-red-700 border border-red-200";
+            return "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800";
          default:
-            return "bg-gray-50 text-gray-700 border border-gray-200";
+            return "bg-muted text-muted-foreground border border-border";
       }
    };
 
@@ -191,15 +193,16 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
    };
 
    const getStatusBadgeColor = (status: string) => {
+      // token-based bg/text to support dark mode
       switch (status) {
          case "PENDING":
-            return "bg-yellow-100 text-yellow-800";
+            return "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200";
          case "ACCEPTED":
-            return "bg-green-100 text-green-800";
+            return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200";
          case "REJECTED":
-            return "bg-red-100 text-red-800";
+            return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200";
          default:
-            return "bg-gray-100 text-gray-800";
+            return "bg-muted text-muted-foreground";
       }
    };
 
@@ -234,49 +237,45 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
       commitment.cancellationDecisionHistory.length > 1;
 
    return (
-      <Card className="w-full hover:shadow-lg transition-shadow duration-300 overflow-hidden">
-         {/* Header với Subject và Status */}
-         <CardHeader className="pb-4 bg-gradient-to-r from-slate-50 to-white">
+      <Card className="w-full hover:shadow-lg transition-shadow duration-300 overflow-hidden bg-card text-card-foreground">
+         {/* Header */}
+         <CardHeader className="pb-4 bg-muted">
             <div className="flex items-start justify-between gap-4">
                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                     <BookOpen className="w-5 h-5 text-slate-600 flex-shrink-0" />
-                     <h3 className="text-lg font-semibold text-slate-900 truncate">
+                     <BookOpen className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                     <h3 className="text-lg font-semibold text-foreground truncate">
                         {subject}
                      </h3>
                   </div>
                </div>
-               <Badge
-                  className={`flex-shrink-0 font-medium text-xs ${getStatusColor(
-                     commitment.status
-                  )}`}
-               >
+               <Badge className={`flex-shrink-0 font-medium text-xs ${getStatusColor(commitment.status)}`}>
                   {getStatusLabel(commitment.status)}
                </Badge>
             </div>
          </CardHeader>
 
          <CardContent className="space-y-5 pt-4">
-            {/* Tutor và Student */}
+            {/* Tutor & Student */}
             <div className="space-y-3">
-               <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
-                  <Users className="w-4 h-4 text-slate-500 flex-shrink-0" />
+               <div className="flex items-center gap-3 pb-3 border-b border-border">
+                  <Users className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                     <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                         Gia Sư
                      </p>
-                     <p className="text-sm font-medium text-slate-900 truncate">
+                     <p className="text-sm font-medium text-foreground truncate">
                         {commitment.tutor.userId.name}
                      </p>
                   </div>
                </div>
                <div className="flex items-center gap-3">
-                  <Users className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                  <Users className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                     <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                         Học Viên
                      </p>
-                     <p className="text-sm font-medium text-slate-900 truncate">
+                     <p className="text-sm font-medium text-foreground truncate">
                         {commitment.student.userId.name}
                      </p>
                   </div>
@@ -287,33 +286,27 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
             <div className="space-y-2">
                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                     <Clock className="w-4 h-4 text-slate-500" />
-                     <p className="text-sm font-medium text-slate-700">
+                     <Clock className="w-4 h-4 text-muted-foreground" />
+                     <p className="text-sm font-medium text-foreground">
                         Tiến Độ Buổi Học
                      </p>
                   </div>
-                  <span className="text-xs font-semibold text-slate-900">
-                     {commitment.completedSessions ?? 0}/
-                     {commitment.totalSessions ?? "-"}
+                  <span className="text-xs font-semibold text-foreground">
+                     {commitment.completedSessions ?? 0}/{commitment.totalSessions ?? "-"}
                   </span>
                </div>
-               <div className="w-full bg-slate-200 rounded-full h-2">
-                  <div
-                     className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-300"
-                     style={{ width: `${Math.min(progressPercent, 100)}%` }}
-                  />
-               </div>
+               <Progress value={Math.min(progressPercent, 100)} className="h-2" />
             </div>
 
             {/* Dates */}
             <div className="grid grid-cols-2 gap-3">
                <div className="flex items-start gap-2">
-                  <Calendar className="w-4 h-4 text-slate-500 mt-0.5 flex-shrink-0" />
+                  <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                   <div className="min-w-0">
-                     <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                         Bắt Đầu
                      </p>
-                     <p className="text-sm font-medium text-slate-900">
+                     <p className="text-sm font-medium text-foreground">
                         {commitment.startDate
                            ? format(new Date(commitment.startDate), "dd/MM/yy")
                            : "-"}
@@ -321,12 +314,12 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                   </div>
                </div>
                <div className="flex items-start gap-2">
-                  <Calendar className="w-4 h-4 text-slate-500 mt-0.5 flex-shrink-0" />
+                  <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                   <div className="min-w-0">
-                     <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                         Kết Thúc
                      </p>
-                     <p className="text-sm font-medium text-slate-900">
+                     <p className="text-sm font-medium text-foreground">
                         {commitment.endDate
                            ? format(new Date(commitment.endDate), "dd/MM/yy")
                            : "-"}
@@ -336,35 +329,32 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
             </div>
 
             {/* Payment Section */}
-            <div className="space-y-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <div className="space-y-2 p-3 bg-muted rounded-lg border border-border">
                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                     <DollarSign className="w-4 h-4 text-slate-500" />
-                     <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                     <DollarSign className="w-4 h-4 text-muted-foreground" />
+                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                         Tổng Tiền
                      </span>
                   </div>
-                  <span className="font-semibold text-emerald-600">
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                      {(commitment.totalAmount ?? 0).toLocaleString("vi-VN")} VND
                   </span>
                </div>
                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                      Đã Thanh Toán
                   </span>
-                  <span className="font-semibold text-blue-600">
-                     {(commitment.studentPaidAmount ?? 0).toLocaleString(
-                        "vi-VN"
-                     )}{" "}
-                     VND
+                  <span className="font-semibold text-blue-600 dark:text-blue-400">
+                     {(commitment.studentPaidAmount ?? 0).toLocaleString("vi-VN")} VND
                   </span>
                </div>
                {remainingAmount > 0 && (
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-200">
-                     <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
+                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                         Còn Lại
                      </span>
-                     <span className="font-semibold text-orange-600">
+                     <span className="font-semibold text-orange-600 dark:text-orange-400">
                         {remainingAmount.toLocaleString("vi-VN")} VND
                      </span>
                   </div>
@@ -374,46 +364,34 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
             {/* Action Buttons */}
             <div className="space-y-3 pt-2">
                {canViewReason && cancellationDetails && (
-                  <Dialog
-                     open={reasonDialogOpen}
-                     onOpenChange={setReasonDialogOpen}
-                  >
+                  <Dialog open={reasonDialogOpen} onOpenChange={setReasonDialogOpen}>
                      <DialogTrigger asChild>
-                        <Button
-                           variant="outline"
-                           className="w-full text-slate-600 border-slate-200 hover:bg-slate-50"
-                        >
-                           <Info className="w-4 h-4 mr-2" />
+                        <Button variant="outline" className="w-full border-border text-foreground hover:bg-accent">
+                           <Info className="w-4 h-4 mr-2 text-muted-foreground" />
                            Xem Chi Tiết Hủy
                            {hasMultipleCancellations && (
-                              <span className="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold bg-red-500 text-white rounded-full">
-                                 {
-                                    commitment.cancellationDecisionHistory
-                                       ?.length
-                                 }
+                              <span className="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold bg-destructive text-destructive-foreground rounded-full">
+                                 {commitment.cancellationDecisionHistory?.length}
                               </span>
                            )}
                         </Button>
                      </DialogTrigger>
-                     <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                     <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-popover text-popover-foreground">
                         <DialogHeader>
                            <DialogTitle className="flex items-center gap-2">
-                              <AlertCircle className="w-5 h-5 text-orange-600" />
+                              <AlertCircle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                               Chi Tiết Yêu Cầu Hủy Cam Kết
                               {hasMultipleCancellations && (
                                  <Badge variant="outline" className="ml-auto">
-                                    {
-                                       commitment.cancellationDecisionHistory
-                                          ?.length
-                                    }{" "}
-                                    lần hủy
+                                    {commitment.cancellationDecisionHistory?.length} lần hủy
                                  </Badge>
                               )}
                            </DialogTitle>
                         </DialogHeader>
 
                         <div className="space-y-4">
-                           {/* Hiển thị lịch sử hủy */}
+                           {/* History list and single detail blocks */}
+                           {/* Replace hardcoded bg-* with token-aware classes */}
                            {hasMultipleCancellations ? (
                               <div className="space-y-3">
                                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
@@ -850,10 +828,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                               </>
                            )}
 
-                           <Button
-                              onClick={() => setReasonDialogOpen(false)}
-                              className="w-full"
-                           >
+                           <Button onClick={() => setReasonDialogOpen(false)} className="w-full">
                               Đóng
                            </Button>
                         </div>
@@ -865,7 +840,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                   <Button
                      onClick={() => initiatePayment(String(commitment._id))}
                      disabled={isPending}
-                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
                   >
                      {isPending ? "Đang Xử Lý..." : "Thanh Toán Ngay"}
                   </Button>
@@ -873,12 +848,10 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
 
                {canReject && (
                   <Button
-                     onClick={() =>
-                        rejectCommitment.mutate(String(commitment._id))
-                     }
+                     onClick={() => rejectCommitment.mutate(String(commitment._id))}
                      disabled={rejectCommitment.isPending}
                      variant="outline"
-                     className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                     className="w-full text-destructive border-destructive/40 hover:bg-destructive/10"
                   >
                      {rejectCommitment.isPending ? "Đang Xử Lý..." : "Từ Chối"}
                   </Button>
@@ -887,19 +860,16 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                {canRequestCancel && (
                   <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                      <DialogTrigger asChild>
-                        <Button
-                           variant="outline"
-                           className="w-full text-red-600 border-red-200 hover:bg-red-50"
-                        >
+                        <Button variant="outline" className="w-full text-destructive border-destructive/40 hover:bg-destructive/10">
                            Yêu Cầu Hủy
                         </Button>
                      </DialogTrigger>
-                     <DialogContent>
+                     <DialogContent className="bg-popover text-popover-foreground">
                         <DialogHeader>
                            <DialogTitle>Yêu Cầu Hủy Cam Kết</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4">
-                           <p className="text-sm text-slate-600">
+                           <p className="text-sm text-muted-foreground">
                               Vui lòng cung cấp lý do hủy cam kết này:
                            </p>
                            <Textarea
@@ -912,7 +882,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                            <Button
                               onClick={handleRequest}
                               disabled={!reason.trim()}
-                              className="w-full bg-red-600 hover:bg-red-700"
+                              className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                            >
                               Gửi Yêu Cầu
                            </Button>
@@ -924,33 +894,23 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                {canRespondCancel && (
                   <div className="flex gap-3">
                      <Button
-                        onClick={() =>
-                           requestCancellation.mutate({
-                              id: commitment._id,
-                              reason: "Accepted",
-                           })
-                        }
-                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
+                        onClick={() => requestCancellation.mutate({ id: commitment._id, reason: "Accepted" })}
+                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium dark:bg-emerald-500 dark:hover:bg-emerald-600"
                      >
                         Chấp Nhận
                      </Button>
                      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                         <DialogTrigger asChild>
-                           <Button
-                              variant="outline"
-                              className="flex-1 text-red-600 border-red-200 hover:bg-red-50"
-                           >
+                           <Button variant="outline" className="flex-1 text-destructive border-destructive/40 hover:bg-destructive/10">
                               Từ Chối
                            </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="bg-popover text-popover-foreground">
                            <DialogHeader>
                               <DialogTitle>Từ Chối Hủy Cam Kết</DialogTitle>
                            </DialogHeader>
                            <div className="space-y-4">
-                              <p className="text-sm text-slate-600">
-                                 Vui lòng cung cấp lý do từ chối:
-                              </p>
+                              <p className="text-sm text-muted-foreground">Vui lòng cung cấp lý do từ chối:</p>
                               <Textarea
                                  placeholder="Nhập lý do từ chối..."
                                  value={reason}
@@ -961,7 +921,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                               <Button
                                  onClick={handleReject}
                                  disabled={!reason.trim()}
-                                 className="w-full bg-red-600 hover:bg-red-700"
+                                 className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                               >
                                  Gửi Từ Chối
                               </Button>

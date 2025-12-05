@@ -47,8 +47,6 @@ export function TutorReviewSection({ tutorId }: TutorReviewSectionProps) {
       return reviewerId === user?.id;
    });
 
-   // console.log("Eligibility Check:", { hasCompleted, teachingRequestIds });
-
    const handleWriteReview = () => {
       setEditingReview(null);
       setIsModalOpen(true);
@@ -65,34 +63,28 @@ export function TutorReviewSection({ tutorId }: TutorReviewSectionProps) {
    }) => {
       try {
          if (editingReview) {
-            // Update existing review
             await updateReview({
                reviewId: editingReview._id,
                data: { rating: data.rating, comment: data.comment },
             });
-            toast("success", "Review updated successfully!");
+            toast("success", "Cập nhật đánh giá thành công!");
          } else {
-            // Create new review - need completed learning commitment
-            console.log("Eligibility:", { hasCompleted, teachingRequestIds });
-
             if (!hasCompleted || teachingRequestIds.length === 0) {
                toast(
                   "error",
-                  "You must complete at least one learning commitment with this tutor before writing a review."
+                  "Bạn cần hoàn thành ít nhất một yêu cầu học tập với gia sư này trước khi viết đánh giá."
                );
                return;
             }
 
-            // Use the first completed teaching request ID
             await createReview({
                teachingRequestId: teachingRequestIds[0],
                rating: data.rating,
                comment: data.comment,
             });
-            toast("success", "Review submitted successfully!");
+            toast("success", "Gửi đánh giá thành công!");
          }
 
-         // Refresh data after mutation
          await Promise.all([refetchTutorReviews(), refetchStats()]);
          setIsModalOpen(false);
          setEditingReview(null);
@@ -100,12 +92,11 @@ export function TutorReviewSection({ tutorId }: TutorReviewSectionProps) {
          console.error("Review submission error:", error);
          toast(
             "error",
-            error?.response?.data?.message || "Failed to submit review"
+            error?.response?.data?.message || "Không thể gửi đánh giá"
          );
       }
    };
 
-   // Show loading state
    if (isEligibilityLoading) {
       return (
          <div className="py-3">
@@ -153,7 +144,7 @@ export function TutorReviewSection({ tutorId }: TutorReviewSectionProps) {
             {/* Reviews List Section */}
             <div className="space-y-4">
                <h2 className="text-2xl font-bold text-foreground">
-                  Student Reviews
+                  Đánh giá của học viên
                </h2>
                {isTutorReviewsLoading ? (
                   <div className="flex items-center justify-center py-12">
@@ -176,7 +167,7 @@ export function TutorReviewSection({ tutorId }: TutorReviewSectionProps) {
                         className="gap-2 rounded-full bg-[#FBBF24] text-black shadow-lg hover:bg-[#EAB308] md:rounded-lg"
                      >
                         <PenSquare className="h-5 w-5" />
-                        <span className="font-semibold">Edit Your Review</span>
+                        <span className="font-semibold">Chỉnh sửa đánh giá</span>
                      </Button>
                   ) : (
                      <Button
@@ -185,7 +176,7 @@ export function TutorReviewSection({ tutorId }: TutorReviewSectionProps) {
                         className="gap-2 rounded-full bg-[#3B82F6] text-white shadow-lg hover:bg-[#2563EB] md:rounded-lg"
                      >
                         <PenSquare className="h-5 w-5" />
-                        <span className="font-semibold">Write a Review</span>
+                        <span className="font-semibold">Viết đánh giá</span>
                      </Button>
                   )}
                </div>

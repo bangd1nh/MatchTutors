@@ -16,7 +16,9 @@ export function EducationList({ education }: EducationListProps) {
                   {edu.startDate.substring(0, 7)} -{" "}
                   {edu.endDate.substring(0, 7)}
                </p>
-               <p className="text-sm mt-2">{edu.description}</p>
+               <p className="text-sm mt-2 whitespace-pre-line break-words">
+                  {edu.description}
+               </p>
             </div>
          ))}
       </div>

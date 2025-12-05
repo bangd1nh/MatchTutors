@@ -17,22 +17,22 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-background text-foreground">
             <div className="w-full h-full mx-auto">
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Tutor Profile</h1>
-                        <p className="text-gray-600">View and manage your tutor information</p>
+                        <h1 className="text-2xl font-bold">Tutor Profile</h1>
+                        <p className="text-muted-foreground">View and manage your tutor information</p>
                     </div>
-                    <Button onClick={onEdit} className="bg-blue-600 hover:bg-blue-700">
-                        <Edit className="w-4 h-4 mr-2" />
+                    <Button onClick={onEdit} className="gap-2">
+                        <Edit className="w-4 h-4" />
                         Edit Profile
                     </Button>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Profile Overview */}
-                    <Card className="lg:col-span-1">
+                    <Card className="lg:col-span-1 bg-card text-card-foreground">
                         <CardContent className="pt-6">
                             <div className="flex flex-col items-center space-y-4">
                                 <Avatar className="w-32 h-32">
@@ -50,17 +50,18 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                                     <h2 className="text-xl font-bold">
                                         {typeof tutor?.userId === "object" && tutor?.userId?.name
                                             ? tutor.userId.name
-                                            : "Tutor"}
+                                            : "Gia sư"}
                                     </h2>
                                     <div className="flex items-center justify-center space-x-1 mt-2">
-                                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                        <Star className="w-4 h-4 text-yellow-500" />
                                         <span className="font-medium">{tutor?.ratings?.average ?? "-"}</span>
-                                        <span className="text-gray-500">({tutor?.ratings?.totalReviews ?? "-"} reviews)</span>
+                                        <span className="text-muted-foreground">({tutor?.ratings?.totalReviews ?? "-"} reviews)</span>
                                     </div>
                                     <Badge
-                                        className={`mt-2 ${tutor?.isApproved ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}
+                                        variant={tutor?.isApproved ? "default" : "secondary"}
+                                        className={tutor?.isApproved ? "bg-emerald-600 text-primary-foreground dark:bg-emerald-500" : ""}
                                     >
-                                        {tutor?.isApproved ? "Approved" : "Pending Approval"}
+                                        {tutor?.isApproved ? "Đã duyệt" : "Đang chờ duyệt"}
                                     </Badge>
                                 </div>
                             </div>
@@ -68,9 +69,9 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                     </Card>
 
                     {/* Contact & Basic Info */}
-                    <Card className="lg:col-span-2">
+                    <Card className="lg:col-span-2 bg-card text-card-foreground">
                         <CardHeader>
-                            <CardTitle>Contact Information</CardTitle>
+                            <CardTitle>Thông tin liên hệ</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {tutor && <ContactInfoDisplay tutor={tutor} />}
@@ -78,9 +79,9 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                     </Card>
 
                     {/* Teaching Information */}
-                    <Card className="lg:col-span-3">
+                    <Card className="lg:col-span-3 bg-card text-card-foreground">
                         <CardHeader>
-                            <CardTitle>Teaching Information</CardTitle>
+                            <CardTitle>Thông tin giảng dạy</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {tutor && <StatsOverview tutor={tutor} />}
@@ -88,11 +89,11 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                     </Card>
 
                     {/* Education */}
-                    <Card className="lg:col-span-3">
+                    <Card className="lg:col-span-3 bg-card text-card-foreground">
                         <CardHeader>
                             <CardTitle className="flex items-center">
                                 <GraduationCap className="w-5 h-5 mr-2" />
-                                Education
+                                Học vấn
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -101,19 +102,19 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                     </Card>
 
                     {/* Certifications */}
-                    <Card className="lg:col-span-3">
+                    <Card className="lg:col-span-3 bg-card text-card-foreground">
                         <CardHeader>
                             <CardTitle className="flex items-center">
                                 <Award className="w-5 h-5 mr-2" />
-                                Certifications
+                                Chứng chỉ
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {(tutor?.certifications ?? []).map((cert, index) => (
-                                <div key={index} className="border rounded-lg p-4">
-                                    <h4 className="font-medium">{cert.name}</h4>
+                                <div key={index} className="border border-border rounded-lg p-4 bg-muted/40">
+                                    <h4 className="font-medium text-foreground">{cert.name}</h4>
                                     {cert.description && (
-                                        <p className="text-gray-600 mt-2">{cert.description}</p>
+                                        <p className="text-muted-foreground mt-2">{cert.description}</p>
                                     )}
 
                                     {/* Images */}
@@ -125,7 +126,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                                                         <img
                                                             src={url}
                                                             alt={`Certification ${index + 1} - Image ${urlIndex + 1}`}
-                                                            className="w-20 h-20 object-cover rounded cursor-pointer border hover:opacity-80"
+                                                            className="w-20 h-20 object-cover rounded cursor-pointer border border-border hover:opacity-80"
                                                             onClick={() => setSelectedImage(url)}
                                                         />
                                                     </div>
@@ -136,11 +137,11 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                                 </div>
                             ))}
                             <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-                                <DialogContent className="max-w-2xl max-h-screen bg-white border-none shadow-none">
+                                <DialogContent className="max-w-2xl max-h-screen bg-card text-card-foreground border border-border">
                                     {selectedImage && (
                                         <img
                                             src={selectedImage}
-                                            alt="Certification enlarged"
+                                            alt="Chứng chỉ phóng to"
                                             className="max-h-[80vh] w-auto mx-auto rounded-lg"
                                         />
                                     )}
@@ -150,11 +151,11 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                     </Card>
 
                     {/* Availability */}
-                    <Card className="lg:col-span-3">
+                    <Card className="lg:col-span-3 bg-card text-card-foreground">
                         <CardHeader>
                             <CardTitle className="flex items-center">
                                 <Calendar className="w-5 h-5 mr-2" />
-                                Availability Schedule
+                                Lịch giảng dạy
                             </CardTitle>
                         </CardHeader>
                         <CardContent>

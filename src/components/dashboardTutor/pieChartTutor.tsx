@@ -7,7 +7,6 @@ import {
    ResponsiveContainer,
    Sector,
 } from "recharts";
-import { translatePieData } from "../../utils/statusTranslations";
 
 type PieDataItem = {
    status: string;
@@ -86,10 +85,10 @@ const renderCustomLabelPosition = (props: any) => {
       <text
          x={x}
          y={y}
-         fill="#333333"
+         fill="white"
          textAnchor={x > cx ? "start" : "end"}
          dominantBaseline="central"
-         className="text-sm font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"
+         className="text-xs font-semibold"
       >
          {`${status} (${value})`}
       </text>
@@ -115,29 +114,26 @@ export default function PieChartTutor(props: PieChartTutorProps) {
       <div className="space-y-6">
          {/* Sessions by Status - Pie Chart with Gap & Rounded Corners */}
          <div className="bg-white p-6 rounded shadow">
-            <h4 className="font-medium mb-4 text-lg">Phiên học theo trạng thái</h4>
+            <h4 className="font-medium mb-4 text-lg">Sessions by Status</h4>
             {sessionsByStatus.length > 0 ? (
                <div style={{ width: "100%", height: 400 }}>
                   <ResponsiveContainer>
                      <PieChart>
                         <Tooltip
                            formatter={(value: any) => [
-                              `${value} phiên`,
-                              "Số lượng",
+                              `${value} sessions`,
+                              "Count",
                            ]}
                         />
-                        <Legend formatter={(value) => {
-                           const translated = translatePieData([{ status: value, value: 0 }], 'session');
-                           return translated[0]?.status || value;
-                        }} />
+                        <Legend />
                         <Pie
-                           data={translatePieData(sessionsByStatus, "session")}
+                           data={sessionsByStatus}
                            cx="50%"
                            cy="50%"
                            labelLine={false}
-                           label={({ status, value }: any) => {
-                              return `${status}: ${value}`;
-                           }}
+                           label={({ status, value }: any) =>
+                              `${status}: ${value}`
+                           }
                            outerRadius={100}
                            fill="#8884d8"
                            dataKey="value"
@@ -165,7 +161,7 @@ export default function PieChartTutor(props: PieChartTutorProps) {
          {/* Money Spent on Packages - Custom Active Shape */}
          <div className="bg-white p-6 rounded shadow">
             <h4 className="font-medium mb-4 text-lg">
-               Tổng tiền đã chi cho gói học
+               Total Money Spent on Packages
             </h4>
             <div className="flex items-center justify-center">
                <div className="text-center">
@@ -213,7 +209,7 @@ export default function PieChartTutor(props: PieChartTutorProps) {
          {/* Learning Commitments - Pie Chart with Customized Label */}
          <div className="bg-white p-6 rounded shadow">
             <h4 className="font-medium mb-4 text-lg">
-               Cam kết học tập theo trạng thái
+               Learning Commitments by Status
             </h4>
             {learningCommitments.length > 0 ? (
                <div style={{ width: "100%", height: 400 }}>
@@ -221,41 +217,17 @@ export default function PieChartTutor(props: PieChartTutorProps) {
                      <PieChart>
                         <Tooltip
                            formatter={(value: any) => [
-                              `${value} cam kết`,
-                              "Số lượng",
+                              `${value} commitments`,
+                              "Count",
                            ]}
                         />
-                        <Legend formatter={(value) => {
-                           const translated = translatePieData([{ status: value, value: 0 }], 'commitment');
-                           return translated[0]?.status || value;
-                        }} />
+                        <Legend />
                         <Pie
-                           data={translatePieData(learningCommitments, "commitment")}
+                           data={learningCommitments}
                            cx="50%"
                            cy="50%"
                            labelLine={true}
-                           label={(props: any) => {
-                              const { cx, cy, midAngle, innerRadius, outerRadius, percent, index, ...rest } = props;
-                              if (!rest.payload?.status) return null;
-                              
-                              const translatedData = translatePieData(
-                                 [{ status: rest.payload.status, value: 0 }], 
-                                 'commitment'
-                              );
-                              
-                              return renderCustomLabelPosition({ 
-                                 cx, 
-                                 cy, 
-                                 midAngle, 
-                                 innerRadius, 
-                                 outerRadius, 
-                                 value: rest.payload.value,
-                                 payload: { 
-                                    ...rest.payload, 
-                                    status: translatedData[0]?.status || rest.payload.status 
-                                 }
-                              });
-                           }}
+                           label={renderCustomLabelPosition}
                            outerRadius={100}
                            fill="#8884d8"
                            dataKey="value"

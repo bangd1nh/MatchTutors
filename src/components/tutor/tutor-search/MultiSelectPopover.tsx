@@ -13,6 +13,7 @@ interface MultiSelectPopoverProps {
     selected: string[]
     onChange: (selected: string[]) => void
     placeholder?: string
+    getLabel?: (value: string) => string   // customize label
 }
 
 export function MultiSelectPopover({
@@ -22,11 +23,14 @@ export function MultiSelectPopover({
     selected,
     onChange,
     placeholder = "Search...",
+    getLabel,
 }: MultiSelectPopoverProps) {
     const [searchTerm, setSearchTerm] = useState("")
 
     const filteredOptions = options.filter((option) =>
-        option.toLowerCase().includes(searchTerm.toLowerCase())
+        (getLabel ? getLabel(option) : option)
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
     )
 
     const toggleOption = (option: string, checked: boolean) => {
@@ -59,9 +63,8 @@ export function MultiSelectPopover({
 
             <PopoverContent className="w-80 max-h-96 overflow-y-auto" align="start">
                 <div className="space-y-4">
-                    <h4 className="font-medium text-sm">Select {label}</h4>
+                    <h4 className="font-medium text-sm">Chọn {label}</h4>
 
-                    {/* 🔎 Search */}
                     <Input
                         placeholder={placeholder}
                         value={searchTerm}
@@ -81,12 +84,14 @@ export function MultiSelectPopover({
                                         }
                                     />
                                     <Label htmlFor={`${label}-${option}`} className="text-sm">
-                                        {option}
+                                        {getLabel ? getLabel(option) : option}
                                     </Label>
                                 </div>
                             ))
                         ) : (
-                            <p className="text-sm text-muted-foreground">No results found</p>
+                            <p className="text-sm text-muted-foreground">
+                                Không tìm thấy kết quả
+                            </p>
                         )}
                     </div>
                 </div>

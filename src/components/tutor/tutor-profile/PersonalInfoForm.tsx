@@ -22,30 +22,30 @@ export function PersonalInfoForm({ formData, onFieldChange, getError, hasError, 
         <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="name">Full Name *</Label>
+                    <Label htmlFor="name">Họ và tên *</Label>
                     <Input
                         id="name"
                         name="name"
                         value={formData.name || ""}
                         onChange={(e) => handleChange("name", e.target.value)}
-                        placeholder="Enter your full name"
+                        placeholder="Nhập họ và tên của bạn"
                         className={hasError("name") ? "border-red-500" : ""}
                     />
                     <ValidationError message={getError("name")} />
                 </div>
                 <div>
-                    <Label htmlFor="gender">Gender *</Label>
+                    <Label htmlFor="gender">Giới tính *</Label>
                     <Select
                         value={formData.gender}
                         onValueChange={(value) => handleChange("gender", value)}
                     >
                         <SelectTrigger className={hasError("gender") ? "border-red-500" : ""}>
-                            <SelectValue placeholder="Select gender" />
+                            <SelectValue placeholder="Chọn giới tính" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="MALE">Male</SelectItem>
-                            <SelectItem value="FEMALE">Female</SelectItem>
-                            <SelectItem value="OTHER">Other</SelectItem>
+                            <SelectItem value="MALE">Nam</SelectItem>
+                            <SelectItem value="FEMALE">Nữ</SelectItem>
+                            <SelectItem value="OTHER">Khác</SelectItem>
                         </SelectContent>
                     </Select>
                     <ValidationError message={getError("gender")} />
@@ -58,20 +58,20 @@ export function PersonalInfoForm({ formData, onFieldChange, getError, hasError, 
                         type="email"
                         value={formData.email || ""}
                         onChange={(e) => handleChange("email", e.target.value)}
-                        placeholder="your.email@example.com"
+                        placeholder="email.cua-ban@example.com"
                         className={hasError("email") ? "border-red-500" : ""}
                         disabled
                     />
                     <ValidationError message={getError("email")} />
                 </div>
                 <div>
-                    <Label htmlFor="phone">Phone Number *</Label>
+                    <Label htmlFor="phone">Số điện thoại *</Label>
                     <Input
                         id="phone"
                         name="phone"
                         value={formData.phone || ""}
                         onChange={(e) => handleChange("phone", e.target.value)}
-                        placeholder="Enter phone number"
+                        placeholder="Nhập số điện thoại"
                         className={hasError("phone") ? "border-red-500" : ""}
                     />
                     <ValidationError message={getError("phone")} />

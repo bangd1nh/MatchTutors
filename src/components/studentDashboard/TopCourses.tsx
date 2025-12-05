@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { TopCourseDTO } from "@/types/studentDashboard"
+import { getLevelLabelVi, getSubjectLabelVi } from "@/utils/educationDisplay"
 
 interface TopCoursesProps {
   courses: TopCourseDTO[]
@@ -46,9 +47,9 @@ export function TopCourses({ courses }: TopCoursesProps) {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 text-base">{course.subject}</h4>
+                    <h4 className="font-semibold text-gray-900 text-base">{getSubjectLabelVi(course.subject)}</h4>
                     <p className="text-sm text-gray-600 mt-1">{course.tutorName}</p>
-                    <p className="text-xs text-gray-500 mt-1">{course.level}</p>
+                    <p className="text-xs text-gray-500 mt-1">{getLevelLabelVi(course.level)}</p>
                   </div>
                   {course.studentPaidAmount && (
                     <div className="text-right ml-4">
