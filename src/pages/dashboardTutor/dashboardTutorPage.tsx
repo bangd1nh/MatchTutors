@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Users, UserPlus, Clipboard, Inbox } from "lucide-react";
 import {
    useFetchDashboardOverview,
    useFetchDashboardCharts,
@@ -7,9 +8,6 @@ import {
 import StatisticChartTutor from "@/components/dashboardTutor/statisticChartTutor";
 import PieChartTutor from "@/components/dashboardTutor/pieChartTutor";
 import { useToast } from "@/hooks/useToast";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export default function DashboardTutorPage() {
    const toast = useToast();
@@ -30,20 +28,12 @@ export default function DashboardTutorPage() {
    const pieDataQuery = useFetchDashboardPieData();
 
    if (overviewQuery.isLoading || chartsQuery.isLoading) {
-      return (
-         <div className="p-6">
-            <Card className="p-6 bg-card text-card-foreground">Loading...</Card>
-         </div>
-      );
+      return <div className="p-6">Loading...</div>;
    }
 
    if (overviewQuery.isError || chartsQuery.isError) {
       return (
-         <div className="p-6">
-            <Card className="p-6 bg-destructive/10 text-destructive border border-destructive/30">
-               Không thể tải dữ liệu dashboard
-            </Card>
-         </div>
+         <div className="p-6 text-red-500">Không thể tải dữ liệu dashboard</div>
       );
    }
 
@@ -51,64 +41,72 @@ export default function DashboardTutorPage() {
    const charts = chartsQuery.data;
    const pieData = pieDataQuery.data;
 
+   // pretty UI: month picker + week segmented control
    return (
       <div className="p-6 space-y-6">
-         {/* Overview cards */}
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="p-4 bg-card text-card-foreground border border-border">
-               <div className="text-sm text-muted-foreground">
-                  Active students
+            <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+               <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  Học sinh đang học
                </div>
-               <div className="text-2xl font-semibold text-foreground">
+               <div className="text-2xl font-semibold dark:text-white">
                   {overview?.activeStudents ?? 0}
                </div>
-            </Card>
-            <Card className="p-4 bg-card text-card-foreground border border-border">
-               <div className="text-sm text-muted-foreground">Max students</div>
-               <div className="text-2xl font-semibold text-foreground">
+            </div>
+            <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+               <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                  <UserPlus className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  Số lượng lời mời dạy học còn lại
+               </div>
+               <div className="text-2xl font-semibold dark:text-white">
                   {overview?.maxStudents ?? 0}
                </div>
-            </Card>
-            <Card className="p-4 bg-card text-card-foreground border border-border">
-               <div className="text-sm text-muted-foreground">Max quiz</div>
-               <div className="text-2xl font-semibold text-foreground">
+            </div>
+            <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+               <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                  <Clipboard className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  Số lượng quiz được tạo còn lại
+               </div>
+               <div className="text-2xl font-semibold dark:text-white">
                   {overview?.maxQuiz ?? 0}
                </div>
-            </Card>
-            <Card className="p-4 bg-card text-card-foreground border border-border">
-               <div className="text-sm text-muted-foreground">
-                  Requests received
+            </div>
+            <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+               <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                  <Inbox className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  Số lượng lời mời nhận được
                </div>
-               <div className="text-2xl font-semibold text-foreground">
+               <div className="text-2xl font-semibold dark:text-white">
                   {overview?.teachingRequestsReceived ?? 0}
                </div>
-            </Card>
+            </div>
          </div>
 
-         {/* Filters */}
-         <Card className="p-4 bg-card text-card-foreground border border-border">
+         <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
             <div className="flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between gap-4">
-               {/* Week segmented control */}
+               {/* Week (chọn trước) */}
                <div>
-                  <label className="text-sm text-muted-foreground mr-3">
-                     Week (chọn trước)
+                  <label className="text-sm text-gray-600 dark:text-gray-300 mr-3">
+                     Tuần (chọn trước)
                   </label>
-                  <div className="inline-flex rounded-md bg-muted p-1 border border-border">
+                  <div className="inline-flex rounded-md bg-gray-100 dark:bg-gray-700 p-1">
                      {[1, 2, 3, 4].map((w) => {
                         const active = w === week;
                         return (
-                           <Button
+                           <button
                               key={w}
-                              type="button"
                               onClick={() => setWeek(active ? undefined : w)}
-                              variant={active ? "default" : "ghost"}
-                              className={`px-3 py-1 text-sm rounded-md ${
-                                 active ? "" : "hover:bg-accent"
-                              }`}
+                              className={
+                                 "px-3 py-1 text-sm rounded-md transition-colors " +
+                                 (active
+                                    ? "bg-blue-600 text-white"
+                                    : "text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600")
+                              }
                               aria-pressed={active}
                            >
                               W{w}
-                           </Button>
+                           </button>
                         );
                      })}
                   </div>
@@ -116,25 +114,31 @@ export default function DashboardTutorPage() {
 
                {/* Month picker disabled until week selected */}
                <div className="flex items-center gap-3">
-                  <label className="text-sm text-muted-foreground">
-                     Choose month
-                     <span className="ml-2 text-xs text-muted-foreground">
+                  <label className="text-sm text-gray-600 dark:text-gray-300">
+                     Chọn tháng
+                     <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">
                         (chỉ sau khi chọn tuần)
                      </span>
                   </label>
-                  <Input
+                  <input
                      type="month"
                      value={monthYear ?? ""}
                      onChange={(e) => setMonthYear(e.target.value || undefined)}
                      disabled={!week}
                      aria-disabled={!week}
-                     className="h-10 w-44"
+                     className={
+                        "h-10 px-3 rounded-md border text-sm focus:outline-none " +
+                        (week
+                           ? "border-gray-200 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
+                           : "border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500")
+                     }
                   />
                </div>
 
                <div className="flex items-center gap-2">
-                  <Button
+                  <button
                      onClick={() => {
+                        // nếu user bấm Áp dụng mà chưa chọn tuần -> báo
                         if (!week) {
                            toast(
                               "error",
@@ -145,41 +149,39 @@ export default function DashboardTutorPage() {
                         chartsQuery.refetch();
                         toast("success", "Đã cập nhật filter");
                      }}
-                     className="text-sm"
+                     className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
                   >
                      Áp dụng
-                  </Button>
-                  <Button
-                     variant="outline"
+                  </button>
+                  <button
                      onClick={() => {
                         setMonthYear(undefined);
                         setWeek(undefined);
                         chartsQuery.refetch();
                         toast("success", "Đặt lại về mặc định");
                      }}
-                     className="text-sm"
+                     className="inline-flex items-center px-3 py-2 border border-gray-200 rounded-md text-sm hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                   >
                      Reset
-                  </Button>
+                  </button>
                </div>
             </div>
-         </Card>
+         </div>
 
-         {/* Charts */}
-         <Card className="p-4 bg-card text-card-foreground border border-border">
+         <div>
             <StatisticChartTutor
                bubble={charts?.bubble}
                sessions={charts?.sessions}
             />
-         </Card>
+         </div>
 
-         <Card className="p-4 bg-card text-card-foreground border border-border">
+         <div>
             <PieChartTutor
                sessionsByStatus={pieData?.sessions || []}
                moneySpent={pieData?.moneySpent || 0}
                learningCommitments={pieData?.learningCommitments || []}
             />
-         </Card>
+         </div>
       </div>
    );
 }

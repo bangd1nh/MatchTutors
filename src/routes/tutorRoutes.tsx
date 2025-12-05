@@ -54,6 +54,10 @@ export const tutorRoutes = {
             </ProtectedTutorProfileRoute>
          ),
       },
+      {
+         path: "/tutor/wallet",
+         element: <WalletManagement />,
+      },
       { path: "/tutor/profile", element: <ProfilePage /> },
       { path: "/tutor/create-profile", element: <TutorProfilePage /> },
       { path: "/tutor/change-password", element: <ChangePasswordPage /> },
@@ -235,14 +239,7 @@ export const tutorRoutes = {
             </ProtectedTutorProfileRoute>
          ),
       },
-      {
-         path: "/tutor/wallet",
-         element: (
-            <ProtectedTutorProfileRoute requireApproval={true}>
-               <WalletManagement />
-            </ProtectedTutorProfileRoute>
-         ),
-      },
+
       {
          path: "/tutor/session/:id",
          element: (

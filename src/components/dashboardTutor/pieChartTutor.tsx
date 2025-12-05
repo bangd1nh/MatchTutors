@@ -7,7 +7,7 @@ import {
    ResponsiveContainer,
    Sector,
 } from "recharts";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { translatePieData } from "../../utils/statusTranslations";
 
 type PieDataItem = {
    status: string;
@@ -20,13 +20,7 @@ type PieChartTutorProps = {
    learningCommitments?: PieDataItem[];
 };
 
-const COLORS = [
-   "hsl(var(--primary))",
-   "hsl(152 76% 40%)", // green tone
-   "hsl(25 95% 53%)", // orange
-   "hsl(0 84% 60%)", // red
-   "hsl(262 83% 58%)", // purple
-];
+const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
 // Custom active shape for money spent pie chart
 const renderActiveShape = (props: any) => {
@@ -51,26 +45,21 @@ const renderActiveShape = (props: any) => {
    const ey = my;
    const textAnchor = cos >= 0 ? "start" : "end";
 
-   const accent = "hsl(var(--accent))";
-   const fg = "hsl(var(--foreground))";
-
    return (
       <g>
          <path
             d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
-            stroke={accent}
+            stroke="#8884d8"
             fill="none"
          />
-         <circle cx={ex} cy={ey} r={4} fill={accent} />
+         <circle cx={ex} cy={ey} r={4} fill="#8884d8" />
          <text
             x={ex + (cos >= 0 ? 1 : -1) * 12}
             y={ey}
             textAnchor={textAnchor}
-            fill={fg}
+            fill="#333"
             className="font-semibold"
-         >
-            {`${value.toLocaleString()} VNĐ`}
-         </text>
+         >{`${value.toLocaleString()} VNĐ`}</text>
          <Sector
             cx={cx}
             cy={cy}
@@ -78,13 +67,13 @@ const renderActiveShape = (props: any) => {
             outerRadius={outerRadius + 10}
             startAngle={startAngle}
             endAngle={endAngle}
-            fill={accent}
+            fill="#8884d8"
          />
       </g>
    );
 };
 
-// Custom label positioned inside slices
+// Custom label component with positioning
 const renderCustomLabelPosition = (props: any) => {
    const { cx, cy, midAngle, innerRadius, outerRadius, value, payload } = props;
    const RADIAN = Math.PI / 180;
@@ -97,17 +86,17 @@ const renderCustomLabelPosition = (props: any) => {
       <text
          x={x}
          y={y}
-         fill="hsl(var(--primary-foreground))"
+         fill="#333333"
          textAnchor={x > cx ? "start" : "end"}
          dominantBaseline="central"
-         className="text-xs font-semibold"
+         className="text-sm font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"
       >
          {`${status} (${value})`}
       </text>
    );
 };
 
-// Any-aliased Pie to bypass strict Recharts typing
+// Add an any-aliased Pie to avoid strict Recharts prop typings
 const AnyPie: any = Pie;
 
 export default function PieChartTutor(props: PieChartTutorProps) {
@@ -117,94 +106,92 @@ export default function PieChartTutor(props: PieChartTutorProps) {
       learningCommitments = [],
    } = props;
 
-   const pieChartConfig = { gap: 3, cornerRadius: 8 };
-
-   const tooltipStyle = {
-      zIndex: 1000,
-      fontSize: 13,
-      background: "hsl(var(--popover))",
-      color: "hsl(var(--popover-foreground))",
-      border: "1px solid hsl(var(--border))",
-      boxShadow: "0 8px 24px hsla(0,0%,0%,0.15)",
+   const pieChartConfig = {
+      gap: 3,
+      cornerRadius: 8,
    };
 
    return (
       <div className="space-y-6">
-         {/* Sessions by Status */}
-         <Card className="bg-card text-card-foreground border border-border shadow-sm">
-            <CardHeader>
-               <CardTitle className="font-medium text-lg">
-                  Sessions by Status
-               </CardTitle>
-            </CardHeader>
-            <CardContent>
-               {sessionsByStatus.length > 0 ? (
-                  <div style={{ width: "100%", height: 400 }}>
-                     <ResponsiveContainer>
-                        <PieChart>
-                           <Tooltip
-                              formatter={(value: any) => [
-                                 `${value} sessions`,
-                                 "Count",
-                              ]}
-                              wrapperStyle={tooltipStyle}
-                           />
-                           <Legend
-                              wrapperStyle={{
-                                 color: "hsl(var(--foreground))",
-                              }}
-                           />
-                           <Pie
-                              data={sessionsByStatus}
-                              cx="50%"
-                              cy="50%"
-                              labelLine={false}
-                              label={({ status, value }: any) =>
-                                 `${status}: ${value}`
-                              }
-                              outerRadius={100}
-                              fill="hsl(var(--primary))"
-                              dataKey="value"
-                              nameKey="status"
-                              paddingAngle={pieChartConfig.gap}
-                              cornerRadius={pieChartConfig.cornerRadius}
-                           >
-                              {sessionsByStatus.map((_, index) => (
-                                 <Cell
-                                    key={`cell-${index}`}
-                                    fill={COLORS[index % COLORS.length]}
-                                 />
-                              ))}
-                           </Pie>
-                        </PieChart>
-                     </ResponsiveContainer>
-                  </div>
-               ) : (
-                  <div className="h-96 flex items-center justify-center text-muted-foreground">
-                     No data available
-                  </div>
-               )}
-            </CardContent>
-         </Card>
-
-         {/* Money Spent */}
-         <Card className="bg-card text-card-foreground border border-border shadow-sm">
-            <CardHeader>
-               <CardTitle className="font-medium text-lg">
-                  Total Money Spent on Packages
-               </CardTitle>
-            </CardHeader>
-            <CardContent>
-               <div className="flex items-center justify-center">
-                  <div className="text-center">
-                     <div className="text-5xl font-bold text-primary mb-2">
-                        {moneySpent.toLocaleString()}
-                     </div>
-                     <div className="text-muted-foreground">VNĐ</div>
-                  </div>
+         {/* Sessions by Status - Pie Chart with Gap & Rounded Corners */}
+         <div className="bg-white dark:bg-gray-800 p-6 rounded shadow">
+            <h4 className="font-medium mb-4 text-lg dark:text-white">
+               Phiên học theo trạng thái
+            </h4>
+            {sessionsByStatus.length > 0 ? (
+               <div style={{ width: "100%", height: 400 }}>
+                  <ResponsiveContainer>
+                     <PieChart>
+                        <Tooltip
+                           formatter={(value: any) => [
+                              `${value} phiên`,
+                              "Số lượng",
+                           ]}
+                           contentStyle={{
+                              backgroundColor: "rgba(255, 255, 255, 0.8)",
+                              border: "1px solid #ccc",
+                           }}
+                           itemStyle={{ color: "#333" }}
+                        />
+                        <Legend
+                           formatter={(value) => {
+                              const translated = translatePieData(
+                                 [{ status: value, value: 0 }],
+                                 "session"
+                              );
+                              return translated[0]?.status || value;
+                           }}
+                           wrapperStyle={{ color: "#333" }}
+                           className="dark:text-gray-300"
+                        />
+                        <Pie
+                           data={translatePieData(sessionsByStatus, "session")}
+                           cx="50%"
+                           cy="50%"
+                           labelLine={false}
+                           label={({ status, value }: any) => {
+                              return `${status}: ${value}`;
+                           }}
+                           outerRadius={100}
+                           fill="#8884d8"
+                           dataKey="value"
+                           nameKey="status"
+                           paddingAngle={pieChartConfig.gap}
+                           cornerRadius={pieChartConfig.cornerRadius}
+                        >
+                           {sessionsByStatus.map((_, index) => (
+                              <Cell
+                                 key={`cell-${index}`}
+                                 fill={COLORS[index % COLORS.length]}
+                              />
+                           ))}
+                        </Pie>
+                     </PieChart>
+                  </ResponsiveContainer>
                </div>
-               {moneySpent > 0 && (
-                  <div className="mt-6" style={{ width: "100%", height: 300 }}>
+            ) : (
+               <div className="h-96 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                  No data available
+               </div>
+            )}
+         </div>
+
+         {/* Money Spent on Packages - Custom Active Shape */}
+         <div className="bg-white dark:bg-gray-800 p-6 rounded shadow">
+            <h4 className="font-medium mb-4 text-lg dark:text-white">
+               Tổng tiền đã chi cho gói học
+            </h4>
+            <div className="flex items-center justify-center">
+               <div className="text-center">
+                  <div className="text-5xl font-bold text-blue-600 mb-2">
+                     {moneySpent.toLocaleString()}
+                  </div>
+                  <div className="text-gray-600 dark:text-gray-400">VNĐ</div>
+               </div>
+            </div>
+            {moneySpent > 0 && (
+               <div className="mt-6">
+                  <div style={{ width: "100%", height: 300 }}>
                      <ResponsiveContainer>
                         <PieChart>
                            <AnyPie
@@ -218,80 +205,125 @@ export default function PieChartTutor(props: PieChartTutorProps) {
                               cy="50%"
                               innerRadius={60}
                               outerRadius={100}
-                              fill="hsl(var(--accent))"
+                              fill="#8884d8"
                               dataKey="value"
                               activeIndex={0}
                               activeShape={renderActiveShape}
                            >
-                              <Cell fill="hsl(var(--primary))" />
+                              <Cell fill="#3b82f6" />
                            </AnyPie>
                            <Tooltip
                               formatter={(value: any) =>
                                  `${value.toLocaleString()} VNĐ`
                               }
-                              wrapperStyle={tooltipStyle}
-                           />
-                        </PieChart>
-                     </ResponsiveContainer>
-                  </div>
-               )}
-            </CardContent>
-         </Card>
-
-         {/* Learning Commitments */}
-         <Card className="bg-card text-card-foreground border border-border shadow-sm">
-            <CardHeader>
-               <CardTitle className="font-medium text-lg">
-                  Learning Commitments by Status
-               </CardTitle>
-            </CardHeader>
-            <CardContent>
-               {learningCommitments.length > 0 ? (
-                  <div style={{ width: "100%", height: 400 }}>
-                     <ResponsiveContainer>
-                        <PieChart>
-                           <Tooltip
-                              formatter={(value: any) => [
-                                 `${value} commitments`,
-                                 "Count",
-                              ]}
-                              wrapperStyle={tooltipStyle}
-                           />
-                           <Legend
-                              wrapperStyle={{
-                                 color: "hsl(var(--foreground))",
+                              contentStyle={{
+                                 backgroundColor: "rgba(255, 255, 255, 0.8)",
+                                 border: "1px solid #ccc",
                               }}
+                              itemStyle={{ color: "#333" }}
                            />
-                           <Pie
-                              data={learningCommitments}
-                              cx="50%"
-                              cy="50%"
-                              labelLine
-                              label={renderCustomLabelPosition}
-                              outerRadius={100}
-                              fill="hsl(var(--primary))"
-                              dataKey="value"
-                              nameKey="status"
-                              paddingAngle={pieChartConfig.gap}
-                              cornerRadius={pieChartConfig.cornerRadius}
-                           >
-                              {learningCommitments.map((_, index) => (
-                                 <Cell
-                                    key={`cell-${index}`}
-                                    fill={COLORS[index % COLORS.length]}
-                                 />
-                              ))}
-                           </Pie>
                         </PieChart>
                      </ResponsiveContainer>
                   </div>
-               ) : (
-                  <div className="h-96 flex items-center justify-center text-muted-foreground">
-                     No data available
-                  </div>
-               )}
-            </CardContent>
-         </Card>
+               </div>
+            )}
+         </div>
+
+         {/* Learning Commitments - Pie Chart with Customized Label */}
+         <div className="bg-white dark:bg-gray-800 p-6 rounded shadow">
+            <h4 className="font-medium mb-4 text-lg dark:text-white">
+               Cam kết học tập theo trạng thái
+            </h4>
+            {learningCommitments.length > 0 ? (
+               <div style={{ width: "100%", height: 400 }}>
+                  <ResponsiveContainer>
+                     <PieChart>
+                        <Tooltip
+                           formatter={(value: any) => [
+                              `${value} cam kết`,
+                              "Số lượng",
+                           ]}
+                           contentStyle={{
+                              backgroundColor: "rgba(255, 255, 255, 0.8)",
+                              border: "1px solid #ccc",
+                           }}
+                           itemStyle={{ color: "#333" }}
+                        />
+                        <Legend
+                           formatter={(value) => {
+                              const translated = translatePieData(
+                                 [{ status: value, value: 0 }],
+                                 "commitment"
+                              );
+                              return translated[0]?.status || value;
+                           }}
+                           wrapperStyle={{ color: "#333" }}
+                           className="dark:text-gray-300"
+                        />
+                        <Pie
+                           data={translatePieData(
+                              learningCommitments,
+                              "commitment"
+                           )}
+                           cx="50%"
+                           cy="50%"
+                           labelLine={true}
+                           label={(props: any) => {
+                              const {
+                                 cx,
+                                 cy,
+                                 midAngle,
+                                 innerRadius,
+                                 outerRadius,
+                                 percent,
+                                 index,
+                                 ...rest
+                              } = props;
+                              if (!rest.payload?.status) return null;
+
+                              const translatedData = translatePieData(
+                                 [{ status: rest.payload.status, value: 0 }],
+                                 "commitment"
+                              );
+
+                              return renderCustomLabelPosition({
+                                 cx,
+                                 cy,
+                                 midAngle,
+                                 innerRadius,
+                                 outerRadius,
+                                 value: rest.payload.value,
+                                 payload: {
+                                    ...rest.payload,
+                                    status:
+                                       translatedData[0]?.status ||
+                                       rest.payload.status,
+                                 },
+                              });
+                           }}
+                           outerRadius={100}
+                           fill="#8884d8"
+                           dataKey="value"
+                           nameKey="status"
+                           paddingAngle={pieChartConfig.gap}
+                           cornerRadius={pieChartConfig.cornerRadius}
+                        >
+                           {learningCommitments.map((_, index) => (
+                              <Cell
+                                 key={`cell-${index}`}
+                                 fill={COLORS[index % COLORS.length]}
+                              />
+                           ))}
+                        </Pie>
+                     </PieChart>
+                  </ResponsiveContainer>
+               </div>
+            ) : (
+               <div className="h-96 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                  No data available
+               </div>
+            )}
+         </div>
       </div>
    );
 }
