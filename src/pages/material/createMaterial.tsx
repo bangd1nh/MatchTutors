@@ -29,7 +29,6 @@ const ALLOWED_FILE_TYPES = [
 
 const formSchema = z.object({
    title: z.string().min(1, "Tiêu đề không được để trống"),
-   // giới hạn mô tả tối đa 300 ký tự
    description: z.string().max(300, "Mô tả tối đa 300 ký tự").optional(),
    material: z
       .instanceof(FileList)
@@ -149,10 +148,7 @@ const CreateMaterialPage = () => {
    const { upload, isUploading } = useMaterial();
    const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
-      defaultValues: {
-         title: "",
-         description: "",
-      },
+      defaultValues: { title: "", description: "" },
    });
 
    const onSubmit = (values: z.infer<typeof formSchema>) => {
@@ -160,7 +156,6 @@ const CreateMaterialPage = () => {
       formData.append("title", values.title);
       formData.append("description", values.description || "");
       formData.append("material", values.material[0]);
-
       upload(formData, {
          onSuccess: () => {
             navigate("/tutor/material-management");
@@ -169,18 +164,18 @@ const CreateMaterialPage = () => {
    };
 
    return (
-      <Card>
+      <Card className="bg-card text-card-foreground border border-border shadow-sm">
          <CardHeader>
             <CardTitle>
                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-md bg-rose-50 text-rose-600">
+                  <div className="p-2 rounded-md bg-muted text-muted-foreground">
                      <IconUpload />
                   </div>
                   <div>
-                     <div className="text-lg font-semibold">
+                     <div className="text-lg font-semibold text-foreground">
                         Tải lên tài liệu mới
                      </div>
-                     <div className="text-sm text-slate-500">
+                     <div className="text-sm text-muted-foreground">
                         Chọn 1 file — PDF/Word/Excel/PPT • tối đa 10MB
                      </div>
                   </div>
@@ -204,7 +199,7 @@ const CreateMaterialPage = () => {
                               <Input
                                  placeholder="Ví dụ: Đề cương ôn tập Toán 10"
                                  {...field}
-                                 className="bg-white/95 border-slate-200"
+                                 className="bg-muted border-border"
                               />
                            </FormControl>
                            <FormMessage />
@@ -222,7 +217,7 @@ const CreateMaterialPage = () => {
                               <Textarea
                                  placeholder="Mô tả ngắn về tài liệu..."
                                  {...field}
-                                 className="bg-white/95 border-slate-200"
+                                 className="bg-muted border-border"
                                  rows={4}
                               />
                            </FormControl>
@@ -231,8 +226,8 @@ const CreateMaterialPage = () => {
                               <div
                                  className={`ml-2 ${
                                     (field.value?.length || 0) > 300
-                                       ? "text-rose-600"
-                                       : "text-slate-400"
+                                       ? "text-destructive"
+                                       : "text-muted-foreground"
                                  }`}
                               >
                                  {field.value?.length || 0}/300
@@ -257,29 +252,28 @@ const CreateMaterialPage = () => {
                            <FormItem>
                               <FormLabel>File tài liệu</FormLabel>
                               <FormControl>
-                                 {/* keep same visible Input so layout/fit unchanged */}
                                  <Input
                                     type="file"
                                     accept={ALLOWED_FILE_TYPES.join(",")}
                                     onChange={(e) =>
                                        field.onChange(e.target.files)
                                     }
+                                    className="bg-muted border-border"
                                  />
                               </FormControl>
 
-                              {/* file annotation: name + size + delete (small, unobtrusive) */}
                               <div className="mt-3">
                                  {selectedFile ? (
-                                    <div className="flex items-center justify-between rounded-md border px-3 py-2 bg-white shadow-sm">
+                                    <div className="flex items-center justify-between rounded-md border border-border px-3 py-2 bg-card">
                                        <div className="flex items-center gap-3">
-                                          <div className="p-1 rounded bg-amber-50 text-amber-600">
+                                          <div className="p-1 rounded bg-accent text-accent-foreground">
                                              <IconFile />
                                           </div>
                                           <div className="text-sm">
-                                             <div className="font-medium text-slate-800">
+                                             <div className="font-medium text-foreground">
                                                 {selectedFile.name}
                                              </div>
-                                             <div className="text-xs text-slate-500">
+                                             <div className="text-xs text-muted-foreground">
                                                 {fileExt} •{" "}
                                                 {formatBytes(selectedFile.size)}
                                              </div>
@@ -292,7 +286,7 @@ const CreateMaterialPage = () => {
                                                 const dt = new DataTransfer();
                                                 field.onChange(dt.files);
                                              }}
-                                             className="text-slate-500 hover:text-rose-600 p-1 rounded"
+                                             className="text-muted-foreground hover:text-destructive p-1 rounded"
                                              aria-label="Xóa file"
                                           >
                                              <IconDelete />
@@ -300,16 +294,16 @@ const CreateMaterialPage = () => {
                                        </div>
                                     </div>
                                  ) : (
-                                    <div className="text-sm text-slate-500">
+                                    <div className="text-sm text-muted-foreground">
                                        Chưa có file được chọn
                                     </div>
                                  )}
                                  {error ? (
-                                    <div className="mt-2 text-xs text-rose-600">
+                                    <div className="mt-2 text-xs text-destructive">
                                        {String(error)}
                                     </div>
                                  ) : (
-                                    <div className="mt-2 text-xs text-slate-400">
+                                    <div className="mt-2 text-xs text-muted-foreground">
                                        Bạn chỉ có thể chọn 1 file. Định dạng:
                                        PDF, Word, Excel, Powerpoint. Tối đa
                                        10MB.
@@ -324,20 +318,17 @@ const CreateMaterialPage = () => {
                   />
 
                   <div className="flex items-center gap-3">
-                     <Button
-                        type="submit"
-                        disabled={isUploading}
-                        className="bg-rose-600 hover:bg-rose-700"
-                     >
+                     <Button type="submit" disabled={isUploading}>
                         {isUploading ? "Đang tải lên..." : "Tải lên"}
                      </Button>
-                     <button
+                     <Button
                         type="button"
+                        variant="outline"
                         onClick={() => navigate("/tutor/material-management")}
-                        className="text-sm px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50"
+                        className="text-sm"
                      >
                         Hủy
-                     </button>
+                     </Button>
                   </div>
                </form>
             </Form>

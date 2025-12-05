@@ -14,6 +14,8 @@ import { usePackagePayment } from "@/hooks/usePackagePayment";
 import type { IPackage } from "@/types/package";
 import { useUser } from "@/hooks/useUser";
 import { useNavigate } from "react-router-dom";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface PricingTier extends IPackage {
    id: string;
@@ -90,20 +92,20 @@ export default function PricingPage() {
 
    if (isLoading) {
       return (
-         <div className="w-full min-h-screen py-16 px-4 flex items-center justify-center bg-gray-50">
-            <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+         <div className="w-full min-h-screen py-16 px-4 flex items-center justify-center bg-background">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
          </div>
       );
    }
 
    if (isError || !pricingTiers.length) {
       return (
-         <div className="w-full min-h-screen py-16 px-4 bg-gray-50">
+         <div className="w-full min-h-screen py-16 px-4 bg-background">
             <div className="max-w-7xl mx-auto text-center">
-               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+               <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
                   Gói Dịch Vụ Gia Sư
                </h1>
-               <p className="text-xl text-gray-600 mb-8">
+               <p className="text-xl text-muted-foreground mb-8">
                   Không thể tải thông tin gói dịch vụ. Vui lòng thử lại sau.
                </p>
             </div>
@@ -112,210 +114,137 @@ export default function PricingPage() {
    }
 
    return (
-      <div className="w-full min-h-screen py-16 px-4 bg-gray-50">
+      <div className="w-full min-h-screen py-16 px-4 bg-background">
          <div className="max-w-7xl mx-auto">
             {/* Header */}
             <div className="text-center mb-16">
-               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+               <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
                   Gói Dịch Vụ Gia Sư
                </h1>
-               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                  Chọn gói dịch vụ phù hợp với nhu cầu của bạn và bắt đầu
-                  hành trình giảng dạy chuyên nghiệp
+               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                  Chọn gói dịch vụ phù hợp với nhu cầu của bạn và bắt đầu hành trình giảng dạy chuyên nghiệp
                </p>
             </div>
 
             {/* Pricing Cards */}
-            <div className="flex justify-center gap-8">
+            <div className="flex justify-center gap-8 flex-wrap">
                {pricingTiers.map((tier) => (
-                  <div
+                  <Card
                      key={tier.id}
-                     className={`relative rounded-2xl p-8 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] transition-all duration-300 ease-in-out ${
+                     className={`relative w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] overflow-hidden border border-border ${
                         tier.highlighted
-                           ? "bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-2xl scale-105 hover:scale-110"
-                           : "bg-white shadow-lg hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1"
+                           ? "bg-gradient-to-br from-primary to-blue-600 text-primary-foreground shadow-2xl"
+                           : "bg-card text-card-foreground shadow"
                      }`}
                   >
                      {tier.highlighted && (
-                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                           <span className="bg-yellow-400 text-indigo-900 px-4 py-1 rounded-full text-sm font-semibold">
+                        <div className="absolute top-5 left-1/2 -translate-x-1/2">
+                           <span className="bg-yellow-400 text-blue-900 px-4 py-1 rounded-full text-sm font-semibold">
                               Phổ Biến Nhất
                            </span>
                         </div>
                      )}
 
-                     {/* Icon */}
-                     <div
-                        className={`mb-4 ${
-                           tier.highlighted
-                              ? "text-white"
-                              : "text-indigo-600"
-                        }`}
-                     >
-                        {tier.icon}
-                     </div>
+                     <CardHeader>
+                        {/* Icon */}
+                        <div className={tier.highlighted ? "text-primary-foreground mb-2" : "text-primary mb-2"}>
+                           {tier.icon}
+                        </div>
 
-                     {/* Tier Name */}
-                     <h3
-                        className={`text-2xl font-bold mb-2 ${
-                           tier.highlighted ? "text-white" : "text-gray-900"
-                        }`}
-                     >
-                        {tier.name}
-                     </h3>
+                        {/* Tier Name */}
+                        <CardTitle className={tier.highlighted ? "text-primary-foreground" : "text-foreground"}>
+                           {tier.name}
+                        </CardTitle>
 
-                     {/* Description */}
-                     {tier.description && tier.description[0] && (
-                        <p
-                           className={`mb-6 ${
-                              tier.highlighted
-                                 ? "text-indigo-100"
-                                 : "text-gray-600"
+                        {/* Description */}
+                        {tier.description && tier.description[0] && (
+                           <p className={`${tier.highlighted ? "text-primary-foreground/80" : "text-muted-foreground"} mt-2`}>
+                              {tier.description[0]}
+                           </p>
+                        )}
+                     </CardHeader>
+
+                     <CardContent>
+                        {/* Price */}
+                        <div className="mb-6">
+                           <div className="flex items-baseline">
+                              {tier.price === 0 ? (
+                                 <span className={`text-4xl font-bold ${tier.highlighted ? "text-primary-foreground" : "text-foreground"}`}>
+                                    Miễn phí
+                                 </span>
+                              ) : (
+                                 <>
+                                    <span className={`text-4xl font-bold ${tier.highlighted ? "text-primary-foreground" : "text-foreground"}`}>
+                                       {tier.price.toLocaleString("vi-VN")}
+                                    </span>
+                                    <span className={`${tier.highlighted ? "text-primary-foreground/80" : "text-muted-foreground"} ml-2`}>
+                                       ₫
+                                    </span>
+                                 </>
+                              )}
+                           </div>
+                        </div>
+
+                        {/* Features */}
+                        <ul className="space-y-3">
+                           {tier.description?.map((feature, featureIndex) => (
+                              <li key={featureIndex} className="flex items-start">
+                                 <CheckIcon className={`w-5 h-5 mr-3 flex-shrink-0 mt-0.5 ${tier.highlighted ? "text-emerald-300" : "text-emerald-500"}`} />
+                                 <span className={tier.highlighted ? "text-primary-foreground/90" : "text-foreground"}>
+                                    {feature}
+                                 </span>
+                              </li>
+                           ))}
+
+                           {tier.features?.maxStudents && (
+                              <li className="flex items-start">
+                                 <CheckIcon className={`w-5 h-5 mr-3 flex-shrink-0 mt-0.5 ${tier.highlighted ? "text-emerald-300" : "text-emerald-500"}`} />
+                                 <span className={tier.highlighted ? "text-primary-foreground/90" : "text-foreground"}>
+                                    Tối đa {tier.features.maxStudents} học sinh
+                                 </span>
+                              </li>
+                           )}
+
+                           {tier.features?.maxQuiz && (
+                              <li className="flex items-start">
+                                 <CheckIcon className={`w-5 h-5 mr-3 flex-shrink-0 mt-0.5 ${tier.highlighted ? "text-emerald-300" : "text-emerald-500"}`} />
+                                 <span className={tier.highlighted ? "text-primary-foreground/90" : "text-foreground"}>
+                                    Tối đa {tier.features.maxQuiz} bài quiz
+                                 </span>
+                              </li>
+                           )}
+                        </ul>
+                     </CardContent>
+
+                     <CardFooter>
+                        <Button
+                           onClick={() => handleChoosePackage(tier.id)}
+                           disabled={isPaymentLoading}
+                           className={`w-full py-3 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                              tier.highlighted ? "bg-background text-foreground hover:bg-muted" : ""
                            }`}
                         >
-                           {tier.description[0]}
-                        </p>
-                     )}
-
-                     {/* Price */}
-                     <div className="mb-6">
-                        <div className="flex items-baseline">
-                           {tier.price === 0 ? (
-                              <span
-                                 className={`text-4xl font-bold ${
-                                    tier.highlighted
-                                       ? "text-white"
-                                       : "text-gray-900"
-                                 }`}
-                              >
-                                 Miễn phí
+                           {isPaymentLoading ? (
+                              <span className="flex items-center justify-center">
+                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                 Đang xử lý...
                               </span>
                            ) : (
-                              <>
-                                 <span
-                                    className={`text-4xl font-bold ${
-                                       tier.highlighted
-                                          ? "text-white"
-                                          : "text-gray-900"
-                                    }`}
-                                 >
-                                    {tier.price.toLocaleString("vi-VN")}
-                                 </span>
-                                 <span
-                                    className={`ml-2 ${
-                                       tier.highlighted
-                                          ? "text-indigo-100"
-                                          : "text-gray-600"
-                                    }`}
-                                 >
-                                    ₫
-                                 </span>
-                              </>
+                              "Chọn Gói Này"
                            )}
-                        </div>
-                     </div>
-
-                     {/* Features */}
-                     <ul className="space-y-3 mb-8">
-                        {tier.description?.map((feature, featureIndex) => (
-                           <li
-                              key={featureIndex}
-                              className="flex items-start"
-                           >
-                              <CheckIcon
-                                 className={`w-5 h-5 mr-3 flex-shrink-0 mt-0.5 ${
-                                    tier.highlighted
-                                       ? "text-green-300"
-                                       : "text-green-500"
-                                 }`}
-                              />
-                              <span
-                                 className={
-                                    tier.highlighted
-                                       ? "text-indigo-50"
-                                       : "text-gray-700"
-                                 }
-                              >
-                                 {feature}
-                              </span>
-                           </li>
-                        ))}
-
-                        {tier.features?.maxStudents && (
-                           <li className="flex items-start">
-                              <CheckIcon
-                                 className={`w-5 h-5 mr-3 flex-shrink-0 mt-0.5 ${
-                                    tier.highlighted
-                                       ? "text-green-300"
-                                       : "text-green-500"
-                                 }`}
-                              />
-                              <span
-                                 className={
-                                    tier.highlighted
-                                       ? "text-indigo-50"
-                                       : "text-gray-700"
-                                 }
-                              >
-                                 Tối đa {tier.features.maxStudents} học sinh
-                              </span>
-                           </li>
-                        )}
-
-                        {tier.features?.maxQuiz && (
-                           <li className="flex items-start">
-                              <CheckIcon
-                                 className={`w-5 h-5 mr-3 flex-shrink-0 mt-0.5 ${
-                                    tier.highlighted
-                                       ? "text-green-300"
-                                       : "text-green-500"
-                                 }`}
-                              />
-                              <span
-                                 className={
-                                    tier.highlighted
-                                       ? "text-indigo-50"
-                                       : "text-gray-700"
-                                 }
-                              >
-                                 Tối đa {tier.features.maxQuiz} bài quiz
-                              </span>
-                           </li>
-                        )}
-                     </ul>
-
-                     {/* CTA Button */}
-                     <button
-                        onClick={() => handleChoosePackage(tier.id)}
-                        disabled={isPaymentLoading}
-                        className={`w-full py-3 px-6 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                           tier.highlighted
-                              ? "bg-white text-indigo-600 hover:bg-indigo-50"
-                              : "bg-indigo-600 text-white hover:bg-indigo-700"
-                        }`}
-                     >
-                        {isPaymentLoading ? (
-                           <div className="flex items-center justify-center">
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Đang xử lý...
-                           </div>
-                        ) : (
-                           "Chọn Gói Này"
-                        )}
-                     </button>
-                  </div>
+                        </Button>
+                     </CardFooter>
+                  </Card>
                ))}
             </div>
 
             {/* Additional Info */}
             <div className="mt-16 text-center">
-               <p className="text-gray-600 mb-4">
-                  Tất cả các gói đều bao gồm thời gian dùng thử 7 ngày miễn
-                  phí
+               <p className="text-muted-foreground mb-4">
+                  Tất cả các gói đều bao gồm thời gian dùng thử 7 ngày miễn phí
                </p>
-               <p className="text-gray-500 text-sm">
-                  Có câu hỏi? Liên hệ với chúng tôi qua email:
-                  support@giasu.vn
+               <p className="text-muted-foreground text-sm">
+                  Có câu hỏi? Liên hệ với chúng tôi qua email: support@giasu.vn
                </p>
             </div>
          </div>

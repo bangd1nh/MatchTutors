@@ -1,6 +1,6 @@
 import { Level } from "@/enums/level.enum";
 import { Subject } from "@/enums/subject.enum";
-import { ClassType } from "../enums/classType.enum";
+import { ClassType } from '../enums/classType.enum';
 
 export const LEVEL_LABELS_VI: Record<string, string> = {
    [Level.GRADE_1]: "Lớp 1",

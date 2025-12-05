@@ -79,36 +79,34 @@ export function TutorCard({ tutor }: TutorCardProps) {
    };
 
    return (
-      <Card className="group overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm">
+      <Card className="group overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 border border-border bg-card text-card-foreground">
          <CardContent className="p-6">
             <div className="space-y-4">
                {/* Header Section */}
                <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4">
                      <div className="relative">
-                        <Avatar className="h-16 w-16 border-3 border-white shadow-lg ring-2 ring-primary/10">
+                        <Avatar className="h-16 w-16 ring-2 ring-primary/10">
                            <AvatarImage
                               src={tutorUser.avatarUrl || "/placeholder.svg"}
                               alt={tutorUser.name}
                               className="object-cover"
                            />
-                           <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold text-lg">
+                           <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
                               {tutorUser.name.charAt(0).toUpperCase()}
                            </AvatarFallback>
                         </Avatar>
                      </div>
                      <div className="flex-1">
                         <h3
-                           className="text-xl font-bold text-gray-900 cursor-pointer hover:text-primary transition-colors group-hover:text-primary"
+                           className="text-xl font-bold text-foreground cursor-pointer transition-colors hover:text-primary"
                            onClick={() => onViewProfile(tutor._id)}
                         >
                            {tutorUser.name}
                         </h3>
-                        <div className="flex items-center text-gray-500 text-sm mt-1">
+                        <div className="flex items-center text-muted-foreground text-sm mt-1">
                            <MapPin className="h-4 w-4 mr-1.5" />
-                           <span>
-                              {tutorUser.address?.city || "Chưa cập nhật"}
-                           </span>
+                           <span>{tutorUser.address?.city || "Chưa cập nhật"}</span>
                         </div>
                         <div className="flex items-center gap-2 mt-2">
                            <div className="flex items-center gap-1">
@@ -117,14 +115,13 @@ export function TutorCard({ tutor }: TutorCardProps) {
                                     key={i}
                                     className={cn(
                                        "h-4 w-4",
-                                       tutor.ratings &&
-                                          i < Math.floor(tutor.ratings.average)
+                                       tutor.ratings && i < Math.floor(tutor.ratings.average)
                                           ? "fill-amber-400 text-amber-400"
-                                          : "text-gray-200"
+                                          : "text-muted"
                                     )}
                                  />
                               ))}
-                              <span className="text-sm text-gray-500 ml-1">
+                              <span className="text-sm text-muted-foreground ml-1">
                                  ({tutor.ratings?.totalReviews ?? 0})
                               </span>
                            </div>
@@ -136,38 +133,34 @@ export function TutorCard({ tutor }: TutorCardProps) {
                      variant="ghost"
                      size="icon"
                      onClick={() => handleFav(tutor._id)}
-                     className="h-10 w-10 rounded-full hover:bg-red-50 transition-colors"
+                     className="h-10 w-10 rounded-full hover:bg-destructive/10"
                   >
                      <Heart
                         className={cn(
                            "h-5 w-5 transition-colors",
                            isFav?.isFav === true && isFav?.tutorId === tutor._id
                               ? "fill-red-500 text-red-500"
-                              : "text-gray-400 hover:text-red-400"
+                              : "text-muted-foreground hover:text-red-400"
                         )}
                      />
                   </Button>
                </div>
 
-               {/* Price and Experience - Prominent Display */}
-               <div className="bg-gradient-to-r from-primary/5 to-primary/10 p-4 rounded-xl border border-primary/10">
+               {/* Price and Experience */}
+               <div className="bg-muted p-4 rounded-xl border border-border">
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-sm text-gray-600 mb-1">Học phí</p>
+                        <p className="text-sm text-muted-foreground mb-1">Học phí</p>
                         <p className="text-2xl font-bold text-primary">
                            {formatPrice(tutor.hourlyRate || 0)}
-                           <span className="text-sm font-normal text-gray-500 ml-1">
-                              /giờ
-                           </span>
+                           <span className="text-sm font-normal text-muted-foreground ml-1">/giờ</span>
                         </p>
                      </div>
                      <div className="text-right">
-                        <p className="text-sm text-gray-600 mb-1">
-                           Kinh nghiệm
-                        </p>
+                        <p className="text-sm text-muted-foreground mb-1">Kinh nghiệm</p>
                         <div className="flex items-center gap-1">
                            <GraduationCap className="h-4 w-4 text-primary" />
-                           <span className="text-lg font-semibold text-gray-900">
+                           <span className="text-lg font-semibold text-foreground">
                               {tutor.experienceYears}+ năm
                            </span>
                         </div>
@@ -177,19 +170,15 @@ export function TutorCard({ tutor }: TutorCardProps) {
 
                {/* Class Type */}
                <div className="flex items-center justify-center">
-                  <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
-                     <Users className="h-4 w-4 text-blue-600" />
-                     <span className="text-sm font-medium text-blue-700">
+                  <div className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full border border-border">
+                     <Users className="h-4 w-4 text-primary" />
+                     <span className="text-sm font-medium text-foreground">
                         {Array.isArray(tutor.classType)
                            ? tutor.classType
-                              .map((type) =>
-                                 type === "ONLINE"
-                                    ? "Trực tuyến"
-                                    : type === "IN_PERSON"
-                                       ? "Tại nhà"
-                                       : type
-                              )
-                              .join(" • ")
+                                .map((type) =>
+                                   type === "ONLINE" ? "Trực tuyến" : type === "IN_PERSON" ? "Tại nhà" : type
+                                )
+                                .join(" • ")
                            : tutor.classType ?? ""}
                      </span>
                   </div>
@@ -198,25 +187,20 @@ export function TutorCard({ tutor }: TutorCardProps) {
                {/* Availability */}
                <div>
                   <div className="flex items-center gap-2 mb-3">
-                     <Clock className="h-4 w-4 text-gray-500" />
-                     <span className="text-sm font-medium text-gray-700">
-                        Lịch rảnh
-                     </span>
+                     <Clock className="h-4 w-4 text-muted-foreground" />
+                     <span className="text-sm font-medium text-foreground">Lịch rảnh</span>
                   </div>
                   <div className="flex gap-2 justify-between">
                      {dayNames.map((day, index) => (
                         <div
                            key={day}
                            className={cn(
-                              "flex-1 h-10 rounded-lg flex items-center justify-center text-sm font-medium transition-all duration-200",
+                              "flex-1 h-10 rounded-lg flex items-center justify-center text-sm font-medium transition-all duration-200 border border-border",
                               availableDaysWithSlots.includes(index)
-                                 ? "bg-primary text-white shadow-md transform scale-105"
-                                 : "bg-gray-100 text-gray-400"
+                                 ? "bg-primary text-primary-foreground shadow-md transform scale-[1.02]"
+                                 : "bg-muted text-muted-foreground"
                            )}
-                           title={`${day}${availableDaysWithSlots.includes(index)
-                              ? " - Có lịch"
-                              : " - Không có lịch"
-                              }`}
+                           title={`${day}${availableDaysWithSlots.includes(index) ? " - Có lịch" : " - Không có lịch"}`}
                         >
                            {day}
                         </div>
@@ -227,17 +211,15 @@ export function TutorCard({ tutor }: TutorCardProps) {
                {/* Subjects */}
                <div>
                   <div className="flex items-center gap-2 mb-3">
-                     <Award className="h-4 w-4 text-gray-500" />
-                     <span className="text-sm font-medium text-gray-700">
-                        Môn học
-                     </span>
+                     <Award className="h-4 w-4 text-muted-foreground" />
+                     <span className="text-sm font-medium text-foreground">Môn học</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                      {(tutor.subjects ?? []).slice(0, 4).map((subject) => (
                         <Badge
                            key={subject}
                            variant="secondary"
-                           className="text-xs py-1.5 px-3 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                           className="text-xs py-1.5 px-3 rounded-full"
                         >
                            {getSubjectLabelVi(subject)}
                         </Badge>
@@ -248,27 +230,19 @@ export function TutorCard({ tutor }: TutorCardProps) {
                            <PopoverTrigger asChild>
                               <Badge
                                  variant="outline"
-                                 className="text-xs py-1.5 px-3 rounded-full bg-primary/10 text-primary border-primary/20 cursor-pointer hover:bg-primary/20 transition-colors"
+                                 className="text-xs py-1.5 px-3 rounded-full bg-primary/10 text-primary border-primary/20 cursor-pointer hover:bg-primary/20"
                               >
                                  +{(tutor.subjects?.length ?? 0) - 4} môn khác
                               </Badge>
                            </PopoverTrigger>
-                           <PopoverContent className="w-64 p-4" align="start">
-                              <h4 className="text-sm font-semibold mb-3 text-gray-900">
-                                 Tất cả môn học
-                              </h4>
+                           <PopoverContent className="w-64 p-4 bg-popover text-popover-foreground border border-border" align="start">
+                              <h4 className="text-sm font-semibold mb-3 text-foreground">Tất cả môn học</h4>
                               <div className="flex flex-wrap gap-2">
-                                 {(tutor.subjects ?? [])
-                                    .slice(4)
-                                    .map((subject) => (
-                                       <Badge
-                                          key={subject}
-                                          variant="outline"
-                                          className="text-xs py-1 px-2 rounded-md"
-                                       >
-                                          {getSubjectLabelVi(subject)}
-                                       </Badge>
-                                    ))}
+                                 {(tutor.subjects ?? []).slice(4).map((subject) => (
+                                    <Badge key={subject} variant="outline" className="text-xs py-1 px-2 rounded-md">
+                                       {getSubjectLabelVi(subject)}
+                                    </Badge>
+                                 ))}
                               </div>
                            </PopoverContent>
                         </Popover>
@@ -282,7 +256,7 @@ export function TutorCard({ tutor }: TutorCardProps) {
          <CardFooter className="p-6 pt-0">
             <Button
                size="lg"
-               className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 rounded-xl transition-all duration-200 hover:shadow-lg"
+               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-3 rounded-xl transition-all duration-200 hover:shadow-lg"
                onClick={() => onViewProfile(tutor._id)}
             >
                Xem hồ sơ chi tiết

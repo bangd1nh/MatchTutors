@@ -34,7 +34,10 @@ export const useDoSAQ = (quizId?: string) => {
         },
     });
 
-
+    const  fetchSAQHistory = useQuery({
+        queryKey: ["shortAnswerHistoryList"],
+        queryFn: fetchShortAnswerHistoryList,
+    }); 
 
     // Fetch tutor's view of student submissions (for tutors)
     const fetchStudentSAQSubmissions = useQuery({
@@ -46,6 +49,7 @@ export const useDoSAQ = (quizId?: string) => {
         // Queries
         fetchSAQForAttempt,
         fetchStudentSAQSubmissions,
+        fetchSAQHistory,
 
         // Mutations
         submitSAQ,

@@ -6,10 +6,11 @@ import {
    IShortAnswerSubmissionResponse,
    IQuizSubmissionBody,
    IStudentSAQHistoryResponse,
+   IQuizSubmissionListResponse,
 } from "@/types/quizSubmission";
 
 export const fetchMCQHistoryList =
-   async (): Promise<IQuizSubmissionResponse> => {
+   async (): Promise<IQuizSubmissionListResponse> => {
       const response = await apiClient.get("/doQuiz/getSubmitedMCQList");
       return response.data;
    };

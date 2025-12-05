@@ -11,6 +11,7 @@ import {
    Legend,
 } from "recharts";
 import { Activity, TrendingUp } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSessionStatusLabel } from "@/utils/session-status-translation";
 
 type DayItem = {
@@ -31,23 +32,19 @@ export default function StatisticChartTutor(props: {
 }) {
    const { bubble, sessions } = props;
 
-   // helper to format ISO date string to local date display
    const formatLocalDate = (isoDate: string) => {
       try {
          const d = new Date(isoDate);
-         // Use toLocaleDateString to respect user's local timezone
-         const dateStr = d.toLocaleDateString("vi-VN", {
+         return d.toLocaleDateString("vi-VN", {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
          });
-         return dateStr;
       } catch {
          return isoDate;
       }
    };
 
-   // helper to build full weekday + date label in user's local timezone
    const fullLabel = (isoDate: string) => {
       try {
          const d = new Date(isoDate);
@@ -59,7 +56,6 @@ export default function StatisticChartTutor(props: {
       }
    };
 
-   // bubble -> transform into points
    const bubblePoints =
       bubble?.days?.map((d, i) => ({
          x: i + 1,
@@ -70,7 +66,6 @@ export default function StatisticChartTutor(props: {
          labelFull: fullLabel(d.date),
       })) || [];
 
-   // sessions line: array with local dates
    const sessionDays =
       sessions?.days?.map((d) => {
          const obj: any = { rawDate: d.date, dateLabel: fullLabel(d.date) };
@@ -83,93 +78,108 @@ export default function StatisticChartTutor(props: {
    const top = 10;
    const ticks = [0, 2, 4, 6, 8, 10];
 
-   // dark-aware colors for lines
    const linePalette = [
       "hsl(var(--primary))",
-      "hsl(0 84% 60%)", // red-ish
-      "hsl(25 95% 53%)", // orange
-      "hsl(200 98% 39%)", // blue
+      "hsl(0 84% 60%)",
+      "hsl(25 95% 53%)",
+      "hsl(200 98% 39%)",
    ];
 
    return (
       <div className="space-y-6">
-         <div className="bg-white p-6 rounded shadow">
-            <h4 className="font-medium mb-4 text-lg flex items-center gap-2">
-               <Activity className="w-5 h-5 text-gray-500" />
-               Số lượng buổi học hoàn thành theo ngày
-            </h4>
-            <div style={{ width: "100%", height: 480 }}>
-               <ResponsiveContainer>
-                  <ScatterChart
-                     margin={{ top: 24, right: 20, bottom: 110, left: 40 }}
-                  >
-                     <CartesianGrid stroke="hsl(var(--border))" />
-                     <XAxis
-                        dataKey="x"
-                        name="day"
-                        ticks={bubblePoints.map((p) => p.x)}
-                        tickFormatter={(v) => {
-                           const idx = Number(v) - 1;
-                           return bubblePoints[idx]?.labelShort || String(v);
-                        }}
-                        type="number"
-                        allowDecimals={false}
-                        domain={[1, 7]}
-                        tick={{ fontSize: 13, fill: "hsl(var(--foreground))" }}
-                        interval={0}
-                        angle={-40}
-                        textAnchor="end"
-                        xAxisId={0}
-                        height={100}
-                     />
-                     <YAxis
-                        ticks={ticks}
-                        domain={[0, top]}
-                        tick={{ fontSize: 14, fill: "hsl(var(--foreground))" }}
-                        label={{
-                           value: "Số lượng",
-                           angle: -90,
-                           position: "insideLeft",
-                           offset: -10,
-                           style: {
+         <Card className="bg-card text-card-foreground border border-border shadow-sm">
+            <CardHeader>
+               <CardTitle className="flex items-center gap-2 text-lg font-medium">
+                  <Activity className="w-5 h-5 text-muted-foreground" />
+                  Số lượng buổi học hoàn thành theo ngày
+               </CardTitle>
+            </CardHeader>
+            <CardContent>
+               <div style={{ width: "100%", height: 480 }}>
+                  <ResponsiveContainer>
+                     <ScatterChart
+                        margin={{ top: 24, right: 20, bottom: 110, left: 40 }}
+                     >
+                        <CartesianGrid stroke="hsl(var(--border))" />
+                        <XAxis
+                           dataKey="x"
+                           name="day"
+                           ticks={bubblePoints.map((p) => p.x)}
+                           tickFormatter={(v) => {
+                              const idx = Number(v) - 1;
+                              return bubblePoints[idx]?.labelShort || String(v);
+                           }}
+                           type="number"
+                           allowDecimals={false}
+                           domain={[1, 7]}
+                           tick={{
+                              fontSize: 13,
+                              fill: "hsl(var(--foreground))",
+                           }}
+                           interval={0}
+                           angle={-40}
+                           textAnchor="end"
+                           xAxisId={0}
+                           height={100}
+                        />
+                        <YAxis
+                           ticks={ticks}
+                           domain={[0, top]}
+                           tick={{
                               fontSize: 14,
                               fill: "hsl(var(--foreground))",
-                           },
-                        }}
-                        width={70}
-                     />
-                     <Tooltip
-                        formatter={(value: any, name: any) => [
-                           value,
-                           name === "day" ? "ngày" : name,
-                        ]}
-                        labelFormatter={(label) => {
-                           const idx = Number(label) - 1;
-                           return bubblePoints[idx]?.labelFull || String(label);
-                        }}
-                        wrapperStyle={{
-                           zIndex: 1000,
-                           fontSize: 13,
-                           background: "hsl(var(--popover))",
-                           color: "hsl(var(--popover-foreground))",
-                           border: "1px solid hsl(var(--border))",
-                           boxShadow: "0 8px 24px hsla(0,0%,0%,0.15)",
-                        }}
-                     />
-                     <Scatter
-                        dataKey="z"
-                        data={bubblePoints}
-                        fill="hsl(var(--primary))"
-                     />
-                  </ScatterChart>
-               </ResponsiveContainer>
-            </div>
+                           }}
+                           label={{
+                              value: "Số lượng",
+                              angle: -90,
+                              position: "insideLeft",
+                              offset: -10,
+                              style: {
+                                 fontSize: 14,
+                                 fill: "hsl(var(--foreground))",
+                              },
+                           }}
+                           width={70}
+                        />
+                        <Tooltip
+                           formatter={(value: any, name: any) => [
+                              value,
+                              name === "day" ? "ngày" : name,
+                           ]}
+                           labelFormatter={(label) => {
+                              const idx = Number(label) - 1;
+                              return (
+                                 bubblePoints[idx]?.labelFull || String(label)
+                              );
+                           }}
+                           wrapperStyle={{
+                              zIndex: 1000,
+                              fontSize: 13,
+                              background: "hsl(var(--popover))",
+                              color: "hsl(var(--popover-foreground))",
+                              border: "1px solid hsl(var(--border))",
+                              boxShadow: "0 8px 24px hsla(0,0%,0%,0.15)",
+                           }}
+                        />
+                        <Scatter
+                           dataKey="z"
+                           data={bubblePoints}
+                           fill="hsl(var(--primary))"
+                        />
+                     </ScatterChart>
+                  </ResponsiveContainer>
+               </div>
+            </CardContent>
+         </Card>
 
-            <div className="bg-white p-6 rounded shadow">
-               <h4 className="font-medium mb-4 text-lg flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-gray-500" />
+         <Card className="bg-card text-card-foreground border border-border shadow-sm">
+            <CardHeader>
+               <CardTitle className="flex items-center gap-2 text-lg font-medium">
+                  <TrendingUp className="w-5 h-5 text-muted-foreground" />
                   Số lượng buổi học theo các trạng thái theo ngày
-               </h4>
+               </CardTitle>
+            </CardHeader>
+            <CardContent>
                <div style={{ width: "100%", height: 480 }}>
                   <ResponsiveContainer>
                      <LineChart
@@ -211,8 +221,20 @@ export default function StatisticChartTutor(props: {
                               getSessionStatusLabel(name),
                            ]}
                            labelFormatter={(label) => label}
+                           wrapperStyle={{
+                              zIndex: 1000,
+                              fontSize: 13,
+                              background: "hsl(var(--popover))",
+                              color: "hsl(var(--popover-foreground))",
+                              border: "1px solid hsl(var(--border))",
+                              boxShadow: "0 8px 24px hsla(0,0%,0%,0.15)",
+                           }}
                         />
-                        <Legend />
+                        <Legend
+                           wrapperStyle={{
+                              color: "hsl(var(--foreground))",
+                           }}
+                        />
                         {(sessions?.statuses || []).map((s, idx) => (
                            <Line
                               key={s}
@@ -221,13 +243,15 @@ export default function StatisticChartTutor(props: {
                               dataKey={s}
                               stroke={linePalette[idx % linePalette.length]}
                               strokeWidth={3}
+                              dot={{ r: 2 }}
+                              activeDot={{ r: 4 }}
                            />
                         ))}
                      </LineChart>
                   </ResponsiveContainer>
                </div>
-            </div>
-         </div>
+            </CardContent>
+         </Card>
       </div>
    );
 }

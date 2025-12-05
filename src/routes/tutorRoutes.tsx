@@ -303,7 +303,7 @@ export const tutorRoutes = {
          path: "/chat",
          element: (
             <ProtectedTutorProfileRoute requireApproval={true}>
-               <ChatPage />,
+               <ChatPage />
             </ProtectedTutorProfileRoute>
          ),
       },

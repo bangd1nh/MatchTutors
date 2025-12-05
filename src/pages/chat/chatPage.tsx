@@ -7,6 +7,7 @@ import type { Conversation } from "@/api/chat";
 import { chatApi } from "@/api/chat";
 
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, X, Send } from "lucide-react";
@@ -129,50 +130,56 @@ export default function ChatPage() {
 
    if (loadingConversations) {
       return (
-         <div className="flex items-center justify-center h-screen bg-gray-50">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600" />
+         <div className="flex items-center justify-center h-screen bg-background">
+            <div
+               className="animate-spin rounded-full h-8 w-8 border-b-2"
+               style={{ borderColor: "hsl(var(--primary))" }}
+            />
          </div>
       );
    }
 
    return (
-      <div className="flex h-screen bg-[#FBFBFA] text-gray-800">
+      <div className="flex h-[calc(100dvh-112px)] bg-background text-foreground">
          {/* Sidebar */}
-         <aside className="w-72 border-r border-gray-100 bg-white flex flex-col shadow-sm">
-            <div className="p-5 border-b border-gray-100">
+         <aside className="w-72 border-r border-border bg-card text-card-foreground flex flex-col shadow-sm">
+            <div className="p-5 border-b border-border">
                <h2 className="text-lg font-semibold mb-3 tracking-wide">
                   Tin nhắn
                </h2>
                <div className="flex gap-3 items-center">
                   <div className="flex-1 relative">
-                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                      <Input
                         placeholder="Tìm kiếm..."
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        className="pl-11 py-2 bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-blue-100"
+                        className="pl-11 py-2 bg-muted border border-border"
                      />
                   </div>
-                  <button
+                  <Button
                      onClick={handleSearchClick}
                      disabled={!searchInput.trim()}
-                     className="flex items-center gap-2 px-3 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                     className="px-3 py-2"
+                     size="sm"
                   >
                      Tìm
-                  </button>
+                  </Button>
                   {isSearching && (
-                     <button
+                     <Button
                         onClick={handleClearSearch}
-                        className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9"
                         title="Xóa tìm kiếm"
                      >
                         <X className="h-4 w-4" />
-                     </button>
+                     </Button>
                   )}
                </div>
                {isSearching && (
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                      Kết quả cho:{" "}
                      <span className="italic">"{searchInput}"</span>
                   </p>
@@ -181,12 +188,15 @@ export default function ChatPage() {
 
             <ScrollArea className="flex-1">
                {isFetching ? (
-                  <div className="p-6 text-center text-gray-500">
-                     <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-sky-400" />
+                  <div className="p-6 text-center text-muted-foreground">
+                     <div
+                        className="inline-block animate-spin rounded-full h-6 w-6 border-b-2"
+                        style={{ borderColor: "hsl(var(--primary))" }}
+                     />
                      <p className="mt-2 text-sm">Đang tìm kiếm...</p>
                   </div>
                ) : filteredConversations.length === 0 ? (
-                  <div className="p-6 text-center text-gray-500">
+                  <div className="p-6 text-center text-muted-foreground">
                      {isSearching
                         ? "Không tìm thấy cuộc trò chuyện nào"
                         : "Chưa có cuộc trò chuyện nào"}
@@ -196,11 +206,11 @@ export default function ChatPage() {
                      <button
                         key={conv._id}
                         onClick={() => setActiveConversation(conv._id)}
-                        className={`w-full text-left p-4 border-b border-gray-50 flex gap-3 items-start hover:bg-[#F7FAFC] transition-colors ${
+                        className={`w-full text-left p-4 border-b border-border flex gap-3 items-start transition-colors ${
                            activeConversationId === conv._id
-                              ? "bg-[#F0F8FF]"
-                              : "bg-white"
-                        }`}
+                              ? "bg-primary/5"
+                              : "bg-card"
+                        } hover:bg-muted`}
                      >
                         <Avatar className="h-10 w-10 flex-shrink-0">
                            <AvatarImage
@@ -217,7 +227,7 @@ export default function ChatPage() {
                                  {conv.otherUser.name}
                               </p>
                               {conv.lastMessage && (
-                                 <span className="text-xs text-gray-400">
+                                 <span className="text-xs text-muted-foreground">
                                     {formatMessageTime(
                                        conv.lastMessage.createdAt
                                     )}
@@ -225,7 +235,7 @@ export default function ChatPage() {
                               )}
                            </div>
                            <div className="flex items-center justify-between gap-3">
-                              <p className="text-xs text-gray-500 truncate">
+                              <p className="text-xs text-muted-foreground truncate">
                                  {conv.lastMessage
                                     ? conv.lastMessage.content
                                     : conv.otherUser.role === "TUTOR"
@@ -245,7 +255,7 @@ export default function ChatPage() {
             {activeConversation ? (
                <>
                   {/* Header */}
-                  <div className="border-b border-gray-100 p-4 bg-white flex items-center gap-3 sticky top-0 z-10">
+                  <div className="border-b border-border p-4 bg-card text-card-foreground flex items-center gap-3 sticky top-0 z-10">
                      <Avatar className="h-12 w-12">
                         <AvatarImage
                            src={activeConversation?.otherUser?.avatarUrl}
@@ -256,10 +266,10 @@ export default function ChatPage() {
                         </AvatarFallback>
                      </Avatar>
                      <div>
-                        <h2 className="text-base font-semibold text-gray-900">
+                        <h2 className="text-base font-semibold text-foreground">
                            {activeConversation?.otherUser?.name || "Chat"}
                         </h2>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-muted-foreground">
                            {activeConversation?.otherUser?.role === "TUTOR"
                               ? "Gia sư"
                               : "Học sinh"}
@@ -268,10 +278,10 @@ export default function ChatPage() {
                   </div>
 
                   {/* Messages */}
-                  <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#FBFBFA]">
+                  <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-background">
                      {loadingMessages ? (
                         <div className="flex justify-center items-center h-full">
-                           <span className="text-gray-500">
+                           <span className="text-muted-foreground">
                               Đang tải tin nhắn...
                            </span>
                         </div>
@@ -307,8 +317,8 @@ export default function ChatPage() {
                                  <div
                                     className={`max-w-[70%] px-4 py-2 rounded-2xl shadow-sm ${
                                        isOwn
-                                          ? "bg-sky-600 text-white rounded-br-none"
-                                          : "bg-white text-gray-900 rounded-bl-none border border-gray-100"
+                                          ? "bg-primary text-primary-foreground rounded-br-none"
+                                          : "bg-card text-card-foreground rounded-bl-none border border-border"
                                     }`}
                                  >
                                     <p className="text-sm leading-relaxed break-words">
@@ -317,8 +327,8 @@ export default function ChatPage() {
                                     <p
                                        className={`text-xs mt-2 ${
                                           isOwn
-                                             ? "text-sky-100"
-                                             : "text-gray-400"
+                                             ? "text-primary-foreground/70"
+                                             : "text-muted-foreground"
                                        }`}
                                     >
                                        {formatMessageTime(msg.createdAt)}
@@ -341,7 +351,7 @@ export default function ChatPage() {
                         })
                      ) : (
                         <div className="flex justify-center items-center h-full">
-                           <span className="text-gray-500">
+                           <span className="text-muted-foreground">
                               Không có tin nhắn nào
                            </span>
                         </div>
@@ -352,35 +362,35 @@ export default function ChatPage() {
                   {/* Input */}
                   <form
                      onSubmit={handleSendMessage}
-                     className="border-t border-gray-100 p-4 bg-white flex items-center gap-3"
+                     className="border-t border-border p-4 bg-card text-card-foreground flex items-center gap-3"
                   >
-                     <input
+                     <Input
                         type="text"
                         value={messageInput}
                         onChange={(e) => setMessageInput(e.target.value)}
                         placeholder="Nhập tin nhắn..."
-                        className="flex-1 px-4 py-3 border border-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-sky-100 bg-gray-50"
+                        className="flex-1 px-4 py-3 rounded-full bg-muted border border-border"
                         disabled={sendingMessage}
                      />
-                     <button
+                     <Button
                         type="submit"
                         disabled={sendingMessage || !messageInput.trim()}
-                        className="flex items-center gap-2 px-4 py-2 bg-sky-600 text-white rounded-full hover:bg-sky-700 disabled:opacity-50 transition-colors"
+                        className="rounded-full"
                      >
-                        <Send className="h-4 w-4" />
+                        <Send className="h-4 w-4 mr-2" />
                         <span className="text-sm">
                            {sendingMessage ? "Đang gửi..." : "Gửi"}
                         </span>
-                     </button>
+                     </Button>
                   </form>
                </>
             ) : (
-               <div className="flex-1 flex items-center justify-center bg-[#FBFBFA]">
+               <div className="flex-1 flex items-center justify-center bg-background">
                   <div className="text-center">
-                     <h3 className="text-lg font-medium text-gray-700">
+                     <h3 className="text-lg font-medium text-foreground">
                         Chọn một cuộc trò chuyện
                      </h3>
-                     <p className="text-sm text-gray-500 mt-2">
+                     <p className="text-sm text-muted-foreground mt-2">
                         Bắt đầu cuộc trò chuyện với học sinh hoặc gia sư
                      </p>
                   </div>

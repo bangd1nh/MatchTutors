@@ -38,7 +38,7 @@ const QuizNumberSection = (props: Props) => {
    };
 
    return (
-      <Card className="w-full h-fit sticky top-20 border-border bg-card">
+      <Card className="w-full h-fit sticky top-44 border-border bg-card">
          <CardHeader className="pb-4">
             <CardTitle className="flex items-center justify-between text-foreground">
                <span>Danh sách câu hỏi</span>

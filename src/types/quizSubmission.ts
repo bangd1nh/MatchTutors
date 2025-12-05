@@ -72,6 +72,33 @@ export interface IQuizSubmissionResponse extends BaseAPIResponse {
    };
 }
 
+export interface IQuizSubmissionListResponse extends BaseAPIResponse {
+   data: {
+      quizSnapshot: {
+         quizMode: QuizModeEnum;
+         settings: {
+            shuffleQuestions: boolean;
+            showCorrectAnswersAfterSubmit: boolean;
+            timeLimitMinutes: number;
+         };
+      };
+      _id: string;
+      quizId: {
+         title: string;
+         description: string;
+         quizMode: QuizModeEnum;
+         quizType: QuestionTypeEnum;
+         totalQuestions: number;
+      };
+      studentId: { name: string; email: string };
+      answers: IAnswerResponse[];
+      score: number;
+      gradedBy: string;
+      gradedAt: Date;
+      submittedAt: Date;
+   }[];
+}
+
 export interface IShortAnswerSubmissionResponse extends BaseAPIResponse {
    data: {
       quizSnapshot: {

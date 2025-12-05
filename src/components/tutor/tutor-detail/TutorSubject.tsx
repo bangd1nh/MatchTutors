@@ -9,31 +9,35 @@ interface TutorSubjectProps {
 }
 
 export function TutorSubject({ tutor }: TutorSubjectProps) {
+   const subjects = tutor.subjects || [];
+
    return (
-      <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
+      <Card className="bg-card text-card-foreground border border-border shadow-sm">
          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-xl font-medium text-sky-800">
-               <div className="w-8 h-8 bg-sky-50 rounded-lg flex items-center justify-center">
-                  <BookOpen className="w-4 h-4 text-sky-600" />
+            <CardTitle className="flex items-center gap-3 text-xl font-medium">
+               <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-muted text-muted-foreground">
+                  <BookOpen className="w-4 h-4" />
                </div>
                Môn học có thể dạy
             </CardTitle>
          </CardHeader>
          <CardContent>
-            {(tutor.subjects || []).length > 0 ? (
+            {subjects.length > 0 ? (
                <div className="flex flex-wrap gap-3">
-                  {(tutor.subjects || []).map((subject, index) => (
-                     <Badge 
-                        key={index} 
+                  {subjects.map((subject, index) => (
+                     <Badge
+                        key={index}
                         variant="secondary"
-                        className="bg-gray-100 text-gray-800 hover:bg-gray-200 border-0 px-4 py-2 text-sm font-medium rounded-full"
+                        className="rounded-full px-4 py-2 text-sm"
                      >
                         {getSubjectLabelVi(subject)}
                      </Badge>
                   ))}
                </div>
             ) : (
-               <p className="text-gray-500 italic">Chưa có thông tin môn học.</p>
+               <p className="text-muted-foreground italic">
+                  Chưa có thông tin môn học.
+               </p>
             )}
          </CardContent>
       </Card>

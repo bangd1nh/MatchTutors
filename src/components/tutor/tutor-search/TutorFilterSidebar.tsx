@@ -29,6 +29,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { MultiSelectPopover } from "./MultiSelectPopover";
 import { CITY_TYPE_VALUES } from "@/enums/city.enum";
 import { getSubjectLabelVi } from "@/utils/educationDisplay";
+import { Card } from "@/components/ui/card";
 
 const getLevelDisplayName = (level: Level): string => {
    const levelMap: Record<Level, string> = {
@@ -164,7 +165,7 @@ export default function TutorFilterBar({
    };
 
    return (
-      <div className="sticky top-16 z-40 bg-white border-b border-gray-200 shadow-sm">
+      <Card className="sticky top-16 z-40 bg-card text-card-foreground border-b border-border shadow-sm">
          <div className="px-6 py-4 space-y-3">
             {/* Thanh tìm kiếm - Chiều rộng đầy đủ */}
             <div className="flex w-full max-w-2xl">
@@ -178,7 +179,7 @@ export default function TutorFilterBar({
                />
                <Button
                   onClick={onApplyFilters}
-                  className="h-10 rounded-l-none bg-blue-600 hover:bg-blue-700 text-white border-l-0 shrink-0"
+                  className="h-10 rounded-l-none border-l-0 shrink-0"
                >
                   <Search className="h-4 w-4" />
                </Button>
@@ -355,58 +356,34 @@ export default function TutorFilterBar({
                   {/* Bộ lọc trình độ */}
                   <Popover>
                      <PopoverTrigger asChild>
-                        <Button
-                           variant="outline"
-                           className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24"
-                        >
+                        <Button variant="outline" className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24">
                            <Layers className="h-4 w-4" />
                            Trình độ
                            {currentFilters.selectedLevels.length > 0 && (
-                              <Badge
-                                 variant="secondary"
-                                 className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center"
-                              >
+                              <Badge variant="secondary" className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center">
                                  {currentFilters.selectedLevels.length}
                               </Badge>
                            )}
                         </Button>
                      </PopoverTrigger>
-                     <PopoverContent
-                        className="w-60 max-h-80 overflow-y-auto"
-                        align="start"
-                     >
+                     <PopoverContent className="w-60 max-h-80 overflow-y-auto bg-popover text-popover-foreground border border-border" align="start">
                         <div className="space-y-4">
-                           <h4 className="font-medium text-sm">
-                              Trình độ học vấn
-                           </h4>
+                           <h4 className="font-medium text-sm">Trình độ học vấn</h4>
                            <div className="space-y-2">
                               {LEVEL_VALUES.map((level) => (
-                                 <div
-                                    key={level}
-                                    className="flex items-center space-x-2"
-                                 >
+                                 <div key={level} className="flex items-center space-x-2">
                                     <Checkbox
                                        id={`level-${level}`}
-                                       checked={currentFilters.selectedLevels.includes(
-                                          level
-                                       )}
+                                       checked={currentFilters.selectedLevels.includes(level)}
                                        onCheckedChange={(checked) => {
                                           onFilterChange({
                                              selectedLevels: checked
-                                                ? [
-                                                   ...currentFilters.selectedLevels,
-                                                   level,
-                                                ]
-                                                : currentFilters.selectedLevels.filter(
-                                                   (l) => l !== level
-                                                ),
+                                                ? [...currentFilters.selectedLevels, level]
+                                                : currentFilters.selectedLevels.filter((l) => l !== level),
                                           });
                                        }}
                                     />
-                                    <Label
-                                       htmlFor={`level-${level}`}
-                                       className="text-sm"
-                                    >
+                                    <Label htmlFor={`level-${level}`} className="text-sm">
                                        {getLevelDisplayName(level)}
                                     </Label>
                                  </div>
@@ -422,9 +399,7 @@ export default function TutorFilterBar({
                      icon={<GraduationCap className="h-4 w-4" />}
                      options={SUBJECT_VALUES}
                      selected={currentFilters.selectedSubjects ?? []}
-                     onChange={(newSelected) =>
-                        onFilterChange({ selectedSubjects: newSelected })
-                     }
+                     onChange={(newSelected) => onFilterChange({ selectedSubjects: newSelected })}
                      placeholder="Tìm môn học..."
                      getLabel={getSubjectLabelVi}
                   />
@@ -432,23 +407,17 @@ export default function TutorFilterBar({
                   {/* Bộ lọc loại lớp học */}
                   <Popover>
                      <PopoverTrigger asChild>
-                        <Button
-                           variant="outline"
-                           className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24"
-                        >
+                        <Button variant="outline" className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24">
                            <BookOpen className="h-4 w-4" />
                            Loại lớp học
                            {currentFilters.selectedClassTypes.length > 0 && (
-                              <Badge
-                                 variant="secondary"
-                                 className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center"
-                              >
+                              <Badge variant="secondary" className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center">
                                  {currentFilters.selectedClassTypes.length}
                               </Badge>
                            )}
                         </Button>
                      </PopoverTrigger>
-                     <PopoverContent className="w-60" align="start">
+                     <PopoverContent className="w-60 bg-popover text-popover-foreground border border-border" align="start">
                         <div className="space-y-4">
                            <h4 className="font-medium text-sm">Loại lớp học</h4>
                            <div className="space-y-2">
@@ -456,33 +425,19 @@ export default function TutorFilterBar({
                                  { value: "ONLINE", label: "Trực tuyến" },
                                  { value: "IN_PERSON", label: "Trực tiếp" },
                               ].map((classType) => (
-                                 <div
-                                    key={classType.value}
-                                    className="flex items-center space-x-2"
-                                 >
+                                 <div key={classType.value} className="flex items-center space-x-2">
                                     <Checkbox
                                        id={`classType-${classType.value}`}
-                                       checked={currentFilters.selectedClassTypes.includes(
-                                          classType.value
-                                       )}
+                                       checked={currentFilters.selectedClassTypes.includes(classType.value)}
                                        onCheckedChange={(checked) => {
                                           onFilterChange({
                                              selectedClassTypes: checked
-                                                ? [
-                                                   ...currentFilters.selectedClassTypes,
-                                                   classType.value,
-                                                ]
-                                                : currentFilters.selectedClassTypes.filter(
-                                                   (c) =>
-                                                      c !== classType.value
-                                                ),
+                                                ? [...currentFilters.selectedClassTypes, classType.value]
+                                                : currentFilters.selectedClassTypes.filter((c) => c !== classType.value),
                                           });
                                        }}
                                     />
-                                    <Label
-                                       htmlFor={`classType-${classType.value}`}
-                                       className="text-sm"
-                                    >
+                                    <Label htmlFor={`classType-${classType.value}`} className="text-sm">
                                        {classType.label}
                                     </Label>
                                  </div>
@@ -498,57 +453,38 @@ export default function TutorFilterBar({
                      icon={<MapPin className="h-4 w-4" />}
                      options={CITY_TYPE_VALUES}
                      selected={currentFilters.selectedCities ?? []}
-                     onChange={(newSelected) =>
-                        onFilterChange({ selectedCities: newSelected })
-                     }
+                     onChange={(newSelected) => onFilterChange({ selectedCities: newSelected })}
                      placeholder="Tìm thành phố..."
                   />
 
                   {/* Bộ lọc đánh giá */}
                   <Popover>
                      <PopoverTrigger asChild>
-                        <Button
-                           variant="outline"
-                           className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24"
-                        >
+                        <Button variant="outline" className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24">
                            <Star className="h-4 w-4" />
                            Đánh giá
-                           {(currentFilters.ratingRange[0] > 0 ||
-                              currentFilters.ratingRange[1] < 5) && (
-                                 <Badge
-                                    variant="secondary"
-                                    className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center"
-                                 >
-                                    1
-                                 </Badge>
-                              )}
+                           {(currentFilters.ratingRange[0] > 0 || currentFilters.ratingRange[1] < 5) && (
+                              <Badge variant="secondary" className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center">
+                                 1
+                              </Badge>
+                           )}
                         </Button>
                      </PopoverTrigger>
-                     <PopoverContent className="w-80" align="start">
+                     <PopoverContent className="w-80 bg-popover text-popover-foreground border border-border" align="start">
                         <div className="space-y-6">
                            <div>
                               <Label className="text-sm font-medium mb-3 block">
-                                 Đánh giá: {currentFilters.ratingRange[0]} -{" "}
-                                 {currentFilters.ratingRange[1]} sao
+                                 Đánh giá: {currentFilters.ratingRange[0]} - {currentFilters.ratingRange[1]} sao
                               </Label>
                               <Slider
                                  value={currentFilters.ratingRange}
-                                 onValueChange={(value) =>
-                                    onFilterChange({
-                                       ratingRange: value as [number, number],
-                                    })
-                                 }
+                                 onValueChange={(value) => onFilterChange({ ratingRange: value as [number, number] })}
                                  max={5}
                                  step={1}
                                  className="w-full"
                               />
-                              <div className="flex justify-between text-xs text-gray-500 mt-1">
-                                 <span>0</span>
-                                 <span>1</span>
-                                 <span>2</span>
-                                 <span>3</span>
-                                 <span>4</span>
-                                 <span>5</span>
+                              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                                 <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
                               </div>
                            </div>
                         </div>
@@ -558,42 +494,28 @@ export default function TutorFilterBar({
                   {/* Bộ lọc giá & kinh nghiệm */}
                   <Popover>
                      <PopoverTrigger asChild>
-                        <Button
-                           variant="outline"
-                           className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24"
-                        >
+                        <Button variant="outline" className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24">
                            <DollarSign className="h-4 w-4" />
-                           Giá & Kinh nghiệm
+                           Giá
                            {(currentFilters.priceRange[0] > 0 ||
-                              currentFilters.priceRange[1] < 2000000 ||
-                              currentFilters.experienceYears[0] > 0 ||
-                              currentFilters.experienceYears[1] < 20) && (
-                                 <Badge
-                                    variant="secondary"
-                                    className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center"
-                                 >
-                                    1
-                                 </Badge>
-                              )}
+                             currentFilters.priceRange[1] < 2000000 ||
+                             currentFilters.experienceYears[0] > 0 ||
+                             currentFilters.experienceYears[1] < 20) && (
+                              <Badge variant="secondary" className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center">
+                                 1
+                              </Badge>
+                           )}
                         </Button>
                      </PopoverTrigger>
-                     <PopoverContent className="w-80" align="start">
+                     <PopoverContent className="w-80 bg-popover text-popover-foreground border border-border" align="start">
                         <div className="space-y-6">
                            <div>
                               <Label className="text-sm font-medium mb-3 block">
-                                 Khoảng giá:{" "}
-                                 {currentFilters.priceRange[0].toLocaleString()}{" "}
-                                 vnd -{" "}
-                                 {currentFilters.priceRange[1].toLocaleString()}{" "}
-                                 vnd/giờ
+                                 Khoảng giá: {currentFilters.priceRange[0].toLocaleString()} vnd - {currentFilters.priceRange[1].toLocaleString()} vnd/giờ
                               </Label>
                               <Slider
                                  value={currentFilters.priceRange}
-                                 onValueChange={(value) =>
-                                    onFilterChange({
-                                       priceRange: value as [number, number],
-                                    })
-                                 }
+                                 onValueChange={(value) => onFilterChange({ priceRange: value as [number, number] })}
                                  max={2000000}
                                  step={100000}
                                  className="w-full"
@@ -601,19 +523,11 @@ export default function TutorFilterBar({
                            </div>
                            <div>
                               <Label className="text-sm font-medium mb-3 block">
-                                 Kinh nghiệm: {currentFilters.experienceYears[0]}{" "}
-                                 - {currentFilters.experienceYears[1]} năm
+                                 Kinh nghiệm: {currentFilters.experienceYears[0]} - {currentFilters.experienceYears[1]} năm
                               </Label>
                               <Slider
                                  value={currentFilters.experienceYears}
-                                 onValueChange={(value) =>
-                                    onFilterChange({
-                                       experienceYears: value as [
-                                          number,
-                                          number
-                                       ],
-                                    })
-                                 }
+                                 onValueChange={(value) => onFilterChange({ experienceYears: value as [number, number] })}
                                  max={20}
                                  step={1}
                                  className="w-full"
@@ -626,25 +540,17 @@ export default function TutorFilterBar({
                   {/* Bộ lọc lịch trình */}
                   <Popover>
                      <PopoverTrigger asChild>
-                        <Button
-                           variant="outline"
-                           className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24"
-                        >
+                        <Button variant="outline" className="h-10 gap-2 bg-transparent text-sm flex-1 min-w-24">
                            <Clock className="h-4 w-4" />
                            Lịch trình
-                           {(currentFilters.selectedTimeSlots.length > 0 ||
-                              currentFilters.selectedDays.length > 0) && (
-                                 <Badge
-                                    variant="secondary"
-                                    className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center"
-                                 >
-                                    {currentFilters.selectedTimeSlots.length +
-                                       currentFilters.selectedDays.length}
-                                 </Badge>
-                              )}
+                           {(currentFilters.selectedTimeSlots.length > 0 || currentFilters.selectedDays.length > 0) && (
+                              <Badge variant="secondary" className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center">
+                                 {currentFilters.selectedTimeSlots.length + currentFilters.selectedDays.length}
+                              </Badge>
+                           )}
                         </Button>
                      </PopoverTrigger>
-                     <PopoverContent className="w-80" align="start">
+                     <PopoverContent className="w-80 bg-popover text-popover-foreground border border-border" align="start">
                         <div className="space-y-6">
                            <div>
                               <Label className="text-sm font-medium mb-3 block">
@@ -736,20 +642,14 @@ export default function TutorFilterBar({
                   </Popover>
 
                   {/* Nút hành động */}
-                  <div className="flex items-center gap-2 ml-2 pl-2 border-l border-gray-200 shrink-0">
-                     <Button
-                        onClick={onApplyFilters}
-                        className="h-10 text-sm whitespace-nowrap px-4"
-                     >
+                  <div className="flex items-center gap-2 ml-2 pl-2 border-l border-border shrink-0">
+                     <Button onClick={onApplyFilters} className="h-10 text-sm whitespace-nowrap px-4">
                         Áp dụng
                      </Button>
                      <Button
                         variant="ghost"
                         onClick={onClearFilters}
-                        className={`h-10 px-3 shrink-0 transition-opacity ${hasActiveFilters()
-                           ? "opacity-100"
-                           : "opacity-0 pointer-events-none"
-                           }`}
+                        className={`h-10 px-3 shrink-0 transition-opacity ${hasActiveFilters() ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                      >
                         <X className="h-4 w-4" />
                      </Button>
@@ -757,6 +657,6 @@ export default function TutorFilterBar({
                </div>
             </div>
          </div>
-      </div>
+      </Card>
    );
 }
