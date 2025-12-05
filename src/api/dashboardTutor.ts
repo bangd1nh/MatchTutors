@@ -5,12 +5,8 @@ export const fetchDashboardOverview = async () => {
    return res.data?.data;
 };
 
-export const fetchDashboardCharts = async (params?: {
-   month?: number;
-   year?: number;
-   week?: number;
-}) => {
-   const res = await apiClient.get("/dashboardTutor/charts", { params });
+export const fetchDashboardCharts = async () => {
+   const res = await apiClient.get("/dashboardTutor/analysis-charts");
    return res.data?.data;
 };
 
