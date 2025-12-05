@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, User, BookOpen } from "lucide-react";
 import type { NextSessionDTO } from "@/types/studentDashboard";
+import { getSubjectLabelVi } from "@/utils/educationDisplay";
+import { translateStatus } from "@/utils/studentDashboard";
 
 interface NextSessionCardProps {
    session: NextSessionDTO | null;
@@ -91,7 +93,7 @@ export function NextSessionCard({ session }: NextSessionCardProps) {
                   <div>
                      <p className="text-xs text-green-700">Môn học</p>
                      <p className="font-semibold text-green-900 text-sm">
-                        {session.subject}
+                        {getSubjectLabelVi(session.subject)}
                      </p>
                   </div>
                </div>
@@ -110,7 +112,10 @@ export function NextSessionCard({ session }: NextSessionCardProps) {
                            : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
                      }
                   >
-                     {session.studentConfirmation.status}
+                     {translateStatus(
+                        "STUDENT_CONFIRMATION",
+                        session.studentConfirmation.status
+                     )}
                   </Badge>
                </div>
             )}
