@@ -1,158 +1,86 @@
 import {
    ResponsiveContainer,
-   ScatterChart,
-   Scatter,
+   RadarChart,
+   PolarGrid,
+   PolarAngleAxis,
+   PolarRadiusAxis,
+   Radar,
+   BarChart,
+   Bar,
    XAxis,
    YAxis,
    CartesianGrid,
    Tooltip,
-   LineChart,
-   Line,
    Legend,
 } from "recharts";
 import { Activity, TrendingUp } from "lucide-react";
-import { getSessionStatusLabel } from "@/utils/session-status-translation";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 
-type DayItem = {
-   date: string;
-   label?: string;
-   count?: number;
-   total?: number;
-   counts?: Record<string, number>;
-   percents?: Record<string, number>;
+type SubjectAnalysisItem = {
+   subject: string;
+   offered: number;
+   requests: number;
 };
 
-type BubbleDataIn = { days: DayItem[]; range?: any };
-type SessionsDataIn = { statuses: string[]; days: DayItem[]; range?: any };
+type LevelDistributionItem = {
+   level: string;
+   count: number;
+};
 
 export default function StatisticChartTutor(props: {
-   bubble?: BubbleDataIn | null;
-   sessions?: SessionsDataIn | null;
+   subjectAnalysis?: SubjectAnalysisItem[] | null;
+   levelDistribution?: LevelDistributionItem[] | null;
 }) {
-   const { bubble, sessions } = props;
+   const { subjectAnalysis, levelDistribution } = props;
 
-   // helper to format ISO date string to local date display
-   const formatLocalDate = (isoDate: string) => {
-      try {
-         const d = new Date(isoDate);
-         // Use toLocaleDateString to respect user's local timezone
-         const dateStr = d.toLocaleDateString("vi-VN", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-         });
-         return dateStr;
-      } catch {
-         return isoDate;
-      }
-   };
-
-   // helper to build full weekday + date label in user's local timezone
-   const fullLabel = (isoDate: string) => {
-      try {
-         const d = new Date(isoDate);
-         const weekday = d.toLocaleDateString("vi-VN", { weekday: "long" });
-         const dateStr = formatLocalDate(isoDate);
-         return `${weekday} ${dateStr}`;
-      } catch {
-         return isoDate;
-      }
-   };
-
-   // bubble -> transform into points
-   const bubblePoints =
-      bubble?.days?.map((d, i) => ({
-         x: i + 1,
-         y: d.count || 0,
-         z: d.count || 0,
-         rawDate: d.date,
-         labelShort: formatLocalDate(d.date),
-         labelFull: fullLabel(d.date),
+   // Transform data with Vietnamese labels
+   const translatedSubjectAnalysis =
+      subjectAnalysis?.map((item) => ({
+         ...item,
+         subjectLabel: getSubjectLabelVi(item.subject),
       })) || [];
 
-   // sessions line: array with local dates
-   const sessionDays =
-      sessions?.days?.map((d) => {
-         const obj: any = { rawDate: d.date, dateLabel: fullLabel(d.date) };
-         (sessions.statuses || []).forEach((s) => {
-            obj[s] = d.counts?.[s] ?? 0;
-         });
-         return obj;
-      }) || [];
-
-   const top = 10;
-   const ticks = [0, 2, 4, 6, 8, 10];
+   const translatedLevelDistribution =
+      levelDistribution?.map((item) => ({
+         ...item,
+         levelLabel: getLevelLabelVi(item.level),
+      })) || [];
 
    return (
       <div className="space-y-6">
          <div className="bg-white dark:bg-gray-800 p-6 rounded shadow">
             <h4 className="font-medium mb-4 text-lg flex items-center gap-2 dark:text-white">
                <Activity className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-               Số lượng buổi học hoàn thành theo ngày
+               Phân tích môn học (Được mời vs. Yêu cầu)
             </h4>
             <div style={{ width: "100%", height: 480 }}>
                <ResponsiveContainer>
-                  <ScatterChart
-                     margin={{ top: 24, right: 20, bottom: 110, left: 40 }}
+                  <RadarChart
+                     cx="50%"
+                     cy="50%"
+                     outerRadius="80%"
+                     data={translatedSubjectAnalysis}
                   >
-                     <CartesianGrid
-                        stroke="#e6e6e6"
-                        strokeDasharray="3 3"
-                        className="dark:stroke-gray-700"
+                     <PolarGrid />
+                     <PolarAngleAxis dataKey="subjectLabel" />
+                     <PolarRadiusAxis />
+                     <Tooltip />
+                     <Legend />
+                     <Radar
+                        name="Môn học gia sư dạy"
+                        dataKey="offered"
+                        stroke="#3b82f6"
+                        fill="#3b82f6"
+                        fillOpacity={0.6}
                      />
-                     <XAxis
-                        dataKey="x"
-                        name="day"
-                        ticks={bubblePoints.map((p) => p.x)}
-                        tickFormatter={(v) => {
-                           const idx = Number(v) - 1;
-                           return bubblePoints[idx]?.labelShort || String(v);
-                        }}
-                        type="number"
-                        allowDecimals={false}
-                        domain={[1, 7]}
-                        tick={{ fontSize: 13, fill: "#6b7280" }}
-                        className="dark:fill-gray-400"
-                        interval={0}
-                        angle={-40}
-                        textAnchor="end"
-                        xAxisId={0}
-                        height={100}
+                     <Radar
+                        name="Yêu cầu nhận được"
+                        dataKey="requests"
+                        stroke="#f97316"
+                        fill="#f97316"
+                        fillOpacity={0.6}
                      />
-                     <YAxis
-                        ticks={ticks}
-                        domain={[0, top]}
-                        tick={{ fontSize: 14, fill: "#6b7280" }}
-                        className="dark:fill-gray-400"
-                        label={{
-                           value: "Số lượng",
-                           angle: -90,
-                           position: "insideLeft",
-                           offset: -10,
-                           style: { fontSize: 14, fill: "#6b7280" },
-                           className: "dark:fill-gray-400",
-                        }}
-                        width={70}
-                     />
-                     <Tooltip
-                        formatter={(value: any, name: any) => [
-                           value,
-                           name === "day" ? "ngày" : name,
-                        ]}
-                        labelFormatter={(label) => {
-                           const idx = Number(label) - 1;
-                           return bubblePoints[idx]?.labelFull || String(label);
-                        }}
-                        wrapperStyle={{ zIndex: 1000, fontSize: 13 }}
-                        contentStyle={{
-                           backgroundColor: "rgba(255, 255, 255, 0.8)",
-                           border: "1px solid #ccc",
-                        }}
-                        itemStyle={{ color: "#333" }}
-                        labelStyle={{ color: "#333", fontWeight: "bold" }}
-                     />
-                     <Scatter dataKey="z" data={bubblePoints} fill="#7c3aed" />
-                  </ScatterChart>
+                  </RadarChart>
                </ResponsiveContainer>
             </div>
          </div>
@@ -160,66 +88,30 @@ export default function StatisticChartTutor(props: {
          <div className="bg-white dark:bg-gray-800 p-6 rounded shadow">
             <h4 className="font-medium mb-4 text-lg flex items-center gap-2 dark:text-white">
                <TrendingUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-               Số lượng buổi học theo các trạng thái theo ngày
+               Phân bổ cấp độ học sinh đang dạy
             </h4>
             <div style={{ width: "100%", height: 480 }}>
                <ResponsiveContainer>
-                  <LineChart
-                     data={sessionDays}
-                     margin={{ bottom: 100, left: 40 }}
+                  <BarChart
+                     data={translatedLevelDistribution}
+                     margin={{
+                        top: 5,
+                        right: 30,
+                        left: 20,
+                        bottom: 5,
+                     }}
                   >
-                     <CartesianGrid
-                        stroke="#e6e6e6"
-                        strokeDasharray="3 3"
-                        className="dark:stroke-gray-700"
+                     <CartesianGrid strokeDasharray="3 3" />
+                     <XAxis dataKey="levelLabel" />
+                     <YAxis allowDecimals={false} />
+                     <Tooltip />
+                     <Legend />
+                     <Bar
+                        dataKey="count"
+                        fill="#8884d8"
+                        name="Số lượng học sinh"
                      />
-                     <XAxis
-                        dataKey="dateLabel"
-                        tick={{ fontSize: 13, fill: "#6b7280" }}
-                        className="dark:fill-gray-400"
-                        interval={0}
-                        height={100}
-                     />
-                     <YAxis
-                        ticks={ticks}
-                        domain={[0, top]}
-                        tick={{ fontSize: 14, fill: "#6b7280" }}
-                        className="dark:fill-gray-400"
-                        label={{
-                           value: "Số lượng",
-                           angle: -90,
-                           position: "insideLeft",
-                           offset: -10,
-                           style: { fontSize: 14, fill: "#6b7280" },
-                           className: "dark:fill-gray-400",
-                        }}
-                        width={70}
-                     />
-                     <Tooltip
-                        formatter={(value: number, name: string) => [
-                           value,
-                           getSessionStatusLabel(name),
-                        ]}
-                        labelFormatter={(label) => label}
-                        contentStyle={{
-                           backgroundColor: "rgba(255, 255, 255, 0.8)",
-                           border: "1px solid #ccc",
-                        }}
-                        itemStyle={{ color: "#333" }}
-                        labelStyle={{ color: "#333", fontWeight: "bold" }}
-                     />
-                     <Legend wrapperStyle={{ color: "#333" }} />
-                     {(sessions?.statuses || []).map((s, idx) => (
-                        <Line
-                           key={s}
-                           name={getSessionStatusLabel(s)}
-                           type="monotone"
-                           dataKey={s}
-                           stroke={["#8884d8", "#ff7300"][idx % 2]}
-                           strokeWidth={3}
-                        />
-                     ))}
-                  </LineChart>
+                  </BarChart>
                </ResponsiveContainer>
             </div>
          </div>

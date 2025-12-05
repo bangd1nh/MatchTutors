@@ -14,15 +14,10 @@ export const useFetchDashboardOverview = () => {
    });
 };
 
-export const useFetchDashboardCharts = (opts?: {
-   month?: number;
-   year?: number;
-   week?: number;
-   enabled?: boolean;
-}) => {
+export const useFetchDashboardCharts = (opts?: { enabled?: boolean }) => {
    return useQuery({
       queryKey: ["TUTOR_CHARTS", opts],
-      queryFn: () => fetchDashboardCharts(opts),
+      queryFn: () => fetchDashboardCharts(),
       enabled: opts?.enabled ?? true,
       staleTime: 1000 * 60 * 2,
       throwOnError: true,
