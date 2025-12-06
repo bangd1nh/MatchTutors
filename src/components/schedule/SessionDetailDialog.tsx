@@ -747,14 +747,18 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
          <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
             <DialogContent className="w-full sm:max-w-lg h-[100dvh] sm:h-auto sm:max-h-[85vh] overflow-y-auto p-0 sm:p-6 rounded-none sm:rounded-lg bg-card text-card-foreground border border-border">
                <DialogHeader>
-                  <DialogTitle className="text-foreground">Hủy buổi học</DialogTitle>
+                  <DialogTitle className="text-foreground">
+                     Hủy buổi học
+                  </DialogTitle>
                   <DialogDescription className="text-muted-foreground">
                      Vui lòng nhập lý do hủy buổi học. Lý do phải có ít nhất 10
                      ký tự.
                   </DialogDescription>
                </DialogHeader>
                <div className="py-4">
-                  <Label htmlFor="cancelReason" className="text-foreground">Lý do hủy</Label>
+                  <Label htmlFor="cancelReason" className="text-foreground">
+                     Lý do hủy
+                  </Label>
                   <Textarea
                      id="cancelReason"
                      placeholder="Nhập lý do hủy buổi học..."
@@ -798,7 +802,9 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
          <Dialog open={showDisputeDialog} onOpenChange={setShowDisputeDialog}>
             <DialogContent className="w-full sm:max-w-lg h-[100dvh] sm:h-auto sm:max-h-[85vh] overflow-y-auto p-0 sm:p-6 rounded-none sm:rounded-lg bg-card text-card-foreground border border-border">
                <DialogHeader>
-                  <DialogTitle className="text-foreground">Báo vắng / Khiếu nại Điểm danh</DialogTitle>
+                  <DialogTitle className="text-foreground">
+                     Báo vắng / Khiếu nại Điểm danh
+                  </DialogTitle>
                   <DialogDescription className="text-muted-foreground">
                      Vui lòng cung cấp lý do và bằng chứng cho quản trị viên xem
                      xét.
@@ -806,7 +812,9 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                </DialogHeader>
                <div className="py-4 space-y-4">
                   <div>
-                     <Label htmlFor="disputeReason" className="text-foreground">Lý do báo vắng</Label>
+                     <Label htmlFor="disputeReason" className="text-foreground">
+                        Lý do báo vắng
+                     </Label>
                      <Textarea
                         id="disputeReason"
                         placeholder="Ví dụ: Gia sư không đến, buổi học kết thúc sớm, học sinh vắng mặt..."

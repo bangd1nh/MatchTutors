@@ -159,6 +159,11 @@ export const tutorSidebarConfig: SidebarSection[] = [
             label: "Lịch sử thanh toán",
             icon: <CreditCard className="h-4 w-4" />,
          },
+         {
+            to: "/tutor/payout-history",
+            label: "Lịch sử rút tiền",
+            icon: <CreditCard className="h-4 w-4" />,
+         },
       ],
    },
    {
