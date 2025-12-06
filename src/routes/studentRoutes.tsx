@@ -30,6 +30,7 @@ import ViewSAQHistoryList from "@/pages/ShortAnswer/ViewSAQHistoryList";
 // import SessionDetailPage from "@/pages/SessionDetailPage"; // Moved to sharedRoutes
 import ChatPage from "@/pages/chat/chatPage";
 import StudentDashboardPage from "@/pages/Student/StudentDashboardPage";
+import { PayoutHistoryList } from "@/pages/paymentTutor/payoutHistory";
 
 export const studentRoutes = {
    element: (
@@ -195,5 +196,9 @@ export const studentRoutes = {
          element: <MyViolationReportsPage />,
       },
       { path: "/student/change-password", element: <ChangePasswordPage /> },
+      {
+         path: "/student/payout-history",
+         element: <PayoutHistoryList />,
+      },
    ],
 };

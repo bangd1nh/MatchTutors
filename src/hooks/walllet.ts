@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { getWalletInfo, Wallet } from "@/api/wallet";
+import { getPayoutHistory, getWalletInfo, Wallet } from "@/api/wallet";
 import { WithdrawRequest, WithdrawResponse, withdrawMoney } from "@/api/wallet";
+import { useQuery } from "@tanstack/react-query";
 
 export const useWallet = () => {
    const [wallet, setWallet] = useState<Wallet | null>(null);
@@ -51,4 +52,11 @@ export const useWithdraw = () => {
    };
 
    return { withdraw, loading, error };
+};
+
+export const usePayoutHistory = (limit: number = 6, skip: number = 0) => {
+   return useQuery({
+      queryKey: ["payoutHistory", limit, skip],
+      queryFn: () => getPayoutHistory(limit, skip),
+   });
 };

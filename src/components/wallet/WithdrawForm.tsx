@@ -4,6 +4,14 @@ import { useWallet, useWithdraw } from "@/hooks/walllet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AlertCircle, CheckCircle, Ban } from "lucide-react";
+import {
+   Dialog,
+   DialogContent,
+   DialogHeader,
+   DialogTitle,
+   DialogDescription,
+   DialogFooter,
+} from "@/components/ui/dialog";
 
 const BANKS = [
    { code: "970436", name: "Vietcombank", icon: "🏦" },
@@ -23,6 +31,7 @@ export const WithdrawForm: React.FC = () => {
 
    const [successMessage, setSuccessMessage] = useState<string | null>(null);
    const [validationError, setValidationError] = useState<string | null>(null);
+   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
    const selectedBank = BANKS.find((b) => b.code === formData.toBin);
 
@@ -53,13 +62,17 @@ export const WithdrawForm: React.FC = () => {
       return true;
    };
 
-   const handleSubmit = async (e: React.FormEvent) => {
+   const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
 
       if (!validateForm()) {
          return;
       }
 
+      setShowConfirmDialog(true);
+   };
+
+   const handleConfirmWithdraw = async () => {
       const result = await withdraw({
          toBin: formData.toBin,
          toAccountNumber: formData.toAccountNumber,
@@ -79,140 +92,218 @@ export const WithdrawForm: React.FC = () => {
             amount: "",
             description: "Rút tiền từ MatchWork",
          });
+         setShowConfirmDialog(false);
 
          setTimeout(() => setSuccessMessage(null), 5000);
       }
    };
 
    return (
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6">
-         <div className="flex items-center mb-6">
-            <Ban className="h-6 w-6 text-sky-500 mr-2" />
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-               Rút tiền
-            </h2>
+      <>
+         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6">
+            <div className="flex items-center mb-6">
+               <Ban className="h-6 w-6 text-sky-500 mr-2" />
+               <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
+                  Rút tiền
+               </h2>
+            </div>
+
+            {successMessage && (
+               <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-start">
+                  <CheckCircle className="h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <p className="text-green-800 dark:text-green-200">
+                     {successMessage}
+                  </p>
+               </div>
+            )}
+
+            {(error || validationError) && (
+               <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start">
+                  <AlertCircle className="h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <p className="text-red-800 dark:text-red-200">
+                     {error || validationError}
+                  </p>
+               </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+               {/* Hiển thị số dư */}
+               <div className="p-4 bg-sky-50 dark:bg-sky-900/20 rounded-lg border border-sky-200 dark:border-sky-800">
+                  <p className="text-sm text-sky-700 dark:text-sky-200">
+                     Số dư hiện tại
+                  </p>
+                  <p className="text-2xl font-bold text-sky-600 dark:text-sky-400">
+                     {walletLoading
+                        ? "..."
+                        : `${wallet?.balance.toLocaleString("vi-VN")} VNĐ`}
+                  </p>
+               </div>
+
+               {/* Chọn ngân hàng */}
+               <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                     Chọn ngân hàng
+                  </label>
+                  <select
+                     value={formData.toBin}
+                     onChange={(e) =>
+                        setFormData({ ...formData, toBin: e.target.value })
+                     }
+                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                  >
+                     {BANKS.map((bank) => (
+                        <option key={bank.code} value={bank.code}>
+                           {bank.icon} {bank.name}
+                        </option>
+                     ))}
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                     BIN: {selectedBank?.code}
+                  </p>
+               </div>
+
+               {/* Nhập số tài khoản */}
+               <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                     Số tài khoản
+                  </label>
+                  <Input
+                     type="number"
+                     placeholder="Nhập số tài khoản"
+                     value={formData.toAccountNumber}
+                     onChange={(e) =>
+                        setFormData({
+                           ...formData,
+                           toAccountNumber: e.target.value,
+                        })
+                     }
+                     disabled={withdrawLoading}
+                  />
+               </div>
+
+               {/* Nhập số tiền */}
+               <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                     Số tiền (VNĐ)
+                  </label>
+                  <Input
+                     type="number"
+                     placeholder="Tối thiểu 2.000 VNĐ"
+                     value={formData.amount}
+                     onChange={(e) =>
+                        setFormData({ ...formData, amount: e.target.value })
+                     }
+                     disabled={withdrawLoading}
+                     min="2000"
+                     step="1000"
+                  />
+               </div>
+
+               {/* Ghi chú */}
+               <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                     Ghi chú (tuỳ chọn)
+                  </label>
+                  <Input
+                     type="text"
+                     placeholder="Ghi chú về lệnh rút tiền"
+                     value={formData.description}
+                     onChange={(e) =>
+                        setFormData({
+                           ...formData,
+                           description: e.target.value,
+                        })
+                     }
+                     disabled={withdrawLoading}
+                  />
+               </div>
+
+               {/* Nút submit */}
+               <Button
+                  type="submit"
+                  disabled={withdrawLoading || walletLoading}
+                  className="w-full bg-sky-600 hover:bg-sky-700 text-white"
+               >
+                  {withdrawLoading ? "Đang xử lý..." : "Rút tiền"}
+               </Button>
+            </form>
+
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
+               💡 Lưu ý: Số tiền tối thiểu là 2.000 VNĐ.
+            </p>
          </div>
 
-         {successMessage && (
-            <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-start">
-               <CheckCircle className="h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-               <p className="text-green-800 dark:text-green-200">
-                  {successMessage}
-               </p>
-            </div>
-         )}
+         {/* Confirmation Dialog */}
+         <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+            <DialogContent className="w-full sm:max-w-md">
+               <DialogHeader>
+                  <DialogTitle>Xác nhận thông tin rút tiền</DialogTitle>
+                  <DialogDescription>
+                     Vui lòng kiểm tra lại thông tin trước khi xác nhận
+                  </DialogDescription>
+               </DialogHeader>
 
-         {(error || validationError) && (
-            <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start">
-               <AlertCircle className="h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" />
-               <p className="text-red-800 dark:text-red-200">
-                  {error || validationError}
-               </p>
-            </div>
-         )}
+               <div className="space-y-4 py-4">
+                  <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3">
+                     <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                           Ngân hàng
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                           {selectedBank?.icon} {selectedBank?.name}
+                        </span>
+                     </div>
 
-         <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Hiển thị số dư */}
-            <div className="p-4 bg-sky-50 dark:bg-sky-900/20 rounded-lg border border-sky-200 dark:border-sky-800">
-               <p className="text-sm text-sky-700 dark:text-sky-200">
-                  Số dư hiện tại
-               </p>
-               <p className="text-2xl font-bold text-sky-600 dark:text-sky-400">
-                  {walletLoading
-                     ? "..."
-                     : `${wallet?.balance.toLocaleString("vi-VN")} VNĐ`}
-               </p>
-            </div>
+                     <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                           Số tài khoản
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                           {formData.toAccountNumber}
+                        </span>
+                     </div>
 
-            {/* Chọn ngân hàng */}
-            <div>
-               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Chọn ngân hàng
-               </label>
-               <select
-                  value={formData.toBin}
-                  onChange={(e) =>
-                     setFormData({ ...formData, toBin: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-               >
-                  {BANKS.map((bank) => (
-                     <option key={bank.code} value={bank.code}>
-                        {bank.icon} {bank.name}
-                     </option>
-                  ))}
-               </select>
-               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  BIN: {selectedBank?.code}
-               </p>
-            </div>
+                     <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                           Số tiền
+                        </span>
+                        <span className="text-sm font-semibold text-sky-600 dark:text-sky-400">
+                           {parseFloat(formData.amount).toLocaleString("vi-VN")}{" "}
+                           VNĐ
+                        </span>
+                     </div>
 
-            {/* Nhập số tài khoản */}
-            <div>
-               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Số tài khoản
-               </label>
-               <Input
-                  type="number"
-                  placeholder="Nhập số tài khoản"
-                  value={formData.toAccountNumber}
-                  onChange={(e) =>
-                     setFormData({
-                        ...formData,
-                        toAccountNumber: e.target.value,
-                     })
-                  }
-                  disabled={withdrawLoading}
-               />
-            </div>
+                     {formData.description && (
+                        <div className="flex justify-between items-start">
+                           <span className="text-sm text-gray-600 dark:text-gray-400">
+                              Ghi chú
+                           </span>
+                           <span className="text-sm text-gray-900 dark:text-white text-right max-w-xs">
+                              {formData.description}
+                           </span>
+                        </div>
+                     )}
+                  </div>
+               </div>
 
-            {/* Nhập số tiền */}
-            <div>
-               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Số tiền (VNĐ)
-               </label>
-               <Input
-                  type="number"
-                  placeholder="Tối thiểu 10.000 VNĐ"
-                  value={formData.amount}
-                  onChange={(e) =>
-                     setFormData({ ...formData, amount: e.target.value })
-                  }
-                  disabled={withdrawLoading}
-                  min="2000"
-                  step="1000"
-               />
-            </div>
-
-            {/* Ghi chú */}
-            <div>
-               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Ghi chú (tuỳ chọn)
-               </label>
-               <Input
-                  type="text"
-                  placeholder="Ghi chú về lệnh rút tiền"
-                  value={formData.description}
-                  onChange={(e) =>
-                     setFormData({ ...formData, description: e.target.value })
-                  }
-                  disabled={withdrawLoading}
-               />
-            </div>
-
-            {/* Nút submit */}
-            <Button
-               type="submit"
-               disabled={withdrawLoading || walletLoading}
-               className="w-full bg-sky-600 hover:bg-sky-700 text-white"
-            >
-               {withdrawLoading ? "Đang xử lý..." : "Rút tiền"}
-            </Button>
-         </form>
-
-         <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-            💡 Lưu ý: Số tiền tối thiểu là 2.000 VNĐ.
-         </p>
-      </div>
+               <DialogFooter className="space-x-2">
+                  <Button
+                     variant="outline"
+                     onClick={() => setShowConfirmDialog(false)}
+                     disabled={withdrawLoading}
+                  >
+                     Hủy
+                  </Button>
+                  <Button
+                     onClick={handleConfirmWithdraw}
+                     disabled={withdrawLoading}
+                     className="bg-sky-600 hover:bg-sky-700 text-white"
+                  >
+                     {withdrawLoading ? "Đang xử lý..." : "Xác nhận"}
+                  </Button>
+               </DialogFooter>
+            </DialogContent>
+         </Dialog>
+      </>
    );
 };

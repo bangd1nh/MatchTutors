@@ -128,6 +128,11 @@ export const studentSidebarConfig: SidebarSection[] = [
             label: "Lịch sử thanh toán",
             icon: <CreditCard className="h-4 w-4" />,
          },
+         {
+            to: "/student/payout-history",
+            label: "Lịch sử rút tiền",
+            icon: <CreditCard className="h-4 w-4" />,
+         },
       ],
    },
    {

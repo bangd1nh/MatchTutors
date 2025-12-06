@@ -38,6 +38,7 @@ import ChatPage from "@/pages/chat/chatPage";
 import DashboardTutorPage from "@/pages/dashboardTutor/dashboardTutorPage";
 import ViewSAQHistory from "@/pages/ShortAnswer/ViewSAQHistory";
 import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
+import { PayoutHistoryList } from "@/pages/paymentTutor/payoutHistory";
 
 export const tutorRoutes = {
    element: (
@@ -301,6 +302,14 @@ export const tutorRoutes = {
          element: (
             <ProtectedTutorProfileRoute requireApproval={true}>
                <ChatPage />
+            </ProtectedTutorProfileRoute>
+         ),
+      },
+      {
+         path: "/tutor/payout-history",
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <PayoutHistoryList />
             </ProtectedTutorProfileRoute>
          ),
       },
