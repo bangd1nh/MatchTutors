@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { useReview } from "@/hooks/useReview"
+import { useToast } from "@/hooks/useToast"
 import { Review } from "@/types/review"
 import { Search, Filter, X, Star, BookOpen, GraduationCap, Calendar } from "lucide-react"
 import { useState, useMemo, useEffect } from "react"
@@ -61,7 +62,8 @@ export function ReviewList() {
         return filterParams;
     }, [tempFilters, currentPage, reviewsPerPage]);
 
-    const { myTutorReviews, isMyTutorReviewsLoading } = useReview(undefined, filters)
+    const { myTutorReviews, isMyTutorReviewsLoading, requestHideReview, isRequestingHide } = useReview(undefined, filters)
+    const toast = useToast()
 
     const mr = (myTutorReviews as any) ?? {}
     const reviews = mr.reviews ?? []
@@ -389,7 +391,19 @@ export function ReviewList() {
                         </Card>
                     ) : (
                         reviews.map((review: Review) => (
-                            <ReviewManagementCard key={review._id} review={review} />
+                            <ReviewManagementCard
+                                key={review._id}
+                                review={review}
+                                loading={isRequestingHide}
+                                onRequestHide={async (reviewId, reason) => {
+                                    try {
+                                        await requestHideReview({ reviewId, reason })
+                                        toast("success", "Đã gửi yêu cầu ẩn đánh giá")
+                                    } catch (error: any) {
+                                        toast("error", error?.response?.data?.message || "Gửi yêu cầu thất bại")
+                                    }
+                                }}
+                            />
                         ))
                     )}
                 </div>

@@ -1,17 +1,32 @@
-import { Star, Calendar, BookOpen } from "lucide-react";
+import { Star, Calendar, BookOpen, EyeOff } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import type { Review } from "@/types/review";
 import { getLevelLabelVi, getSubjectLabelVi } from "@/utils/educationDisplay";
+import {
+   Dialog,
+   DialogContent,
+   DialogHeader,
+   DialogTitle,
+   DialogFooter,
+   DialogDescription,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface ReviewManagementCardProps {
    review: Review;
+   onRequestHide?: (reviewId: string, reason?: string) => Promise<void>;
+   loading?: boolean;
 }
 
-export function ReviewManagementCard({ review }: ReviewManagementCardProps) {
+export function ReviewManagementCard({ review, onRequestHide, loading }: ReviewManagementCardProps) {
    const [isExpanded, setIsExpanded] = useState(false);
+   const [isDialogOpen, setIsDialogOpen] = useState(false);
+   const [reason, setReason] = useState("");
    const maxLength = 150;
 
    const getInitials = (name: string) =>
@@ -46,6 +61,19 @@ export function ReviewManagementCard({ review }: ReviewManagementCardProps) {
    const studentAvatar = review.reviewerId?.avatarUrl;
    const subject = review.teachingRequestId?.subject || "Môn học không xác định";
    const level = review.teachingRequestId?.level || "Trình độ không xác định";
+   const visibilityStatus = review.visibilityRequestStatus;
+   const isPending = visibilityStatus === "PENDING";
+   const isApproved = visibilityStatus === "APPROVED";
+   const isHidden = review.isVisible === false || isApproved;
+
+   const canRequestHide = !!onRequestHide && !isPending && !isApproved;
+
+   const handleSubmit = async () => {
+      if (!onRequestHide) return;
+      await onRequestHide(review._id, reason.trim() || undefined);
+      setIsDialogOpen(false);
+      setReason("");
+   };
 
    return (
       <Card className="rounded-2xl border p-6 shadow-sm transition-all">
@@ -69,8 +97,15 @@ export function ReviewManagementCard({ review }: ReviewManagementCardProps) {
                         <h3 className="font-semibold text-foreground">
                            {studentName}
                         </h3>
-                        {/* Có thể hiển thị huy hiệu nếu bạn thêm tính năng ẩn/hiện sau này */}
-                        {/* <Badge variant="secondary" className="text-xs">Đã ẩn</Badge> */}
+                        {isPending && (
+                           <Badge variant="secondary" className="text-xs">Chờ duyệt ẩn</Badge>
+                        )}
+                        {isHidden && !isPending && (
+                           <Badge variant="outline" className="text-xs">Đã ẩn</Badge>
+                        )}
+                        {visibilityStatus === "REJECTED" && (
+                           <Badge variant="destructive" className="text-xs">Từ chối ẩn</Badge>
+                        )}
                      </div>
 
                      {/* Sao đánh giá */}
@@ -122,6 +157,48 @@ export function ReviewManagementCard({ review }: ReviewManagementCardProps) {
                </div>
             </div>
          </div>
+
+         {/* Nút yêu cầu ẩn */}
+         {canRequestHide && (
+            <div className="mt-4">
+               <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsDialogOpen(true)}
+                  disabled={loading}
+                  className="inline-flex items-center gap-2"
+               >
+                  <EyeOff className="h-4 w-4" />
+                  Yêu cầu ẩn
+               </Button>
+            </div>
+         )}
+
+         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent>
+               <DialogHeader>
+                  <DialogTitle>Yêu cầu ẩn đánh giá</DialogTitle>
+                  <DialogDescription>
+                     Lý do (tùy chọn, tối đa 1000 ký tự)
+                  </DialogDescription>
+               </DialogHeader>
+               <Textarea
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value.slice(0, 1000))}
+                  placeholder="Nhập lý do (tùy chọn)"
+                  maxLength={1000}
+                  className="min-h-[120px]"
+               />
+               <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                     Hủy
+                  </Button>
+                  <Button onClick={handleSubmit} disabled={loading}>
+                     Gửi yêu cầu
+                  </Button>
+               </DialogFooter>
+            </DialogContent>
+         </Dialog>
       </Card>
    );
 }

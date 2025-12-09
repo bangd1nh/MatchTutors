@@ -368,9 +368,21 @@ const TutorProfileListPage: React.FC = () => {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-lg truncate max-w-[220px]" title={tutor.name}>
-                            {tutor.name}
-                          </h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-gray-900 text-lg truncate max-w-[220px]" title={tutor.name}>
+                              {tutor.name}
+                            </h3>
+                            {tutor.isBanned && (
+                              <span className="px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full bg-red-100 text-red-700 border border-red-200">
+                                Đã khóa
+                              </span>
+                            )}
+                            {(((tutor as any)?.reportInfo?.hasBeenReported) || ((tutor as any)?.tutor?.hasBeenReported)) && (
+                              <span className="px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                Đã báo cáo
+                              </span>
+                            )}
+                          </div>
                           <div className="flex items-center text-yellow-500">
                             <Star className="h-4 w-4 fill-current" />
                             <span className="ml-1 text-sm font-medium text-gray-900">

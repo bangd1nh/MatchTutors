@@ -7,6 +7,10 @@ import {
     updateReview,
     getMyTutorReviews,
     checkReviewEligibility,
+    requestHideReview,
+    getReviewVisibilityRequests,
+    updateReviewVisibility,
+    ReviewVisibilityAction,
 } from "@/api/review";
 import { useUser } from "./useUser";
 import { Role } from "@/types/user";
@@ -92,6 +96,45 @@ export const useReview = (tutorId?: string, filters?: {
         },
     });
 
+    // Tutor: request hide review
+    const requestHideMutation = useMutation({
+        mutationFn: ({ reviewId, reason }: { reviewId: string; reason?: string }) =>
+            requestHideReview(reviewId, reason),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["myTutorReviews"] });
+            queryClient.invalidateQueries({ queryKey: ["tutorReviews", tutorId] });
+        },
+    });
+
+    // Admin: fetch visibility requests
+    const useVisibilityRequests = (params?: {
+        page?: number;
+        limit?: number;
+        status?: "NONE" | "PENDING" | "APPROVED" | "REJECTED";
+        tutorUserId?: string;
+    }) =>
+        useQuery({
+            queryKey: ["reviewVisibilityRequests", params],
+            queryFn: () => getReviewVisibilityRequests(params),
+        });
+
+    // Admin: approve/reject visibility
+    const updateVisibilityMutation = useMutation({
+        mutationFn: ({
+            reviewId,
+            action,
+            note,
+        }: {
+            reviewId: string;
+            action: ReviewVisibilityAction;
+            note?: string;
+        }) => updateReviewVisibility(reviewId, { action, note }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["reviewVisibilityRequests"] });
+            queryClient.invalidateQueries({ queryKey: ["tutorReviews", tutorId] });
+        },
+    });
+
     return {
         // reviews
         tutorReviews,
@@ -112,8 +155,13 @@ export const useReview = (tutorId?: string, filters?: {
         // mutations
         createReview: createMutation.mutateAsync,
         updateReview: updateMutation.mutateAsync,
+        requestHideReview: requestHideMutation.mutateAsync,
+        updateReviewVisibility: updateVisibilityMutation.mutateAsync,
+        useVisibilityRequests,
         isCreating: createMutation.isPending,
         isUpdating: updateMutation.isPending,
+        isRequestingHide: requestHideMutation.isPending,
+        isUpdatingVisibility: updateVisibilityMutation.isPending,
     };
 };
 

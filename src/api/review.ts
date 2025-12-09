@@ -1,6 +1,8 @@
 import apiClient from "@/lib/api";
 import type { Review } from "@/types/review";
 
+export type ReviewVisibilityAction = "approve" | "reject" | "restore";
+
 // Create a new review
 export const createReview = async (data: {
     teachingRequestId: string;
@@ -102,6 +104,41 @@ export const updateReview = async (reviewId: string, data: {
 }): Promise<Review> => {
     const response = await apiClient.put(`/review/${reviewId}`, data);
     return response.data.data.review;
+};
+
+// Tutor: gửi yêu cầu ẩn review
+export const requestHideReview = async (reviewId: string, reason?: string): Promise<Review> => {
+    // Backend mount path: /api/review (singular)
+    const response = await apiClient.post(`/review/${reviewId}/request-hide`, {
+        reason,
+    });
+    return response.data.data?.review || response.data.data;
+};
+
+// Admin: lấy danh sách yêu cầu ẩn review
+export const getReviewVisibilityRequests = async (params?: {
+    page?: number;
+    limit?: number;
+    status?: "NONE" | "PENDING" | "APPROVED" | "REJECTED";
+    tutorUserId?: string;
+}) => {
+    const query = new URLSearchParams();
+    if (params?.page) query.append("page", params.page.toString());
+    if (params?.limit) query.append("limit", params.limit.toString());
+    if (params?.status && params.status !== "NONE") query.append("status", params.status);
+    if (params?.tutorUserId) query.append("tutorUserId", params.tutorUserId);
+
+    const response = await apiClient.get(`/admin/reviews/visibility-requests?${query.toString()}`);
+    return response.data.data;
+};
+
+// Admin: duyệt/từ chối yêu cầu ẩn review
+export const updateReviewVisibility = async (
+    reviewId: string,
+    payload: { action: ReviewVisibilityAction; note?: string }
+): Promise<Review> => {
+    const response = await apiClient.patch(`/admin/reviews/${reviewId}/visibility`, payload);
+    return response.data.data?.review || response.data.data;
 };
 
 // Check if student can review a tutor (has completed learning commitments)

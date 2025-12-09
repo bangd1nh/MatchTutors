@@ -15,6 +15,7 @@ import {
    AlertCircle,
    AlertTriangle,
    Wallet,
+   EyeOff,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -55,6 +56,11 @@ const urgentItems: SidebarItem[] = [
       to: "/admin/learning",
       label: "Tranh chấp học tập",
       icon: <Users className="h-5 w-5" />,
+   },
+   {
+      to: "/admin/review-visibility",
+      label: "Yêu cầu ẩn đánh giá",
+      icon: <EyeOff className="h-5 w-5" />,
    },
 ];
 
@@ -122,6 +128,9 @@ const AdminSidebarItems: React.FC<{
             location.pathname === "/admin/tutors" ||
             location.pathname.includes("/admin/tutors/") && location.pathname.includes("/full")
          );
+      }
+      if (path === "/admin/review-visibility") {
+         return location.pathname.startsWith("/admin/review-visibility");
       }
       if (path === "/admin/tutor-profile") {
          return (
