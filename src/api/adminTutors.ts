@@ -356,6 +356,232 @@ export const getTutorIdByUserId = async (
   }
 };
 
+// Interfaces for new endpoints
+export interface TutorFullDetails {
+  tutor: {
+    _id: string;
+    userId: {
+      _id: string;
+      role: string;
+      name: string;
+      email: string;
+      isBanned: boolean;
+      createdAt: string;
+      address?: {
+        city: string;
+        street: string;
+      };
+      avatarUrl?: string;
+      gender?: string;
+      phone?: string;
+    };
+    subjects: string[];
+    levels: string[];
+    education: any[];
+    certifications: any[];
+    experienceYears?: number;
+    hourlyRate?: number;
+    bio?: string;
+    classType: string[];
+    availability: any[];
+    isApproved: boolean;
+    approvedAt?: string;
+    rejectedReason?: string | null;
+    rejectedAt?: string | null;
+    hasBeenReported: boolean;
+    reportedAt?: string | null;
+    reportCount: number;
+    ratings: {
+      average: number;
+      totalReviews: number;
+    };
+    maxStudents?: number;
+    maxQuiz?: number;
+    embedding?: number[];
+    createdAt: string;
+    updatedAt: string;
+  };
+  statistics: {
+    commitments: {
+      byStatus: {
+        active?: number;
+        completed?: number;
+        cancelled?: number;
+        pending_agreement?: number;
+      };
+      active?: number;
+      completed?: number;
+    };
+    sessions: {
+      byStatus: Record<string, number>;
+    };
+    teachingRequests: {
+      byStatus: Record<string, number>;
+    };
+    violationReports: {
+      byStatus: Record<string, number>;
+      total: number;
+    };
+    reviews: {
+      byRating?: Record<string, number>; // From /full endpoint
+      distribution?: Record<string, number>; // From /statistics endpoint
+      average: number;
+      total: number;
+    };
+  };
+}
+
+export interface TutorFullDetailsResponse {
+  status: string;
+  message: string;
+  code: number;
+  data: TutorFullDetails;
+}
+
+export interface PaginatedResponse<T> {
+  status: string;
+  message: string;
+  code: number;
+  data: {
+    data?: T[];
+    commitments?: T[];
+    sessions?: T[];
+    teachingRequests?: T[];
+    reports?: T[];
+    reviews?: T[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      pages: number; // Always use 'pages', not 'totalPages'
+    };
+  };
+}
+
+/**
+ * Lấy thông tin đầy đủ của gia sư
+ */
+export const getTutorFullDetails = async (
+  tutorId: string
+): Promise<TutorFullDetailsResponse> => {
+  const response = await apiClient.get(`/admin/tutor/${tutorId}/full`);
+  return response.data;
+};
+
+/**
+ * Lấy danh sách learning commitments của gia sư
+ */
+export const getTutorLearningCommitments = async (
+  tutorId: string,
+  params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+  }
+): Promise<PaginatedResponse<any>> => {
+  const response = await apiClient.get(`/admin/tutor/${tutorId}/commitments`, {
+    params,
+  });
+  return response.data;
+};
+
+/**
+ * Lấy danh sách sessions của gia sư
+ */
+export const getTutorSessions = async (
+  tutorId: string,
+  params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+  }
+): Promise<PaginatedResponse<any>> => {
+  const response = await apiClient.get(`/admin/tutor/${tutorId}/sessions`, {
+    params,
+  });
+  return response.data;
+};
+
+/**
+ * Lấy danh sách teaching requests của gia sư
+ */
+export const getTutorTeachingRequests = async (
+  tutorId: string,
+  params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+  }
+): Promise<PaginatedResponse<any>> => {
+  const response = await apiClient.get(`/admin/tutor/${tutorId}/teaching-requests`, {
+    params,
+  });
+  return response.data;
+};
+
+/**
+ * Lấy danh sách violation reports của gia sư
+ */
+export const getTutorViolationReports = async (
+  tutorId: string,
+  params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+  }
+): Promise<PaginatedResponse<any>> => {
+  const response = await apiClient.get(`/admin/tutor/${tutorId}/reports`, {
+    params,
+  });
+  return response.data;
+};
+
+/**
+ * Lấy danh sách reviews của gia sư
+ */
+export const getTutorReviews = async (
+  tutorId: string,
+  params?: {
+    page?: number;
+    limit?: number;
+    rating?: number;
+    type?: string;
+  }
+): Promise<PaginatedResponse<any>> => {
+  const response = await apiClient.get(`/admin/tutor/${tutorId}/reviews`, {
+    params,
+  });
+  return response.data;
+};
+
+/**
+ * Lấy thống kê của gia sư
+ */
+export const getTutorStatistics = async (
+  tutorId: string
+): Promise<{
+  status: string;
+  message: string;
+  code: number;
+  data: {
+    totalCommitments: number;
+    totalSessions: number;
+    totalTeachingRequests: number;
+    totalViolationReports: number;
+    totalReviews: number;
+    averageRating: number;
+  };
+}> => {
+  const response = await apiClient.get(`/admin/tutor/${tutorId}/statistics`);
+  return response.data;
+};
+
 // Export default object chứa tất cả functions
 export default {
   getAllTutors,
@@ -370,4 +596,11 @@ export default {
   getTutorMapping,
   hideTutor,
   getTutorIdByUserId,
+  getTutorFullDetails,
+  getTutorLearningCommitments,
+  getTutorSessions,
+  getTutorTeachingRequests,
+  getTutorViolationReports,
+  getTutorReviews,
+  getTutorStatistics,
 };

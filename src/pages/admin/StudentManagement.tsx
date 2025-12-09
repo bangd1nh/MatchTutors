@@ -199,7 +199,7 @@ const StudentManagement = () => {
                                              <img
                                                 className={`h-12 w-12 rounded-xl object-cover ring-2 ring-white shadow-sm transition-all duration-200 ${student.isBanned ? 'grayscale opacity-75' : 'hover:scale-105'}`}
                                                 src={student.avatarUrl}
-                                                alt={student.name}
+                                                alt={student.name || student.email || "Học sinh"}
                                              />
                                              {student.isBanned && (
                                                 <div className="absolute inset-0 bg-red-500 bg-opacity-20 rounded-xl"></div>
@@ -208,7 +208,7 @@ const StudentManagement = () => {
                                        ) : (
                                           <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center shadow-sm">
                                              <span className="text-lg font-semibold text-white">
-                                                {student.name.charAt(0).toUpperCase()}
+                                                {(student.name?.charAt(0) || student.email?.charAt(0) || "H").toUpperCase()}
                                              </span>
                                           </div>
                                        )}
@@ -216,7 +216,7 @@ const StudentManagement = () => {
                                     <div className="ml-4">
                                        <div className="flex items-center space-x-2">
                                           <div className="text-sm font-semibold text-gray-900">
-                                             {student.name}
+                                             {student.name || student.email || "Chưa có tên"}
                                           </div>
                                           {student.isBanned && (
                                              <span className="px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full bg-red-100 text-red-700 border border-red-200">
@@ -236,8 +236,8 @@ const StudentManagement = () => {
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                  {student.address ? (
                                     <div>
-                                       <div className="font-medium">{student.address.street}</div>
-                                       <div className="text-gray-400">{student.address.city}</div>
+                                       <div className="font-medium">{student.address.street || "Chưa cập nhật"}</div>
+                                       <div className="text-gray-400">{student.address.city || ""}</div>
                                     </div>
                                  ) : (
                                     'Chưa cập nhật'
