@@ -154,3 +154,14 @@ export const cancelSession = async (
    });
    return response.data.metadata;
 };
+
+export const createBatchSessions = async (payload: {
+   learningCommitmentId: string;
+   location: string;
+   notes?: string;
+   sessions: { startTime: string; endTime: string }[];
+}): Promise<Session[]> => {
+   const response = await apiClient.post("/session/batch", payload);
+
+   return response.data?.data || response.data?.metadata || [];
+};

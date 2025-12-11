@@ -9,6 +9,7 @@ import {
    confirmAttendance,
    cancelSession,
    rejectAttendance,
+   createBatchSessions,
 } from "@/api/sessions";
 
 import { useToast } from "@/hooks/useToast";
@@ -233,6 +234,29 @@ export const useCancelSession = () => {
             "error",
             error.response?.data?.message || "Hủy buổi học thất bại."
          );
+      },
+   });
+};
+
+export const useCreateBatchSessions = () => {
+   const queryClient = useQueryClient();
+   const toast = useToast();
+
+   return useMutation({
+      mutationFn: createBatchSessions,
+      onSuccess: (data) => {
+         queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+
+         const count = Array.isArray(data) ? data.length : 1;
+
+         toast("success", `Đã tạo thành công ${count} buổi học!`);
+      },
+      onError: (error: any) => {
+         console.error(" Mutation Error:", error);
+
+         const message =
+            error?.response?.data?.message || error?.message || "Tạo thất bại.";
+         toast("error", message);
       },
    });
 };

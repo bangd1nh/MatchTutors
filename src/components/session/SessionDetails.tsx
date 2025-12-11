@@ -34,34 +34,38 @@ export default function SessionDetails({
                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                      <Label htmlFor="date">Ngày học</Label>
+                     {/* Date input */}
                      <Input
                         id="date"
                         type="date"
                         value={
-                           new Date(session.startTime)
-                              .toISOString()
-                              .split("T")[0]
+                           session?.startTime
+                              ? moment(session.startTime)
+                                   .local()
+                                   .format("YYYY-MM-DD")
+                              : ""
                         }
                         disabled={!isEditing || !isTutor}
                         onChange={(e) => {
                            if (!isTutor) return;
-                           const newDate = new Date(e.target.value);
-                           const startTime = new Date(session.startTime);
-                           const endTime = new Date(session.endTime);
-                           startTime.setFullYear(
-                              newDate.getFullYear(),
-                              newDate.getMonth(),
-                              newDate.getDate()
+                           const selectedDate = moment(
+                              e.target.value,
+                              "YYYY-MM-DD"
                            );
-                           endTime.setFullYear(
-                              newDate.getFullYear(),
-                              newDate.getMonth(),
-                              newDate.getDate()
-                           );
+                           const startLocal = moment(session.startTime).local();
+                           const endLocal = moment(session.endTime).local();
+                           startLocal
+                              .year(selectedDate.year())
+                              .month(selectedDate.month())
+                              .date(selectedDate.date());
+                           endLocal
+                              .year(selectedDate.year())
+                              .month(selectedDate.month())
+                              .date(selectedDate.date());
                            setSession({
                               ...session,
-                              startTime: startTime.toISOString(),
-                              endTime: endTime.toISOString(),
+                              startTime: startLocal.toISOString(),
+                              endTime: endLocal.toISOString(),
                            });
                         }}
                      />
@@ -98,48 +102,62 @@ export default function SessionDetails({
                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                      <Label htmlFor="startTime">Giờ bắt đầu</Label>
+                     {/* Start time input */}
                      <Input
                         id="startTime"
                         type="time"
-                        value={new Date(session.startTime)
-                           .toTimeString()
-                           .substring(0, 5)}
+                        value={
+                           session?.startTime
+                              ? moment(session.startTime)
+                                   .local()
+                                   .format("HH:mm")
+                              : ""
+                        }
                         disabled={!isEditing || !isTutor}
                         onChange={(e) => {
                            if (!isTutor) return;
                            const [hours, minutes] = e.target.value
                               .split(":")
                               .map(Number);
-                           const newStartTime = new Date(session.startTime);
-                           newStartTime.setHours(hours, minutes, 0, 0); // Reset seconds/ms
+                           const startLocal = moment(session.startTime).local();
+                           startLocal
+                              .hour(hours)
+                              .minute(minutes)
+                              .second(0)
+                              .millisecond(0);
                            setSession({
                               ...session,
-                              // --- SỬA Ở ĐÂY ---
-                              startTime: newStartTime.toISOString(),
+                              startTime: startLocal.toISOString(),
                            });
                         }}
                      />
                   </div>
                   <div className="space-y-2">
                      <Label htmlFor="endTime">Giờ kết thúc</Label>
+                     {/* End time input */}
                      <Input
                         id="endTime"
                         type="time"
-                        value={new Date(session.endTime)
-                           .toTimeString()
-                           .substring(0, 5)}
+                        value={
+                           session?.endTime
+                              ? moment(session.endTime).local().format("HH:mm")
+                              : ""
+                        }
                         disabled={!isEditing || !isTutor}
                         onChange={(e) => {
                            if (!isTutor) return;
                            const [hours, minutes] = e.target.value
                               .split(":")
                               .map(Number);
-                           const newEndTime = new Date(session.endTime);
-                           newEndTime.setHours(hours, minutes, 0, 0); // Reset seconds/ms
+                           const endLocal = moment(session.endTime).local();
+                           endLocal
+                              .hour(hours)
+                              .minute(minutes)
+                              .second(0)
+                              .millisecond(0);
                            setSession({
                               ...session,
-                              // --- SỬA Ở ĐÂY ---
-                              endTime: newEndTime.toISOString(),
+                              endTime: endLocal.toISOString(),
                            });
                         }}
                      />

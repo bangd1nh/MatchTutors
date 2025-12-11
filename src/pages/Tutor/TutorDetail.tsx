@@ -13,31 +13,35 @@ import {
 } from "@/components/tutor/tutor-detail";
 import { useTutorDetail } from "@/hooks/useTutorListAndDetail";
 import { TutorReviewSection } from "@/components/tutor/tutor-review/TutorReviewSection";
-import { Card, CardContent } from "@/components/ui/card";
 
 const TutorDetail: React.FC = () => {
    const { id } = useParams<{ id: string }>();
+
    const { data: rawTutor, isLoading } = useTutorDetail(id ?? null);
 
    if (isLoading) {
       return (
-         <div className="flex items-center justify-center py-20 bg-background">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+         <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-sky-600" />
          </div>
       );
    }
 
    if (!rawTutor) {
       return (
-         <div className="text-center text-destructive bg-background">
+         <div className="text-center text-red-500">
             Không thể tải thông tin gia sư.
          </div>
       );
    }
 
    const source: any = rawTutor;
-   const userObj = typeof source.userId === "object" ? source.userId : undefined;
 
+   // helper
+   const userObj =
+      typeof source.userId === "object" ? source.userId : undefined;
+
+   // Normalize shape to match UI components and types in src/types/tutorListandDetail.ts
    const normalizedTutor: Tutor = {
       ...source,
       // basic user fields
@@ -101,7 +105,7 @@ const TutorDetail: React.FC = () => {
                     ? {
                          startDate: edu.startDate ?? "",
                          endDate: edu.endDate ?? "",
-                       }
+                      }
                     : { startDate: "", endDate: "" }),
               description: edu.description ?? "",
            }))
@@ -120,60 +124,22 @@ const TutorDetail: React.FC = () => {
    };
 
    return (
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-gray-50/30">
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
                <div className="lg:col-span-2 space-y-8">
-                  <Card className="bg-card text-card-foreground border border-border">
-                     <CardContent className="p-0">
-                        <TutorHeader tutor={normalizedTutor} />
-                     </CardContent>
-                  </Card>
-
-                  <Card className="bg-card text-card-foreground border border-border">
-                     <CardContent className="p-0">
-                        <TutorIntroduction tutor={normalizedTutor} />
-                     </CardContent>
-                  </Card>
-
-                  <Card className="bg-card text-card-foreground border border-border">
-                     <CardContent className="p-0">
-                        <TutorSubject tutor={normalizedTutor} />
-                     </CardContent>
-                  </Card>
-
-                  <Card className="bg-card text-card-foreground border border-border">
-                     <CardContent className="p-0">
-                        <TutorEducation tutor={normalizedTutor} />
-                     </CardContent>
-                  </Card>
-
-                  <Card className="bg-card text-card-foreground border border-border">
-                     <CardContent className="p-0">
-                        <TutorCertification tutor={normalizedTutor} />
-                     </CardContent>
-                  </Card>
-
-                  <Card className="bg-card text-card-foreground border border-border">
-                     <CardContent className="p-0">
-                        <TutorAvailability tutor={normalizedTutor} />
-                     </CardContent>
-                  </Card>
-
-                  <Card className="bg-card text-card-foreground border border-border">
-                     <CardContent className="p-0">
-                        <TutorReviewSection tutorId={normalizedTutor._id} />
-                     </CardContent>
-                  </Card>
+                  <TutorHeader tutor={normalizedTutor} />
+                  <TutorIntroduction tutor={normalizedTutor} />
+                  <TutorSubject tutor={normalizedTutor} />
+                  <TutorEducation tutor={normalizedTutor} />
+                  <TutorCertification tutor={normalizedTutor} />
+                  <TutorAvailability tutor={normalizedTutor} />
+                  <TutorReviewSection tutorId={normalizedTutor._id} />
                </div>
 
                <div className="lg:col-span-1">
                   <div className="sticky top-8 space-y-6">
-                     <Card className="bg-card text-card-foreground border border-border">
-                        <CardContent className="p-0">
-                           <TutorContactCard tutor={normalizedTutor} />
-                        </CardContent>
-                     </Card>
+                     <TutorContactCard tutor={normalizedTutor} />
                   </div>
                </div>
             </div>

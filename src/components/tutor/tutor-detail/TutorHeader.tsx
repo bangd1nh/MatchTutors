@@ -31,7 +31,11 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
    const { isAuthenticated } = useUser();
 
    // Always call the hooks (never wrap them in conditionals)
-   const { data: isFav, isLoading, isError } = useFetchFav(tutor._id, {
+   const {
+      data: isFav,
+      isLoading,
+      isError,
+   } = useFetchFav(tutor._id, {
       enabled: !!isAuthenticated,
    });
 
@@ -40,7 +44,7 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
 
    const handleSave = () => {
       if (!isAuthenticated) {
-         toast("warning", "Vui lòng đăng nhập để thêm gia sư vào danh sách yêu thích");
+         toast("warning", "Please login to favorite this tutor");
          return;
       }
 
@@ -69,13 +73,13 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
    }
 
    return (
-      <Card className="border border-border shadow-sm bg-card text-card-foreground">
+      <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
          <CardContent className="p-8">
             <div className="flex flex-col lg:flex-row gap-8">
                {/* Avatar Section */}
                <div className="flex flex-col items-center lg:items-start">
                   <div className="relative">
-                     <Avatar className="w-40 h-40 ring-4 ring-background shadow-lg">
+                     <Avatar className="w-40 h-40 border-4 border-white shadow-lg">
                         <AvatarImage
                            src={tutor.avatarUrl || "/placeholder.svg"}
                            alt={
@@ -85,7 +89,7 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                            }
                            className="object-cover"
                         />
-                        <AvatarFallback className="text-3xl font-light bg-muted text-muted-foreground">
+                        <AvatarFallback className="text-3xl font-light bg-gray-100 text-gray-600">
                            {(typeof tutor.userId === "object"
                               ? tutor.userId.name
                               : tutor.fullName || "N/A"
@@ -103,16 +107,18 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                         {[...Array(5)].map((_, i: number) => (
                            <Star
                               key={i}
-                              className={`w-5 h-5 ${tutor.ratings &&
+                              className={`w-5 h-5 ${
+                                 tutor.ratings &&
                                  i < Math.floor(tutor.ratings.average)
-                                 ? "fill-amber-400 text-amber-400"
-                                 : "text-muted"
-                                 }`}
+                                    ? "fill-amber-400 text-amber-400"
+                                    : "text-gray-200"
+                              }`}
                            />
                         ))}
                      </div>
-                     <p className="text-sm text-muted-foreground font-medium">
-                        {tutor.ratings?.average?.toFixed(1) ?? "0.0"} • {tutor.ratings?.totalReviews ?? 0} đánh giá
+                     <p className="text-sm text-gray-600 font-medium">
+                        {tutor.ratings?.average?.toFixed(1) ?? "0.0"} •{" "}
+                        {tutor.ratings?.totalReviews ?? 0} đánh giá
                      </p>
                   </div>
                </div>
@@ -120,24 +126,24 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                {/* Info Section */}
                <div className="flex-1 space-y-6">
                   <div>
-                     <h1 className="text-4xl font-light text-foreground mb-2 tracking-tight">
+                     <h1 className="text-4xl font-light text-gray-900 mb-2 tracking-tight">
                         {tutor.fullName}
                      </h1>
-                     <div className="flex items-center gap-2 text-muted-foreground">
+                     <div className="flex items-center gap-2 text-gray-600">
                         <MapPin className="w-4 h-4" />
                         <span className="text-base">{tutor.address.city}</span>
                      </div>
                   </div>
 
                   {/* Experience & Gender */}
-                  <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
                      <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4" />
                         <span>{tutor.experienceYears}+ năm kinh nghiệm</span>
                      </div>
                      {tutor.gender && (
                         <div className="flex items-center gap-2">
-                           <span className="w-1 h-1 bg-muted-foreground/40 rounded-full"></span>
+                           <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
                            <span>{tutor.gender}</span>
                         </div>
                      )}
@@ -146,7 +152,7 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                   {/* Languages */}
                   {tutor.languages.length > 0 && (
                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-foreground">
+                        <div className="flex items-center gap-2 text-gray-700">
                            <Globe className="w-4 h-4" />
                            <span className="text-sm font-medium">Ngôn ngữ</span>
                         </div>
@@ -157,7 +163,7 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                                  <Badge
                                     key={index}
                                     variant="secondary"
-                                    className="px-3 py-1 text-sm font-normal"
+                                    className="bg-gray-100 text-gray-700 hover:bg-gray-200 border-0 px-3 py-1 text-sm font-normal"
                                  >
                                     {lang}
                                  </Badge>
@@ -168,24 +174,29 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                                     <Button
                                        variant="ghost"
                                        size="sm"
-                                       className="h-7 px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-muted"
+                                       className="h-7 px-3 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                                     >
                                        +{tutor.languages.length - 4} khác
                                     </Button>
                                  </PopoverTrigger>
-                                 <PopoverContent className="w-48 p-3 bg-popover text-popover-foreground border border-border" align="start">
+                                 <PopoverContent
+                                    className="w-48 p-3"
+                                    align="start"
+                                 >
                                     <div className="flex flex-wrap gap-2">
                                        {tutor.languages
                                           .slice(4)
-                                          .map((lang: string, index: number) => (
-                                             <Badge
-                                                key={index}
-                                                variant="secondary"
-                                                className="text-xs"
-                                             >
-                                                {lang}
-                                             </Badge>
-                                          ))}
+                                          .map(
+                                             (lang: string, index: number) => (
+                                                <Badge
+                                                   key={index}
+                                                   variant="secondary"
+                                                   className="text-xs"
+                                                >
+                                                   {lang}
+                                                </Badge>
+                                             )
+                                          )}
                                     </div>
                                  </PopoverContent>
                               </Popover>
@@ -201,18 +212,29 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
                         size="default"
                         onClick={handleSave}
                         disabled={fav?.isPending || removeFav?.isPending}
-                        className="hover:bg-muted"
+                        className="border-gray-200 hover:bg-gray-50 hover:border-gray-300"
                      >
                         <Heart
-                           className={`w-4 h-4 mr-2 ${isFav?.isFav ? "text-red-500 fill-red-500" : "text-muted-foreground"}`}
+                           className={`w-4 h-4 mr-2 ${
+                              isFav?.isFav
+                                 ? "text-red-500 fill-red-500"
+                                 : "text-gray-500"
+                           }`}
                         />
                         {isFav?.isFav ? "Bỏ lưu" : "Lưu"}
                      </Button>
-                     <Button size="default" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                     <Button
+                        size="default"
+                        className="bg-sky-600 hover:bg-sky-700 text-white border-0"
+                     >
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Nhắn tin ngay
                      </Button>
-                     <Button variant="secondary" size="default" className="bg-secondary hover:bg-accent text-foreground">
+                     <Button
+                        variant="secondary"
+                        size="default"
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-900 border-0"
+                     >
                         <Calendar className="w-4 h-4 mr-2" />
                         Đặt lịch học
                      </Button>
