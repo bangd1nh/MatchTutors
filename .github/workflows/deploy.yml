@@ -25,20 +25,21 @@ jobs:
               username: ${{ secrets.DOCKER_USERNAME }}
               password: ${{ secrets.DOCKER_PASSWORD }}
 
-         - name: Build and push
+         - name: Build and push (Forcing No-Cache for ENV changes)
            uses: docker/build-push-action@v5
            with:
               context: .
               push: true
               # Đặt tên image (sử dụng run_number làm tag)
               tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
-              cache-from: type=gha
-              cache-to: type=gha,mode=max
+              # THÊM THAM SỐ NÀY ĐỂ BUỘC BUILD LẠI VÀ KHẮC PHỤC LỖI CACHE
+              no-cache: true
+
               # TRUYỀN TẤT CẢ BIẾN MÔI TRƯỜNG VITE VÀO QUÁ TRÌNH BUILD DOCKER
               build-args: |
                  VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
                  VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}
-                 VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }} # <--- ĐÃ THÊM DÒNG NÀY ĐỂ KHẮC PHỤC LỖI WEBSOCKET
+                 VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }}
 
    # --- GIAI ĐOẠN 2: DEPLOY LÊN EC2 ---
    deploy:
