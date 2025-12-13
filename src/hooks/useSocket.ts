@@ -8,8 +8,10 @@ export const useSocket = (type: "chat" | "notifications") => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const baseUrl = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
-      
+      const baseUrl = (
+         import.meta.env.VITE_SOCKET_URL || "http://localhost:5000"
+      ).trim();
+
       const socketUrl = `${baseUrl}/${type}`;
 
       socketRef.current = io(socketUrl, {
