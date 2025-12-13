@@ -34,10 +34,11 @@ jobs:
               tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
               cache-from: type=gha
               cache-to: type=gha,mode=max
-              # TRUYỀN BIẾN MÔI TRƯỜNG VITE VÀO QUÁ TRÌNH BUILD DOCKER
+              # TRUYỀN TẤT CẢ BIẾN MÔI TRƯỜNG VITE VÀO QUÁ TRÌNH BUILD DOCKER
               build-args: |
                  VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
                  VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+                 VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }} # <--- ĐÃ THÊM DÒNG NÀY ĐỂ KHẮC PHỤC LỖI WEBSOCKET
 
    # --- GIAI ĐOẠN 2: DEPLOY LÊN EC2 ---
    deploy:
@@ -86,6 +87,7 @@ jobs:
                  # ========================================================
                  echo "🔥 Đang khởi chạy container Frontend..."
 
+                 # SỬ DỤNG LỆNH RUN DÀI ĐỂ KHÔNG BỊ TRÀN DÒNG TRONG YAML
                  docker run -d \
                    --name $CONTAINER_NAME \
                    --network web_network \
