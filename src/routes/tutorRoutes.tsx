@@ -59,6 +59,10 @@ export const tutorRoutes = {
          path: "/tutor/wallet",
          element: <WalletManagement />,
       },
+      {
+         path: "/tutor/payout-history",
+         element: <PayoutHistoryList />,
+      },
       { path: "/tutor/profile", element: <ProfilePage /> },
       { path: "/tutor/create-profile", element: <TutorProfilePage /> },
       { path: "/tutor/change-password", element: <ChangePasswordPage /> },
@@ -302,14 +306,6 @@ export const tutorRoutes = {
          element: (
             <ProtectedTutorProfileRoute requireApproval={true}>
                <ChatPage />
-            </ProtectedTutorProfileRoute>
-         ),
-      },
-      {
-         path: "/tutor/payout-history",
-         element: (
-            <ProtectedTutorProfileRoute requireApproval={true}>
-               <PayoutHistoryList />
             </ProtectedTutorProfileRoute>
          ),
       },
