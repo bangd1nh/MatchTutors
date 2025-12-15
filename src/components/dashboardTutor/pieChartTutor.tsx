@@ -214,7 +214,7 @@ export default function PieChartTutor(props: PieChartTutorProps) {
                            </AnyPie>
                            <Tooltip
                               formatter={(value: any) =>
-                                 `${value.toLocaleString()} VNĐ`
+                                 `${Number(value).toLocaleString()} VNĐ`
                               }
                               contentStyle={{
                                  backgroundColor: "rgba(255, 255, 255, 0.8)",
