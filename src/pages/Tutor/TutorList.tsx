@@ -11,13 +11,13 @@ interface TutorListPageProps {
 }
 
 const dayMap: Record<string, number> = {
-   Sunday: 0,
-   Monday: 1,
-   Tuesday: 2,
-   Wednesday: 3,
-   Thursday: 4,
-   Friday: 5,
-   Saturday: 6,
+   "Chủ Nhật": 0,
+   "Thứ Hai": 1,
+   "Thứ Ba": 2,
+   "Thứ Tư": 3,
+   "Thứ Năm": 4,
+   "Thứ Sáu": 5,
+   "Thứ Bảy": 6,
 };
 
 export default function TutorListPage({
@@ -71,16 +71,16 @@ export default function TutorListPage({
             : undefined,
       availability:
          shouldFetchFromAPI &&
-         (filters.selectedDays.length > 0 ||
-            filters.selectedTimeSlots.length > 0)
+            (filters.selectedDays.length > 0 ||
+               filters.selectedTimeSlots.length > 0)
             ? {
-                 dayOfWeek: filters.selectedDays.length
-                    ? filters.selectedDays.map((d: string) => dayMap[d])
-                    : undefined,
-                 slots: filters.selectedTimeSlots.length
-                    ? filters.selectedTimeSlots
-                    : undefined,
-              }
+               dayOfWeek: filters.selectedDays.length
+                  ? filters.selectedDays.map((d: string) => dayMap[d])
+                  : undefined,
+               slots: filters.selectedTimeSlots.length
+                  ? filters.selectedTimeSlots
+                  : undefined,
+            }
             : undefined,
       minRating:
          shouldFetchFromAPI && filters.ratingRange?.[0] > 0

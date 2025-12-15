@@ -477,21 +477,21 @@ export default function TutorProfile() {
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h1 className="text-2xl font-bold">
-                                {tutor ? "Edit Profile" : "Create Tutor Profile"}
+                                {tutor ? "Chỉnh sửa hồ sơ" : "Tạo hồ sơ gia sư"}
                             </h1>
                             <p className="text-muted-foreground">
                                 {tutor
-                                    ? "Update your tutor information"
-                                    : "Complete the information below to create your profile"}
+                                    ? "Cập nhật thông tin gia sư của bạn"
+                                    : "Vui lòng hoàn thành thông tin bên dưới để tạo hồ sơ"}
                             </p>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Avatar Section */}
+                        {/* Phần ảnh đại diện */}
                         <Card className="bg-card text-card-foreground">
                             <CardHeader>
-                                <CardTitle className="text-foreground">Profile Picture</CardTitle>
+                                <CardTitle className="text-foreground">Ảnh đại diện</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <ProfileAvatar
@@ -503,10 +503,10 @@ export default function TutorProfile() {
                             </CardContent>
                         </Card>
 
-                        {/* Personal Information */}
+                        {/* Thông tin cá nhân */}
                         <Card className="lg:col-span-2 bg-card text-card-foreground">
                             <CardHeader>
-                                <CardTitle className="text-foreground">Personal Information *</CardTitle>
+                                <CardTitle className="text-foreground">Thông tin cá nhân *</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <PersonalInfoForm
@@ -521,81 +521,81 @@ export default function TutorProfile() {
 
                         {/* Thông tin giảng dạy */}
                         <TeachingInformationForm
-                           formData={formData}
-                           handleFieldChange={handleFieldChange}
-                           handleClassTypeChange={handleClassTypeChange}
-                           clearFieldError={clearFieldError}
-                           hasError={hasError}
-                           getError={getError}
+                            formData={formData}
+                            handleFieldChange={handleFieldChange}
+                            handleClassTypeChange={handleClassTypeChange}
+                            clearFieldError={clearFieldError}
+                            hasError={hasError}
+                            getError={getError}
                         />
 
                         {/* Subjects */}
                         <Card className="lg:col-span-3 bg-card text-card-foreground">
-                          <CardHeader>
-                            <CardTitle className="text-foreground">Môn Dạy *</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <MultiSelectInput
-                              wrapperRef={subjectRef}
-                              value={formData.subjects || []}
-                              onChange={(val) => {
-                                setFormData((prev) => ({ ...prev, subjects: val }));
-                                validateField("subjects", val, !!tutorProfile);
-                                clearFieldError("subjects");
-                              }}
-                              options={SUBJECT_VALUES}
-                              // Use Vietnamese subject labels
-                              labels={SUBJECT_LABELS_VI}
-                              placeholder="Select subjects..."
-                              searchPlaceholder="Search subjects..."
-                              className={hasError("subjects") ? "border-destructive rounded-md" : ""}
-                            />
-                            <ValidationError message={getError("subjects")} />
-                          </CardContent>
+                            <CardHeader>
+                                <CardTitle className="text-foreground">Môn Dạy *</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <MultiSelectInput
+                                    wrapperRef={subjectRef}
+                                    value={formData.subjects || []}
+                                    onChange={(val) => {
+                                        setFormData((prev) => ({ ...prev, subjects: val }));
+                                        validateField("subjects", val, !!tutorProfile);
+                                        clearFieldError("subjects");
+                                    }}
+                                    options={SUBJECT_VALUES}
+                                    // Use Vietnamese subject labels
+                                    labels={SUBJECT_LABELS_VI}
+                                    placeholder="Select subjects..."
+                                    searchPlaceholder="Search subjects..."
+                                    className={hasError("subjects") ? "border-destructive rounded-md" : ""}
+                                />
+                                <ValidationError message={getError("subjects")} />
+                            </CardContent>
                         </Card>
 
                         {/* Levels */}
                         <Card className="lg:col-span-3 bg-card text-card-foreground">
-                          <CardHeader>
-                            <CardTitle className="text-foreground">Cấp bậc *</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <MultiSelectInput
-                              wrapperRef={levelsRef}
-                              value={formData.levels || []}
-                              onChange={(val) => {
-                                setFormData((prev) => ({ ...prev, levels: val }));
-                                validateField("levels", val, !!tutorProfile);
-                                clearFieldError("levels");
-                              }}
-                              options={LEVEL_VALUES}
-                              // Use Vietnamese level labels
-                              labels={LEVEL_LABELS_VI}
-                              placeholder="Select levels..."
-                              searchPlaceholder="Search levels..."
-                              className={hasError("levels") ? "border-destructive rounded-md" : ""}
-                            />
-                            <ValidationError message={getError("levels")} />
-                          </CardContent>
+                            <CardHeader>
+                                <CardTitle className="text-foreground">Cấp bậc *</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <MultiSelectInput
+                                    wrapperRef={levelsRef}
+                                    value={formData.levels || []}
+                                    onChange={(val) => {
+                                        setFormData((prev) => ({ ...prev, levels: val }));
+                                        validateField("levels", val, !!tutorProfile);
+                                        clearFieldError("levels");
+                                    }}
+                                    options={LEVEL_VALUES}
+                                    // Use Vietnamese level labels
+                                    labels={LEVEL_LABELS_VI}
+                                    placeholder="Select levels..."
+                                    searchPlaceholder="Search levels..."
+                                    className={hasError("levels") ? "border-destructive rounded-md" : ""}
+                                />
+                                <ValidationError message={getError("levels")} />
+                            </CardContent>
                         </Card>
 
                         {/* Học vấn */}
                         <EducationForm
-                           education={(formData.education || []).map((e) => ({
-                              degree: e.degree ?? "",
-                              institution: e.institution ?? "",
-                              fieldOfStudy: e.fieldOfStudy ?? "",
-                              startDate: e.startDate ?? "",
-                              endDate: e.endDate ?? "",
-                              description: e.description ?? "",
-                              dateRange: e.dateRange ?? "",
-                           }))}
-                           addEducation={addEducation}
-                           removeEducation={removeEducation}
-                           handleEducationChange={handleEducationChange}
-                           hasError={hasError}
-                           getError={getError}
-                           getDateDisplayValue={getDateDisplayValue}
+                            education={(formData.education || []).map((e) => ({
+                                degree: e.degree ?? "",
+                                institution: e.institution ?? "",
+                                fieldOfStudy: e.fieldOfStudy ?? "",
+                                startDate: e.startDate ?? "",
+                                endDate: e.endDate ?? "",
+                                description: e.description ?? "",
+                                dateRange: e.dateRange ?? "",
+                            }))}
+                            addEducation={addEducation}
+                            removeEducation={removeEducation}
+                            handleEducationChange={handleEducationChange}
+                            hasError={hasError}
+                            getError={getError}
+                            getDateDisplayValue={getDateDisplayValue}
                         />
 
 
@@ -625,29 +625,29 @@ export default function TutorProfile() {
                                                     Tên Chứng chỉ *
                                                 </Label>
                                                 <Input
-                                                   id={`certifications.${index}.name`}
-                                                   name={`certifications.${index}.name`}
-                                                   placeholder="Certification Name"
-                                                   value={cert.name}
-                                                   onChange={(e) =>
-                                                      handleCertificationChange(index, "name", e.target.value)
-                                                   }
-                                                   className={hasError(`certifications.${index}.name`) ? "border-destructive" : ""}
+                                                    id={`certifications.${index}.name`}
+                                                    name={`certifications.${index}.name`}
+                                                    placeholder="Certification Name"
+                                                    value={cert.name}
+                                                    onChange={(e) =>
+                                                        handleCertificationChange(index, "name", e.target.value)
+                                                    }
+                                                    className={hasError(`certifications.${index}.name`) ? "border-destructive" : ""}
                                                 />
                                                 <ValidationError message={getError(`certifications.${index}.name`)} />
                                             </div>
                                             <div>
                                                 <Label htmlFor={`certifications.${index}.description`} className="text-foreground">
-                                                   Mô tả *
+                                                    Mô tả *
                                                 </Label>
                                                 <Textarea
-                                                   id={`certifications.${index}.description`}
-                                                   name={`certifications.${index}.description`}
-                                                   placeholder="Description"
-                                                   value={cert.description || ""}
-                                                   onChange={(e) =>
-                                                      handleCertificationChange(index, "description", e.target.value)
-                                                   }
+                                                    id={`certifications.${index}.description`}
+                                                    name={`certifications.${index}.description`}
+                                                    placeholder="Description"
+                                                    value={cert.description || ""}
+                                                    onChange={(e) =>
+                                                        handleCertificationChange(index, "description", e.target.value)
+                                                    }
                                                 />
                                                 <ValidationError message={getError(`certifications.${index}.description`)} />
                                             </div>
@@ -656,187 +656,187 @@ export default function TutorProfile() {
                                             <div>
                                                 <Label className="text-foreground">Ảnh chứng chỉ</Label>
                                                 <div className="mt-2">
-                                                   <input
-                                                      type="file"
-                                                      accept="image/*"
-                                                      multiple
-                                                      onChange={(e) =>
-                                                         handleCertificationImageUpload(index, e.target.files)
-                                                      }
-                                                      className="hidden"
-                                                      id={`certification-images-${index}`}
-                                                   />
-                                                   <label htmlFor={`certification-images-${index}`}>
-                                                      <Button variant="outline" size="sm" asChild>
-                                                         <span>Thêm ảnh</span>
-                                                      </Button>
-                                                   </label>
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        multiple
+                                                        onChange={(e) =>
+                                                            handleCertificationImageUpload(index, e.target.files)
+                                                        }
+                                                        className="hidden"
+                                                        id={`certification-images-${index}`}
+                                                    />
+                                                    <label htmlFor={`certification-images-${index}`}>
+                                                        <Button variant="outline" size="sm" asChild>
+                                                            <span>Thêm ảnh</span>
+                                                        </Button>
+                                                    </label>
                                                 </div>
 
                                                 {/* Hiển thị ảnh đã chọn */}
                                                 {certificationFiles[index] && certificationFiles[index].length > 0 && (
-                                                   <div className="mt-3">
-                                                      <p className="text-sm text-muted-foreground mb-2">Chọn ảnh: </p>
-                                                      <div className="flex flex-wrap gap-2">
-                                                         {certificationFiles[index].map((file, fileIndex) => (
-                                                            <div key={fileIndex} className="relative">
-                                                               <img
-                                                                  src={URL.createObjectURL(file)}
-                                                                  alt={file.name}
-                                                                  className="w-16 h-16 object-cover rounded border border-border"
-                                                               />
-                                                               <Button
-                                                                  size="sm"
-                                                                  variant="destructive"
-                                                                  className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
-                                                                  onClick={() => removeCertificationImage(index, fileIndex)}
-                                                               >
-                                                                  <X className="h-3 w-3" />
-                                                               </Button>
-                                                               <p className="text-xs text-muted-foreground truncate w-16">
-                                                                  {file.name}
-                                                               </p>
-                                                            </div>
-                                                         ))}
-                                                      </div>
-                                                   </div>
+                                                    <div className="mt-3">
+                                                        <p className="text-sm text-muted-foreground mb-2">Chọn ảnh: </p>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {certificationFiles[index].map((file, fileIndex) => (
+                                                                <div key={fileIndex} className="relative">
+                                                                    <img
+                                                                        src={URL.createObjectURL(file)}
+                                                                        alt={file.name}
+                                                                        className="w-16 h-16 object-cover rounded border border-border"
+                                                                    />
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="destructive"
+                                                                        className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
+                                                                        onClick={() => removeCertificationImage(index, fileIndex)}
+                                                                    >
+                                                                        <X className="h-3 w-3" />
+                                                                    </Button>
+                                                                    <p className="text-xs text-muted-foreground truncate w-16">
+                                                                        {file.name}
+                                                                    </p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
                                                 )}
 
                                                 {/* Hiển thị ảnh hiện có từ server */}
                                                 {cert.imageUrls && cert.imageUrls.length > 0 && (
-                                                   <div className="mt-3">
-                                                      <p className="text-sm text-muted-foreground mb-2">Ảnh tồn Tại: </p>
-                                                      <div className="flex flex-wrap gap-2">
-                                                         {cert.imageUrls?.map((url, urlIndex) => (
-                                                            <div key={urlIndex} className="relative group">
-                                                               <img
-                                                                  src={url}
-                                                                  alt={`Certification image ${urlIndex + 1}`}
-                                                                  className="w-16 h-16 object-cover rounded border border-border"
-                                                               />
-                                                               <p className="text-xs text-muted-foreground truncate w-16">
-                                                                  Ảnh {urlIndex + 1}
-                                                               </p>
+                                                    <div className="mt-3">
+                                                        <p className="text-sm text-muted-foreground mb-2">Ảnh tồn Tại: </p>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {cert.imageUrls?.map((url, urlIndex) => (
+                                                                <div key={urlIndex} className="relative group">
+                                                                    <img
+                                                                        src={url}
+                                                                        alt={`Certification image ${urlIndex + 1}`}
+                                                                        className="w-16 h-16 object-cover rounded border border-border"
+                                                                    />
+                                                                    <p className="text-xs text-muted-foreground truncate w-16">
+                                                                        Ảnh {urlIndex + 1}
+                                                                    </p>
 
-                                                               {/* Remove button */}
-                                                               <button
-                                                                  type="button"
-                                                                  onClick={() =>
-                                                                     handleRemoveExistingImage(cert, urlIndex, index)
-                                                                  }
-                                                                  className="absolute top-0 right-0 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                               >
-                                                                  ✕
-                                                               </button>
-                                                            </div>
-                                                         ))}
-                                                      </div>
-                                                   </div>
+                                                                    {/* Remove button */}
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            handleRemoveExistingImage(cert, urlIndex, index)
+                                                                        }
+                                                                        className="absolute top-0 right-0 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                    >
+                                                                        ✕
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
                                                 )}
-                                             </div>
-                                          </div>
-                                       </div>
-                                    ))}
-                                 </CardContent>
-                              </Card>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
 
-                              {/* Availability */}
-                              <Card className="lg:col-span-3 bg-card text-card-foreground" id="availability-section">
-                                 <CardHeader>
-                                    <CardTitle className="text-foreground">Lịch Rảnh *</CardTitle>
-                                    <p className="text-sm text-muted-foreground">
-                                        Chọn Ngày và khung giờ có thể nhận việc dạy học
-                                    </p>
-                                 </CardHeader>
-                                 <CardContent>
-                                    <AvailabilityGrid
-                                       availability={formData.availability || []}
-                                       onAvailabilityChange={updateAvailability}
-                                    />
-                                    <ValidationError message={getError("availability")} className="mt-4" />
-                                 </CardContent>
-                              </Card>
+                        {/* Availability */}
+                        <Card className="lg:col-span-3 bg-card text-card-foreground" id="availability-section">
+                            <CardHeader>
+                                <CardTitle className="text-foreground">Lịch Rảnh *</CardTitle>
+                                <p className="text-sm text-muted-foreground">
+                                    Chọn Ngày và khung giờ có thể nhận việc dạy học
+                                </p>
+                            </CardHeader>
+                            <CardContent>
+                                <AvailabilityGrid
+                                    availability={formData.availability || []}
+                                    onAvailabilityChange={updateAvailability}
+                                />
+                                <ValidationError message={getError("availability")} className="mt-4" />
+                            </CardContent>
+                        </Card>
 
-                              {/* Address */}
-                              <Card className="lg:col-span-3 bg-card text-card-foreground">
-                                 <CardHeader>
-                                    <CardTitle className="text-foreground">Địa chỉ *</CardTitle>
-                                 </CardHeader>
-                                 <CardContent>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                       {/* City */}
-                                       <div>
-                                          <Label htmlFor="address.city" className="text-foreground">Thành Phố *</Label>
-                                          <Select
-                                             value={formData.address?.city || ""}
-                                             onValueChange={(value) => {
+                        {/* Address */}
+                        <Card className="lg:col-span-3 bg-card text-card-foreground">
+                            <CardHeader>
+                                <CardTitle className="text-foreground">Địa chỉ *</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* City */}
+                                    <div>
+                                        <Label htmlFor="address.city" className="text-foreground">Thành Phố *</Label>
+                                        <Select
+                                            value={formData.address?.city || ""}
+                                            onValueChange={(value) => {
                                                 handleAddressChange("city", value);
                                                 clearFieldError("address.city");
-                                             }}
-                                          >
-                                             <SelectTrigger className={hasError("address.city") ? "border-destructive" : ""}>
+                                            }}
+                                        >
+                                            <SelectTrigger className={hasError("address.city") ? "border-destructive" : ""}>
                                                 <SelectValue placeholder="Select a city" />
-                                             </SelectTrigger>
-                                             <SelectContent>
+                                            </SelectTrigger>
+                                            <SelectContent>
                                                 {CITY_TYPE_VALUES.map((city) => (
-                                                   <SelectItem key={city} value={city}>
-                                                      {city}
-                                                   </SelectItem>
+                                                    <SelectItem key={city} value={city}>
+                                                        {city}
+                                                    </SelectItem>
                                                 ))}
-                                             </SelectContent>
-                                          </Select>
-                                          <ValidationError message={getError("address.city")} />
-                                       </div>
+                                            </SelectContent>
+                                        </Select>
+                                        <ValidationError message={getError("address.city")} />
+                                    </div>
 
-                                       {/* Street */}
-                                       <div>
-                                          <Label htmlFor="address.street" className="text-foreground">Địa chỉ *</Label>
-                                          <Input
-                                             id="address.street"
-                                             name="address.street"
-                                             value={formData.address?.street || ""}
-                                             onChange={(e) => {
+                                    {/* Street */}
+                                    <div>
+                                        <Label htmlFor="address.street" className="text-foreground">Địa chỉ *</Label>
+                                        <Input
+                                            id="address.street"
+                                            name="address.street"
+                                            value={formData.address?.street || ""}
+                                            onChange={(e) => {
                                                 handleAddressChange("street", e.target.value);
                                                 clearFieldError("address.street");
-                                             }}
-                                             placeholder="Enter street address"
-                                             className={hasError("address.street") ? "border-destructive" : ""}
-                                          />
-                                          <ValidationError message={getError("address.street")} />
-                                       </div>
+                                            }}
+                                            placeholder="Enter street address"
+                                            className={hasError("address.street") ? "border-destructive" : ""}
+                                        />
+                                        <ValidationError message={getError("address.street")} />
                                     </div>
-                                 </CardContent>
-                              </Card>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                              {/* Action Buttons */}
-                              <Card className="lg:col-span-3 bg-card text-card-foreground">
-                                 <CardContent className="pt-6">
-                                    <div className="mt-4 flex justify-end space-x-2">
-                                       <Button
-                                          variant="secondary"
-                                          onClick={() => setIsEditing(false)}
-                                          disabled={isCreating || isUpdating}
-                                       >
-                                          Hủy
-                                       </Button>
+                        {/* Action Buttons */}
+                        <Card className="lg:col-span-3 bg-card text-card-foreground">
+                            <CardContent className="pt-6">
+                                <div className="mt-4 flex justify-end space-x-2">
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => setIsEditing(false)}
+                                        disabled={isCreating || isUpdating}
+                                    >
+                                        Hủy
+                                    </Button>
 
-                                       <Button onClick={handleSave} disabled={isCreating || isUpdating}>
-                                          {isCreating || isUpdating ? (
-                                             <span className="flex items-center space-x-2">
+                                    <Button onClick={handleSave} disabled={isCreating || isUpdating}>
+                                        {isCreating || isUpdating ? (
+                                            <span className="flex items-center space-x-2">
                                                 <Loader2 className="h-5 w-5 animate-spin" />
                                                 <span>Đang Lưu...</span>
-                                             </span>
-                                          ) : (
-                                             "Save"
-                                          )}
-                                       </Button>
-                                    </div>
-                                 </CardContent>
-                              </Card>
-                           </div>
-                        </div>
-                     </div>
-                  );
+                                            </span>
+                                        ) : (
+                                            "Lưu"
+                                        )}
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     // Profile View

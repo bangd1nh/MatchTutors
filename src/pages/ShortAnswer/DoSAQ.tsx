@@ -6,8 +6,9 @@ import QuizInfo from "@/components/Quiz/QuizInfo";
 import { Button } from "@/components/ui/button";
 import { useDoSAQ } from "@/hooks/useDoSAQ";
 import { useDoSAQStore } from "@/store/useDoSAQStore";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import QuizTimer from "../MultipleChoice/QuizTimer";
 
 const DoSAQ = () => {
     const navigate = useNavigate();
@@ -16,6 +17,9 @@ const DoSAQ = () => {
 
     const { fetchSAQForAttempt, submitSAQ } = useDoSAQ(quizId);
     const quizessSectionRef = useRef<QuizessSectionSAQRef>(null);
+
+    const [isTimeOver, setIsTimeOver] = useState(false);
+    const timeUpCalledRef = useRef(false);
     const [isInitialized, setIsInitialized] = useState(false);
 
     const isLoading = fetchSAQForAttempt.isLoading;
@@ -52,6 +56,14 @@ const DoSAQ = () => {
         const payload = getSubmitQuiz();
         submitSAQ.mutate(payload);
     };
+
+    const handleTimeUp = useCallback(() => {
+        // Chỉ gọi nộp bài 1 lần khi hết giờ
+        if (timeUpCalledRef.current) return;
+        timeUpCalledRef.current = true;
+        setIsTimeOver(true);
+        handleSubmit();
+    }, [handleSubmit]);
 
     const handleQuestionClick = (questionIndex: number) => {
         if (quizessSectionRef.current) {
@@ -98,8 +110,15 @@ const DoSAQ = () => {
         <div className="container mx-auto py-6">
             <QuizInfo quizInfo={quizInfo} />
 
+
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
                 <div className="lg:col-span-2">
+                    <QuizTimer
+                        timeLimitMinutes={quizInfo.settings?.timeLimitMinutes || 0}
+                        onTimeUp={handleTimeUp}
+                        // Dừng timer và cũng là tín hiệu hết giờ
+                        isSubmitting={submitSAQ.isPending || isTimeOver}
+                    />
                     <QuizNumberSectionSAQ
                         questions={questions}
                         onSubmit={handleSubmit}

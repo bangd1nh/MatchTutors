@@ -21,12 +21,14 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
             <div className="w-full h-full mx-auto">
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold">Tutor Profile</h1>
-                        <p className="text-muted-foreground">View and manage your tutor information</p>
+                        <h1 className="text-2xl font-bold">Hồ sơ Gia sư</h1>
+                        <p className="text-muted-foreground">
+                            Xem và quản lý thông tin gia sư của bạn
+                        </p>
                     </div>
                     <Button onClick={onEdit} className="gap-2">
                         <Edit className="w-4 h-4" />
-                        Edit Profile
+                        Chỉnh sửa hồ sơ
                     </Button>
                 </div>
 
@@ -55,7 +57,7 @@ export function TutorProfileView({ tutor, onEdit }: TutorProfileViewProps) {
                                     <div className="flex items-center justify-center space-x-1 mt-2">
                                         <Star className="w-4 h-4 text-yellow-500" />
                                         <span className="font-medium">{tutor?.ratings?.average ?? "-"}</span>
-                                        <span className="text-muted-foreground">({tutor?.ratings?.totalReviews ?? "-"} reviews)</span>
+                                        <span className="text-muted-foreground">({tutor?.ratings?.totalReviews ?? "-"} đánh giá)</span>
                                     </div>
                                     <Badge
                                         variant={tutor?.isApproved ? "default" : "secondary"}
