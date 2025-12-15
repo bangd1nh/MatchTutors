@@ -1,10 +1,7 @@
 # Stage 1: Build & Dependencies
-# CHUYỂN SANG node:22-slim (Debian) để khắc phục lỗi Rollup/Vite native
 FROM node:22-slim AS builder 
 WORKDIR /app
 
-# ⚠️ LƯU Ý: Nếu pdftotext cần cho quá trình build, bạn phải cài bằng lệnh Debian:
-# RUN apt-get update && apt-get install -y poppler-utils 
 
 # Khai báo ARG/ENV (Giữ nguyên)
 ARG VITE_API_BASE_URL 
@@ -23,7 +20,7 @@ RUN rm -rf node_modules package-lock.json && npm install
 
 # Copy source code và Build (Sẽ thành công trên Debian Slim)
 COPY . .
-RUN npm run build 
+RUN npm run vite build
 
 # Stage 2: Production Final Image (Giữ Nginx Alpine để image nhẹ hơn)
 # Stage 2 không cần pdftotext trừ khi Nginx hoặc file HTML cần nó.

@@ -25,16 +25,15 @@ jobs:
               username: ${{ secrets.DOCKER_USERNAME }}
               password: ${{ secrets.DOCKER_PASSWORD }}
 
-         - name: Build and push (Forcing No-Cache for ENV changes)
+         - name: Build and push
            uses: docker/build-push-action@v5
            with:
               context: .
               push: true
               # Đặt tên image (sử dụng run_number làm tag)
               tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
-              # THÊM THAM SỐ NÀY ĐỂ BUỘC BUILD LẠI VÀ KHẮC PHỤC LỖI CACHE
-              no-cache: true
-
+              cache-from: type=gha
+              cache-to: type=gha,mode=max
               # TRUYỀN TẤT CẢ BIẾN MÔI TRƯỜNG VITE VÀO QUÁ TRÌNH BUILD DOCKER
               build-args: |
                  VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
