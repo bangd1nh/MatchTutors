@@ -9,7 +9,7 @@ env:
    DOCKER_IMAGE_TAG: ${{ github.run_number }}
 
 jobs:
-   # --- GIAI ĐOẠN 1: BUILD & PUSH DOCKER ----
+   # ---- GIAI ĐOẠN 1: BUILD & PUSH DOCKER ----
    build-and-push:
       runs-on: ubuntu-latest
       steps:
