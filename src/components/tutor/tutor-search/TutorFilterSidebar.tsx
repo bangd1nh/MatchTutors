@@ -220,7 +220,7 @@ export default function TutorFilterBar({
                               className="flex items-center gap-1 py-1"
                            >
                               <GraduationCap className="h-3 w-3" />
-                              {subject}
+                              {getSubjectLabelVi(subject)}
                               <X
                                  className="h-3 w-3 cursor-pointer hover:text-destructive"
                                  onClick={() => removeSubjectFilter(subject)}
@@ -498,13 +498,13 @@ export default function TutorFilterBar({
                            <DollarSign className="h-4 w-4" />
                            Giá
                            {(currentFilters.priceRange[0] > 0 ||
-                             currentFilters.priceRange[1] < 2000000 ||
-                             currentFilters.experienceYears[0] > 0 ||
-                             currentFilters.experienceYears[1] < 20) && (
-                              <Badge variant="secondary" className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center">
-                                 1
-                              </Badge>
-                           )}
+                              currentFilters.priceRange[1] < 2000000 ||
+                              currentFilters.experienceYears[0] > 0 ||
+                              currentFilters.experienceYears[1] < 20) && (
+                                 <Badge variant="secondary" className="h-5 w-5 p-0 min-w-5 text-xs flex items-center justify-center">
+                                    1
+                                 </Badge>
+                              )}
                         </Button>
                      </PopoverTrigger>
                      <PopoverContent className="w-80 bg-popover text-popover-foreground border border-border" align="start">
