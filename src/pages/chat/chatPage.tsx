@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useChat } from "@/hooks/useChat";
 import { useChatStore } from "@/store/useChatStore";
@@ -26,6 +26,7 @@ export default function ChatPage() {
       sendMessage,
       sendingMessage,
       searchConversations,
+      currentUserId,
    } = useChat();
 
    const { setActiveConversation } = useChatStore();
@@ -93,6 +94,36 @@ export default function ChatPage() {
    const filteredConversations: Conversation[] = isSearching
       ? searchResults?.data || []
       : conversations;
+
+   // Sort conversations: unread (other user's lastMessage not read by current user) first,
+   // then by lastMessageAt desc.
+   const sortedConversations = useMemo(() => {
+      const isUnread = (conv: any) => {
+         const lm = conv?.lastMessage;
+         if (!lm) return false;
+         if (!currentUserId) return false;
+         const senderId = lm?.sender?._id || lm?.sender;
+         if (!senderId) return false;
+         if (String(senderId) === String(currentUserId)) return false; // own message
+         const readBy = Array.isArray(lm?.isReadBy)
+            ? lm.isReadBy.map(String)
+            : [];
+         return !readBy.includes(String(currentUserId));
+      };
+
+      return (filteredConversations || []).slice().sort((a: any, b: any) => {
+         const aUnread = isUnread(a);
+         const bUnread = isUnread(b);
+         if (aUnread !== bUnread) return aUnread ? -1 : 1;
+         const aTime = a?.lastMessageAt
+            ? new Date(a.lastMessageAt).getTime()
+            : 0;
+         const bTime = b?.lastMessageAt
+            ? new Date(b.lastMessageAt).getTime()
+            : 0;
+         return bTime - aTime;
+      });
+   }, [filteredConversations, currentUserId]);
 
    const handleSendMessage = (e: React.FormEvent) => {
       e.preventDefault();
@@ -202,56 +233,83 @@ export default function ChatPage() {
                         : "Chưa có cuộc trò chuyện nào"}
                   </div>
                ) : (
-                  filteredConversations.map((conv: Conversation) => (
-                     <button
-                        key={conv._id}
-                        onClick={() => setActiveConversation(conv._id)}
-                        className={`w-full text-left p-4 border-b border-border flex gap-3 items-start transition-colors ${
-                           activeConversationId === conv._id
-                              ? "bg-primary/5"
-                              : "bg-card"
-                        } hover:bg-muted`}
-                     >
-                        <Avatar className="h-10 w-10 flex-shrink-0">
-                           <AvatarImage
-                              src={conv.otherUser.avatarUrl}
-                              alt={conv.otherUser.name || conv.otherUser.email}
-                           />
-                           <AvatarFallback>
-                              {(
-                                 conv.otherUser.name ||
-                                 conv.otherUser.email ||
-                                 "?"
-                              )
-                                 .charAt(0)
-                                 .toUpperCase()}
-                           </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                           <div className="flex items-center justify-between gap-2">
-                              <p className="font-medium text-sm truncate">
-                                 {conv.otherUser.name || conv.otherUser.email}
-                              </p>
-                              {conv.lastMessage && (
-                                 <span className="text-xs text-muted-foreground">
-                                    {formatMessageTime(
-                                       conv.lastMessage.createdAt
+                  sortedConversations.map((conv: any) => {
+                     const lm = conv?.lastMessage;
+                     const isConvUnread =
+                        lm &&
+                        currentUserId &&
+                        String(lm?.sender?._id || lm?.sender) !==
+                           String(currentUserId) &&
+                        !(lm?.isReadBy || [])
+                           .map(String)
+                           .includes(String(currentUserId));
+
+                     return (
+                        <div
+                           key={conv._id}
+                           className={`flex items-center gap-3 p-3 hover:bg-accent/50 cursor-pointer ${
+                              isConvUnread ? "bg-accent/20" : ""
+                           }`}
+                           onClick={() => setActiveConversation(conv._id)}
+                        >
+                           <Avatar className="h-10 w-10 flex-shrink-0">
+                              <AvatarImage
+                                 src={conv.otherUser?.avatarUrl}
+                                 alt={
+                                    conv.otherUser?.name ||
+                                    conv.otherUser?.email
+                                 }
+                              />
+                              <AvatarFallback>
+                                 {(
+                                    conv.otherUser?.name ||
+                                    conv.otherUser?.email ||
+                                    "?"
+                                 )
+                                    .charAt(0)
+                                    .toUpperCase()}
+                              </AvatarFallback>
+                           </Avatar>
+
+                           <div className="flex-1">
+                              <div className="flex justify-between items-center">
+                                 <p
+                                    className={` ${
+                                       isConvUnread
+                                          ? "font-semibold"
+                                          : "font-medium"
+                                    }`}
+                                 >
+                                    {conv.otherUser?.name ||
+                                       conv.otherUser?.email}
+                                 </p>
+                                 <p className="text-xs text-muted-foreground">
+                                    {formatDistanceToNow(
+                                       new Date(
+                                          conv.lastMessageAt ||
+                                             conv.updatedAt ||
+                                             Date.now()
+                                       ),
+                                       {
+                                          addSuffix: true,
+                                          locale: vi,
+                                       }
                                     )}
-                                 </span>
-                              )}
-                           </div>
-                           <div className="flex items-center justify-between gap-3">
-                              <p className="text-xs text-muted-foreground truncate">
-                                 {conv.lastMessage
-                                    ? conv.lastMessage.content
-                                    : conv.otherUser.role === "TUTOR"
-                                    ? "Gia sư"
-                                    : "Học sinh"}
+                                 </p>
+                              </div>
+                              <p
+                                 className={`text-sm truncate ${
+                                    isConvUnread
+                                       ? "font-semibold"
+                                       : "text-muted-foreground"
+                                 }`}
+                              >
+                                 {conv.lastMessage?.content || ""}
                               </p>
                            </div>
                         </div>
-                     </button>
-                  ))
+                     );
+                  })
                )}
             </ScrollArea>
          </aside>
@@ -312,6 +370,16 @@ export default function ChatPage() {
                               msg.sender?._id !==
                               activeConversation?.otherUser?._id;
 
+                           // Kiểm tra đã seen bởi người kia chưa
+                           const isSeen =
+                              isOwn &&
+                              Array.isArray(msg.isReadBy) &&
+                              msg.isReadBy
+                                 .map(String)
+                                 .includes(
+                                    String(activeConversation?.otherUser?._id)
+                                 );
+
                            return (
                               <div
                                  key={msg._id}
@@ -350,15 +418,23 @@ export default function ChatPage() {
                                     <p className="text-sm leading-relaxed break-words">
                                        {msg.content}
                                     </p>
-                                    <p
-                                       className={`text-xs mt-2 ${
-                                          isOwn
-                                             ? "text-primary-foreground/70"
-                                             : "text-muted-foreground"
-                                       }`}
-                                    >
-                                       {formatMessageTime(msg.createdAt)}
-                                    </p>
+                                    <div className="flex items-center gap-2">
+                                       <p
+                                          className={`text-xs mt-2 ${
+                                             isOwn
+                                                ? "text-primary-foreground/70"
+                                                : "text-muted-foreground"
+                                          }`}
+                                       >
+                                          {formatMessageTime(msg.createdAt)}
+                                       </p>
+
+                                       {isOwn && isSeen && (
+                                          <span className="text-xs mt-2 text-muted-foreground italic">
+                                             Đã xem
+                                          </span>
+                                       )}
+                                    </div>
                                  </div>
 
                                  {isOwn && (

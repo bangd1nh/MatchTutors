@@ -162,8 +162,8 @@ const ViewStudentMCQHistoryList = () => {
                Lịch sử làm bài của học sinh
             </h1>
             <p className="text-muted-foreground">
-               Quản lý và theo dõi kết quả làm bài trắc nghiệm của tất cả học
-               sinh ({submissionHistory.length} bài làm)
+               Quản lý và theo dõi kết quả làm bài của tất cả học sinh (
+               {submissionHistory.length} bài làm)
             </p>
          </div>
 
@@ -199,7 +199,7 @@ const ViewStudentMCQHistoryList = () => {
                         <option value="all">Tất cả</option>
                         {uniqueQuizModes.map((mode) => (
                            <option key={mode} value={mode}>
-                              {mode}
+                              {getQuestionTypeLabelVi(mode)}
                            </option>
                         ))}
                      </select>

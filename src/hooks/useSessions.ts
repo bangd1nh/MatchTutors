@@ -11,6 +11,9 @@ import {
    rejectAttendance,
    createBatchSessions,
    busySession,
+   getSessionsByCommitment, // <-- added
+   confirmAttendanceFake, // <-- added
+   rejectAttendanceFake, // <-- added
 } from "@/api/sessions";
 
 import { useToast } from "@/hooks/useToast";
@@ -46,6 +49,17 @@ export const useSessionDetail = (sessionId?: string) => {
       queryFn: () => getSessionById(sessionId!),
       enabled: !!sessionId,
       staleTime: 1000 * 60 * 5, // 5 minutes
+   });
+};
+
+// NEW: hook to fetch sessions by learning commitment id
+export const useSessionsByCommitment = (commitmentId?: string) => {
+   return useQuery({
+      queryKey: sessionKeys.list(`commitment-${commitmentId || "unknown"}`),
+      queryFn: () => getSessionsByCommitment(commitmentId!),
+      enabled: !!commitmentId,
+      staleTime: 1000 * 60 * 5,
+      select: (data) => data ?? [],
    });
 };
 
@@ -269,3 +283,49 @@ export const useStudentBusySchedules = () => {
       queryFn: busySession,
    })
 }
+/**
+ * Hook để xác nhận điểm danh (fake) — dùng cho testing
+ */
+export const useConfirmAttendanceFake = () => {
+   const queryClient = useQueryClient();
+   const toast = useToast();
+
+   return useMutation({
+      mutationFn: (sessionId: string) => confirmAttendanceFake(sessionId),
+      onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+         toast("success", "Đã xác nhận điểm danh (fake)!");
+      },
+      onError: (error: any) => {
+         toast(
+            "error",
+            error.response?.data?.message || "Xác nhận điểm danh thất bại."
+         );
+      },
+   });
+};
+
+/**
+ * Hook để từ chối điểm danh (fake) — dùng cho testing
+ */
+export const useRejectAttendanceFake = () => {
+   const queryClient = useQueryClient();
+   const toast = useToast();
+
+   return useMutation({
+      mutationFn: ({
+         sessionId,
+         payload,
+      }: {
+         sessionId: string;
+         payload?: { reason?: string; evidenceUrls?: string[] };
+      }) => rejectAttendanceFake(sessionId, payload),
+      onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+         toast("success", "Đã gửi báo vắng/khiếu nại (fake)!");
+      },
+      onError: (error: any) => {
+         toast("error", error.response?.data?.message || "Thao tác thất bại.");
+      },
+   });
+};

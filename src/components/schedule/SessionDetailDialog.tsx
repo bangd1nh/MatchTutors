@@ -19,6 +19,8 @@ import {
    useDeleteSession,
    useCancelSession,
    useRejectAttendance,
+   useConfirmAttendanceFake, // <-- added
+   useRejectAttendanceFake, // <-- added
 } from "@/hooks/useSessions";
 import { Session } from "@/types/session";
 import { SessionStatus } from "@/enums/session.enum";
@@ -44,6 +46,8 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
    const { user } = useUser();
    const confirmParticipationMutation = useConfirmParticipation();
    const confirmAttendanceMutation = useConfirmAttendance();
+   const confirmAttendanceFakeMutation = useConfirmAttendanceFake(); // <-- added
+   const rejectAttendanceFakeMutation = useRejectAttendanceFake(); // <-- added
    const rejectAttendanceMutation = useRejectAttendance();
    const deleteSessionMutation = useDeleteSession();
    const cancelSessionMutation = useCancelSession();
@@ -150,9 +154,29 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
       });
    };
 
+   const handleAttendanceConfirmFake = () => {
+      confirmAttendanceFakeMutation.mutate(session._id, {
+         onSuccess: onClose,
+      });
+   };
+
    const handleAttendanceReject = () => {
       // Both tutor and student must provide reason for rejection
       setShowDisputeDialog(true);
+   };
+
+   const handleAttendanceRejectFake = () => {
+      // provide minimal fake payload to satisfy validation
+      rejectAttendanceFakeMutation.mutate(
+         {
+            sessionId: session._id,
+            payload: {
+               reason: "Fake absence test",
+               evidenceUrls: ["https://example.com/fake-evidence.jpg"],
+            },
+         },
+         { onSuccess: onClose }
+      );
    };
 
    const handleSubmitDispute = () => {
@@ -664,22 +688,51 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
 
                         {/* Attendance Button */}
                         {showAttendanceButtons && (
-                           <div className="grid grid-cols-2 gap-3">
-                              <Button
-                                 onClick={handleAttendanceConfirm}
-                                 disabled={confirmAttendanceMutation.isPending}
-                                 variant="default"
-                              >
-                                 Xác nhận có mặt
-                              </Button>
-                              <Button
-                                 variant="destructive"
-                                 onClick={handleAttendanceReject}
-                                 disabled={rejectAttendanceMutation.isPending}
-                              >
-                                 Báo vắng / Khiếu nại
-                              </Button>
-                           </div>
+                           <>
+                              <div className="grid grid-cols-2 gap-3">
+                                 <Button
+                                    onClick={handleAttendanceConfirm}
+                                    disabled={
+                                       confirmAttendanceMutation.isPending
+                                    }
+                                    variant="default"
+                                 >
+                                    Xác nhận có mặt
+                                 </Button>
+                                 <Button
+                                    variant="destructive"
+                                    onClick={handleAttendanceReject}
+                                    disabled={
+                                       rejectAttendanceMutation.isPending
+                                    }
+                                 >
+                                    Báo vắng / Khiếu nại
+                                 </Button>
+                              </div>
+
+                              {/* Fake attendance (testing) - moved to same row style */}
+                              <div className="grid grid-cols-2 gap-3 mt-2">
+                                 <Button
+                                    variant="outline"
+                                    onClick={handleAttendanceConfirmFake}
+                                    disabled={
+                                       confirmAttendanceFakeMutation.isPending
+                                    }
+                                 >
+                                    Xác nhận có mặt (Fake)
+                                 </Button>
+
+                                 <Button
+                                    variant="outline"
+                                    onClick={handleAttendanceRejectFake}
+                                    disabled={
+                                       rejectAttendanceFakeMutation.isPending
+                                    }
+                                 >
+                                    Báo vắng / Khiếu nại (Fake)
+                                 </Button>
+                              </div>
+                           </>
                         )}
 
                         {/* Edit/Delete Buttons for Tutor */}

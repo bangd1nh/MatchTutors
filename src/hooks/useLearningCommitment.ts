@@ -71,13 +71,46 @@ export const useInitiatePayment = () => {
    });
 };
 
+export const useInitiateTopUp = () => {
+   const addToast = useToast();
+
+   return useMutation({
+      mutationFn: ({
+         id,
+         additionalSessions,
+         amount,
+      }: {
+         id: string;
+         additionalSessions: number;
+         amount: number;
+      }) => learningCommitmentApi.initiateTopUp(id, additionalSessions, amount),
+      onSuccess: (data) => {
+         window.open(data.paymentLink, "_blank");
+         addToast("success", "Tạo link top-up thành công");
+      },
+      onError: (error: any) => {
+         addToast(
+            "error",
+            error.response?.data?.message || "Thất bại khi tạo link top-up"
+         );
+      },
+   });
+};
+
 export const useRequestCancellation = () => {
    const queryClient = useQueryClient();
    const addToast = useToast();
 
    return useMutation({
-      mutationFn: ({ id, reason }: { id: string; reason: string }) =>
-         learningCommitmentApi.requestCancellation(id, reason),
+      mutationFn: ({
+         id,
+         reason,
+         linkUrl,
+      }: {
+         id: string;
+         reason: string;
+         linkUrl?: string;
+      }) => learningCommitmentApi.requestCancellation(id, reason, linkUrl),
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: ["learningCommitment"] });
          addToast("success", "Nộp yêu cầu huỷ thành công");
@@ -96,8 +129,15 @@ export const useRejectCancellation = () => {
    const addToast = useToast();
 
    return useMutation({
-      mutationFn: ({ id, reason }: { id: string; reason: string }) =>
-         learningCommitmentApi.rejectCancellation(id, reason),
+      mutationFn: ({
+         id,
+         reason,
+         linkUrl,
+      }: {
+         id: string;
+         reason: string;
+         linkUrl?: string;
+      }) => learningCommitmentApi.rejectCancellation(id, reason, linkUrl),
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: ["learningCommitment"] });
          addToast(

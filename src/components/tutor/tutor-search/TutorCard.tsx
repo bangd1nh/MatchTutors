@@ -23,6 +23,7 @@ import { useAddFav, useFetchFav, useRemoveFav } from "@/hooks/useFavTutor";
 import { useUser } from "@/hooks/useUser";
 import { useToast } from "@/hooks/useToast";
 import { getSubjectLabelVi } from "@/utils/educationDisplay";
+import { getLevelLabelVi } from "@/utils/educationDisplay";
 
 interface TutorCardProps {
    tutor: Tutor;
@@ -41,7 +42,10 @@ export function TutorCard({ tutor }: TutorCardProps) {
 
    const handleFav = (tutorId: string) => {
       if (!isAuthenticated) {
-         toast("warning", "Vui lòng đăng nhập để thêm gia sư này vào danh sách yêu thích");
+         toast(
+            "warning",
+            "Vui lòng đăng nhập để thêm gia sư này vào danh sách yêu thích"
+         );
          return;
       }
       if (isFav?.isFav) {
@@ -106,7 +110,9 @@ export function TutorCard({ tutor }: TutorCardProps) {
                         </h3>
                         <div className="flex items-center text-muted-foreground text-sm mt-1">
                            <MapPin className="h-4 w-4 mr-1.5" />
-                           <span>{tutorUser.address?.city || "Chưa cập nhật"}</span>
+                           <span>
+                              {tutorUser.address?.city || "Chưa cập nhật"}
+                           </span>
                         </div>
                         <div className="flex items-center gap-2 mt-2">
                            <div className="flex items-center gap-1">
@@ -115,7 +121,8 @@ export function TutorCard({ tutor }: TutorCardProps) {
                                     key={i}
                                     className={cn(
                                        "h-4 w-4",
-                                       tutor.ratings && i < Math.floor(tutor.ratings.average)
+                                       tutor.ratings &&
+                                          i < Math.floor(tutor.ratings.average)
                                           ? "fill-amber-400 text-amber-400"
                                           : "text-muted"
                                     )}
@@ -150,14 +157,20 @@ export function TutorCard({ tutor }: TutorCardProps) {
                <div className="bg-muted p-4 rounded-xl border border-border">
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Học phí</p>
+                        <p className="text-sm text-muted-foreground mb-1">
+                           Học phí
+                        </p>
                         <p className="text-2xl font-bold text-primary">
                            {formatPrice(tutor.hourlyRate || 0)}
-                           <span className="text-sm font-normal text-muted-foreground ml-1">/giờ</span>
+                           <span className="text-sm font-normal text-muted-foreground ml-1">
+                              /giờ
+                           </span>
                         </p>
                      </div>
                      <div className="text-right">
-                        <p className="text-sm text-muted-foreground mb-1">Kinh nghiệm</p>
+                        <p className="text-sm text-muted-foreground mb-1">
+                           Kinh nghiệm
+                        </p>
                         <div className="flex items-center gap-1">
                            <GraduationCap className="h-4 w-4 text-primary" />
                            <span className="text-lg font-semibold text-foreground">
@@ -176,7 +189,11 @@ export function TutorCard({ tutor }: TutorCardProps) {
                         {Array.isArray(tutor.classType)
                            ? tutor.classType
                                 .map((type) =>
-                                   type === "ONLINE" ? "Trực tuyến" : type === "IN_PERSON" ? "Tại nhà" : type
+                                   type === "ONLINE"
+                                      ? "Trực tuyến"
+                                      : type === "IN_PERSON"
+                                      ? "Tại nhà"
+                                      : type
                                 )
                                 .join(" • ")
                            : tutor.classType ?? ""}
@@ -188,7 +205,9 @@ export function TutorCard({ tutor }: TutorCardProps) {
                <div>
                   <div className="flex items-center gap-2 mb-3">
                      <Clock className="h-4 w-4 text-muted-foreground" />
-                     <span className="text-sm font-medium text-foreground">Lịch rảnh</span>
+                     <span className="text-sm font-medium text-foreground">
+                        Lịch rảnh
+                     </span>
                   </div>
                   <div className="flex gap-2 justify-between">
                      {dayNames.map((day, index) => (
@@ -200,7 +219,11 @@ export function TutorCard({ tutor }: TutorCardProps) {
                                  ? "bg-primary text-primary-foreground shadow-md transform scale-[1.02]"
                                  : "bg-muted text-muted-foreground"
                            )}
-                           title={`${day}${availableDaysWithSlots.includes(index) ? " - Có lịch" : " - Không có lịch"}`}
+                           title={`${day}${
+                              availableDaysWithSlots.includes(index)
+                                 ? " - Có lịch"
+                                 : " - Không có lịch"
+                           }`}
                         >
                            {day}
                         </div>
@@ -208,11 +231,48 @@ export function TutorCard({ tutor }: TutorCardProps) {
                   </div>
                </div>
 
+               {/* Levels (Lớp dạy) */}
+               <div>
+                  <div className="flex items-center gap-2 mb-3">
+                     <GraduationCap className="h-4 w-4 text-muted-foreground" />
+                     <span className="text-sm font-medium text-foreground">
+                        Các trình độ có thể dạy
+                     </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                     {Array.isArray((tutor as any).levels) &&
+                     (tutor as any).levels.length > 0 ? (
+                        (tutor as any).levels.map((lv: string) => (
+                           <Badge
+                              key={lv}
+                              variant="secondary"
+                              className="text-xs py-1.5 px-3 rounded-full"
+                           >
+                              {getLevelLabelVi(lv)}
+                           </Badge>
+                        ))
+                     ) : tutor.level ? (
+                        <Badge
+                           variant="secondary"
+                           className="text-xs py-1.5 px-3 rounded-full"
+                        >
+                           {getLevelLabelVi((tutor as any).level)}
+                        </Badge>
+                     ) : (
+                        <span className="text-sm text-muted-foreground">
+                           Chưa cập nhật
+                        </span>
+                     )}
+                  </div>
+               </div>
+
                {/* Subjects */}
                <div>
                   <div className="flex items-center gap-2 mb-3">
                      <Award className="h-4 w-4 text-muted-foreground" />
-                     <span className="text-sm font-medium text-foreground">Môn học</span>
+                     <span className="text-sm font-medium text-foreground">
+                        Môn học
+                     </span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                      {(tutor.subjects ?? []).slice(0, 4).map((subject) => (
@@ -235,14 +295,25 @@ export function TutorCard({ tutor }: TutorCardProps) {
                                  +{(tutor.subjects?.length ?? 0) - 4} môn khác
                               </Badge>
                            </PopoverTrigger>
-                           <PopoverContent className="w-64 p-4 bg-popover text-popover-foreground border border-border" align="start">
-                              <h4 className="text-sm font-semibold mb-3 text-foreground">Tất cả môn học</h4>
+                           <PopoverContent
+                              className="w-64 p-4 bg-popover text-popover-foreground border border-border"
+                              align="start"
+                           >
+                              <h4 className="text-sm font-semibold mb-3 text-foreground">
+                                 Tất cả môn học
+                              </h4>
                               <div className="flex flex-wrap gap-2">
-                                 {(tutor.subjects ?? []).slice(4).map((subject) => (
-                                    <Badge key={subject} variant="outline" className="text-xs py-1 px-2 rounded-md">
-                                       {getSubjectLabelVi(subject)}
-                                    </Badge>
-                                 ))}
+                                 {(tutor.subjects ?? [])
+                                    .slice(4)
+                                    .map((subject) => (
+                                       <Badge
+                                          key={subject}
+                                          variant="outline"
+                                          className="text-xs py-1 px-2 rounded-md"
+                                       >
+                                          {getSubjectLabelVi(subject)}
+                                       </Badge>
+                                    ))}
                               </div>
                            </PopoverContent>
                         </Popover>

@@ -19,7 +19,10 @@ import {
 } from "lucide-react";
 import DeleteFlashcardModal from "@/components/Quiz/FlashCard/DeleteFlashcardModal";
 import { useDeleteFlashcard } from "@/hooks/useQuiz";
-import { getQuestionTypeLabelVi, getQuizModeLabelVi } from "@/utils/quizTypeDisplay";
+import {
+   getQuestionTypeLabelVi,
+   getQuizModeLabelVi,
+} from "@/utils/quizTypeDisplay";
 
 const ViewMultipleQuizList: React.FC = () => {
    const { fetchList } = useMCQ();
@@ -85,7 +88,7 @@ const ViewMultipleQuizList: React.FC = () => {
          {/* Header */}
          <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">
-               Danh sách Multiple Choice Quiz
+               Danh sách Trắc nghiệm
             </h1>
             <p className="text-muted-foreground">
                Quản lý và xem các bộ quiz trắc nghiệm của bạn
@@ -224,7 +227,7 @@ const ViewMultipleQuizList: React.FC = () => {
                                           {q.settings.timeLimitMinutes} phút
                                        </Badge>
                                     </div>
-                                 ): (
+                                 ) : (
                                     <div className="flex items-center justify-between">
                                        <span>Thời gian giới hạn:</span>
                                        <Badge

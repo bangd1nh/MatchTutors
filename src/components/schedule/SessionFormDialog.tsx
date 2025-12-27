@@ -33,6 +33,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Loader2, Clock } from "lucide-react";
 import { getSubjectLabelVi } from "@/utils/educationDisplay";
 import { addDays, startOfWeek, isSameDay } from "date-fns";
+import { TimePickerInput } from "../ui/time-picker";
 
 const DAYS_OF_WEEK = [
    { value: 1, label: "Thứ 2" },
@@ -51,6 +52,16 @@ const baseSchema = z.object({
    location: z.string().min(1, "Vui lòng nhập địa điểm."),
    notes: z.string().optional(),
    additionalDays: z.array(z.number()),
+   // Thêm custom times cho từng buổi
+   customTimes: z
+      .record(
+         z.string(),
+         z.object({
+            startTime: z.date(),
+            endTime: z.date(),
+         })
+      )
+      .optional(),
 });
 
 type SessionFormValues = z.infer<typeof baseSchema>;
@@ -76,30 +87,40 @@ export const SessionFormDialog = ({
    const updateSessionMutation = useUpdateSession();
 
    const [currentLimit, setCurrentLimit] = useState<number>(999);
+   const [weeklyLimit, setWeeklyLimit] = useState<number>(1); // sessionsPerWeek của commitment
+   const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set());
 
    // DYNAMIC SCHEMA ---
    const formSchema = useMemo(() => {
       return baseSchema.superRefine((data, ctx) => {
          if (data.endTime <= data.startTime) {
             ctx.addIssue({
-               code: z.ZodIssueCode.custom,
+               code: "custom",
                message: "Thời gian kết thúc phải sau bắt đầu.",
                path: ["endTime"],
             });
          }
 
          if (!isEditMode) {
-            const totalRequested = 1 + data.additionalDays.length;
-            if (totalRequested > currentLimit) {
+            const totalRequested = 1 + data.additionalDays.length; // include original day
+            const maxAllowed = Math.max(0, Math.min(weeklyLimit, currentLimit));
+            // require exactly maxAllowed sessions (i.e. sessionsPerWeek or remaining if lower)
+            if (maxAllowed === 0) {
                ctx.addIssue({
-                  code: z.ZodIssueCode.custom,
-                  message: `Bạn chỉ còn ${currentLimit} buổi. Đã chọn ${totalRequested}.`,
+                  code: "custom",
+                  message: "Không còn buổi nào để tạo.",
+                  path: ["additionalDays"],
+               });
+            } else if (totalRequested !== maxAllowed) {
+               ctx.addIssue({
+                  code: "custom",
+                  message: `Vui lòng chọn đúng ${maxAllowed} ngày trong tuần (hiện chọn ${totalRequested}).`,
                   path: ["additionalDays"],
                });
             }
          }
       });
-   }, [currentLimit, isEditMode]);
+   }, [currentLimit, isEditMode, weeklyLimit]);
 
    const form = useForm<SessionFormValues>({
       resolver: zodResolver(formSchema),
@@ -111,6 +132,7 @@ export const SessionFormDialog = ({
          startTime: new Date(),
          endTime: new Date(new Date().getTime() + 60 * 60 * 1000),
          additionalDays: [],
+         customTimes: {},
       },
    });
 
@@ -128,6 +150,9 @@ export const SessionFormDialog = ({
       const total = commitment.totalSessions || 0;
       const completed = commitment.completedSessions || 0;
 
+      // set weeklyLimit from commitment
+      setWeeklyLimit(commitment.sessionsPerWeek || 1);
+
       const PENDING_STATUSES = [
          SessionStatus.SCHEDULED,
          SessionStatus.CONFIRMED,
@@ -139,8 +164,9 @@ export const SessionFormDialog = ({
             typeof s.learningCommitmentId === "string"
                ? s.learningCommitmentId
                : s.learningCommitmentId?._id;
-
+         // match backend: only count non-deleted sessions with pending statuses
          if (sCommitmentId !== watchedCommitmentId) return false;
+         if ((s as any).isDeleted) return false;
          return PENDING_STATUSES.includes(s.status as string);
       }).length;
 
@@ -180,6 +206,34 @@ export const SessionFormDialog = ({
       }
    }, [initialData, defaultDate, isOpen, form]);
 
+   const toggleDayExpand = (dayValue: number) => {
+      const start = form.getValues("startTime");
+      // không cho expand nếu là ngày gốc
+      if (start && start.getDay() === dayValue) return;
+
+      const newExpanded = new Set(expandedDays);
+      if (newExpanded.has(dayValue)) {
+         newExpanded.delete(dayValue);
+      } else {
+         newExpanded.add(dayValue);
+      }
+      setExpandedDays(newExpanded);
+   };
+
+   const getTimeForDay = (dayValue: number) => {
+      const customTimes = form.watch("customTimes") || {};
+      const dayKey = `day_${dayValue}`;
+
+      if (customTimes[dayKey]) {
+         return customTimes[dayKey];
+      }
+
+      return {
+         startTime: form.watch("startTime"),
+         endTime: form.watch("endTime"),
+      };
+   };
+
    const onSubmit = async (values: SessionFormValues) => {
       try {
          if (isEditMode && initialData?._id) {
@@ -193,7 +247,7 @@ export const SessionFormDialog = ({
                },
             });
          } else {
-            const sessionsToCreate = [
+            let sessionsToCreate = [
                {
                   startTime: values.startTime.toISOString(),
                   endTime: values.endTime.toISOString(),
@@ -211,16 +265,27 @@ export const SessionFormDialog = ({
                      dateCheck.getDay() === targetDayOfWeek &&
                      !isSameDay(dateCheck, start)
                   ) {
+                     const dayKey = `day_${targetDayOfWeek}`;
+                     const times = values.customTimes?.[dayKey] || {
+                        startTime: start,
+                        endTime: end,
+                     };
+
                      const newStart = new Date(dateCheck);
                      newStart.setHours(
-                        start.getHours(),
-                        start.getMinutes(),
+                        times.startTime.getHours(),
+                        times.startTime.getMinutes(),
                         0,
                         0
                      );
 
                      const newEnd = new Date(dateCheck);
-                     newEnd.setHours(end.getHours(), end.getMinutes(), 0, 0);
+                     newEnd.setHours(
+                        times.endTime.getHours(),
+                        times.endTime.getMinutes(),
+                        0,
+                        0
+                     );
 
                      sessionsToCreate.push({
                         startTime: newStart.toISOString(),
@@ -230,6 +295,16 @@ export const SessionFormDialog = ({
                   }
                }
             });
+
+            sessionsToCreate.sort(
+               (a, b) =>
+                  new Date(a.startTime).getTime() -
+                  new Date(b.startTime).getTime()
+            );
+
+            if (!isEditMode && sessionsToCreate.length > currentLimit) {
+               sessionsToCreate = sessionsToCreate.slice(0, currentLimit);
+            }
 
             await createBatchMutation.mutateAsync({
                learningCommitmentId: values.learningCommitmentId,
@@ -246,6 +321,17 @@ export const SessionFormDialog = ({
 
    const isLoading =
       createBatchMutation.isPending || updateSessionMutation.isPending;
+
+   // selected days (additionalDays) + original day
+   const selectedAdditionalDays = form.watch("additionalDays") || [];
+   const totalRequested = 1 + selectedAdditionalDays.length;
+   const effectiveLimit = Math.max(0, Math.min(weeklyLimit, currentLimit));
+   const toCreateCount = Math.min(totalRequested, currentLimit);
+
+   // disable create when no commitment selected or no remaining slots
+   const createDisabled =
+      isLoading ||
+      (!isEditMode && (!watchedCommitmentId || effectiveLimit <= 0));
 
    const formatDateForInput = (date: Date) => {
       if (!date || isNaN(date.getTime())) return "";
@@ -379,7 +465,7 @@ export const SessionFormDialog = ({
                      <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-primary" />
                         <span className="font-semibold text-sm">
-                           Lặp lại trong cùng tuần (Cùng giờ)
+                           Lặp lại trong cùng tuần
                         </span>
                      </div>
 
@@ -388,69 +474,161 @@ export const SessionFormDialog = ({
                            Không đủ số buổi còn lại để tạo thêm.
                         </p>
                      ) : (
-                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                           {DAYS_OF_WEEK.map((day) => {
-                              const start = form.watch("startTime");
-                              const isCurrentDay =
-                                 start && start.getDay() === day.value;
+                        <div className="space-y-3">
+                           {/* Day selection grid */}
+                           <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                              {DAYS_OF_WEEK.map((day) => {
+                                 const start = form.watch("startTime");
+                                 const isCurrentDay =
+                                    start && start.getDay() === day.value;
+                                 const isSelected = form
+                                    .watch("additionalDays")
+                                    ?.includes(day.value);
+                                 const isExpanded = expandedDays.has(day.value);
 
-                              return (
-                                 <div
-                                    key={day.value}
-                                    className="flex items-center space-x-2"
-                                 >
-                                    <Controller
-                                       name="additionalDays"
-                                       control={form.control}
-                                       render={({ field }) => {
-                                          const checked = field.value?.includes(
-                                             day.value
-                                          );
-                                          return (
-                                             <Checkbox
-                                                id={`day-${day.value}`}
-                                                checked={checked}
-                                                disabled={isCurrentDay}
-                                                onCheckedChange={(
-                                                   isChecked
-                                                ) => {
-                                                   if (isChecked) {
-                                                      field.onChange([
-                                                         ...field.value,
-                                                         day.value,
-                                                      ]);
-                                                   } else {
-                                                      field.onChange(
-                                                         field.value.filter(
-                                                            (v) =>
-                                                               v !== day.value
-                                                         )
-                                                      );
-                                                   }
-                                                }}
+                                 return (
+                                    <div key={day.value} className="space-y-1">
+                                       <div className="flex items-center space-x-2">
+                                          <Controller
+                                             name="additionalDays"
+                                             control={form.control}
+                                             render={({ field }) => {
+                                                const checked =
+                                                   field.value?.includes(
+                                                      day.value
+                                                   );
+                                                return (
+                                                   <Checkbox
+                                                      id={`day-${day.value}`}
+                                                      checked={
+                                                         isCurrentDay
+                                                            ? true
+                                                            : checked
+                                                      }
+                                                      disabled={isCurrentDay}
+                                                      onCheckedChange={(
+                                                         isChecked
+                                                      ) => {
+                                                         if (isCurrentDay)
+                                                            return;
+                                                         if (isChecked) {
+                                                            field.onChange([
+                                                               ...field.value,
+                                                               day.value,
+                                                            ]);
+                                                         } else {
+                                                            field.onChange(
+                                                               field.value.filter(
+                                                                  (v) =>
+                                                                     v !==
+                                                                     day.value
+                                                               )
+                                                            );
+                                                            // Clear expanded state
+                                                            setExpandedDays(
+                                                               (prev) => {
+                                                                  const next =
+                                                                     new Set(
+                                                                        prev
+                                                                     );
+                                                                  next.delete(
+                                                                     day.value
+                                                                  );
+                                                                  return next;
+                                                               }
+                                                            );
+                                                         }
+                                                      }}
+                                                   />
+                                                );
+                                             }}
+                                          />
+                                          <label
+                                             htmlFor={`day-${day.value}`}
+                                             className={`text-sm cursor-pointer ${
+                                                isCurrentDay
+                                                   ? "font-bold text-primary"
+                                                   : "font-medium"
+                                             }`}
+                                          >
+                                             {day.label}
+                                          </label>
+                                       </div>
+
+                                       {/* Time picker for selected day */}
+                                       {isSelected && isExpanded && (
+                                          <div className="ml-6 space-y-2 text-xs">
+                                             <Controller
+                                                name={`customTimes.day_${day.value}.startTime`}
+                                                control={form.control}
+                                                defaultValue={
+                                                   getTimeForDay(day.value)
+                                                      .startTime
+                                                }
+                                                render={({ field }) => (
+                                                   <div className="space-y-1">
+                                                      <label className="text-xs font-medium">
+                                                         Bắt đầu
+                                                      </label>
+                                                      <TimePickerInput
+                                                         value={field.value}
+                                                         onChange={
+                                                            field.onChange
+                                                         }
+                                                         format="HH:mm"
+                                                      />
+                                                   </div>
+                                                )}
                                              />
-                                          );
-                                       }}
-                                    />
-                                    <label
-                                       htmlFor={`day-${day.value}`}
-                                       className={`text-sm cursor-pointer ${
-                                          isCurrentDay
-                                             ? "font-bold text-primary"
-                                             : "font-medium"
-                                       }`}
-                                    >
-                                       {day.label} {isCurrentDay && "(Gốc)"}
-                                    </label>
-                                 </div>
-                              );
-                           })}
+                                             <Controller
+                                                name={`customTimes.day_${day.value}.endTime`}
+                                                control={form.control}
+                                                defaultValue={
+                                                   getTimeForDay(day.value)
+                                                      .endTime
+                                                }
+                                                render={({ field }) => (
+                                                   <div className="space-y-1">
+                                                      <label className="text-xs font-medium">
+                                                         Kết thúc
+                                                      </label>
+                                                      <TimePickerInput
+                                                         value={field.value}
+                                                         onChange={
+                                                            field.onChange
+                                                         }
+                                                         format="HH:mm"
+                                                      />
+                                                   </div>
+                                                )}
+                                             />
+                                          </div>
+                                       )}
+
+                                       {/* Expand button for selected days */}
+                                       {isSelected && (
+                                          <button
+                                             type="button"
+                                             onClick={() =>
+                                                toggleDayExpand(day.value)
+                                             }
+                                             className="text-xs text-primary hover:underline ml-6"
+                                          >
+                                             {isExpanded
+                                                ? "Ẩn giờ"
+                                                : "Đặt giờ riêng"}
+                                          </button>
+                                       )}
+                                    </div>
+                                 );
+                              })}
+                           </div>
+                           {form.formState.errors.additionalDays && (
+                              <p className="text-sm text-destructive mt-1">
+                                 {form.formState.errors.additionalDays.message}
+                              </p>
+                           )}
                         </div>
-                     )}
-                     {form.formState.errors.additionalDays && (
-                        <p className="text-sm text-destructive mt-1">
-                           {form.formState.errors.additionalDays.message}
-                        </p>
                      )}
                   </div>
                )}
@@ -467,15 +645,13 @@ export const SessionFormDialog = ({
                   <Button type="button" variant="outline" onClick={onClose}>
                      Hủy
                   </Button>
-                  <Button type="submit" disabled={isLoading}>
+                  <Button type="submit" disabled={createDisabled}>
                      {isLoading && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                      )}
                      {isEditMode
                         ? "Lưu thay đổi"
-                        : `Tạo ${
-                             1 + (form.watch("additionalDays")?.length || 0)
-                          } buổi học`}
+                        : `Tạo ${toCreateCount} buổi học`}
                   </Button>
                </DialogFooter>
             </form>

@@ -90,10 +90,11 @@ export default function SessionDetails({
                               Đã xác nhận
                            </SelectItem>
                            <SelectItem value="COMPLETED">Hoàn thành</SelectItem>
-                           <SelectItem value="REJECTED">Đã hủy</SelectItem>
+                           <SelectItem value="REJECTED">Đã từ chối</SelectItem>
                            <SelectItem value="NOT_CONDUCTED">
                               Không thực hiện
                            </SelectItem>
+                           <SelectItem value="CANCELLED">Đã Huỷ</SelectItem>
                         </SelectContent>
                      </Select>
                   </div>
@@ -232,35 +233,6 @@ export default function SessionDetails({
                </CardHeader>
                <CardContent>
                   <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                     {/* Cancelled By User Info */}
-                     <div className="mb-4">
-                        <Label className="text-red-600 font-medium block mb-2">
-                           Người hủy:
-                        </Label>
-                        {typeof session.cancellation.cancelledBy === "object" &&
-                        session.cancellation.cancelledBy ? (
-                           <div className="p-3 bg-white rounded-lg border border-red-100">
-                              <div className="space-y-1">
-                                 <div className="text-sm font-semibold text-red-800">
-                                    {session.cancellation.cancelledBy.name ||
-                                       "Người dùng"}
-                                 </div>
-                                 <div className="text-xs text-red-600">
-                                    {session.cancellation.cancelledBy.email ||
-                                       "N/A"}
-                                 </div>
-                              </div>
-                           </div>
-                        ) : (
-                           <div className="p-3 bg-white rounded-lg border border-red-100">
-                              <span className="text-sm text-red-800">
-                                 Người dùng (ID:{" "}
-                                 {session.cancellation.cancelledBy})
-                              </span>
-                           </div>
-                        )}
-                     </div>
-
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                            <Label className="text-red-600 font-medium">
@@ -278,7 +250,7 @@ export default function SessionDetails({
                            </Label>
                            <p className="text-sm text-red-800">
                               {moment(session.cancellation.cancelledAt).format(
-                                 "dddd, DD/MM/YYYY [lúc] HH:mm"
+                                 "HH:mm DD/MM/YYYY"
                               )}
                            </p>
                         </div>

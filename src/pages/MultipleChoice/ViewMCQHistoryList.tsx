@@ -16,6 +16,10 @@ import {
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
+import {
+   getQuizModeLabelVi,
+   getQuestionTypeLabelVi,
+} from "@/utils/quizTypeDisplay";
 
 const ViewMCQHistoryList = () => {
    const { fetchMCQSubmitHistoryList } = useMCQ();
@@ -188,11 +192,17 @@ const ViewMCQHistoryList = () => {
                                  Chấm điểm: {formatDate(submission.gradedAt)}
                               </span>
                            </div>
+                           {submission.quizId?.quizMode && (
+                              <Badge variant="outline">
+                                 {getQuizModeLabelVi(
+                                    submission.quizId.quizMode
+                                 )}
+                              </Badge>
+                           )}
                            <Badge variant="outline">
-                              {submission.quizId?.quizMode}
-                           </Badge>
-                           <Badge variant="outline">
-                              {submission?.quizId?.quizType}
+                              {getQuestionTypeLabelVi(
+                                 submission?.quizId?.quizType
+                              )}
                            </Badge>
                         </div>
 
@@ -216,15 +226,15 @@ const ViewMCQHistoryList = () => {
                               </Badge>
                               {submission.quizSnapshot.settings
                                  .timeLimitMinutes && (
-                                    <Badge variant="outline">
-                                       Giới hạn:{" "}
-                                       {
-                                          submission.quizSnapshot.settings
-                                             .timeLimitMinutes
-                                       }{" "}
-                                       phút
-                                    </Badge>
-                                 )}
+                                 <Badge variant="outline">
+                                    Giới hạn:{" "}
+                                    {
+                                       submission.quizSnapshot.settings
+                                          .timeLimitMinutes
+                                    }{" "}
+                                    phút
+                                 </Badge>
+                              )}
                            </div>
                         </div>
 

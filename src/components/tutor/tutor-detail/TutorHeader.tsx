@@ -44,7 +44,7 @@ export function TutorHeader({ tutor }: TutorHeaderProps) {
 
    const handleSave = () => {
       if (!isAuthenticated) {
-         toast("warning", "Please login to favorite this tutor");
+         toast("warning", "Vui lòng đăng nhập để lưu gia sư yêu thích");
          return;
       }
 

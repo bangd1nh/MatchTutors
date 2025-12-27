@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { chatApi, type Message } from "@/api/chat";
 import { useSocket } from "./useSocket";
@@ -17,6 +17,20 @@ export const useChat = () => {
       setMessages,
       addMessage,
    } = useChatStore();
+
+   // decode current user id from JWT token (client-side)
+   const currentUserId = useMemo(() => {
+      try {
+         const token = localStorage.getItem("token");
+         if (!token) return null;
+         const raw = token.split(".")[1];
+         if (!raw) return null;
+         const payload = JSON.parse(atob(raw));
+         return payload.id || payload.userId || payload._id || null;
+      } catch {
+         return null;
+      }
+   }, []);
 
    // Lấy danh sách conversations
    const { data: conversationsData, isLoading: loadingConversations } =
@@ -41,7 +55,7 @@ export const useChat = () => {
             : null,
       enabled: !!activeConversationId,
       refetchOnWindowFocus: false,
-      retry: false, //  Không retry khi lỗi
+      retry: false,
       staleTime: 5 * 60 * 1000,
    });
 
@@ -51,7 +65,7 @@ export const useChat = () => {
       }
    }, [messagesData, activeConversationId, setMessages]);
 
-   // Join conversation room khi active conversation thay đổi
+   // Join/leave rooms
    useEffect(() => {
       if (!socket || !activeConversationId) return;
 
@@ -73,25 +87,98 @@ export const useChat = () => {
          message: Message;
          chat: string;
       }) => {
-
          addMessage(chat, message);
          updateConversation(chat, {
             lastMessage: message,
             lastMessageAt: message.createdAt,
          });
 
-         // Xóa để tránh gọi API không cần thiết
-         // queryClient.invalidateQueries({
-         //    queryKey: ["conversations"],
-         // });
+         // Only mark read automatically if incoming message is from the other user (not self)
+         if (
+            chat === activeConversationId &&
+            message?.sender &&
+            currentUserId &&
+            String(message.sender._id) !== String(currentUserId)
+         ) {
+            try {
+               socket.emit("markRead", {
+                  chatId: chat,
+                  messageIds: [message._id],
+               });
+            } catch (e) {
+               // ignore
+            }
+         }
+      };
+
+      const handleMessagesRead = (payload: {
+         chatId: string;
+         userId: string;
+         messageIds: string[];
+         messages?: Message[];
+      }) => {
+         // If server returns full updated messages, MERGE them into existing messages (don't replace)
+         if (payload?.messages && payload.chatId) {
+            const current = messages[payload.chatId] || [];
+            const updatedMap: Record<string, Message> = {};
+            payload.messages.forEach((m) => {
+               updatedMap[String((m as any)._id)] = m;
+            });
+
+            // merge keeping original order, replace items that are present in updatedMap
+            const merged = current.map(
+               (m) => updatedMap[String((m as any)._id)] ?? m
+            );
+
+            // append any updated messages not present in current
+            payload.messages.forEach((m) => {
+               const exists = current.find(
+                  (c) => String((c as any)._id) === String((m as any)._id)
+               );
+               if (!exists) merged.push(m);
+            });
+
+            setMessages(payload.chatId, merged);
+         } else if (payload?.chatId && payload?.messageIds) {
+            // fallback: cập nhật isReadBy trong messages hiện tại
+            const current = messages[payload.chatId] || [];
+            if (current.length > 0) {
+               const updated = current.map((m) => {
+                  if (payload.messageIds.includes(String((m as any)._id))) {
+                     const isReadBy = Array.isArray((m as any).isReadBy)
+                        ? [...(m as any).isReadBy]
+                        : [];
+                     if (
+                        !isReadBy.map(String).includes(String(payload.userId))
+                     ) {
+                        isReadBy.push(payload.userId);
+                     }
+                     return { ...(m as any), isReadBy };
+                  }
+                  return m;
+               });
+               setMessages(payload.chatId, updated);
+            }
+         }
       };
 
       socket.on("newMessage", handleNewMessage);
+      socket.on("messagesRead", handleMessagesRead);
 
       return () => {
          socket.off("newMessage", handleNewMessage);
+         socket.off("messagesRead", handleMessagesRead);
       };
-   }, [socket, addMessage, updateConversation, queryClient]);
+   }, [
+      socket,
+      addMessage,
+      updateConversation,
+      queryClient,
+      activeConversationId,
+      messages,
+      setMessages,
+      currentUserId,
+   ]);
 
    const sendMessage = useCallback(
       (content: string) => {
@@ -107,6 +194,17 @@ export const useChat = () => {
       },
       [socket, activeConversationId]
    );
+
+   // When user opens a conversation, mark all messages as read for that chat
+   useEffect(() => {
+      if (!socket || !activeConversationId) return;
+
+      try {
+         socket.emit("markRead", { chatId: activeConversationId });
+      } catch (e) {
+         // ignore
+      }
+   }, [socket, activeConversationId]);
 
    // Thêm hook để search conversations
    const searchConversations = useCallback(
@@ -131,5 +229,6 @@ export const useChat = () => {
       sendMessage,
       sendingMessage: false,
       searchConversations,
+      currentUserId,
    };
 };

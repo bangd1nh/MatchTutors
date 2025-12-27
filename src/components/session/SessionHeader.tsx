@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
+import { translateSessionStatus } from "@/utils/statusTranslations";
 
 export default function SessionHeader({
    session,
@@ -27,33 +28,22 @@ export default function SessionHeader({
    // Use learningCommitment for subject/level
    const learningCommitment = (session as any).learningCommitmentId;
 
-   //  map status -> label + classes
-   const statusMap: Record<string, { label: string; className: string }> = {
-      SCHEDULED: {
-         label: "Đã lên lịch",
-         className: "bg-blue-100 text-blue-800",
-      },
-      CONFIRMED: {
-         label: "Đã xác nhận",
-         className: "bg-green-100 text-green-800",
-      },
-      COMPLETED: {
-         label: "Hoàn thành",
-         className: "bg-gray-100 text-gray-800",
-      },
-      REJECTED: {
-         label: "Đã hủy",
-         className: "bg-red-100 text-red-800",
-      },
-      NOT_CONDUCTED: {
-         label: "Không thực hiện",
-         className: "bg-orange-100 text-orange-800",
-      },
+   // mapping for badge colors (kept separate from translation)
+   const statusClassMap: Record<string, string> = {
+      SCHEDULED: "bg-blue-100 text-blue-800",
+      CONFIRMED: "bg-green-100 text-green-800",
+      COMPLETED: "bg-gray-100 text-gray-800",
+      REJECTED: "bg-red-100 text-red-800",
+      CANCELLED: "bg-red-100 text-red-800",
+      NOT_CONDUCTED: "bg-orange-100 text-orange-800",
+      DISPUTED: "bg-purple-100 text-purple-800",
    };
-   const statusInfo = statusMap[session.status] ?? {
-      label: session.status,
-      className: "bg-gray-100 text-gray-800",
-   };
+   const statusLabel = translateSessionStatus(String(session.status));
+   const statusClass =
+      statusClassMap[String(session.status)] ?? "bg-gray-100 text-gray-800";
+
+   // cho phép chỉnh sửa khi ở các trạng thái này
+   const editableStatuses = new Set(["SCHEDULED", "CONFIRMED"]);
 
    return (
       <div className="border-b bg-card">
@@ -82,10 +72,8 @@ export default function SessionHeader({
                                 )
                               : "Cấp độ"}
                         </h1>
-                        {/*  use mapped label + class */}
-                        <Badge className={statusInfo.className}>
-                           {statusInfo.label}
-                        </Badge>
+                        {/*  label translated + color from map */}
+                        <Badge className={statusClass}>{statusLabel}</Badge>
                      </div>
                      <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                         <div className="flex items-center gap-1">
@@ -119,7 +107,7 @@ export default function SessionHeader({
                   </div>
                </div>
                <div className="flex items-center gap-2">
-                  {canEdit && session.status === "SCHEDULED" && (
+                  {canEdit && editableStatuses.has(String(session.status)) && (
                      <>
                         {isEditing ? (
                            <>

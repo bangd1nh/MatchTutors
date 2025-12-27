@@ -17,6 +17,10 @@ import {
    Plus,
 } from "lucide-react";
 import DeleteShortAnswerQuizModal from "./DeleteShortAnswerQuizModal";
+import {
+   getQuestionTypeLabelVi,
+   getQuizModeLabelVi,
+} from "@/utils/quizTypeDisplay";
 
 const ViewShortAnswerQuizList: React.FC = () => {
    const { fetchList } = useShortAnswerQuiz();
@@ -94,7 +98,7 @@ const ViewShortAnswerQuizList: React.FC = () => {
             {/* Header */}
             <div className="mb-8">
                <h1 className="text-3xl font-bold text-foreground mb-2">
-                  Danh sách Short Answer Quiz
+                  Danh sách bài tập tự luận
                </h1>
                <p className="text-muted-foreground">
                   Quản lý và xem các bộ quiz tự luận của bạn
@@ -123,13 +127,13 @@ const ViewShortAnswerQuizList: React.FC = () => {
                                  variant="default"
                                  className="bg-green-500/10 text-green-600 border-green-500/20 font-medium"
                               >
-                                 {String(q.quizType ?? "SHORT_ANSWER")}
+                                 {getQuestionTypeLabelVi(q.quizType)}
                               </Badge>
                               <Badge
                                  variant="secondary"
                                  className="bg-secondary/50"
                               >
-                                 {String(q.quizMode ?? "STUDY")}
+                                 {getQuizModeLabelVi(q.quizMode)}
                               </Badge>
                            </div>
                         </div>

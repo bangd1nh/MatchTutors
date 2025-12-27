@@ -42,7 +42,11 @@ export default function BarChartTutor({
    ];
 
    const currentYear = new Date().getFullYear();
-   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
+   const futureYears = 2; // include next 2 years (change this number if you want more)
+   const years = Array.from(
+      { length: 10 + futureYears },
+      (_, i) => currentYear + futureYears - i
+   );
 
    return (
       <div className="bg-white dark:bg-gray-800 p-6 rounded shadow">
@@ -52,7 +56,9 @@ export default function BarChartTutor({
             </h3>
             <div className="flex items-center gap-3">
                <div>
-                  <label className="sr-only">Tháng</label>
+                  <label className="text-sm text-muted-foreground block mb-1">
+                     Tháng
+                  </label>
                   <select
                      value={selectedMonth ?? ""}
                      onChange={(e) =>
@@ -61,8 +67,9 @@ export default function BarChartTutor({
                         )
                      }
                      className="px-2 py-1 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
+                     aria-label="Chọn tháng"
                   >
-                     <option value="">Tất cả</option>
+                     <option value="">Tháng</option>
                      {Array.from({ length: 12 }, (_, i) => (
                         <option key={i + 1} value={i + 1}>
                            {i + 1}
@@ -71,7 +78,9 @@ export default function BarChartTutor({
                   </select>
                </div>
                <div>
-                  <label className="sr-only">Năm</label>
+                  <label className="text-sm text-muted-foreground block mb-1">
+                     Năm
+                  </label>
                   <select
                      value={selectedYear ?? ""}
                      onChange={(e) =>
@@ -80,8 +89,9 @@ export default function BarChartTutor({
                         )
                      }
                      className="px-2 py-1 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
+                     aria-label="Chọn năm"
                   >
-                     <option value="">Tất cả</option>
+                     <option value="">Năm</option>
                      {years.map((y) => (
                         <option key={y} value={y}>
                            {y}

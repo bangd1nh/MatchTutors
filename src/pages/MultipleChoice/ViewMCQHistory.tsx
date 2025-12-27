@@ -19,6 +19,10 @@ import {
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
+import {
+   getQuizModeLabelVi,
+   getQuestionTypeLabelVi,
+} from "@/utils/quizTypeDisplay";
 
 const ViewMCQHistory = () => {
    const searchParams = new URLSearchParams(window.location.search);
@@ -215,10 +219,10 @@ const ViewMCQHistory = () => {
                      <span>Học sinh: {submissionData.studentId.name}</span>
                   </div>
                   <Badge variant="outline">
-                     {submissionData.quizSnapshot.quizMode}
+                     {getQuizModeLabelVi(submissionData.quizSnapshot.quizMode)}
                   </Badge>
                   <Badge variant="outline">
-                     {submissionData.quizId.quizType}
+                     {getQuestionTypeLabelVi(submissionData.quizId.quizType)}
                   </Badge>
                </div>
 
