@@ -26,6 +26,9 @@ import {
    TooltipTrigger,
 } from "../ui/tooltip";
 import { InfoIcon } from "lucide-react";
+import { SUBJECT_VALUES, SUBJECT_LABELS_VI } from "@/enums/subject.enum";
+import { LEVEL_VALUES, LEVEL_LABELS_VI } from "@/enums/level.enum";
+import { useTutorProfile } from "@/hooks/useTutorProfile";
 
 type Props = {
    defaultValues?: Partial<QuizInfoValues>;
@@ -41,6 +44,16 @@ export type QuizInfoHandle = {
 
 const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
    ({ defaultValues, isFlashcard = false }, ref) => {
+      const { tutorProfile } = useTutorProfile();
+
+      // Filter subjects and levels based on tutor's profile
+      const availableSubjects = tutorProfile?.subjects
+         ? SUBJECT_VALUES.filter((s) => tutorProfile.subjects?.includes(s))
+         : [];
+      const availableLevels = tutorProfile?.levels
+         ? LEVEL_VALUES.filter((l) => tutorProfile.levels?.includes(l))
+         : [];
+
       const {
          register,
          control,
@@ -62,6 +75,8 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
                timeLimitMinutes: null,
             },
             tags: [],
+            subject: undefined,
+            level: undefined,
             ...defaultValues,
          },
       });
@@ -114,6 +129,8 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
                },
                tags: vals.tags ?? [],
                totalQuestions: vals.totalQuestions,
+               subject: vals.subject,
+               level: vals.level,
             } as QuizInfoValues;
          },
          validate: async () => {
@@ -143,6 +160,28 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
                }
             }
 
+            // subject is required
+            if (!vals.subject) {
+               setError("subject" as any, {
+                  type: "manual",
+                  message: "Môn học là bắt buộc",
+               });
+               valid = false;
+            } else {
+               clearErrors("subject" as any);
+            }
+
+            // level is required
+            if (!vals.level) {
+               setError("level" as any, {
+                  type: "manual",
+                  message: "Cấp độ là bắt buộc",
+               });
+               valid = false;
+            } else {
+               clearErrors("level" as any);
+            }
+
             return valid;
          },
          reset: (v?: Partial<QuizInfoValues>) => reset(v as any),
@@ -164,6 +203,8 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
                      ? QuizModeEnum.STUDY
                      : v.quizMode ?? QuizModeEnum.EXAM,
                   totalQuestions: v.totalQuestions,
+                  subject: v.subject,
+                  level: v.level,
                } as any);
             } else {
                reset();
@@ -274,6 +315,86 @@ const QuizInfoForm = forwardRef<QuizInfoHandle, Props>(
                   {errors.quizMode && (
                      <div className="text-xs text-red-400 mt-1">
                         {String(errors.quizMode.message)}
+                     </div>
+                  )}
+               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+               <div>
+                  <Label>
+                     Môn học <span className="text-red-500">*</span>
+                  </Label>
+                  <Controller
+                     name="subject"
+                     control={control}
+                     rules={{ required: "Môn học là bắt buộc" }}
+                     render={({ field }) => (
+                        <Select
+                           onValueChange={field.onChange}
+                           value={field.value || undefined}
+                        >
+                           <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Chọn môn học" />
+                           </SelectTrigger>
+                           <SelectContent>
+                              {availableSubjects.length > 0 ? (
+                                 availableSubjects.map((subject) => (
+                                    <SelectItem key={subject} value={subject}>
+                                       {SUBJECT_LABELS_VI[subject] || subject}
+                                    </SelectItem>
+                                 ))
+                              ) : (
+                                 <SelectItem value="NO_SUBJECT" disabled>
+                                    Chưa có môn học nào
+                                 </SelectItem>
+                              )}
+                           </SelectContent>
+                        </Select>
+                     )}
+                  />
+                  {errors.subject && (
+                     <div className="text-xs text-red-400 mt-1">
+                        {String(errors.subject.message)}
+                     </div>
+                  )}
+               </div>
+
+               <div>
+                  <Label>
+                     Cấp độ <span className="text-red-500">*</span>
+                  </Label>
+                  <Controller
+                     name="level"
+                     control={control}
+                     rules={{ required: "Cấp độ là bắt buộc" }}
+                     render={({ field }) => (
+                        <Select
+                           onValueChange={field.onChange}
+                           value={field.value || undefined}
+                        >
+                           <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Chọn cấp độ" />
+                           </SelectTrigger>
+                           <SelectContent>
+                              {availableLevels.length > 0 ? (
+                                 availableLevels.map((level) => (
+                                    <SelectItem key={level} value={level}>
+                                       {LEVEL_LABELS_VI[level] || level}
+                                    </SelectItem>
+                                 ))
+                              ) : (
+                                 <SelectItem value="NO_LEVEL" disabled>
+                                    Chưa có cấp độ nào
+                                 </SelectItem>
+                              )}
+                           </SelectContent>
+                        </Select>
+                     )}
+                  />
+                  {errors.level && (
+                     <div className="text-xs text-red-400 mt-1">
+                        {String(errors.level.message)}
                      </div>
                   )}
                </div>

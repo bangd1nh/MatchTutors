@@ -9,6 +9,11 @@ export interface PaginatedMaterials {
    limit: number;
 }
 
+export interface MaterialFilters {
+   subjects?: string[];
+   levels?: string[];
+}
+
 // Lấy danh sách tài liệu của gia sư (hỗ trợ phân trang)
 export const getMaterials = async (
    page = 1,
@@ -16,6 +21,23 @@ export const getMaterials = async (
 ): Promise<PaginatedMaterials> => {
    const response = await apiClient.get("/material", {
       params: { page, limit },
+   });
+   return response.data.data;
+};
+
+// Lấy danh sách tài liệu với filter
+export const getMaterialsByFilters = async (
+   page = 1,
+   limit = 10,
+   filters?: MaterialFilters
+): Promise<PaginatedMaterials> => {
+   const response = await apiClient.get("/material/filter", {
+      params: {
+         page,
+         limit,
+         subjects: filters?.subjects?.join(","),
+         levels: filters?.levels?.join(","),
+      },
    });
    return response.data.data;
 };
@@ -60,7 +82,7 @@ export const getMaterialsBySessionId = async (sessionId: string) => {
    return response.data?.data || [];
 };
 
-//  deleteMaterial -->
+// Xóa tài liệu
 export const deleteMaterial = async (materialId: string) => {
    const response = await apiClient.delete(`/material/${materialId}`);
    return response.data.data;

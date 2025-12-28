@@ -28,10 +28,13 @@ export const useCreateShortAnswerQuiz = () => {
    });
 };
 
-export const useFetchShortAnswerQuizByTutor = () => {
+export const useFetchShortAnswerQuizByTutor = (
+   subject?: string,
+   level?: string
+) => {
    return useQuery<IQuizResponse>({
-      queryKey: ["TUTOR_SHORT_ANSWER_QUIZS"],
-      queryFn: fetchShortAnswerQuiz,
+      queryKey: ["TUTOR_SHORT_ANSWER_QUIZS", subject, level],
+      queryFn: () => fetchShortAnswerQuiz(subject, level),
    });
 };
 
@@ -149,7 +152,7 @@ export const useShortAnswerQuiz = (quizId?: string) => {
 
    const fetchListQuery = useQuery<IQuizResponse>({
       queryKey: ["TUTOR_SHORT_ANSWER_QUIZS"],
-      queryFn: fetchShortAnswerQuiz,
+      queryFn: () => fetchShortAnswerQuiz(undefined, undefined),
    });
 
    const fetchByIdQuery = useQuery<IQuizQuestionResponse>({

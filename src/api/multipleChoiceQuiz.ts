@@ -10,8 +10,16 @@ export const createMCQ = async (payload: IQuizBody): Promise<MCQResponse> => {
    return response.data;
 };
 
-export const fetchMCQList = async (): Promise<MCQResponse> => {
-   const response = await apiClient.get("quiz/getMultipleChoiceQuizesByTutor");
+export const fetchMCQList = async (
+   subject?: string,
+   level?: string
+): Promise<MCQResponse> => {
+   const params: any = {};
+   if (subject) params.subject = subject;
+   if (level) params.level = level;
+   const response = await apiClient.get("quiz/getMultipleChoiceQuizesByTutor", {
+      params,
+   });
    return response.data;
 };
 

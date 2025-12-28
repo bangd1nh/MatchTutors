@@ -65,6 +65,8 @@ const CreateShortAnswerQuiz = () => {
          questionArr: mappedQuestions,
          totalQuestions: mappedQuestions.length,
          quizType: QuestionTypeEnum.SHORT_ANSWER,
+         subject: infoValues.subject,
+         level: infoValues.level,
       } as IQuizBody;
 
       console.log("Full payload:", payload);

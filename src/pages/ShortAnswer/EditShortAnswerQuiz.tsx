@@ -77,6 +77,8 @@ const EditShortAnswerQuiz = () => {
                     timeLimitMinutes: quizInfo.settings?.timeLimitMinutes || null,
                 },
                 totalQuestions: quizInfo.totalQuestions,
+                subject: quizInfo.subject,
+                level: quizInfo.level,
             });
         }
     }, [quizInfo]);
@@ -143,6 +145,8 @@ const EditShortAnswerQuiz = () => {
                 (originalQuestions?.length || 0) -
                 (deletedQuestions?.length || 0) +
                 (newQuestions?.length || 0),
+            subject: infoValues.subject,
+            level: infoValues.level,
         };
 
         update.mutate(payload as unknown as IQUizUpdate);
