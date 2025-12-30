@@ -56,6 +56,8 @@ const EditFlashcardQuiz = () => {
          settings: normalizedSettings,
          tags: quizInfo?.tags,
          totalQuestions: quizInfo?.totalQuestions,
+         subject: quizInfo?.subject,
+         level: quizInfo?.level,
       });
    }, [data]);
 
@@ -130,6 +132,8 @@ const EditFlashcardQuiz = () => {
          deleteQuestionArr,
          editQuestionArr,
          newQuestionArr,
+         subject: quizInfoValues.subject,
+         level: quizInfoValues.level,
       };
 
       console.log("Edit payload:", payload);

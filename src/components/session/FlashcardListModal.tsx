@@ -24,7 +24,7 @@ interface FlashcardListModalProps {
 }
 
 const FlashcardListModal = ({ isOpen, onClose }: FlashcardListModalProps) => {
-   const { data: response, isLoading, isError } = useFetchQuizByTutor();
+   const { data: response, isLoading, isError } = useFetchQuizByTutor(undefined, undefined);
    const [searchTerm, setSearchTerm] = useState("");
    const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 

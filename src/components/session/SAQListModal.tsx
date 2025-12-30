@@ -36,7 +36,7 @@ const SAQListModal = ({ isOpen, onClose, sessionId }: SAQListModalProps) => {
       if (!fetchList.isLoading && fetchList.data && isOpen) {
          initAsignSAQ(quizzes);
       }
-   }, [isOpen, fetchList.data?.data]);
+   }, [isOpen, fetchList.data, fetchList.isLoading, initAsignSAQ]);
 
    const asign = useAsignShortAnswerQuizToSession();
 

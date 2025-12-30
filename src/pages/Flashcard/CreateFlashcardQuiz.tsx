@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/useToast";
 import { z } from "zod";
 import { QuestionTypeEnum, QuizModeEnum } from "@/enums/quiz.enum";
+import { Subject } from "@/enums/subject.enum";
+import { Level } from "@/enums/level.enum";
 import { IQuizQuestion } from "@/types/quizQuestion";
 import { useCreateQuiz } from "@/hooks/useQuiz";
 import FlashCardQuizQuestionsForm, {
@@ -28,6 +30,8 @@ const payloadSchema = z.object({
       })
       .optional(),
    tags: z.array(z.string()).optional(),
+   subject: z.nativeEnum(Subject),
+   level: z.nativeEnum(Level),
    questionArr: z
       .array(
          z.object({
@@ -94,6 +98,8 @@ const CreateFlashcardQuiz: React.FC = () => {
                ? infoValues.tags
                : undefined,
          questionArr,
+         subject: infoValues.subject,
+         level: infoValues.level,
       };
 
       // validate with zod and log

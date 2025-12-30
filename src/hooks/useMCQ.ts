@@ -25,7 +25,13 @@ export const useMCQ = (quizId?: string) => {
    const queryClient = useQueryClient();
    const create = useMutation({
       mutationFn: createMCQ,
-      onSuccess: (response) => addToast("success", response.message),
+      onSuccess: (response) => {
+         addToast("success", response.message);
+         // Invalidate all MCQ queries to refetch the list
+         queryClient.invalidateQueries({
+            queryKey: ["MCQLIST"],
+         });
+      },
       onError: (error: any) => {
          addToast(
             "error",

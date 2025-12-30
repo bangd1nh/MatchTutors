@@ -63,6 +63,8 @@ const CreateMultipleChoiceQuiz = () => {
          questionArr: mappedQuestions,
          totalQuestions: mappedQuestions.length,
          quizType: QuestionTypeEnum.MULTIPLE_CHOICE,
+         subject: infoValues.subject,
+         level: infoValues.level,
       } as IQuizBody;
 
       create.mutate(payload);

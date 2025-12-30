@@ -13,6 +13,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useMaterial } from "@/hooks/useMaterial";
+import { useTutorProfile } from "@/hooks/useTutorProfile";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 
@@ -30,6 +32,8 @@ const ALLOWED_FILE_TYPES = [
 const formSchema = z.object({
    title: z.string().min(1, "Tiêu đề không được để trống"),
    description: z.string().max(300, "Mô tả tối đa 300 ký tự").optional(),
+   subject: z.string().min(1, "Vui lòng chọn môn học"),
+   level: z.string().min(1, "Vui lòng chọn cấp học"),
    material: z
       .instanceof(FileList)
       .refine((files) => files?.length === 1, "Vui lòng chọn một file.")
@@ -146,15 +150,18 @@ const formatBytes = (bytes = 0) => {
 const CreateMaterialPage = () => {
    const navigate = useNavigate();
    const { upload, isUploading } = useMaterial();
+   const { tutorProfile, isLoading: tutorLoading } = useTutorProfile();
    const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
-      defaultValues: { title: "", description: "" },
+      defaultValues: { title: "", description: "", subject: "", level: "" },
    });
 
    const onSubmit = (values: z.infer<typeof formSchema>) => {
       const formData = new FormData();
       formData.append("title", values.title);
       formData.append("description", values.description || "");
+      if (values.subject) formData.append("subject", values.subject);
+      if (values.level) formData.append("level", values.level);
       formData.append("material", values.material[0]);
       upload(formData, {
          onSuccess: () => {
@@ -233,6 +240,60 @@ const CreateMaterialPage = () => {
                                  {field.value?.length || 0}/300
                               </div>
                            </div>
+                        </FormItem>
+                     )}
+                  />
+
+                  <FormField
+                     control={form.control}
+                     name="subject"
+                     render={({ field }) => (
+                        <FormItem>
+                           <FormLabel>Môn học (bắt buộc)</FormLabel>
+                           <FormControl>
+                              <select
+                                 {...field}
+                                 className="bg-muted border-border p-2 rounded w-full"
+                                 disabled={tutorLoading}
+                              >
+                                 <option value="">
+                                    -- Chọn môn (nếu có) --
+                                 </option>
+                                 {tutorProfile?.subjects?.map((s: string) => (
+                                    <option key={s} value={s}>
+                                       {getSubjectLabelVi(s)}
+                                    </option>
+                                 ))}
+                              </select>
+                           </FormControl>
+                           <FormMessage />
+                        </FormItem>
+                     )}
+                  />
+
+                  <FormField
+                     control={form.control}
+                     name="level"
+                     render={({ field }) => (
+                        <FormItem>
+                           <FormLabel>Cấp học (bắt buộc)</FormLabel>
+                           <FormControl>
+                              <select
+                                 {...field}
+                                 className="bg-muted border-border p-2 rounded w-full"
+                                 disabled={tutorLoading}
+                              >
+                                 <option value="">
+                                    -- Chọn cấp (nếu có) --
+                                 </option>
+                                 {tutorProfile?.levels?.map((l: string) => (
+                                    <option key={l} value={l}>
+                                       {getLevelLabelVi(l)}
+                                    </option>
+                                 ))}
+                              </select>
+                           </FormControl>
+                           <FormMessage />
                         </FormItem>
                      )}
                   />
