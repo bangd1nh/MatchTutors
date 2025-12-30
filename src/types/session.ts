@@ -108,26 +108,18 @@ export interface BusySession extends BaseAPIResponse {
       startTime: Date;
       endTime: Date;
       status: string;
-      learningCommitmentId: {
-         student?: {
-            userId: {
-               email: string;
-               name: string;
-               _id: string;
-               avatarUrl?: string;
-            };
-         };
-         tutor?: {
-            userId: {
-               email: string;
-               name: string;
-               _id: string;
-               avatarUrl?: string;
-            };
-         };
-         teachingRequest?: {
-            _id: string;
-         };
+      learningCommitmentId: string;
+      student: {
+         email: string;
+         name: string;
+         _id: string;
+         avatarUrl?: string;
+      };
+      tutor: {
+         email: string;
+         name: string;
+         _id: string;
+         avatarUrl?: string;
       };
    }>;
 }
@@ -137,25 +129,17 @@ export interface BSession {
    startTime: Date;
    endTime: Date;
    status: string;
-   learningCommitmentId: {
-      student?: {
-         userId: {
-            email: string;
-            name: string;
-            _id: string;
-            avatarUrl?: string;
-         };
-      };
-      tutor?: {
-         userId: {
-            email: string;
-            name: string;
-            _id: string;
-            avatarUrl?: string;
-         };
-      };
-      teachingRequest?: {
-         _id: string;
-      };
+   learningCommitmentId: string;
+   student: {
+      email: string;
+      name: string;
+      _id: string;
+      avatarUrl?: string;
+   };
+   tutor: {
+      email: string;
+      name: string;
+      _id: string;
+      avatarUrl?: string;
    };
 }

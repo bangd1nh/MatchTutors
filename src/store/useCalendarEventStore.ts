@@ -1,20 +1,27 @@
 import { create } from "zustand";
 import { SSchedulesBody } from "../types/suggestionSchedules";
+import { Session } from "@/types/session";
 
 export interface CalendarEventItem {
    start: Date;
    end: Date;
+   resource?: Session | any;
    isBusy?: boolean;
    title?: string;
 }
 
-type CalendarEventChangeType = "drop" | "resize" | "selectEvent" | "selectSlot";
+type CalendarEventChangeType =
+   | "drop"
+   | "resize"
+   | "selectEvent"
+   | "selectSlot"
+   | "remove";
 
 interface CalendarEventChange {
    type: CalendarEventChangeType;
    sessionId?: string;
-   startTime: string;
-   endTime: string;
+   startTime?: string;
+   endTime?: string;
 }
 
 interface CalendarEventState {
@@ -26,6 +33,7 @@ interface CalendarEventState {
    setEvents: (events: CalendarEventItem[]) => void;
    addEvent: (event: CalendarEventItem) => void;
    updateEventTime: (start: Date, end: Date) => void;
+   removeEvent: (sessionId: string) => void;
    setChange: (change: CalendarEventChange) => void;
    getEvents: () => SSchedulesBody;
    setTitle: (title: string) => void;
@@ -55,6 +63,12 @@ export const useCalendarEventStore = create<CalendarEventState>((set, get) => ({
          events: state.events.map((evt) => {
             return { ...evt, start, end };
          }),
+      })),
+   removeEvent: (sessionId) =>
+      set((state) => ({
+         events: state.events.filter(
+            (evt) => evt.resource?._id !== sessionId
+         ),
       })),
    setChange: (change) => set({ lastChange: change }),
    setTeachingRequestId: (teachingRequestId) => set({ teachingRequestId }),

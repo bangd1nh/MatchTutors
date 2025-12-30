@@ -23,7 +23,10 @@ import { useUser } from "@/hooks/useUser";
 import { BSession, Session } from "@/types/session";
 import { Role } from "@/types/user";
 import { SessionStatus } from "@/enums/session.enum";
-import { getMyPendingSuggestions, TutorPendingSuggestion } from "@/api/suggestionSchedules";
+import {
+   getMyPendingSuggestions,
+   TutorPendingSuggestion,
+} from "@/api/suggestionSchedules";
 import { useQuery } from "@tanstack/react-query";
 
 import { SessionFormDialog } from "./SessionFormDialog";
@@ -130,6 +133,7 @@ export function SessionCalendar() {
                .filter(Boolean)
                .join(" ") ||
             "Học sinh";
+            console.log("lc",lc)
          const subject = getSubjectLabelVi(
             lc?.teachingRequest?.subject ?? "Môn học"
          );
@@ -187,24 +191,21 @@ export function SessionCalendar() {
 
    const busyEvents = useMemo(() => {
       if (!bSessions?.data) return [];
-      
+      console.log(bSessions);
+
       return bSessions.data.map((busy: BSession) => {
-         // Nếu là gia sư: hiển thị tên học sinh với gia sư khác
-         // Nếu là học sinh: hiển thị tên gia sư với học sinh khác
          let title = "Bận";
-         
+
          if (user?.role === Role.TUTOR) {
-            // Gia sư xem: học sinh đang học với gia sư khác
-            const studentName = busy.learningCommitmentId?.student?.userId?.name || "Học sinh";
-            const otherTutorName = busy.learningCommitmentId?.tutor?.userId?.name || "Gia sư khác";
-            title = `${studentName} bận (${otherTutorName})`;
+            const studentName = busy.student?.name || "Học sinh";
+            const otherTutorName = busy.tutor?.name || "Gia sư khác";
+            title = `${studentName} bận với gia sư: ${otherTutorName}`;
          } else if (user?.role === Role.STUDENT) {
-            // Học sinh xem: gia sư đang dạy học sinh khác
-            const tutorName = busy.learningCommitmentId?.tutor?.userId?.name || "Gia sư";
-            const otherStudentName = busy.learningCommitmentId?.student?.userId?.name || "Học sinh khác";
+            const tutorName = busy.tutor?.name || "Gia sư";
+            const otherStudentName = busy.student?.name || "Học sinh khác";
             title = `${tutorName} bận (${otherStudentName})`;
          }
-         
+
          return {
             title,
             start: new Date(busy.startTime),
@@ -219,28 +220,31 @@ export function SessionCalendar() {
    const pendingSuggestionEvents = useMemo(() => {
       if (!pendingSuggestions || user?.role !== Role.TUTOR) return [];
 
-      return pendingSuggestions.flatMap((suggestion: TutorPendingSuggestion) => {
-         if (!suggestion.schedules || suggestion.schedules.length === 0) return [];
-         
-         const studentName = suggestion.student?.name || "Học sinh";
-         const subject = suggestion.subject
-            ? getSubjectLabelVi(suggestion.subject)
-            : suggestion.title || "Lịch đề xuất";
+      return pendingSuggestions.flatMap(
+         (suggestion: TutorPendingSuggestion) => {
+            if (!suggestion.schedules || suggestion.schedules.length === 0)
+               return [];
 
-         return suggestion.schedules.map((schedule) => ({
-            title: `${subject} — ${studentName} (Chờ phản hồi)`,
-            start: new Date(schedule.start),
-            end: new Date(schedule.end),
-            isPendingSuggestion: true,
-            resource: suggestion,
-            style: {
-               backgroundColor: "#3b82f6", // Blue for pending suggestions
-               borderColor: "#2563eb",
-               color: "#fff",
-               opacity: 0.8,
-            },
-         })) as CalendarEvent[];
-      });
+            const studentName = suggestion.student?.name || "Học sinh";
+            const subject = suggestion.subject
+               ? getSubjectLabelVi(suggestion.subject)
+               : suggestion.title || "Lịch đề xuất";
+
+            return suggestion.schedules.map((schedule) => ({
+               title: `${subject} — ${studentName} (Chờ phản hồi)`,
+               start: new Date(schedule.start),
+               end: new Date(schedule.end),
+               isPendingSuggestion: true,
+               resource: suggestion,
+               style: {
+                  backgroundColor: "#3b82f6", // Blue for pending suggestions
+                  borderColor: "#2563eb",
+                  color: "#fff",
+                  opacity: 0.8,
+               },
+            })) as CalendarEvent[];
+         }
+      );
    }, [pendingSuggestions, user?.role]);
 
    const events: CalendarEvent[] = useMemo(

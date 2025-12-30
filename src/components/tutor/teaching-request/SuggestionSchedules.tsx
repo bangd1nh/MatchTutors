@@ -48,6 +48,7 @@ interface CalendarEvent extends BigCalendarEvent {
    end: Date;
    isBusy?: boolean;
    isMainSchedule?: boolean;
+   isStudentSession?: boolean; // NEW: student’s scheduled session
    style?: React.CSSProperties;
 }
 
@@ -62,7 +63,6 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
       events,
       setEvents,
       addEvent,
-      updateEventTime,
       setChange,
       getEvents,
       setTitle,
@@ -70,6 +70,7 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
       getTitle,
       setProposedTotalPrice,
       getProposedTotalPrice,
+      removeEvent,
    } = useCalendarEventStore();
    const { createSSchedules, fetchSSchedules, updateSSchedules } =
       useSSchedules(TRId);
@@ -77,6 +78,7 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
    const { data: tutorSessions } = useMySessions();
    const initializedRef = useRef(false);
    const isCreatingNewRef = useRef(false); // Flag để track đang tạo mới
+   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
    const [isEditMode, setIsEditMode] = useState(false); // Chế độ view/edit
    const [isCreatingNew, setIsCreatingNew] = useState(false); // State để track đang tạo mới (trigger re-render)
    const [shouldLoadSuggestion, setShouldLoadSuggestion] = useState(false); // Flag để track người dùng muốn xem suggestion
@@ -161,6 +163,7 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
             (res.schedules || []).map((s) => ({
                start: new Date(s.start),
                end: new Date(s.end),
+               resource: { _id: (s as any)._id || (s as any).id }, // ensure identifiable
             }))
          );
       } else {
@@ -170,6 +173,7 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
          setTeachingRequestId(TRId);
          setProposedTotalPrice(0);
       }
+      setSelectedEventId(null);
    }, [
       fetchSSchedules.data,
       setEvents,
@@ -179,6 +183,7 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
       TRId,
       isEditMode,
       isViewMode,
+      shouldLoadSuggestion, // <— add this
    ]);
 
    // Tạo busy events từ studentBusySchedules và studentBusySessions (chỉ hiển thị khi gia sư xem)
@@ -235,11 +240,8 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
          .map((session) => {
             const lc: any = (session as any).learningCommitmentId;
             const studentName =
-               lc?.student?.userId?.name ||
-               lc?.student?.name ||
-               "Học sinh";
-            const subjectRaw =
-               lc?.teachingRequest?.subject || "Môn học";
+               lc?.student?.userId?.name || lc?.student?.name || "Học sinh";
+            const subjectRaw = lc?.teachingRequest?.subject || "Môn học";
             const subject = getSubjectLabelVi(subjectRaw);
 
             return {
@@ -275,6 +277,7 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
          setIsEditMode(false);
          setIsCreatingNew(false);
          setShouldLoadSuggestion(false); // Reset flag khi đóng dialog
+         setSelectedEventId(null);
       }
    }, [isOpen]);
 
@@ -473,8 +476,8 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
             addEvent({
                start: eventStart.toDate(),
                end: eventEnd.toDate(),
+               resource: { _id: `bulk-${Date.now()}-${created}` }, // ensure removable
             });
-
             created += 1;
             if (repeatMode === "count" && created >= totalSessions) {
                stop = true;
@@ -507,74 +510,79 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
 
    const handleEventDrop = useCallback(
       ({ event, start, end }: EventInteractionArgs<CalendarEvent>) => {
-         if (event?.isBusy || user?.role !== Role.TUTOR) return;
-         const payload = {
-            sessionId: event.resource._id,
+         if (
+            event?.isBusy ||
+            event?.isMainSchedule ||
+            user?.role !== Role.TUTOR ||
+            isViewMode
+         )
+            return;
+         const eventId = event.resource?._id;
+         const updatedEvents = events.map((ev) =>
+            ev.resource?._id === eventId
+               ? { ...ev, start: start as Date, end: end as Date }
+               : ev
+         );
+         setEvents(updatedEvents);
+         setChange({
+            type: "drop",
+            sessionId: eventId,
             startTime: (start as Date).toISOString(),
             endTime: (end as Date).toISOString(),
-         };
-         updateEventTime(start as Date, end as Date);
-         console.log("Drop success", payload);
-         setChange({ type: "drop", ...payload });
+         });
       },
-      [user, updateEventTime, setChange]
+      [user, isViewMode, setEvents, setChange, events]
    );
 
    const handleEventResize = useCallback(
       ({ event, start, end }: EventInteractionArgs<CalendarEvent>) => {
-         if (event?.isBusy || user?.role !== Role.TUTOR) return;
-         const payload = {
-            sessionId: event.resource._id,
+         if (
+            event?.isBusy ||
+            event?.isMainSchedule ||
+            user?.role !== Role.TUTOR ||
+            isViewMode
+         )
+            return;
+         const eventId = event.resource?._id;
+         const updatedEvents = events.map((ev) =>
+            ev.resource?._id === eventId
+               ? { ...ev, start: start as Date, end: end as Date }
+               : ev
+         );
+         setEvents(updatedEvents);
+         setChange({
+            type: "resize",
+            sessionId: eventId,
             startTime: (start as Date).toISOString(),
             endTime: (end as Date).toISOString(),
-         };
-         updateEventTime(start as Date, end as Date);
-         console.log("Resize success", payload);
-         setChange({ type: "resize", ...payload });
+         });
       },
-      [user, updateEventTime, setChange]
+      [user, isViewMode, setEvents, setChange, events]
    );
 
    const handleSelectEvent = useCallback(
       (event: CalendarEvent) => {
-         if (event.isBusy) return; // Không cho phép chọn busy events
-         const payload = {
-            sessionId: event.resource?._id,
+         if (event.isBusy || event.isMainSchedule) return;
+         if (isViewMode || user?.role !== Role.TUTOR) return;
+         const id =
+            event.resource?._id ||
+            (typeof (event as any).id === "string"
+               ? (event as any).id
+               : undefined);
+         setSelectedEventId(id || null);
+         setChange({
+            type: "selectEvent",
+            sessionId: id,
             startTime: (event.start as Date).toISOString(),
             endTime: (event.end as Date).toISOString(),
-         };
-         console.log("Select event", payload);
-         setChange({ type: "selectEvent", ...payload });
+         });
       },
-      [setChange]
+      [isViewMode, user?.role, setChange]
    );
-
-   const eventPropGetter = useCallback((event: CalendarEvent) => {
-      // Nếu event đã có style (từ tutorMainScheduleEvents), sử dụng style đó
-      if (event.style) {
-         return {
-            style: {
-               ...event.style,
-               cursor: event.isMainSchedule ? "default" : "not-allowed",
-            },
-         };
-      }
-      if (event.isBusy) {
-         return {
-            style: {
-               backgroundColor: "#1f2937",
-               borderColor: "#111827",
-               opacity: 0.75,
-               cursor: "not-allowed",
-            },
-         };
-      }
-      return { style: event.style };
-   }, []);
 
    const handleSelectSlot = useCallback(
       ({ start, end }: { start: Date; end: Date }) => {
-         if (user?.role !== Role.TUTOR) return;
+         if (user?.role !== Role.TUTOR || isViewMode) return;
          const newId = `slot-${Date.now()}`;
          const newEvent = {
             title: "Buổi mới",
@@ -583,15 +591,46 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
             resource: { _id: newId },
          };
          addEvent(newEvent);
-         const payload = {
+         setSelectedEventId(newId);
+         setChange({
+            type: "selectSlot",
             sessionId: newId,
             startTime: (start as Date).toISOString(),
             endTime: (end as Date).toISOString(),
-         };
-         console.log("Create slot", payload);
-         setChange({ type: "selectSlot", ...payload });
+         });
       },
-      [addEvent, setChange, user?.role]
+      [addEvent, setChange, user?.role, isViewMode]
+   );
+
+   const eventPropGetter = useCallback(
+      (event: CalendarEvent) => {
+         const base =
+            event.style ||
+            (event.isBusy
+               ? {
+                    backgroundColor: "#1f2937",
+                    borderColor: "#111827",
+                    opacity: 0.75,
+                    cursor: "not-allowed",
+                 }
+               : {});
+         const isSelected =
+            selectedEventId && event.resource?._id === selectedEventId;
+         return {
+            style: {
+               ...base,
+               cursor:
+                  event.isBusy ||
+                  event.isMainSchedule ||
+                  isViewMode ||
+                  event.isStudentSession
+                     ? "not-allowed"
+                     : "pointer",
+               boxShadow: isSelected ? "0 0 0 2px #2563eb" : base.boxShadow,
+            },
+         };
+      },
+      [selectedEventId, isViewMode]
    );
 
    const messages = {
@@ -650,7 +689,7 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
    return (
       <>
          <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-6xl w-[95vw] h-[80vh] p-0 sm:p-6 flex flex-col gap-4">
+            <DialogContent className="max-w-7xl w-[95vw] h-[80vh] p-0 sm:p-6 flex flex-col gap-4">
                <DialogHeader className="px-6 pt-6">
                   <DialogTitle className="flex items-center justify-between">
                      <div className="flex items-center gap-2">
@@ -664,7 +703,8 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                         {suggestion &&
                            suggestion._id &&
                            (suggestion.status === "PENDING" ||
-                              suggestion.studentResponse?.status === "PENDING") &&
+                              suggestion.studentResponse?.status ===
+                                 "PENDING") &&
                            !shouldLoadSuggestion &&
                            !isEditMode && (
                               <Button
@@ -764,16 +804,32 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                                  size="sm"
                                  variant="outline"
                                  onClick={() => {
-                                    // Xóa tất cả events hiện tại để cho phép tạo mới
                                     setEvents([]);
                                     setTitle("lịch đề xuất");
                                     setProposedTotalPrice(0);
-                                    isCreatingNewRef.current = true; // Đánh dấu đang tạo mới
-                                    setIsCreatingNew(true); // Set state để trigger re-render
+                                    isCreatingNewRef.current = true;
+                                    setIsCreatingNew(true);
+                                    setSelectedEventId(null);
                                  }}
                               >
                                  <Trash2 className="h-4 w-4 mr-2" />
                                  Xóa tất cả
+                              </Button>
+                              <Button
+                                 size="sm"
+                                 variant="destructive"
+                                 disabled={!selectedEventId}
+                                 onClick={() => {
+                                    if (!selectedEventId) return;
+                                    removeEvent(selectedEventId);
+                                    setChange({
+                                       type: "remove",
+                                       sessionId: selectedEventId,
+                                    });
+                                    setSelectedEventId(null);
+                                 }}
+                              >
+                                 Xóa buổi
                               </Button>
                            </>
                         )}
@@ -891,22 +947,20 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
 
                <div className="flex-1 min-h-0 flex flex-col px-4 sm:px-6 pb-6 overflow-hidden">
                   {/* Legend cho các loại events */}
-                  {user?.role === Role.TUTOR && (
-                     <div className="mb-4 flex flex-wrap gap-4 text-sm bg-muted/50 p-3 rounded-lg flex-shrink-0">
-                        <div className="flex items-center gap-2">
-                           <div className="w-4 h-4 rounded bg-blue-500"></div>
-                           <span>Lịch đề xuất</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                           <div className="w-4 h-4 rounded bg-green-500"></div>
-                           <span>Lịch chính (đã lên lịch)</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                           <div className="w-4 h-4 rounded bg-gray-700"></div>
-                           <span>Học sinh bận</span>
-                        </div>
+                  <div className="mb-4 flex flex-wrap gap-4 text-sm bg-muted/50 p-3 rounded-lg flex-shrink-0">
+                     <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-blue-500"></div>
+                        <span>Lịch đề xuất</span>
                      </div>
-                  )}
+                     <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-green-500"></div>
+                        <span>Lịch chính (đã lên lịch)</span>
+                     </div>
+                     <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-gray-700"></div>
+                        <span>Học sinh bận</span>
+                     </div>
+                  </div>
                   <div className="flex-1 min-h-0 overflow-hidden">
                      <DnDCalendar
                         events={calendarEvents}
@@ -964,10 +1018,16 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                            value={startDateTime}
                            min={minDate}
                            onChange={(e) => {
-                              const selectedDate = moment(e.target.value, "YYYY-MM-DD");
+                              const selectedDate = moment(
+                                 e.target.value,
+                                 "YYYY-MM-DD"
+                              );
                               const today = moment().startOf("day");
                               if (selectedDate.isSameOrBefore(today)) {
-                                 addToast("error", "Ngày bắt đầu phải lớn hơn ngày hiện tại");
+                                 addToast(
+                                    "error",
+                                    "Ngày bắt đầu phải lớn hơn ngày hiện tại"
+                                 );
                                  return;
                               }
                               setStartDateTime(e.target.value);
@@ -1003,7 +1063,9 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                                     <label className="flex items-center gap-1.5 cursor-pointer">
                                        <Checkbox
                                           checked={weekdays.includes(d)}
-                                          onCheckedChange={() => toggleWeekday(d)}
+                                          onCheckedChange={() =>
+                                             toggleWeekday(d)
+                                          }
                                           className="h-3.5 w-3.5 flex-shrink-0"
                                        />
                                        <span className="font-medium text-xs whitespace-nowrap">

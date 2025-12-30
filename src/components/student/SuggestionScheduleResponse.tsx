@@ -10,10 +10,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Calendar, CheckCircle, XCircle, Clock, CreditCard } from "lucide-react";
+import {
+   Calendar,
+   CheckCircle,
+   XCircle,
+   Clock,
+   CreditCard,
+} from "lucide-react";
 import moment from "moment";
 import { useSSchedules } from "@/hooks/useSSchedules";
-import { useInitiatePayment, useLearningCommitments } from "@/hooks/useLearningCommitment";
+import {
+   useInitiatePayment,
+   useLearningCommitments,
+} from "@/hooks/useLearningCommitment";
 import { Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -24,6 +33,10 @@ import {
    momentLocalizer,
 } from "react-big-calendar";
 import { EventProps } from "react-big-calendar";
+import { useQuery } from "@tanstack/react-query";
+import { getMySessions } from "@/api/sessions";
+import { useUser } from "@/hooks/useUser";
+import { Role } from "@/types/user";
 
 moment.locale("vi");
 const localizer = momentLocalizer(moment);
@@ -47,11 +60,20 @@ export const SuggestionScheduleResponse = ({
    isOpen,
    onClose,
 }: SuggestionScheduleResponseProps) => {
+   const { user } = useUser();
+
+   const { data: studentSessions } = useQuery({
+      queryKey: ["STUDENT_SESSIONS"],
+      queryFn: getMySessions,
+      enabled: user?.role === Role.STUDENT,
+      staleTime: 1000 * 60 * 2,
+   });
+
+   console.log("student", studentSessions);
    const [rejectReason, setRejectReason] = useState("");
    const [showRejectForm, setShowRejectForm] = useState(false);
-   const { fetchSSchedules, respondSuggestion } = useSSchedules(
-      teachingRequestId
-   );
+   const { fetchSSchedules, respondSuggestion } =
+      useSSchedules(teachingRequestId);
    const initiatePayment = useInitiatePayment();
    // Query LearningCommitments để tìm commitment chưa thanh toán
    const { data: commitmentsData } = useLearningCommitments(1, 100);
@@ -180,7 +202,26 @@ export const SuggestionScheduleResponse = ({
       );
    };
 
-   // Tạo calendar events từ suggestion schedules và tutor busy times
+   // Lịch đã lên lịch của chính học sinh
+   const studentScheduledEvents = useMemo(() => {
+      const list = (studentSessions as any)?.data ?? studentSessions ?? [];
+      if (!Array.isArray(list)) return [];
+      return list.map((session: any) => ({
+         title: session.title || "Buổi đã lên lịch",
+         start: new Date(session.startTime),
+         end: new Date(session.endTime),
+         isBusy: false,
+         isSuggestion: false,
+         style: {
+            backgroundColor: "#8b5cf6",
+            borderColor: "#7c3aed",
+            color: "#fff",
+            opacity: 0.9,
+         },
+      })) as CalendarEvent[];
+   }, [studentSessions]);
+
+   // Tạo calendar events từ suggestion schedules, busy times và lịch đã lên lịch của học sinh
    const calendarEvents = useMemo(() => {
       const events: CalendarEvent[] = [];
 
@@ -203,11 +244,15 @@ export const SuggestionScheduleResponse = ({
       }
 
       // 2. Thêm các lịch bận từ suggestions của gia sư với học sinh khác
-      if (suggestion?.tutorBusySchedules && suggestion.tutorBusySchedules.length > 0) {
+      if (
+         suggestion?.tutorBusySchedules &&
+         suggestion.tutorBusySchedules.length > 0
+      ) {
          suggestion.tutorBusySchedules.forEach((busySchedule) => {
             if (busySchedule.schedules && busySchedule.schedules.length > 0) {
                busySchedule.schedules.forEach((schedule) => {
-                  const studentName = busySchedule.student?.name || "Học sinh khác";
+                  const studentName =
+                     busySchedule.student?.name || "Học sinh khác";
                   events.push({
                      title: `Gia sư bận (${studentName})`,
                      start: new Date(schedule.start),
@@ -226,7 +271,10 @@ export const SuggestionScheduleResponse = ({
       }
 
       // 3. Thêm các session đã lên lịch của gia sư với học sinh khác
-      if (suggestion?.tutorBusySessions && suggestion.tutorBusySessions.length > 0) {
+      if (
+         suggestion?.tutorBusySessions &&
+         suggestion.tutorBusySessions.length > 0
+      ) {
          suggestion.tutorBusySessions.forEach((busySession) => {
             const studentName = busySession.student?.name || "Học sinh khác";
             events.push({
@@ -244,8 +292,11 @@ export const SuggestionScheduleResponse = ({
          });
       }
 
+      // 4. Thêm các buổi đã lên lịch của chính học sinh (màu tím)
+      events.push(...studentScheduledEvents);
+
       return events;
-   }, [suggestion]);
+   }, [suggestion, studentScheduledEvents]);
 
    // Custom event component để hiển thị tooltip
    const EventComponent = ({ event }: EventProps<CalendarEvent>) => {
@@ -253,7 +304,8 @@ export const SuggestionScheduleResponse = ({
          <div className="p-1 text-xs">
             <div className="font-semibold truncate">{event.title}</div>
             <div className="text-xs opacity-90">
-               {moment(event.start).format("HH:mm")} - {moment(event.end).format("HH:mm")}
+               {moment(event.start).format("HH:mm")} -{" "}
+               {moment(event.end).format("HH:mm")}
             </div>
          </div>
       );
@@ -268,7 +320,7 @@ export const SuggestionScheduleResponse = ({
 
    return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+         <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
                <DialogTitle className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
@@ -320,7 +372,10 @@ export const SuggestionScheduleResponse = ({
                            Giá đề xuất:
                         </p>
                         <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                           {suggestion.proposedTotalPrice.toLocaleString("vi-VN")} VNĐ
+                           {suggestion.proposedTotalPrice.toLocaleString(
+                              "vi-VN"
+                           )}{" "}
+                           VNĐ
                         </p>
                      </div>
                   )}
@@ -336,15 +391,18 @@ export const SuggestionScheduleResponse = ({
                         {/* Danh sách lịch học */}
                         <div>
                            <Label className="text-base font-semibold mb-2 block">
-                              Các buổi học ({suggestion.schedules?.length || 0} buổi)
+                              Các buổi học ({suggestion.schedules?.length || 0}{" "}
+                              buổi)
                            </Label>
                            <div className="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-4">
-                              {suggestion.schedules && suggestion.schedules.length > 0 ? (
+                              {suggestion.schedules &&
+                              suggestion.schedules.length > 0 ? (
                                  suggestion.schedules.map((schedule, index) => {
                                     const start = new Date(schedule.start);
                                     const end = new Date(schedule.end);
                                     const duration =
-                                       (end.getTime() - start.getTime()) / (1000 * 60);
+                                       (end.getTime() - start.getTime()) /
+                                       (1000 * 60);
                                     return (
                                        <div
                                           key={index}
@@ -361,9 +419,12 @@ export const SuggestionScheduleResponse = ({
                                                    )}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                   {moment(start).format("HH:mm")} -{" "}
-                                                   {moment(end).format("HH:mm")} (
-                                                   {duration} phút)
+                                                   {moment(start).format(
+                                                      "HH:mm"
+                                                   )}{" "}
+                                                   -{" "}
+                                                   {moment(end).format("HH:mm")}{" "}
+                                                   ({duration} phút)
                                                 </p>
                                              </div>
                                           </div>
@@ -393,11 +454,19 @@ export const SuggestionScheduleResponse = ({
                                  </div>
                                  <div className="flex items-center gap-2">
                                     <div className="w-4 h-4 rounded bg-orange-500"></div>
-                                    <span>Gia sư bận (đề xuất với học sinh khác)</span>
+                                    <span>
+                                       Gia sư bận (đề xuất với học sinh khác)
+                                    </span>
                                  </div>
                                  <div className="flex items-center gap-2">
                                     <div className="w-4 h-4 rounded bg-red-500"></div>
-                                    <span>Gia sư bận (buổi học đã lên lịch)</span>
+                                    <span>
+                                       Gia sư bận (buổi học đã lên lịch)
+                                    </span>
+                                 </div>
+                                 <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 rounded bg-purple-500"></div>
+                                    <span>Buổi đã lên lịch của bạn</span>
                                  </div>
                               </div>
                               <div style={{ height: "500px" }}>
@@ -424,7 +493,8 @@ export const SuggestionScheduleResponse = ({
                                        date: "Ngày",
                                        time: "Giờ",
                                        event: "Sự kiện",
-                                       noEventsInRange: "Không có sự kiện trong khoảng thời gian này",
+                                       noEventsInRange:
+                                          "Không có sự kiện trong khoảng thời gian này",
                                     }}
                                  />
                               </div>
@@ -557,4 +627,3 @@ export const SuggestionScheduleResponse = ({
       </Dialog>
    );
 };
-
