@@ -1,4 +1,5 @@
 import apiClient from "@/lib/api";
+import { SuggestionResponse } from "@/types/Tutor";
 import type { TutorsApiResponse, Tutor } from "@/types/tutorListandDetail";
 
 interface SearchTutorsParams {
@@ -74,6 +75,11 @@ export const getTutorById = async (id: string): Promise<Tutor> => {
       d.data?.metadata ?? d.data?.data ?? d.data ?? d.metadata ?? d; // fallback
 
    return candidate?.data ?? candidate;
+};
+
+export const getSuggestion = async (): Promise<SuggestionResponse> => {
+   const response = await apiClient.get("/tutor/suggestion");
+   return response.data;
 };
 
 export default {

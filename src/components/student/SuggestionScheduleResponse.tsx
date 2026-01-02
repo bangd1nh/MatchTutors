@@ -254,7 +254,7 @@ export const SuggestionScheduleResponse = ({
                   const studentName =
                      busySchedule.student?.name || "Học sinh khác";
                   events.push({
-                     title: `Gia sư bận (${studentName})`,
+                     title: `Gia sư bận`,
                      start: new Date(schedule.start),
                      end: new Date(schedule.end),
                      isBusy: true,
@@ -278,7 +278,7 @@ export const SuggestionScheduleResponse = ({
          suggestion.tutorBusySessions.forEach((busySession) => {
             const studentName = busySession.student?.name || "Học sinh khác";
             events.push({
-               title: `Gia sư bận (${studentName})`,
+               title: `Gia sư bận`,
                start: new Date(busySession.startTime),
                end: new Date(busySession.endTime),
                isBusy: true,

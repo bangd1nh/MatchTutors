@@ -1,7 +1,9 @@
 import TutorFilterBar from "@/components/tutor/tutor-search/TutorFilterSidebar";
 import TutorListPage from "./TutorList";
 import { useState } from "react";
-import AISearch from "./AISearch";
+import { useTutorSuggestionList } from "../../hooks/useTutorListAndDetail";
+import AIrecommendation from "./AIrecommendation";
+import { TutorSuggestion } from "@/types/Tutor";
 
 export type FiltersType = {
    searchQuery: string;
@@ -89,30 +91,29 @@ export default function TutorSearch() {
       setFilteredTutors([]);
    };
 
-   const handleAISearchResults = (results: any) => {
-      console.log("Received AI search results:", results);
-      setAiSearchResults(results);
-      setIsUsingAIResults(true);
+   const { data, isLoading, isError } = useTutorSuggestionList();
 
-      // Handle different response formats
-      let tutorList: any[] = [];
+   const sData = Array.isArray(data?.data.recommendedTutors)
+      ? data.data.recommendedTutors as unknown as TutorSuggestion[]
+      : [];
 
-      if (results && Array.isArray(results)) {
-         tutorList = results;
-      } else if (results?.data.results && Array.isArray(results.data.results)) {
-         // This is the correct property based on your console log
-         tutorList = results.data.results;
-      } else if (results?.data.tutors && Array.isArray(results.data.tutors)) {
-         tutorList = results.data.tutors;
-      } else if (results?.data && Array.isArray(results.data)) {
-         tutorList = results.data;
-      }
+   if (isLoading) {
+      return (
+         <div className="container mx-auto px-4 py-6">
+            <p className="text-muted-foreground">Đang tải gợi ý gia sư...</p>
+         </div>
+      );
+   }
 
-      console.log(tutorList);
-
-      setFilteredTutors(tutorList);
-      console.log("Processed AI tutors:", tutorList);
-   };
+   if (isError) {
+      return (
+         <div className="container mx-auto px-4 py-6">
+            <p className="text-red-500">
+               Không thể tải gợi ý gia sư. Vui lòng thử lại sau.
+            </p>
+         </div>
+      );
+   }
 
    return (
       <div className="container mx-auto px-4 py-6">
@@ -131,12 +132,7 @@ export default function TutorSearch() {
             tutors={[]} // optional if not needed
          />
 
-         <AISearch
-            currentFilters={filters}
-            onFilterChange={handleFilterChange}
-            onApplyFilters={handleApplyFilters}
-            onAISearchResults={handleAISearchResults}
-         />
+         <AIrecommendation tutor={sData || []} />
 
          {/* Show AI search insights if available */}
          {aiSearchResults && isUsingAIResults && (

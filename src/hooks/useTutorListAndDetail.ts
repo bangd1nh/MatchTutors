@@ -3,8 +3,11 @@ import {
    getTutors,
    getTutorById,
    searchTutors,
+   getSuggestion,
 } from "@/api/tutorListAndDetail";
 import type { TutorsApiResponse, Tutor } from "@/types/tutorListandDetail";
+import { SuggestionResponse } from "@/types/Tutor";
+import { useUser } from "./useUser";
 
 interface UseSearchTutorsOptions {
    keyword?: string;
@@ -29,7 +32,7 @@ interface UseSearchTutorsOptions {
 }
 
 export const useSearchTutors = (
-filters: UseSearchTutorsOptions = {},
+   filters: UseSearchTutorsOptions = {}
    // p0: { enabled: any }
 ) => {
    return useQuery<TutorsApiResponse>({
@@ -60,5 +63,15 @@ export const useTutorDetail = (id?: string | null) => {
       enabled: Boolean(id),
       queryFn: () => getTutorById(String(id)),
       staleTime: 1000 * 60 * 5,
+   });
+};
+
+export const useTutorSuggestionList = () => {
+   const { isAuthenticated } = useUser();
+
+   return useQuery<SuggestionResponse>({
+      queryKey: ["suggestion_tutor"],
+      queryFn: () => getSuggestion(),
+      enabled: !!isAuthenticated,
    });
 };

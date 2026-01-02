@@ -198,9 +198,8 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
          res.studentBusySchedules.forEach((busySchedule) => {
             busySchedule.schedules.forEach((schedule) => {
                busyEventsList.push({
-                  title: `Học sinh bận (${
-                     busySchedule.tutor?.name || "Gia sư khác"
-                  })`,
+                  title: `Học sinh bận Gia sư khác
+                  `,
                   start: new Date(schedule.start),
                   end: new Date(schedule.end),
                   isBusy: true,
@@ -214,9 +213,7 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
       if (res.studentBusySessions && res.studentBusySessions.length > 0) {
          res.studentBusySessions.forEach((busySession) => {
             busyEventsList.push({
-               title: `Học sinh bận (${
-                  busySession.tutor?.name || "Gia sư khác"
-               })`,
+               title: `Học sinh bận Gia sư khác`,
                start: new Date(busySession.startTime),
                end: new Date(busySession.endTime),
                isBusy: true,
