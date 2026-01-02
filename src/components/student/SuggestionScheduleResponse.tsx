@@ -55,6 +55,20 @@ interface SuggestionScheduleResponseProps {
    onClose: () => void;
 }
 
+// Thêm helper function này trước component
+const getVietnameseDayName = (date: Date) => {
+   const days = [
+      "Chủ nhật",
+      "Thứ hai",
+      "Thứ ba",
+      "Thứ tư",
+      "Thứ năm",
+      "Thứ sáu",
+      "Thứ bảy",
+   ];
+   return days[date.getDay()];
+};
+
 export const SuggestionScheduleResponse = ({
    teachingRequestId,
    isOpen,
@@ -225,11 +239,21 @@ export const SuggestionScheduleResponse = ({
    const calendarEvents = useMemo(() => {
       const events: CalendarEvent[] = [];
 
+      // Kiểm tra xem suggestion đã được chấp nhận chưa
+      const isAccepted =
+         suggestion?.status === "ACCEPTED" ||
+         suggestion?.studentResponse?.status === "ACCEPTED";
+
       // 1. Thêm các buổi học đề xuất (suggestion schedules)
-      if (suggestion?.schedules && suggestion.schedules.length > 0) {
-         suggestion.schedules.forEach((schedule, index) => {
+      // Chỉ hiển thị nếu chưa được chấp nhận (để tránh trùng lặp với lịch chính thức màu tím)
+      if (
+         !isAccepted &&
+         suggestion?.schedules &&
+         suggestion.schedules.length > 0
+      ) {
+         suggestion.schedules.forEach((schedule) => {
             events.push({
-               title: `Buổi học ${index + 1}`,
+               title: `${suggestion.title}`,
                start: new Date(schedule.start),
                end: new Date(schedule.end),
                isSuggestion: true,
@@ -251,8 +275,6 @@ export const SuggestionScheduleResponse = ({
          suggestion.tutorBusySchedules.forEach((busySchedule) => {
             if (busySchedule.schedules && busySchedule.schedules.length > 0) {
                busySchedule.schedules.forEach((schedule) => {
-                  const studentName =
-                     busySchedule.student?.name || "Học sinh khác";
                   events.push({
                      title: `Gia sư bận`,
                      start: new Date(schedule.start),
@@ -276,7 +298,6 @@ export const SuggestionScheduleResponse = ({
          suggestion.tutorBusySessions.length > 0
       ) {
          suggestion.tutorBusySessions.forEach((busySession) => {
-            const studentName = busySession.student?.name || "Học sinh khác";
             events.push({
                title: `Gia sư bận`,
                start: new Date(busySession.startTime),
@@ -414,8 +435,10 @@ export const SuggestionScheduleResponse = ({
                                              </div>
                                              <div>
                                                 <p className="font-medium">
+                                                   {getVietnameseDayName(start)}
+                                                   ,{" "}
                                                    {moment(start).format(
-                                                      "dddd, DD/MM/YYYY"
+                                                      "DD/MM/YYYY"
                                                    )}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">

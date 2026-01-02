@@ -24,6 +24,7 @@ import { RequestDetailModal } from "@/components/tutor/teaching-request/RequestD
 import { TeachingRequestStatus } from "@/enums/teachingRequest.enum";
 import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
 import { Pagination } from "@/components/common/Pagination";
+import SuggestionSchedules from "@/components/tutor/teaching-request/SuggestionSchedules";
 
 export default function TeachingRequestsList() {
    const [page, setPage] = useState(1);
@@ -38,8 +39,12 @@ export default function TeachingRequestsList() {
 
    const [selectedRequest, setSelectedRequest] =
       useState<TeachingRequest | null>(null);
+   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
+      null
+   );
 
-   const handleViewRequest = (request: TeachingRequest) => setSelectedRequest(request);
+   const handleViewRequest = (request: TeachingRequest) =>
+      setSelectedRequest(request);
    const handleCloseModal = () => setSelectedRequest(null);
 
    if (isLoading)
@@ -56,15 +61,25 @@ export default function TeachingRequestsList() {
       return (
          <div className="p-8 text-center">
             <div className="inline-block p-4 bg-destructive/10 rounded-lg border border-destructive/30">
-               <p className="text-destructive font-medium">Không thể tải yêu cầu dạy học</p>
-               <p className="text-muted-foreground text-sm mt-1">Vui lòng thử lại sau</p>
+               <p className="text-destructive font-medium">
+                  Không thể tải yêu cầu dạy học
+               </p>
+               <p className="text-muted-foreground text-sm mt-1">
+                  Vui lòng thử lại sau
+               </p>
             </div>
          </div>
       );
 
-   const pendingRequests = (requests || []).filter((r) => r.status === TeachingRequestStatus.PENDING);
-   const acceptedRequests = (requests || []).filter((r) => r.status === TeachingRequestStatus.ACCEPTED);
-   const rejectedRequests = (requests || []).filter((r) => r.status === TeachingRequestStatus.REJECTED);
+   const pendingRequests = (requests || []).filter(
+      (r) => r.status === TeachingRequestStatus.PENDING
+   );
+   const acceptedRequests = (requests || []).filter(
+      (r) => r.status === TeachingRequestStatus.ACCEPTED
+   );
+   const rejectedRequests = (requests || []).filter(
+      (r) => r.status === TeachingRequestStatus.REJECTED
+   );
 
    return (
       <div className="min-h-screen bg-background p-6 md:p-8 text-foreground">
@@ -102,7 +117,9 @@ export default function TeachingRequestsList() {
                   <Card className="p-4 bg-card text-card-foreground border border-border">
                      <div className="flex items-center justify-between">
                         <div>
-                           <p className="text-sm text-muted-foreground">Chờ xử lý</p>
+                           <p className="text-sm text-muted-foreground">
+                              Chờ xử lý
+                           </p>
                            <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">
                               {pendingRequests.length}
                            </p>
@@ -114,7 +131,9 @@ export default function TeachingRequestsList() {
                   <Card className="p-4 bg-card text-card-foreground border border-border">
                      <div className="flex items-center justify-between">
                         <div>
-                           <p className="text-sm text-muted-foreground">Đã chấp nhận</p>
+                           <p className="text-sm text-muted-foreground">
+                              Đã chấp nhận
+                           </p>
                            <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
                               {acceptedRequests.length}
                            </p>
@@ -126,7 +145,9 @@ export default function TeachingRequestsList() {
                   <Card className="p-4 bg-card text-card-foreground border border-border">
                      <div className="flex items-center justify-between">
                         <div>
-                           <p className="text-sm text-muted-foreground">Từ chối</p>
+                           <p className="text-sm text-muted-foreground">
+                              Từ chối
+                           </p>
                            <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
                               {rejectedRequests.length}
                            </p>
@@ -146,7 +167,12 @@ export default function TeachingRequestsList() {
                   </h2>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                      {pendingRequests.map((r) => (
-                        <RequestCard key={r._id} request={r} onViewRequest={handleViewRequest} />
+                        <RequestCard
+                           key={r._id}
+                           request={r}
+                           onViewRequest={handleViewRequest}
+                           onOpenSchedule={(id) => setSelectedScheduleId(id)}
+                        />
                      ))}
                   </div>
                </div>
@@ -161,7 +187,12 @@ export default function TeachingRequestsList() {
                   </h2>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                      {acceptedRequests.map((r) => (
-                        <RequestCard key={r._id} request={r} onViewRequest={handleViewRequest} />
+                        <RequestCard
+                           key={r._id}
+                           request={r}
+                           onViewRequest={handleViewRequest}
+                           onOpenSchedule={(id) => setSelectedScheduleId(id)}
+                        />
                      ))}
                   </div>
                </div>
@@ -176,7 +207,12 @@ export default function TeachingRequestsList() {
                   </h2>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                      {rejectedRequests.map((r) => (
-                        <RequestCard key={r._id} request={r} onViewRequest={handleViewRequest} />
+                        <RequestCard
+                           key={r._id}
+                           request={r}
+                           onViewRequest={handleViewRequest}
+                           onOpenSchedule={(id) => setSelectedScheduleId(id)}
+                        />
                      ))}
                   </div>
                </div>
@@ -187,9 +223,12 @@ export default function TeachingRequestsList() {
                <Card className="text-center py-16 bg-card text-card-foreground border border-border">
                   <CardContent className="flex flex-col items-center">
                      <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                     <h3 className="text-lg font-medium mb-2">Không có yêu cầu nào</h3>
+                     <h3 className="text-lg font-medium mb-2">
+                        Không có yêu cầu nào
+                     </h3>
                      <p className="text-muted-foreground">
-                        Bạn sẽ nhận được thông báo khi học sinh gửi yêu cầu dạy học
+                        Bạn sẽ nhận được thông báo khi học sinh gửi yêu cầu dạy
+                        học
                      </p>
                   </CardContent>
                </Card>
@@ -209,13 +248,34 @@ export default function TeachingRequestsList() {
          </div>
 
          {/* Render Modal */}
-         <RequestDetailModal isOpen={!!selectedRequest} onClose={handleCloseModal} request={selectedRequest} />
+         <RequestDetailModal
+            isOpen={!!selectedRequest}
+            onClose={handleCloseModal}
+            request={selectedRequest}
+         />
+
+         {/* Render Schedule Modal */}
+         {selectedScheduleId && (
+            <SuggestionSchedules
+               TRId={selectedScheduleId}
+               isOpen={!!selectedScheduleId}
+               onClose={() => setSelectedScheduleId(null)}
+            />
+         )}
       </div>
    );
 }
 
 // Component con để render từng card yêu cầu
-function RequestCard({ request: r, onViewRequest }: { request: TeachingRequest; onViewRequest: (request: TeachingRequest) => void; }) {
+function RequestCard({
+   request: r,
+   onViewRequest,
+   onOpenSchedule,
+}: {
+   request: TeachingRequest;
+   onViewRequest: (request: TeachingRequest) => void;
+   onOpenSchedule: (id: string) => void;
+}) {
    return (
       <Card className="group hover:shadow-lg hover:border-primary/50 transition-all duration-300 overflow-hidden bg-card text-card-foreground border border-border">
          <CardHeader className="pb-3">
@@ -224,7 +284,9 @@ function RequestCard({ request: r, onViewRequest }: { request: TeachingRequest; 
                   <CardTitle className="text-base line-clamp-1">
                      Môn học - {getSubjectLabelVi(r.subject)}
                   </CardTitle>
-                  <p className="text-xs text-muted-foreground mt-1">Lớp - {getLevelLabelVi(r.level)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                     Lớp - {getLevelLabelVi(r.level)}
+                  </p>
                </div>
                <TeachingRequestStatusBadge status={r.status} />
             </div>
@@ -236,15 +298,23 @@ function RequestCard({ request: r, onViewRequest }: { request: TeachingRequest; 
                <Avatar className="h-10 w-10 ring-2 ring-border">
                   <AvatarImage
                      src={
-                        typeof r.studentId === "object" ? r.studentId.userId.avatarUrl : "/placeholder.svg"
+                        typeof r.studentId === "object"
+                           ? r.studentId.userId.avatarUrl
+                           : "/placeholder.svg"
                      }
                   />
                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                     {typeof r.studentId === "object" ? r.studentId.userId.name?.charAt(0) : "S"}
+                     {typeof r.studentId === "object"
+                        ? r.studentId.userId.name?.charAt(0)
+                        : "S"}
                   </AvatarFallback>
                </Avatar>
                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{typeof r.studentId === "object" ? r.studentId.userId.name : "Student"}</p>
+                  <p className="font-medium text-sm truncate">
+                     {typeof r.studentId === "object"
+                        ? r.studentId.userId.name
+                        : "Student"}
+                  </p>
                   <p className="text-xs text-muted-foreground">Học sinh</p>
                </div>
             </div>
@@ -255,12 +325,19 @@ function RequestCard({ request: r, onViewRequest }: { request: TeachingRequest; 
             </p>
          </CardContent>
 
-         <CardFooter>
+         <CardFooter className="flex flex-col gap-2">
             <Button
                onClick={() => onViewRequest(r)}
                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground group-hover:gap-2 transition-all"
             >
                Xem chi tiết <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+            <Button
+               onClick={() => onOpenSchedule(r._id)}
+               variant="outline"
+               className="w-full text-primary border-primary hover:bg-primary/10 transition-all"
+            >
+               Đề xuất lịch học
             </Button>
          </CardFooter>
       </Card>

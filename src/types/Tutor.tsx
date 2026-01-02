@@ -1,4 +1,3 @@
-import { Subject } from "@/enums/subject.enum";
 import { BaseAPIResponse } from "./response";
 
 export interface Tutor {

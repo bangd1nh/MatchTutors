@@ -12,12 +12,12 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { checkCanReport, CheckCanReportResponse, submitViolationReport } from "@/api/violationReport";
 import {
-   Avatar,
-   AvatarFallback,
-   AvatarImage,
-} from "@/components/ui/avatar";
+   checkCanReport,
+   CheckCanReportResponse,
+   submitViolationReport,
+} from "@/api/violationReport";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,6 +38,7 @@ import { RequestDetailModal } from "@/components/tutor/teaching-request/RequestD
 import { ReportModal } from "@/components/student/ReportModal";
 import { getLevelLabelVi, getSubjectLabelVi } from "@/utils/educationDisplay";
 import { TeachingRequestStatusBadge } from "@/components/common/TeachingRequestStatusBadge";
+import { SuggestionScheduleResponse } from "@/components/student/SuggestionScheduleResponse";
 
 const MyApplicationsPage = () => {
    const [page, setPage] = useState(1);
@@ -63,6 +64,9 @@ const MyApplicationsPage = () => {
    const [selectedTeachingRequestId, setSelectedTeachingRequestId] = useState<
       string | null
    >(null);
+   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
+      null
+   );
    const toast = useToast();
 
    // Check report status for each tutor when requests load
@@ -128,6 +132,10 @@ const MyApplicationsPage = () => {
       setSelectedTutorId(null);
       setSelectedTutorName(null);
       setSelectedTeachingRequestId(null);
+   };
+
+   const handleOpenSchedule = (requestId: string) => {
+      setSelectedScheduleId(requestId);
    };
 
    const handleSubmitReport = async (data: {
@@ -394,6 +402,7 @@ const MyApplicationsPage = () => {
                                     : false
                               }
                               onOpenReport={handleOpenReportModal}
+                              onOpenSchedule={handleOpenSchedule}
                            />
                         );
                      })}
@@ -492,6 +501,14 @@ const MyApplicationsPage = () => {
                onSubmit={handleSubmitReport}
             />
          )}
+
+         {selectedScheduleId && (
+            <SuggestionScheduleResponse
+               teachingRequestId={selectedScheduleId}
+               isOpen={!!selectedScheduleId}
+               onClose={() => setSelectedScheduleId(null)}
+            />
+         )}
       </div>
    );
 };
@@ -502,6 +519,7 @@ const ApplicationCard = ({
    canReport,
    hasReported,
    onOpenReport,
+   onOpenSchedule,
 }: {
    request: TeachingRequest;
    onViewDetail: (request: TeachingRequest) => void;
@@ -512,6 +530,7 @@ const ApplicationCard = ({
       tutorName: string,
       teachingRequestId: string
    ) => void;
+   onOpenSchedule?: (requestId: string) => void;
 }) => {
    const tutor = request.tutorId?.userId;
    const tutorId =
@@ -584,7 +603,7 @@ const ApplicationCard = ({
             </div>
          </CardContent>
 
-         <CardFooter className="pt-4">
+         <CardFooter className="pt-4 flex flex-col gap-2">
             <Button
                onClick={() => onViewDetail(request)}
                className="w-full relative h-10 group/btn"
@@ -594,6 +613,16 @@ const ApplicationCard = ({
                   <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
                </span>
             </Button>
+            {request.status === TeachingRequestStatus.ACCEPTED &&
+               onOpenSchedule && (
+                  <Button
+                     onClick={() => onOpenSchedule(request._id)}
+                     variant="outline"
+                     className="w-full text-primary border-primary hover:bg-primary/10 transition-all"
+                  >
+                     Xem lịch đề xuất
+                  </Button>
+               )}
          </CardFooter>
       </Card>
    );
