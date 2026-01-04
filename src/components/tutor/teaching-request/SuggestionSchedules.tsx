@@ -105,6 +105,13 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
       3: { start: "14:00", end: "16:00" },
    });
 
+   // NEW: Edit event time modal state
+   const [showEditTimeModal, setShowEditTimeModal] = useState(false);
+   const [editingEventId, setEditingEventId] = useState<string | null>(null);
+   const [editEventDate, setEditEventDate] = useState("");
+   const [editEventStartTime, setEditEventStartTime] = useState("");
+   const [editEventEndTime, setEditEventEndTime] = useState("");
+
    // Xác định chế độ view/edit dựa trên suggestion status
    const suggestion = fetchSSchedules.data?.data;
 
@@ -160,10 +167,15 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
 
          // gán các event trả về vào calendar
          setEvents(
-            (res.schedules || []).map((s) => ({
+            (res.schedules || []).map((s, index) => ({
                start: new Date(s.start),
                end: new Date(s.end),
-               resource: { _id: (s as any)._id || (s as any).id }, // ensure identifiable
+               resource: {
+                  _id:
+                     (s as any)._id ||
+                     (s as any).id ||
+                     `loaded-${index}-${Date.now()}`,
+               },
             }))
          );
       } else {
@@ -464,6 +476,13 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                .hour(startMomentOfDay.hour())
                .minute(startMomentOfDay.minute())
                .second(0);
+
+            // Di chuyển đoạn kiểm tra này lên TRƯỚC khi addEvent
+            if (repeatMode === "until" && eventStart.isAfter(endLimit)) {
+               stop = true;
+               break;
+            }
+
             const eventEnd = eventStart
                .clone()
                .hour(endMomentOfDay.hour())
@@ -480,10 +499,7 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                stop = true;
                break;
             }
-            if (repeatMode === "until" && eventStart.isAfter(endLimit)) {
-               stop = true;
-               break;
-            }
+            // Xóa đoạn kiểm tra cũ ở dưới này (đã chuyển lên trên)
          }
          cursor.add(1, "week");
          if (repeatMode === "until" && cursor.isAfter(endLimit)) break;
@@ -557,10 +573,83 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
       [user, isViewMode, setEvents, setChange, events]
    );
 
+   // NEW: Open edit time modal for existing event
+   const handleOpenEditTimeModal = (event: CalendarEvent) => {
+      if (event.isBusy || event.isMainSchedule || isViewMode) return;
+
+      const eventId = event.resource?._id;
+      if (!eventId) return;
+
+      setEditingEventId(eventId);
+      setEditEventDate(moment(event.start).format("YYYY-MM-DD"));
+      setEditEventStartTime(moment(event.start).format("HH:mm"));
+      setEditEventEndTime(moment(event.end).format("HH:mm"));
+      setShowEditTimeModal(true);
+   };
+
+   // NEW: Save edited event time
+   const handleSaveEditedTime = () => {
+      if (!editingEventId) return;
+
+      const selectedDate = moment(editEventDate, "YYYY-MM-DD");
+      const today = moment().startOf("day");
+
+      if (selectedDate.isSameOrBefore(today)) {
+         addToast("error", "Ngày bắt đầu phải lớn hơn ngày hiện tại");
+         return;
+      }
+
+      const startTimeMoment = moment(editEventStartTime, "HH:mm");
+      const endTimeMoment = moment(editEventEndTime, "HH:mm");
+
+      if (!startTimeMoment.isValid() || !endTimeMoment.isValid()) {
+         addToast("error", "Giờ không hợp lệ");
+         return;
+      }
+
+      if (endTimeMoment.isSameOrBefore(startTimeMoment)) {
+         addToast("error", "Giờ kết thúc phải sau giờ bắt đầu");
+         return;
+      }
+
+      const newStart = selectedDate
+         .clone()
+         .hour(startTimeMoment.hour())
+         .minute(startTimeMoment.minute())
+         .second(0)
+         .toDate();
+
+      const newEnd = selectedDate
+         .clone()
+         .hour(endTimeMoment.hour())
+         .minute(endTimeMoment.minute())
+         .second(0)
+         .toDate();
+
+      const updatedEvents = events.map((ev) =>
+         ev.resource?._id === editingEventId
+            ? { ...ev, start: newStart, end: newEnd }
+            : ev
+      );
+
+      setEvents(updatedEvents);
+      setChange({
+         type: "resize",
+         sessionId: editingEventId,
+         startTime: newStart.toISOString(),
+         endTime: newEnd.toISOString(),
+      });
+
+      setShowEditTimeModal(false);
+      setEditingEventId(null);
+      addToast("success", "Đã cập nhật thời gian buổi học");
+   };
+
    const handleSelectEvent = useCallback(
       (event: CalendarEvent) => {
          if (event.isBusy || event.isMainSchedule) return;
          if (isViewMode || user?.role !== Role.TUTOR) return;
+
          const id =
             event.resource?._id ||
             (typeof (event as any).id === "string"
@@ -573,6 +662,9 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
             startTime: (event.start as Date).toISOString(),
             endTime: (event.end as Date).toISOString(),
          });
+
+         // NEW: Open edit modal immediately when selecting event
+         handleOpenEditTimeModal(event);
       },
       [isViewMode, user?.role, setChange]
    );
@@ -694,9 +786,7 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                         Lịch gợi ý
                      </div>
                      <div className="flex items-center gap-3">
-                        {/* Hiển thị status badge nếu có suggestion */}
                         {suggestion && suggestion._id && getStatusBadge()}
-                        {/* Nút xem lịch đề xuất khi PENDING và chưa load */}
                         {suggestion &&
                            suggestion._id &&
                            (suggestion.status === "PENDING" ||
@@ -713,7 +803,6 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                                  Xem lịch đề xuất
                               </Button>
                            )}
-                        {/* Nút chỉnh sửa khi REJECTED và đang ở view mode */}
                         {suggestion &&
                            suggestion._id &&
                            (suggestion.status === "REJECTED" ||
@@ -729,7 +818,6 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                                  Chỉnh sửa
                               </Button>
                            )}
-                        {/* Nút đặt lại lịch khi ACCEPTED (cho phép rebook khi commitment đã completed) */}
                         {suggestion &&
                            suggestion._id &&
                            (suggestion.status === "ACCEPTED" ||
@@ -740,14 +828,13 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                                  size="sm"
                                  variant="default"
                                  onClick={() => {
-                                    // Xóa tất cả events và cho phép tạo lịch mới
                                     setEvents([]);
                                     setTitle("lịch đề xuất");
                                     setProposedTotalPrice(0);
                                     setIsEditMode(false);
                                     setIsCreatingNew(true);
                                     isCreatingNewRef.current = true;
-                                    setShouldLoadSuggestion(false); // Không load suggestion cũ
+                                    setShouldLoadSuggestion(false);
                                  }}
                               >
                                  <BookOpen className="h-4 w-4 mr-2" />
@@ -755,7 +842,7 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                               </Button>
                            )}
                         <Badge variant="secondary" className="px-3">
-                           Tuần này
+                           Tổng tiền
                         </Badge>
                         {!isViewMode && (
                            <div className="flex items-center gap-2">
@@ -830,7 +917,6 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                               </Button>
                            </>
                         )}
-                        {/* Hiển thị nút lưu khác nhau tùy vào chế độ */}
                         {isEditMode && suggestion?._id ? (
                            <>
                               <Button
@@ -838,7 +924,6 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                                  variant="outline"
                                  onClick={() => {
                                     setIsEditMode(false);
-                                    // Reset về dữ liệu gốc
                                     if (suggestion) {
                                        setTitle(
                                           suggestion.title || "lịch đề xuất"
@@ -914,8 +999,8 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
 
                                  createSSchedules.mutate(events, {
                                     onSuccess: () => {
-                                       isCreatingNewRef.current = false; // Reset flag sau khi lưu thành công
-                                       setIsCreatingNew(false); // Reset state sau khi lưu thành công
+                                       isCreatingNewRef.current = false;
+                                       setIsCreatingNew(false);
                                        fetchSSchedules.refetch();
                                     },
                                  });
@@ -994,6 +1079,7 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
             </DialogContent>
          </Dialog>
 
+         {/* Bulk create modal */}
          <Dialog open={showBulkModal} onOpenChange={setShowBulkModal}>
             <DialogContent className="max-w-5xl">
                <DialogHeader>
@@ -1168,6 +1254,72 @@ function SuggestionSchedules({ isOpen, onClose, TRId }: Props) {
                      Hủy
                   </Button>
                   <Button onClick={handleBulkCreate}>Tạo</Button>
+               </DialogFooter>
+            </DialogContent>
+         </Dialog>
+
+         {/* NEW: Edit event time modal */}
+         <Dialog open={showEditTimeModal} onOpenChange={setShowEditTimeModal}>
+            <DialogContent className="max-w-md">
+               <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                     <Clock className="h-5 w-5" />
+                     Chỉnh sửa thời gian buổi học
+                  </DialogTitle>
+                  <DialogDescription>
+                     Nhập ngày và giờ cho buổi học
+                  </DialogDescription>
+               </DialogHeader>
+
+               <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                     <label className="text-sm font-medium">Ngày</label>
+                     <Input
+                        type="date"
+                        value={editEventDate}
+                        min={minDate}
+                        onChange={(e) => setEditEventDate(e.target.value)}
+                     />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                     <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                           Giờ bắt đầu
+                        </label>
+                        <Input
+                           type="time"
+                           value={editEventStartTime}
+                           onChange={(e) =>
+                              setEditEventStartTime(e.target.value)
+                           }
+                        />
+                     </div>
+
+                     <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                           Giờ kết thúc
+                        </label>
+                        <Input
+                           type="time"
+                           value={editEventEndTime}
+                           onChange={(e) => setEditEventEndTime(e.target.value)}
+                        />
+                     </div>
+                  </div>
+               </div>
+
+               <DialogFooter className="gap-2">
+                  <Button
+                     variant="outline"
+                     onClick={() => {
+                        setShowEditTimeModal(false);
+                        setEditingEventId(null);
+                     }}
+                  >
+                     Hủy
+                  </Button>
+                  <Button onClick={handleSaveEditedTime}>Lưu</Button>
                </DialogFooter>
             </DialogContent>
          </Dialog>

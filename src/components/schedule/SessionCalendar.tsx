@@ -81,7 +81,7 @@ export function SessionCalendar() {
       isError: bisError,
    } = useStudentBusySchedules();
    const updateSessionMutation = useUpdateSession();
-   
+
    // Lấy tất cả suggestion schedules đang pending của gia sư
    const { data: pendingSuggestions } = useQuery({
       queryKey: ["TUTOR_PENDING_SUGGESTIONS"],
@@ -133,7 +133,7 @@ export function SessionCalendar() {
                .filter(Boolean)
                .join(" ") ||
             "Học sinh";
-            console.log("lc",lc)
+         console.log("lc", lc);
          const subject = getSubjectLabelVi(
             lc?.teachingRequest?.subject ?? "Môn học"
          );
@@ -198,8 +198,8 @@ export function SessionCalendar() {
 
          if (user?.role === Role.TUTOR) {
             const studentName = busy.student?.name || "Học sinh";
-            const otherTutorName = busy.tutor?.name || "Gia sư khác";
-            title = `${studentName} bận với gia sư: ${otherTutorName}`;
+            // const otherTutorName = busy.tutor?.name || "Gia sư khác";
+            title = `${studentName} bận với gia sư khác`;
          } else if (user?.role === Role.STUDENT) {
             const tutorName = busy.tutor?.name || "Gia sư";
             const otherStudentName = busy.student?.name || "Học sinh khác";

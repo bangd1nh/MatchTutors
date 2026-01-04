@@ -48,7 +48,7 @@ export const RequestDetailModal = ({
    const respond = useRespondToRequest();
    const navigate = useNavigate();
 
-   console.log(request)
+   console.log(request);
 
    const [isShowSuggest, setIsShowSuggest] = useState(false);
    const [isShowStudentResponse, setIsShowStudentResponse] = useState(false);
@@ -275,11 +275,12 @@ export const RequestDetailModal = ({
                   <Button variant="outline" onClick={onClose}>
                      Đóng
                   </Button>
-                  {user?.role === "TUTOR" && (
-                     <Button onClick={() => setIsShowSuggest(true)}>
-                        lên lịch học
-                     </Button>
-                  )}
+                  {user?.role === "TUTOR" &&
+                     request.status !== TeachingRequestStatus.REJECTED && (
+                        <Button onClick={() => setIsShowSuggest(true)}>
+                           lên lịch học
+                        </Button>
+                     )}
                   {user?.role === "STUDENT" &&
                      request.status === TeachingRequestStatus.ACCEPTED && (
                         <Button onClick={() => setIsShowStudentResponse(true)}>

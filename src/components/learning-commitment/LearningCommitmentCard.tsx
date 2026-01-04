@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { LearningCommitment } from "@/types/learningCommitment";
 import {
    useInitiatePayment,
-   useInitiateTopUp,
+   // useInitiateTopUp,
 } from "@/hooks/useLearningCommitment";
 import { useUser } from "@/hooks/useUser";
 import {
@@ -22,7 +22,7 @@ import {
    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
+// import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import {
    Calendar,
@@ -48,8 +48,8 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
    const navigate = useNavigate();
    const { user } = useUser();
    const { mutate: initiatePayment, isPending } = useInitiatePayment();
-   const { mutate: initiateTopUp, isPending: isTopUpPending } =
-      useInitiateTopUp();
+   // const { mutate: initiateTopUp, isPending: isTopUpPending } =
+   //    useInitiateTopUp();
    const requestCancellation = useRequestCancellation();
    const rejectCancellation = useRejectCancellation();
    const rejectCommitment = useRejectLearningCommitment();
@@ -61,9 +61,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
    const [expandedHistoryIndex, setExpandedHistoryIndex] = useState<
       number | null
    >(null);
-   const [topUpDialogOpen, setTopUpDialogOpen] = useState(false);
-   const [topUpSessions, setTopUpSessions] = useState<number>(1);
-   const [topUpAmount, setTopUpAmount] = useState<number>(0);
+   // const [topUpDialogOpen, setTopUpDialogOpen] = useState(false);
+   // const [topUpSessions, setTopUpSessions] = useState<number>(1);
+   // const [topUpAmount, setTopUpAmount] = useState<number>(0);
 
    const getStatusColor = (status: string) => {
       // use semantic classes that adapt to dark mode via tokens
@@ -136,10 +136,10 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
       commitment.status === "cancelled" ||
       commitment.status === "admin_review";
 
-   const canTopUp =
-      isStudentRole &&
-      isStudentOwner &&
-      ["active", "pending_agreement"].includes(commitment.status);
+   // const canTopUp =
+   //    isStudentRole &&
+   //    isStudentOwner &&
+   //    ["active", "pending_agreement"].includes(commitment.status);
 
    const getCancellationDetails = () => {
       const decision = commitment.cancellationDecision;
@@ -251,29 +251,29 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
       setLinkUrl("");
    };
 
-   const handleTopUp = () => {
-      if (
-         !topUpSessions ||
-         topUpSessions <= 0 ||
-         !topUpAmount ||
-         topUpAmount <= 0
-      )
-         return;
-      initiateTopUp(
-         {
-            id: String(commitment._id),
-            additionalSessions: topUpSessions,
-            amount: topUpAmount,
-         },
-         {
-            onSuccess: () => {
-               setTopUpDialogOpen(false);
-               setTopUpSessions(1);
-               setTopUpAmount(0);
-            },
-         }
-      );
-   };
+   // const handleTopUp = () => {
+   //    if (
+   //       !topUpSessions ||
+   //       topUpSessions <= 0 ||
+   //       !topUpAmount ||
+   //       topUpAmount <= 0
+   //    )
+   //       return;
+   //    initiateTopUp(
+   //       {
+   //          id: String(commitment._id),
+   //          additionalSessions: topUpSessions,
+   //          amount: topUpAmount,
+   //       },
+   //       {
+   //          onSuccess: () => {
+   //             setTopUpDialogOpen(false);
+   //             setTopUpSessions(1);
+   //             setTopUpAmount(0);
+   //          },
+   //       }
+   //    );
+   // };
 
    const hasMultipleCancellations =
       commitment.cancellationDecisionHistory &&
@@ -348,12 +348,12 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                   className="h-2"
                />
 
-               <div className="flex items-center justify-between text-sm text-muted-foreground">
+               {/* <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <span className="text-sm">Buổi / tuần</span>
                   <span className="text-lg font-semibold text-foreground">
                      {commitment.sessionsPerWeek ?? "-"}
                   </span>
-               </div>
+               </div> */}
             </div>
 
             {/* Dates */}
@@ -1053,7 +1053,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                   </div>
                )}
 
-               {canTopUp && (
+               {/* {canTopUp && (
                   <Dialog
                      open={topUpDialogOpen}
                      onOpenChange={setTopUpDialogOpen}
@@ -1126,7 +1126,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                         </div>
                      </DialogContent>
                   </Dialog>
-               )}
+               )} */}
             </div>
          </CardContent>
       </Card>

@@ -53,6 +53,20 @@ export function NextSessionCard({ session }: NextSessionCardProps) {
          default: "bg-gray-500",
       }[session.status.toLowerCase()] || "bg-gray-500";
 
+   // Hàm helper để hiển thị tiếng Việt
+   const getConfirmationLabel = (status: string) => {
+      switch (status.toLowerCase()) {
+         case "accepted":
+            return "Đã đồng ý";
+         case "rejected":
+            return "Đã từ chối";
+         case "pending":
+            return "Chờ xác nhận";
+         default:
+            return status;
+      }
+   };
+
    return (
       <Card className="h-full flex flex-col">
          <CardHeader className="pb-3">
@@ -116,17 +130,17 @@ export function NextSessionCard({ session }: NextSessionCardProps) {
                      variant="outline"
                      className={cn({
                         "bg-green-100 text-green-800 border-green-200 hover:bg-green-100 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700/60 dark:hover:bg-green-900/50":
-                           session.studentConfirmation.status === "accepted",
+                           session.studentConfirmation.status.toLowerCase() ===
+                           "accepted",
                         "bg-red-100 text-red-800 border-red-200 hover:bg-red-100 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700/60 dark:hover:bg-red-900/50":
-                           session.studentConfirmation.status === "rejected",
+                           session.studentConfirmation.status.toLowerCase() ===
+                           "rejected",
                         "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-700/60 dark:hover:bg-yellow-900/50":
-                           session.studentConfirmation.status === "pending",
+                           session.studentConfirmation.status.toLowerCase() ===
+                           "pending",
                      })}
                   >
-                     {translateStatus(
-                        "STUDENT_CONFIRMATION",
-                        session.studentConfirmation.status
-                     )}
+                     {getConfirmationLabel(session.studentConfirmation.status)}
                   </Badge>
                </div>
             )}
