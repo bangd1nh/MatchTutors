@@ -3,13 +3,13 @@ import type { Tutor } from "@/types/tutorListandDetail";
 import { useParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import {
-   TutorAvailability,
    TutorCertification,
    TutorContactCard,
    TutorEducation,
    TutorHeader,
    TutorIntroduction,
    TutorSubject,
+   TutorTeachingSchedule,
 } from "@/components/tutor/tutor-detail";
 import { useTutorDetail } from "@/hooks/useTutorListAndDetail";
 import { TutorReviewSection } from "@/components/tutor/tutor-review/TutorReviewSection";
@@ -133,7 +133,15 @@ const TutorDetail: React.FC = () => {
                   <TutorSubject tutor={normalizedTutor} />
                   <TutorEducation tutor={normalizedTutor} />
                   <TutorCertification tutor={normalizedTutor} />
-                  <TutorAvailability tutor={normalizedTutor} />
+                  <TutorTeachingSchedule
+                     tutorId={normalizedTutor._id}
+                     tutorName={
+                        typeof normalizedTutor.userId === "object"
+                           ? normalizedTutor.userId.name || "Gia sư"
+                           : "Gia sư"
+                     }
+                     tutorAvailability={normalizedTutor.availability}
+                  />
                   <TutorReviewSection tutorId={normalizedTutor._id} />
                </div>
 
