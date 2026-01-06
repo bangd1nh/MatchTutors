@@ -30,7 +30,15 @@ export const useAuth = () => {
             localStorage.setItem("token", token);
             queryClient.invalidateQueries({ queryKey: ["user", "auth"] });
             toast("success", "Đăng nhập thành công!");
-            navigate("/");
+
+            // Điều hướng dựa trên role
+            if (user.role === "STUDENT") {
+               navigate("/tutor-list");
+            } else if (user.role === "TUTOR") {
+               navigate("/tutor/dashboard");
+            } else {
+               navigate("/");
+            }
          } else {
             toast("error", "Phản hồi đăng nhập không hợp lệ.");
          }
@@ -53,7 +61,15 @@ export const useAuth = () => {
             localStorage.setItem("token", token);
             queryClient.invalidateQueries({ queryKey: ["user", "auth"] });
             toast("success", "Đăng nhập bằng Google thành công!");
-            navigate("/");
+
+            // Điều hướng dựa trên role
+            if (user.role === "STUDENT") {
+               navigate("/tutor-list");
+            } else if (user.role === "TUTOR") {
+               navigate("/tutor/dashboard");
+            } else {
+               navigate("/");
+            }
          } else {
             toast("error", "Phản hồi đăng nhập Google không hợp lệ.");
          }
