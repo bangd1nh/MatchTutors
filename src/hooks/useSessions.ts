@@ -276,13 +276,12 @@ export const useCreateBatchSessions = () => {
    });
 };
 
-
 export const useStudentBusySchedules = () => {
    return useQuery<BusySession>({
-      queryKey:["STUDENTBUSY"],
+      queryKey: ["STUDENTBUSY"],
       queryFn: busySession,
-   })
-}
+   });
+};
 /**
  * Hook để xác nhận điểm danh (fake) — dùng cho testing
  */
@@ -294,7 +293,7 @@ export const useConfirmAttendanceFake = () => {
       mutationFn: (sessionId: string) => confirmAttendanceFake(sessionId),
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: sessionKeys.all });
-         toast("success", "Đã xác nhận điểm danh (fake)!");
+         toast("success", "Đã xác nhận điểm danh (Demo)!");
       },
       onError: (error: any) => {
          toast(
@@ -322,7 +321,7 @@ export const useRejectAttendanceFake = () => {
       }) => rejectAttendanceFake(sessionId, payload),
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: sessionKeys.all });
-         toast("success", "Đã gửi báo vắng/khiếu nại (fake)!");
+         toast("success", "Đã gửi báo vắng/khiếu nại (Demo)!");
       },
       onError: (error: any) => {
          toast("error", error.response?.data?.message || "Thao tác thất bại.");

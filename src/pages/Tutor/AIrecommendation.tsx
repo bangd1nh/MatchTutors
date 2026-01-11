@@ -10,6 +10,7 @@ type AIRecommendationProps = {
    hasProfile?: boolean;
    isAuthenticated?: boolean;
    isStudent?: boolean;
+   hasFetchedOnce?: boolean; // NEW: Đánh dấu đã fetch ít nhất 1 lần
 };
 
 const AIrecommendation = ({
@@ -18,6 +19,7 @@ const AIrecommendation = ({
    hasProfile,
    isAuthenticated,
    isStudent,
+   hasFetchedOnce, // NEW
 }: AIRecommendationProps) => {
    const [isExpanded, setIsExpanded] = useState(false);
 
@@ -104,6 +106,60 @@ const AIrecommendation = ({
             <p className="text-sm text-muted-foreground">
                Chưa có gợi ý gia sư nào. Vui lòng đợi trong giây lát...
             </p>
+         </section>
+      );
+   }
+
+   // Case 4a: Đang chờ AI xử lý lần đầu (chưa có response)
+   if (
+      isAuthenticated &&
+      isStudent &&
+      hasProfile &&
+      isLoading &&
+      !hasFetchedOnce
+   ) {
+      return (
+         <section className="mt-8 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-6 text-center shadow-sm">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+               <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
+            <h3 className="mt-3 text-lg font-semibold text-foreground">
+               Đang tạo gợi ý AI
+            </h3>
+            <p className="text-sm text-muted-foreground">
+               Vui lòng đợi trong giây lát, chúng tôi đang tìm kiếm gia sư phù
+               hợp nhất cho bạn...
+            </p>
+         </section>
+      );
+   }
+
+   // Case 4b: AI đã xử lý nhưng không tìm thấy gia sư phù hợp
+   if (
+      isAuthenticated &&
+      isStudent &&
+      hasProfile &&
+      hasFetchedOnce &&
+      (!tutor || tutor.length === 0)
+   ) {
+      return (
+         <section className="mt-8 rounded-2xl border border-dashed border-orange-300 bg-orange-50 dark:bg-orange-950/20 p-6 text-center shadow-sm">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+               <Sparkles className="h-6 w-6" />
+            </div>
+            <h3 className="mt-3 text-lg font-semibold text-foreground">
+               Chưa tìm thấy gia sư phù hợp
+            </h3>
+            <p className="text-sm text-muted-foreground mb-3">
+               AI chưa tìm thấy gia sư phù hợp với hồ sơ hiện tại của bạn. Hãy
+               thử cập nhật thông tin để nhận gợi ý tốt hơn.
+            </p>
+            <Link
+               to="/student/student-profile"
+               className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 underline"
+            >
+               Cập nhật hồ sơ học sinh
+            </Link>
          </section>
       );
    }

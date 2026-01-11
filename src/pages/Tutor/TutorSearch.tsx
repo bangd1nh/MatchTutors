@@ -134,6 +134,7 @@ export default function TutorSearch() {
             hasProfile={hasProfile}
             isAuthenticated={isAuthenticated}
             isStudent={isStudent}
+            hasFetchedOnce={suggestionData !== undefined} // NEW: Đã có response
          />
 
          {/* Show AI search insights if available */}

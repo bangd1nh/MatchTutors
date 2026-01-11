@@ -719,7 +719,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                        confirmAttendanceFakeMutation.isPending
                                     }
                                  >
-                                    Xác nhận có mặt (Fake)
+                                    Xác nhận có mặt (Demo)
                                  </Button>
 
                                  <Button
@@ -729,7 +729,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({
                                        rejectAttendanceFakeMutation.isPending
                                     }
                                  >
-                                    Báo vắng / Khiếu nại (Fake)
+                                    Báo vắng / Khiếu nại (Demo)
                                  </Button>
                               </div>
                            </>
