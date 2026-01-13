@@ -3,10 +3,12 @@ import {
   getAdminWalletBalance,
   getAdminTransactions,
   getAdminPackageTransactions,
+  getAdminCommitmentTransactions,
   getAdminRevenue,
   type AdminWalletBalanceResponse,
   type AdminTransactionsResponse,
   type AdminPackageTransactionsResponse,
+  type AdminCommitmentTransactionsResponse,
   type AdminRevenueResponse,
   type GetAdminTransactionsParams,
 } from "@/api/adminWallet";
@@ -20,6 +22,8 @@ export const adminWalletKeys = {
     [...adminWalletKeys.all, "transactions", params] as const,
   packageTransactions: (params?: GetAdminTransactionsParams) =>
     [...adminWalletKeys.all, "packageTransactions", params] as const,
+  commitmentTransactions: (params?: GetAdminTransactionsParams) =>
+    [...adminWalletKeys.all, "commitmentTransactions", params] as const,
   revenue: () => [...adminWalletKeys.all, "revenue"] as const,
 };
 
@@ -55,6 +59,17 @@ export const useAdminPackageTransactions = (params?: GetAdminTransactionsParams)
   return useQuery<AdminPackageTransactionsResponse>({
     queryKey: adminWalletKeys.packageTransactions(params),
     queryFn: () => getAdminPackageTransactions(params),
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+/**
+ * Hook để lấy lịch sử giao dịch learning commitment
+ */
+export const useAdminCommitmentTransactions = (params?: GetAdminTransactionsParams) => {
+  return useQuery<AdminCommitmentTransactionsResponse>({
+    queryKey: adminWalletKeys.commitmentTransactions(params),
+    queryFn: () => getAdminCommitmentTransactions(params),
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
