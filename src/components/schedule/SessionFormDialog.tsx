@@ -569,7 +569,7 @@ export const SessionFormDialog = ({
                                                 control={form.control}
                                                 defaultValue={
                                                    getTimeForDay(day.value)
-                                                      .startTime
+                                                      .startTime ?? new Date()
                                                 }
                                                 render={({ field }) => (
                                                    <div className="space-y-1">
@@ -591,7 +591,7 @@ export const SessionFormDialog = ({
                                                 control={form.control}
                                                 defaultValue={
                                                    getTimeForDay(day.value)
-                                                      .endTime
+                                                      .endTime ?? new Date()
                                                 }
                                                 render={({ field }) => (
                                                    <div className="space-y-1">
