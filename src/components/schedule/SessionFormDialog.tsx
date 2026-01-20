@@ -230,13 +230,15 @@ export const SessionFormDialog = ({
          return customTimes[dayKey];
       }
 
-      // Đảm bả luôn trả về Date thay vì undefined
-      const defaultStart = form.watch("startTime");
-      const defaultEnd = form.watch("endTime");
+      // Đảm bảo luôn trả về Date thay vì undefined
+      const defaultStart = form.watch("startTime") || new Date();
+      const defaultEnd =
+         form.watch("endTime") ||
+         new Date(new Date().getTime() + 60 * 60 * 1000);
 
       return {
-         startTime: defaultStart || new Date(),
-         endTime: defaultEnd || new Date(new Date().getTime() + 60 * 60 * 1000),
+         startTime: defaultStart,
+         endTime: defaultEnd,
       };
    };
 
@@ -569,7 +571,7 @@ export const SessionFormDialog = ({
                                                 control={form.control}
                                                 defaultValue={
                                                    getTimeForDay(day.value)
-                                                      .startTime ?? new Date()
+                                                      .startTime
                                                 }
                                                 render={({ field }) => (
                                                    <div className="space-y-1">
@@ -577,7 +579,10 @@ export const SessionFormDialog = ({
                                                          Bắt đầu
                                                       </label>
                                                       <TimePickerInput
-                                                         value={field.value}
+                                                         value={
+                                                            field.value ||
+                                                            new Date()
+                                                         }
                                                          onChange={
                                                             field.onChange
                                                          }
@@ -591,7 +596,7 @@ export const SessionFormDialog = ({
                                                 control={form.control}
                                                 defaultValue={
                                                    getTimeForDay(day.value)
-                                                      .endTime ?? new Date()
+                                                      .endTime
                                                 }
                                                 render={({ field }) => (
                                                    <div className="space-y-1">
@@ -599,7 +604,10 @@ export const SessionFormDialog = ({
                                                          Kết thúc
                                                       </label>
                                                       <TimePickerInput
-                                                         value={field.value}
+                                                         value={
+                                                            field.value ||
+                                                            new Date()
+                                                         }
                                                          onChange={
                                                             field.onChange
                                                          }
