@@ -59,7 +59,7 @@ const baseSchema = z.object({
          z.object({
             startTime: z.date(),
             endTime: z.date(),
-         })
+         }),
       )
       .optional(),
 });
@@ -143,7 +143,7 @@ export const SessionFormDialog = ({
       if (!watchedCommitmentId || !commitments || !allSessions) return;
 
       const commitment = commitments.find(
-         (c: any) => c._id === watchedCommitmentId
+         (c: any) => c._id === watchedCommitmentId,
       );
       if (!commitment) return;
 
@@ -228,9 +228,15 @@ export const SessionFormDialog = ({
          return customTimes[dayKey];
       }
 
+      // Đảm bảo luôn trả về Date thay vì undefined
+      const defaultStart = form.watch("startTime") || new Date();
+      const defaultEnd =
+         form.watch("endTime") ||
+         new Date(new Date().getTime() + 60 * 60 * 1000);
+
       return {
-         startTime: form.watch("startTime"),
-         endTime: form.watch("endTime"),
+         startTime: defaultStart,
+         endTime: defaultEnd,
       };
    };
 
@@ -276,7 +282,7 @@ export const SessionFormDialog = ({
                         times.startTime.getHours(),
                         times.startTime.getMinutes(),
                         0,
-                        0
+                        0,
                      );
 
                      const newEnd = new Date(dateCheck);
@@ -284,7 +290,7 @@ export const SessionFormDialog = ({
                         times.endTime.getHours(),
                         times.endTime.getMinutes(),
                         0,
-                        0
+                        0,
                      );
 
                      sessionsToCreate.push({
@@ -299,7 +305,7 @@ export const SessionFormDialog = ({
             sessionsToCreate.sort(
                (a, b) =>
                   new Date(a.startTime).getTime() -
-                  new Date(b.startTime).getTime()
+                  new Date(b.startTime).getTime(),
             );
 
             if (!isEditMode && sessionsToCreate.length > currentLimit) {
@@ -388,7 +394,7 @@ export const SessionFormDialog = ({
                                  .map((c: any) => (
                                     <SelectItem key={c._id} value={c._id}>
                                        {getSubjectLabelVi(
-                                          c.teachingRequest?.subject
+                                          c.teachingRequest?.subject,
                                        )}{" "}
                                        - {c.student?.userId?.name ?? "Học sinh"}
                                     </SelectItem>
@@ -495,7 +501,7 @@ export const SessionFormDialog = ({
                                              render={({ field }) => {
                                                 const checked =
                                                    field.value?.includes(
-                                                      day.value
+                                                      day.value,
                                                    );
                                                 return (
                                                    <Checkbox
@@ -507,7 +513,7 @@ export const SessionFormDialog = ({
                                                       }
                                                       disabled={isCurrentDay}
                                                       onCheckedChange={(
-                                                         isChecked
+                                                         isChecked,
                                                       ) => {
                                                          if (isCurrentDay)
                                                             return;
@@ -521,21 +527,21 @@ export const SessionFormDialog = ({
                                                                field.value.filter(
                                                                   (v) =>
                                                                      v !==
-                                                                     day.value
-                                                               )
+                                                                     day.value,
+                                                               ),
                                                             );
                                                             // Clear expanded state
                                                             setExpandedDays(
                                                                (prev) => {
                                                                   const next =
                                                                      new Set(
-                                                                        prev
+                                                                        prev,
                                                                      );
                                                                   next.delete(
-                                                                     day.value
+                                                                     day.value,
                                                                   );
                                                                   return next;
-                                                               }
+                                                               },
                                                             );
                                                          }
                                                       }}
