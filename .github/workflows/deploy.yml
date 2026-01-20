@@ -4,7 +4,7 @@ on:
    push:
       branches: ["staging"]
 
-# Thiết lập môi trường mặc định cho toàn bộ Job để lấy Secret
+# Thiết lập môi trường mặc định cho toàn bộ Job để lấy Secret  
 env:
    DOCKER_IMAGE_TAG: ${{ github.run_number }}
 
