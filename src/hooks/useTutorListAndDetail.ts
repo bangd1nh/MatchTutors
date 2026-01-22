@@ -114,7 +114,7 @@ export const useTutorSuggestionList = () => {
 
          // Nếu đã có response nhưng rỗng
          const now = Date.now();
-         
+
          // Lưu thời điểm lần đầu nhận được mảng rỗng
          if (firstEmptyResponseTimeRef.current === null) {
             firstEmptyResponseTimeRef.current = now;
@@ -137,6 +137,8 @@ export const useTutorSuggestionList = () => {
       retry: false,
       // Đặt staleTime = 0 để luôn refetch khi cần
       staleTime: 0,
+      // Ngăn chặn refetch khi focus lại cửa sổ (Alt + Tab hoặc click chuột)
+      refetchOnWindowFocus: false,
    });
 
    // Reset ref khi data thay đổi từ empty sang có data
