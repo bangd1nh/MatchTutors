@@ -46,9 +46,9 @@ const AIrecommendation = ({
             setIsWithinPollingWindow(true);
             setHasExitedWindow(false); // Reset flag
          } else {
-            // Kiểm tra xem còn trong 15 giây không
+            // Kiểm tra xem còn trong 25 giây không (tăng từ 15s)
             const timeSinceFirstEmpty = Date.now() - firstEmptyTimeRef.current;
-            const stillInWindow = timeSinceFirstEmpty <= 15000;
+            const stillInWindow = timeSinceFirstEmpty <= 25000;
             setIsWithinPollingWindow(stillInWindow);
             if (!stillInWindow) {
                setHasExitedWindow(true);
@@ -68,21 +68,21 @@ const AIrecommendation = ({
             clearInterval(interval);
             return;
          }
-         
+
          // Nếu đã có recommend, dừng ngay
          if (tutor && tutor.length > 0) {
             clearInterval(interval);
             return;
          }
-         
+
          const timeSinceFirstEmpty = Date.now() - firstEmptyTimeRef.current;
-         const stillInWindow = timeSinceFirstEmpty <= 15000;
-         
+         const stillInWindow = timeSinceFirstEmpty <= 25000; // Tăng từ 15s lên 25s
+
          // Chỉ update state nếu chưa exit window
          if (!hasExitedWindow) {
             setIsWithinPollingWindow(stillInWindow);
-            
-            // Nếu hết 15 giây, đánh dấu đã exit và clear interval
+
+            // Nếu hết thời gian, đánh dấu đã exit và clear interval
             if (!stillInWindow) {
                setHasExitedWindow(true);
                clearInterval(interval);
@@ -95,7 +95,7 @@ const AIrecommendation = ({
       return () => clearInterval(interval);
    }, [hasFetchedOnce, tutor, hasExitedWindow]); // Re-run khi data thay đổi
 
-   // Nếu đang loading HOẶC đang trong thời gian polling (15 giây đầu), coi như đang loading
+   // Nếu đang loading HOẶC đang trong thời gian polling (25 giây đầu), coi như đang loading
    const isActuallyLoading =
       isLoading ||
       (hasFetchedOnce &&
