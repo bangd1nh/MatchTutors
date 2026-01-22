@@ -96,13 +96,16 @@ export default function TutorSearch() {
    const { isAuthenticated, user } = useUser();
 
    // Chỉ gọi API khi là student đã đăng nhập (đã được xử lý trong hook)
-   const { data: suggestionData, isLoading: isSuggestionLoading } =
-      useTutorSuggestionList();
+   const { 
+      data: suggestionData, 
+      isLoading: isSuggestionLoading,
+      isFetching: isSuggestionFetching 
+   } = useTutorSuggestionList();
    const { data: studentProfile } = useFetchStudentProfile();
 
    // Safely extract recommendations
    const sData: TutorSuggestion[] = Array.isArray(
-      suggestionData?.data?.recommendedTutors
+      suggestionData?.data?.recommendedTutors,
    )
       ? (suggestionData.data.recommendedTutors as unknown as TutorSuggestion[])
       : [];
@@ -130,7 +133,7 @@ export default function TutorSearch() {
          {/* Luôn hiển thị AI Recommendation, logic bên trong sẽ xử lý các trường hợp */}
          <AIrecommendation
             tutor={sData}
-            isLoading={isSuggestionLoading && isStudent && hasProfile}
+            isLoading={(isSuggestionLoading || isSuggestionFetching) && isStudent && hasProfile}
             hasProfile={hasProfile}
             isAuthenticated={isAuthenticated}
             isStudent={isStudent}

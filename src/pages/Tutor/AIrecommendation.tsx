@@ -2,7 +2,7 @@ import { Sparkles, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { TutorCard } from "@/components/tutor/tutor-search/TutorCard";
 import { TutorSuggestion } from "@/types/Tutor";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 type AIRecommendationProps = {
    tutor: TutorSuggestion[];
@@ -19,27 +19,61 @@ const AIrecommendation = ({
    hasProfile,
    isAuthenticated,
    isStudent,
-   hasFetchedOnce, // NEW
+   hasFetchedOnce,
 }: AIRecommendationProps) => {
    const [isExpanded, setIsExpanded] = useState(false);
+   // Lưu thời điểm lần đầu nhận được mảng rỗng
+   const firstEmptyTimeRef = useRef<number | null>(null);
+   // State để force re-render khi hết 5 giây
+   const [isWithinPollingWindow, setIsWithinPollingWindow] = useState(true);
 
-   // Case 1: Đang loading và đã có profile (student) -> đang chờ AI
-   if (isLoading && hasProfile && isAuthenticated && isStudent) {
-      return (
-         <section className="mt-8 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-6 text-center shadow-sm">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-               <Loader2 className="h-6 w-6 animate-spin" />
-            </div>
-            <h3 className="mt-3 text-lg font-semibold text-foreground">
-               Đang tạo gợi ý AI
-            </h3>
-            <p className="text-sm text-muted-foreground">
-               Vui lòng đợi trong giây lát, chúng tôi đang tìm kiếm gia sư phù
-               hợp nhất cho bạn...
-            </p>
-         </section>
-      );
-   }
+   // Track khi nào nhận được mảng rỗng lần đầu và update state
+   useEffect(() => {
+      if (hasFetchedOnce && (!tutor || tutor.length === 0)) {
+         if (firstEmptyTimeRef.current === null) {
+            firstEmptyTimeRef.current = Date.now();
+            setIsWithinPollingWindow(true);
+         } else {
+            // Kiểm tra xem còn trong 5 giây không
+            const timeSinceFirstEmpty = Date.now() - firstEmptyTimeRef.current;
+            setIsWithinPollingWindow(timeSinceFirstEmpty <= 5000);
+         }
+      } else if (tutor && tutor.length > 0) {
+         // Reset khi có data
+         firstEmptyTimeRef.current = null;
+         setIsWithinPollingWindow(false);
+      }
+   }, [hasFetchedOnce, tutor]);
+
+   // Set interval để update state mỗi giây khi đang trong polling window
+   useEffect(() => {
+      if (firstEmptyTimeRef.current === null) return;
+
+      const interval = setInterval(() => {
+         if (firstEmptyTimeRef.current === null) {
+            clearInterval(interval);
+            return;
+         }
+         
+         const timeSinceFirstEmpty = Date.now() - firstEmptyTimeRef.current;
+         const stillInWindow = timeSinceFirstEmpty <= 5000;
+         setIsWithinPollingWindow(stillInWindow);
+         
+         // Nếu hết 5 giây, clear interval
+         if (!stillInWindow) {
+            clearInterval(interval);
+         }
+      }, 1000); // Check mỗi giây
+
+      return () => clearInterval(interval);
+   }, [hasFetchedOnce, tutor]); // Re-run khi data thay đổi
+
+   // Nếu đang loading HOẶC đang trong thời gian polling (5 giây đầu), coi như đang loading
+   const isActuallyLoading =
+      isLoading ||
+      (hasFetchedOnce &&
+         (!tutor || tutor.length === 0) &&
+         isWithinPollingWindow);
 
    // Case 2: Chưa đăng nhập hoặc không phải student -> yêu cầu đăng nhập
    if (!isAuthenticated || !isStudent) {
@@ -88,36 +122,8 @@ const AIrecommendation = ({
       );
    }
 
-   // Case 4: Đã có profile nhưng chưa có gợi ý
-   if (
-      isAuthenticated &&
-      isStudent &&
-      hasProfile &&
-      (!tutor || tutor.length === 0)
-   ) {
-      return (
-         <section className="mt-8 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-6 text-center shadow-sm">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-               <Sparkles className="h-6 w-6" />
-            </div>
-            <h3 className="mt-3 text-lg font-semibold text-foreground">
-               Gợi ý từ AI
-            </h3>
-            <p className="text-sm text-muted-foreground">
-               Chưa có gợi ý gia sư nào. Vui lòng đợi trong giây lát...
-            </p>
-         </section>
-      );
-   }
-
-   // Case 4a: Đang chờ AI xử lý lần đầu (chưa có response)
-   if (
-      isAuthenticated &&
-      isStudent &&
-      hasProfile &&
-      isLoading &&
-      !hasFetchedOnce
-   ) {
+   // Case 4a: Đang loading (lần đầu hoặc đang refetch) - ưu tiên hiển thị loading
+   if (isAuthenticated && isStudent && hasProfile && isActuallyLoading) {
       return (
          <section className="mt-8 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-6 text-center shadow-sm">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -134,11 +140,13 @@ const AIrecommendation = ({
       );
    }
 
-   // Case 4b: AI đã xử lý nhưng không tìm thấy gia sư phù hợp
+   // Case 4b: AI đã xử lý xong (không còn loading) nhưng không tìm thấy gia sư phù hợp
+   // Chỉ hiển thị khi đã fetch xong và không còn polling (sau 5 giây)
    if (
       isAuthenticated &&
       isStudent &&
       hasProfile &&
+      !isActuallyLoading &&
       hasFetchedOnce &&
       (!tutor || tutor.length === 0)
    ) {

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useRef, useEffect } from "react";
 import {
    getTutors,
    getTutorById,
@@ -32,7 +33,7 @@ interface UseSearchTutorsOptions {
 }
 
 export const useSearchTutors = (
-   filters: UseSearchTutorsOptions = {}
+   filters: UseSearchTutorsOptions = {},
    // p0: { enabled: any }
 ) => {
    return useQuery<TutorsApiResponse>({
@@ -68,8 +69,10 @@ export const useTutorDetail = (id?: string | null) => {
 
 export const useTutorSuggestionList = () => {
    const { isAuthenticated, user } = useUser();
+   // Lưu thời điểm lần đầu nhận được mảng rỗng
+   const firstEmptyResponseTimeRef = useRef<number | null>(null);
 
-   return useQuery<SuggestionResponse>({
+   const query = useQuery<SuggestionResponse>({
       queryKey: ["suggestion_tutor"],
       queryFn: async () => {
          try {
@@ -91,21 +94,42 @@ export const useTutorSuggestionList = () => {
       },
       // Chỉ fetch khi đã đăng nhập VÀ là STUDENT
       enabled: isAuthenticated && user?.role === "STUDENT",
-      // Tự động refetch mỗi 3 giây khi chưa có data
+      // Tự động refetch mỗi 3 giây khi chưa có data HOẶC đang chờ AI xử lý lần đầu
       refetchInterval: (query) => {
          const data = query.state.data;
 
-         // Nếu chưa có gợi ý hoặc data null/empty, refetch mỗi 3s
-         if (
-            !data ||
-            !data.data ||
-            !Array.isArray(data.data.recommendedTutors) ||
-            data.data.recommendedTutors.length === 0
-         ) {
+         // Nếu chưa có response nào, tiếp tục polling
+         if (!data || !data.data) {
             return 3000; // 3 seconds
          }
-         // Nếu đã có gợi ý, dừng polling
-         return false;
+
+         // Nếu đã có response và có gợi ý, dừng polling và reset ref
+         if (
+            Array.isArray(data.data.recommendedTutors) &&
+            data.data.recommendedTutors.length > 0
+         ) {
+            firstEmptyResponseTimeRef.current = null;
+            return false;
+         }
+
+         // Nếu đã có response nhưng rỗng
+         const now = Date.now();
+         
+         // Lưu thời điểm lần đầu nhận được mảng rỗng
+         if (firstEmptyResponseTimeRef.current === null) {
+            firstEmptyResponseTimeRef.current = now;
+            return 3000; // Tiếp tục polling lần đầu
+         }
+
+         // Nếu đã quá 5 giây kể từ lần đầu nhận mảng rỗng, dừng polling
+         const timeSinceFirstEmpty = now - firstEmptyResponseTimeRef.current;
+         if (timeSinceFirstEmpty > 5000) {
+            // Đã quá 5 giây, hồ sơ không phù hợp, dừng polling
+            return false;
+         }
+
+         // Vẫn trong 5 giây đầu, tiếp tục polling (AI có thể đang xử lý)
+         return 3000;
       },
       // Tiếp tục refetch ngay cả khi tab không active
       refetchIntervalInBackground: true,
@@ -114,4 +138,17 @@ export const useTutorSuggestionList = () => {
       // Đặt staleTime = 0 để luôn refetch khi cần
       staleTime: 0,
    });
+
+   // Reset ref khi data thay đổi từ empty sang có data
+   useEffect(() => {
+      if (
+         query.data?.data?.recommendedTutors &&
+         Array.isArray(query.data.data.recommendedTutors) &&
+         query.data.data.recommendedTutors.length > 0
+      ) {
+         firstEmptyResponseTimeRef.current = null;
+      }
+   }, [query.data]);
+
+   return query;
 };
