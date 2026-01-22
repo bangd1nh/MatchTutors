@@ -121,14 +121,14 @@ export const useTutorSuggestionList = () => {
             return 3000; // Tiếp tục polling lần đầu
          }
 
-         // Nếu đã quá 5 giây kể từ lần đầu nhận mảng rỗng, dừng polling
+         // Nếu đã quá 15 giây kể từ lần đầu nhận mảng rỗng, dừng polling
          const timeSinceFirstEmpty = now - firstEmptyResponseTimeRef.current;
-         if (timeSinceFirstEmpty > 5000) {
-            // Đã quá 5 giây, hồ sơ không phù hợp, dừng polling
+         if (timeSinceFirstEmpty > 15000) {
+            // Đã quá 15 giây, hồ sơ không phù hợp, dừng polling
             return false;
          }
 
-         // Vẫn trong 5 giây đầu, tiếp tục polling (AI có thể đang xử lý)
+         // Vẫn trong 15 giây đầu, tiếp tục polling (AI có thể đang xử lý)
          return 3000;
       },
       // Tiếp tục refetch ngay cả khi tab không active

@@ -24,30 +24,44 @@ const AIrecommendation = ({
    const [isExpanded, setIsExpanded] = useState(false);
    // Lưu thời điểm lần đầu nhận được mảng rỗng
    const firstEmptyTimeRef = useRef<number | null>(null);
-   // State để force re-render khi hết 5 giây
+   // State để force re-render khi hết 15 giây
    const [isWithinPollingWindow, setIsWithinPollingWindow] = useState(true);
+   // State để đảm bảo chỉ hiển thị "cập nhật hồ sơ" sau khi đã hết 15 giây
+   const [hasExitedWindow, setHasExitedWindow] = useState(false);
 
    // Track khi nào nhận được mảng rỗng lần đầu và update state
    useEffect(() => {
+      // Nếu có recommend, reset tất cả và không hiển thị "cập nhật hồ sơ"
+      if (tutor && tutor.length > 0) {
+         firstEmptyTimeRef.current = null;
+         setIsWithinPollingWindow(false);
+         setHasExitedWindow(false);
+         return; // Dừng ngay, không xử lý tiếp
+      }
+
+      // Chỉ xử lý khi mảng rỗng
       if (hasFetchedOnce && (!tutor || tutor.length === 0)) {
          if (firstEmptyTimeRef.current === null) {
             firstEmptyTimeRef.current = Date.now();
             setIsWithinPollingWindow(true);
+            setHasExitedWindow(false); // Reset flag
          } else {
-            // Kiểm tra xem còn trong 5 giây không
+            // Kiểm tra xem còn trong 15 giây không
             const timeSinceFirstEmpty = Date.now() - firstEmptyTimeRef.current;
-            setIsWithinPollingWindow(timeSinceFirstEmpty <= 5000);
+            const stillInWindow = timeSinceFirstEmpty <= 15000;
+            setIsWithinPollingWindow(stillInWindow);
+            if (!stillInWindow) {
+               setHasExitedWindow(true);
+            }
          }
-      } else if (tutor && tutor.length > 0) {
-         // Reset khi có data
-         firstEmptyTimeRef.current = null;
-         setIsWithinPollingWindow(false);
       }
    }, [hasFetchedOnce, tutor]);
 
    // Set interval để update state mỗi giây khi đang trong polling window
    useEffect(() => {
       if (firstEmptyTimeRef.current === null) return;
+      if (hasExitedWindow) return; // Đã hết thời gian, không cần check nữa
+      if (tutor && tutor.length > 0) return; // Có recommend rồi, không cần check
 
       const interval = setInterval(() => {
          if (firstEmptyTimeRef.current === null) {
@@ -55,20 +69,33 @@ const AIrecommendation = ({
             return;
          }
          
-         const timeSinceFirstEmpty = Date.now() - firstEmptyTimeRef.current;
-         const stillInWindow = timeSinceFirstEmpty <= 5000;
-         setIsWithinPollingWindow(stillInWindow);
+         // Nếu đã có recommend, dừng ngay
+         if (tutor && tutor.length > 0) {
+            clearInterval(interval);
+            return;
+         }
          
-         // Nếu hết 5 giây, clear interval
-         if (!stillInWindow) {
+         const timeSinceFirstEmpty = Date.now() - firstEmptyTimeRef.current;
+         const stillInWindow = timeSinceFirstEmpty <= 15000;
+         
+         // Chỉ update state nếu chưa exit window
+         if (!hasExitedWindow) {
+            setIsWithinPollingWindow(stillInWindow);
+            
+            // Nếu hết 15 giây, đánh dấu đã exit và clear interval
+            if (!stillInWindow) {
+               setHasExitedWindow(true);
+               clearInterval(interval);
+            }
+         } else {
             clearInterval(interval);
          }
       }, 1000); // Check mỗi giây
 
       return () => clearInterval(interval);
-   }, [hasFetchedOnce, tutor]); // Re-run khi data thay đổi
+   }, [hasFetchedOnce, tutor, hasExitedWindow]); // Re-run khi data thay đổi
 
-   // Nếu đang loading HOẶC đang trong thời gian polling (5 giây đầu), coi như đang loading
+   // Nếu đang loading HOẶC đang trong thời gian polling (15 giây đầu), coi như đang loading
    const isActuallyLoading =
       isLoading ||
       (hasFetchedOnce &&
@@ -141,14 +168,15 @@ const AIrecommendation = ({
    }
 
    // Case 4b: AI đã xử lý xong (không còn loading) nhưng không tìm thấy gia sư phù hợp
-   // Chỉ hiển thị khi đã fetch xong và không còn polling (sau 5 giây)
+   // Chỉ hiển thị khi đã fetch xong và không còn polling (sau 15 giây) VÀ không có recommend
    if (
       isAuthenticated &&
       isStudent &&
       hasProfile &&
       !isActuallyLoading &&
       hasFetchedOnce &&
-      (!tutor || tutor.length === 0)
+      (!tutor || tutor.length === 0) &&
+      hasExitedWindow // Đảm bảo đã hết 15 giây
    ) {
       return (
          <section className="mt-8 rounded-2xl border border-dashed border-orange-300 bg-orange-50 dark:bg-orange-950/20 p-6 text-center shadow-sm">
