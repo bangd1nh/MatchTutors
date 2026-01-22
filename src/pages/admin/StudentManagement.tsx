@@ -6,9 +6,10 @@ import {
    useGetAllStudents, 
    useBanStudent,
    useUnbanStudent,
+   useGetStudentProfile,
    AdminStudent 
 } from "@/hooks/useAdminStudents";
-import { Search, ShieldOff, Shield, MoreVertical, Eye } from "lucide-react";
+import { Search, ShieldOff, Shield, MoreVertical, Eye, Loader2, User, Mail, Phone, MapPin, Calendar, BookOpen, Target, Clock } from "lucide-react";
 import {
    Dialog,
    DialogContent,
@@ -19,13 +20,17 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { getSubjectLabelVi, getLevelLabelVi } from "@/utils/educationDisplay";
+import { Separator } from "@/components/ui/separator";
 
 const StudentManagement = () => {
    const [searchTerm, setSearchTerm] = useState("");
    const [selectedStudent, setSelectedStudent] = useState<AdminStudent | null>(null);
+   const [viewingStudentId, setViewingStudentId] = useState<string | null>(null);
    const [banReason, setBanReason] = useState("");
    const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
    const [isUnbanDialogOpen, setIsUnbanDialogOpen] = useState(false);
+   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
    const [activeTab, setActiveTab] = useState<'all' | 'active' | 'banned'>('all');
 
    // API calls
@@ -35,6 +40,10 @@ const StudentManagement = () => {
    
    const banStudentMutation = useBanStudent();
    const unbanStudentMutation = useUnbanStudent();
+   const { data: studentProfileData, isLoading: isLoadingProfile } = useGetStudentProfile(
+      viewingStudentId || "",
+      isProfileDialogOpen && !!viewingStudentId
+   );
 
    // Filter students based on active tab
    const filteredStudents = allStudents?.data?.users?.filter((student) => {
@@ -62,6 +71,16 @@ const StudentManagement = () => {
    };
 
    // Event handlers
+   const handleViewProfile = (student: AdminStudent) => {
+      setViewingStudentId(student._id);
+      setIsProfileDialogOpen(true);
+   };
+
+   const handleCloseProfile = () => {
+      setIsProfileDialogOpen(false);
+      setViewingStudentId(null);
+   };
+
    const handleBanStudent = () => {
       if (selectedStudent && banReason.trim()) {
          banStudentMutation.mutate({
@@ -310,8 +329,9 @@ const StudentManagement = () => {
                                        {student.isBanned ? 'Mở khóa' : 'Khóa'}
                                     </button>
                                     <button 
+                                       onClick={() => handleViewProfile(student)}
                                        className="flex items-center px-3 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 hover:shadow-md transition-all duration-200"
-                                       title="Xem chi tiết"
+                                       title="Xem profile"
                                     >
                                        <Eye className="h-4 w-4 mr-1.5" />
                                        <span className="text-sm font-medium">Xem</span>
@@ -404,6 +424,172 @@ const StudentManagement = () => {
                      disabled={unbanStudentMutation.isPending}
                   >
                      {unbanStudentMutation.isPending ? "Đang mở khóa..." : "Mở khóa tài khoản"}
+                  </Button>
+               </DialogFooter>
+            </DialogContent>
+         </Dialog>
+
+         {/* Profile Dialog */}
+         <Dialog open={isProfileDialogOpen} onOpenChange={handleCloseProfile}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+               <DialogHeader>
+                  <DialogTitle>Thông tin học sinh</DialogTitle>
+                  <DialogDescription>
+                     Chi tiết profile của học sinh
+                  </DialogDescription>
+               </DialogHeader>
+               
+               {isLoadingProfile ? (
+                  <div className="flex items-center justify-center py-12">
+                     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+               ) : studentProfileData?.data?.student ? (
+                  <div className="space-y-6">
+                     {studentProfileData.data.hasProfile ? (
+                        <>
+                           {/* Thông tin cơ bản */}
+                           <div className="space-y-4">
+                              <h3 className="text-lg font-semibold flex items-center gap-2">
+                                 <User className="h-5 w-5" />
+                                 Thông tin cơ bản
+                              </h3>
+                              <div className="grid grid-cols-2 gap-4">
+                                 <div className="space-y-2">
+                                    <Label className="text-sm text-muted-foreground">Tên</Label>
+                                    <p className="text-sm font-medium">{studentProfileData.data.student.userId.name || 'N/A'}</p>
+                                 </div>
+                                 <div className="space-y-2">
+                                    <Label className="text-sm text-muted-foreground flex items-center gap-2">
+                                       <Mail className="h-4 w-4" />
+                                       Email
+                                    </Label>
+                                    <p className="text-sm font-medium">{studentProfileData.data.student.userId.email || 'N/A'}</p>
+                                 </div>
+                                 <div className="space-y-2">
+                                    <Label className="text-sm text-muted-foreground flex items-center gap-2">
+                                       <Phone className="h-4 w-4" />
+                                       Số điện thoại
+                                    </Label>
+                                    <p className="text-sm font-medium">{studentProfileData.data.student.userId.phone || 'Chưa cập nhật'}</p>
+                                 </div>
+                                 <div className="space-y-2">
+                                    <Label className="text-sm text-muted-foreground">Giới tính</Label>
+                                    <p className="text-sm font-medium">{studentProfileData.data.student.userId.gender || 'Chưa cập nhật'}</p>
+                                 </div>
+                                 {studentProfileData.data.student.userId.address && (
+                                    <div className="space-y-2 col-span-2">
+                                       <Label className="text-sm text-muted-foreground flex items-center gap-2">
+                                          <MapPin className="h-4 w-4" />
+                                          Địa chỉ
+                                       </Label>
+                                       <p className="text-sm font-medium">
+                                          {studentProfileData.data.student.userId.address.street || ''} {studentProfileData.data.student.userId.address.city || ''}
+                                       </p>
+                                    </div>
+                                 )}
+                                 {studentProfileData.data.student.userId.isBanned && (
+                                    <div className="space-y-2 col-span-2">
+                                       <Label className="text-sm text-red-600">Trạng thái tài khoản</Label>
+                                       <div className="space-y-1">
+                                          <Badge variant="destructive">Đã bị khóa</Badge>
+                                          {studentProfileData.data.student.userId.banReason && (
+                                             <p className="text-sm text-muted-foreground">Lý do: {studentProfileData.data.student.userId.banReason}</p>
+                                          )}
+                                          {studentProfileData.data.student.userId.bannedAt && (
+                                             <p className="text-sm text-muted-foreground">
+                                                Ngày khóa: {new Date(studentProfileData.data.student.userId.bannedAt).toLocaleDateString('vi-VN')}
+                                             </p>
+                                          )}
+                                       </div>
+                                    </div>
+                                 )}
+                              </div>
+                           </div>
+
+                           <Separator />
+
+                           {/* Thông tin học tập */}
+                           <div className="space-y-4">
+                              <h3 className="text-lg font-semibold flex items-center gap-2">
+                                 <BookOpen className="h-5 w-5" />
+                                 Thông tin học tập
+                              </h3>
+                              <div className="grid grid-cols-2 gap-4">
+                                 {studentProfileData.data.student.gradeLevel && (
+                                    <div className="space-y-2">
+                                       <Label className="text-sm text-muted-foreground">Cấp độ</Label>
+                                       <p className="text-sm font-medium">{getLevelLabelVi(studentProfileData.data.student.gradeLevel)}</p>
+                                    </div>
+                                 )}
+                                 {studentProfileData.data.student.subjectsInterested && studentProfileData.data.student.subjectsInterested.length > 0 && (
+                                    <div className="space-y-2 col-span-2">
+                                       <Label className="text-sm text-muted-foreground">Môn học quan tâm</Label>
+                                       <div className="flex flex-wrap gap-2">
+                                          {studentProfileData.data.student.subjectsInterested.map((subject, index) => (
+                                             <Badge key={index} variant="outline">
+                                                {getSubjectLabelVi(subject)}
+                                             </Badge>
+                                          ))}
+                                       </div>
+                                    </div>
+                                 )}
+                                 {studentProfileData.data.student.bio && (
+                                    <div className="space-y-2 col-span-2">
+                                       <Label className="text-sm text-muted-foreground">Giới thiệu</Label>
+                                       <p className="text-sm">{studentProfileData.data.student.bio}</p>
+                                    </div>
+                                 )}
+                                 {studentProfileData.data.student.learningGoals && (
+                                    <div className="space-y-2 col-span-2">
+                                       <Label className="text-sm text-muted-foreground flex items-center gap-2">
+                                          <Target className="h-4 w-4" />
+                                          Mục tiêu học tập
+                                       </Label>
+                                       <p className="text-sm">{studentProfileData.data.student.learningGoals}</p>
+                                    </div>
+                                 )}
+                              </div>
+                           </div>
+
+                           <Separator />
+
+                           {/* Thông tin khác */}
+                           <div className="space-y-4">
+                              <h3 className="text-lg font-semibold flex items-center gap-2">
+                                 <Calendar className="h-5 w-5" />
+                                 Thông tin khác
+                              </h3>
+                              <div className="grid grid-cols-2 gap-4">
+                                 <div className="space-y-2">
+                                    <Label className="text-sm text-muted-foreground">Ngày tạo</Label>
+                                    <p className="text-sm font-medium">
+                                       {new Date(studentProfileData.data.student.createdAt).toLocaleDateString('vi-VN')}
+                                    </p>
+                                 </div>
+                                 <div className="space-y-2">
+                                    <Label className="text-sm text-muted-foreground">Cập nhật lần cuối</Label>
+                                    <p className="text-sm font-medium">
+                                       {new Date(studentProfileData.data.student.updatedAt).toLocaleDateString('vi-VN')}
+                                    </p>
+                                 </div>
+                              </div>
+                           </div>
+                        </>
+                     ) : (
+                        <div className="text-center py-12">
+                           <p className="text-muted-foreground">Học sinh chưa có profile</p>
+                        </div>
+                     )}
+                  </div>
+               ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                     Không thể tải thông tin profile
+                  </div>
+               )}
+
+               <DialogFooter>
+                  <Button variant="outline" onClick={handleCloseProfile}>
+                     Đóng
                   </Button>
                </DialogFooter>
             </DialogContent>

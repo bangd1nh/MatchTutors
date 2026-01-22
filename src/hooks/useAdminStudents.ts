@@ -7,6 +7,7 @@ import {
   banStudent,
   unbanStudent,
   getStudentDetail,
+  getStudentProfile,
   AdminStudent,
   BanHistory,
 } from "@/api/adminStudents";
@@ -18,6 +19,7 @@ export const adminStudentKeys = {
   list: (filters: Record<string, unknown>) => [...adminStudentKeys.lists(), { filters }] as const,
   details: () => [...adminStudentKeys.all, "detail"] as const,
   detail: (id: string) => [...adminStudentKeys.details(), id] as const,
+  profile: (id: string) => [...adminStudentKeys.all, "profile", id] as const,
 };
 
 /**
@@ -123,6 +125,18 @@ export const useGetStudentDetail = (userId: string) => {
     queryKey: adminStudentKeys.detail(userId),
     queryFn: () => getStudentDetail(userId),
     enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+/**
+ * Hook để lấy profile học sinh
+ */
+export const useGetStudentProfile = (studentId: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: adminStudentKeys.profile(studentId),
+    queryFn: () => getStudentProfile(studentId),
+    enabled: enabled && !!studentId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };

@@ -34,6 +34,45 @@ export interface BanHistory {
   unbannedBy?: string;
 }
 
+// Interface cho Student Profile
+export interface StudentProfile {
+  _id: string;
+  userId: {
+    _id: string;
+    name: string;
+    email: string;
+    avatarUrl?: string;
+    phone?: string;
+    gender?: string;
+    address?: {
+      city?: string;
+      street?: string;
+    };
+    role: string;
+    isBanned: boolean;
+    bannedAt?: string;
+    banReason?: string;
+  };
+  subjectsInterested?: string[];
+  gradeLevel?: string;
+  bio?: string;
+  learningGoals?: string;
+  availability?: any;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StudentProfileResponse {
+  status: string;
+  message: string;
+  code: number;
+  data: {
+    student: StudentProfile;
+    hasProfile: boolean;
+    message: string;
+  };
+}
+
 // Interface cho response pagination
 export interface GetAllStudentsResponse {
   status: string;
@@ -155,5 +194,16 @@ export const getStudentDetail = async (
   banHistory: BanHistory[];
 }> => {
   const response = await apiClient.get(`/admin/user/${userId}/ban-history`);
+  return response.data;
+};
+
+/**
+ * Lấy profile học sinh
+ * GET /admin/student/:id
+ */
+export const getStudentProfile = async (
+  studentId: string
+): Promise<StudentProfileResponse> => {
+  const response = await apiClient.get(`/admin/student/${studentId}`);
   return response.data;
 };
