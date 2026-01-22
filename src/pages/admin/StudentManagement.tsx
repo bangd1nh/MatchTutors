@@ -695,9 +695,10 @@ const StudentManagement = () => {
                                        <Label className="text-sm text-muted-foreground">
                                           Giới thiệu
                                        </Label>
-                                       <p className="text-sm">
-                                          {studentProfileData.data.student.bio}
-                                       </p>
+                                       <div 
+                                          className="text-sm prose prose-sm max-w-none"
+                                          dangerouslySetInnerHTML={{ __html: studentProfileData.data.student.bio }}
+                                       />
                                     </div>
                                  )}
                                  {studentProfileData.data.student
@@ -707,12 +708,10 @@ const StudentManagement = () => {
                                           <Target className="h-4 w-4" />
                                           Mục tiêu học tập
                                        </Label>
-                                       <p className="text-sm">
-                                          {
-                                             studentProfileData.data.student
-                                                .learningGoals
-                                          }
-                                       </p>
+                                       <div 
+                                          className="text-sm prose prose-sm max-w-none"
+                                          dangerouslySetInnerHTML={{ __html: studentProfileData.data.student.learningGoals }}
+                                       />
                                     </div>
                                  )}
                               </div>
