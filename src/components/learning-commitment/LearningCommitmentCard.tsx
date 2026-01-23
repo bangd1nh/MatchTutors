@@ -104,9 +104,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
    const studentObj: any = commitment.student;
    const isStudentOwner = Boolean(
       studentObj &&
-         (String(studentObj.userId?._id || studentObj.userId) ===
-            String(user?.id || user?._id) ||
-            String(studentObj._id) === String(user?.id || user?._id))
+      (String(studentObj.userId?._id || studentObj.userId) ===
+         String(user?.id || user?._id) ||
+         String(studentObj._id) === String(user?.id || user?._id)),
    );
 
    const isStudentRole = String(user?.role || "").toLowerCase() === "student";
@@ -123,7 +123,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
       isStudentOwner &&
       commitment.status === "pending_agreement";
 
-   const canRequestCancel = isTutorRole && commitment.status === "active";
+   const canRequestCancel = commitment.status === "active";
    const canRespondCancel =
       commitment.status === "cancellation_pending" &&
       ((isStudentRole &&
@@ -294,7 +294,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                </div>
                <Badge
                   className={`flex-shrink-0 font-medium text-xs ${getStatusColor(
-                     commitment.status
+                     commitment.status,
                   )}`}
                >
                   {getStatusLabel(commitment.status)}
@@ -392,7 +392,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                   </span>
                   <span className="font-semibold text-blue-600 dark:text-blue-400">
                      {(commitment.studentPaidAmount ?? 0).toLocaleString(
-                        "vi-VN"
+                        "vi-VN",
                      )}{" "}
                      VND
                   </span>
@@ -420,7 +420,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                            ? "/tutor"
                            : "/student";
                      navigate(
-                        `${base}/learning-commitment/${commitment._id}/sessions`
+                        `${base}/learning-commitment/${commitment._id}/sessions`,
                      );
                   }}
                   variant="outline"
@@ -497,7 +497,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                    expandedHistoryIndex ===
                                                       index
                                                       ? null
-                                                      : index
+                                                      : index,
                                                 )
                                              }
                                              className="w-full px-4 py-3 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-150 flex items-center justify-between transition-colors"
@@ -514,9 +514,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                       {record.requestedAt
                                                          ? format(
                                                               new Date(
-                                                                 record.requestedAt
+                                                                 record.requestedAt,
                                                               ),
-                                                              "HH:mm dd/MM/yyyy"
+                                                              "HH:mm dd/MM/yyyy",
                                                            )
                                                          : "Không có thời gian"}
                                                    </p>
@@ -550,7 +550,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                    <p className="text-sm font-medium text-slate-900">
                                                       {getRequesterName(
                                                          record.requestedBy ||
-                                                            "unknown"
+                                                            "unknown",
                                                       )}
                                                    </p>
                                                 </div>
@@ -562,10 +562,10 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                       "ACCEPTED"
                                                          ? "bg-green-50 border-green-200"
                                                          : record.student
-                                                              .status ===
-                                                           "REJECTED"
-                                                         ? "bg-red-50 border-red-200"
-                                                         : "bg-yellow-50 border-yellow-200"
+                                                                .status ===
+                                                             "REJECTED"
+                                                           ? "bg-red-50 border-red-200"
+                                                           : "bg-yellow-50 border-yellow-200"
                                                    }`}
                                                 >
                                                    <div className="flex items-center gap-2 mb-2">
@@ -585,17 +585,17 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                    </div>
                                                    <Badge
                                                       className={`text-xs ${getStatusBadgeColor(
-                                                         record.student.status
+                                                         record.student.status,
                                                       )}`}
                                                    >
                                                       {record.student.status ===
                                                       "ACCEPTED"
                                                          ? "Đã Chấp Nhận"
                                                          : record.student
-                                                              .status ===
-                                                           "REJECTED"
-                                                         ? "Đã Từ Chối"
-                                                         : "Chờ Phản Hồi"}
+                                                                .status ===
+                                                             "REJECTED"
+                                                           ? "Đã Từ Chối"
+                                                           : "Chờ Phản Hồi"}
                                                    </Badge>
                                                    {record.student.reason && (
                                                       <p className="text-xs text-slate-600 mt-2">
@@ -614,10 +614,10 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                       "ACCEPTED"
                                                          ? "bg-green-50 border-green-200"
                                                          : record.tutor
-                                                              .status ===
-                                                           "REJECTED"
-                                                         ? "bg-red-50 border-red-200"
-                                                         : "bg-yellow-50 border-yellow-200"
+                                                                .status ===
+                                                             "REJECTED"
+                                                           ? "bg-red-50 border-red-200"
+                                                           : "bg-yellow-50 border-yellow-200"
                                                    }`}
                                                 >
                                                    <div className="flex items-center gap-2 mb-2">
@@ -637,17 +637,17 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                    </div>
                                                    <Badge
                                                       className={`text-xs ${getStatusBadgeColor(
-                                                         record.tutor.status
+                                                         record.tutor.status,
                                                       )}`}
                                                    >
                                                       {record.tutor.status ===
                                                       "ACCEPTED"
                                                          ? "Đã Chấp Nhận"
                                                          : record.tutor
-                                                              .status ===
-                                                           "REJECTED"
-                                                         ? "Đã Từ Chối"
-                                                         : "Chờ Phản Hồi"}
+                                                                .status ===
+                                                             "REJECTED"
+                                                           ? "Đã Từ Chối"
+                                                           : "Chờ Phản Hồi"}
                                                    </Badge>
                                                    {record.tutor.reason && (
                                                       <p className="text-xs text-slate-600 mt-2">
@@ -695,9 +695,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                       {record.resolvedDate
                                                          ? format(
                                                               new Date(
-                                                                 record.resolvedDate
+                                                                 record.resolvedDate,
                                                               ),
-                                                              "HH:mm dd/MM/yyyy"
+                                                              "HH:mm dd/MM/yyyy",
                                                            )
                                                          : "Chưa xử lý"}
                                                    </p>
@@ -705,7 +705,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                              </div>
                                           )}
                                        </div>
-                                    )
+                                    ),
                                  )}
                               </div>
                            ) : (
@@ -734,7 +734,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                        </p>
                                        <p className="text-sm font-medium text-slate-900">
                                           {getRequesterName(
-                                             cancellationDetails.requestedBy
+                                             cancellationDetails.requestedBy,
                                           )}
                                        </p>
                                     </div>
@@ -747,9 +747,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                           <p className="text-sm text-slate-700">
                                              {format(
                                                 new Date(
-                                                   cancellationDetails.requestedAt
+                                                   cancellationDetails.requestedAt,
                                                 ),
-                                                "HH:mm dd/MM/yyyy"
+                                                "HH:mm dd/MM/yyyy",
                                              )}
                                           </p>
                                        </div>
@@ -765,9 +765,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                           "ACCEPTED"
                                              ? "bg-green-50 border-green-200"
                                              : cancellationDetails.studentStatus ===
-                                               "REJECTED"
-                                             ? "bg-red-50 border-red-200"
-                                             : "bg-yellow-50 border-yellow-200"
+                                                 "REJECTED"
+                                               ? "bg-red-50 border-red-200"
+                                               : "bg-yellow-50 border-yellow-200"
                                        }`}
                                     >
                                        <div className="flex items-center gap-2 mb-2">
@@ -786,16 +786,16 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                        </div>
                                        <Badge
                                           className={`text-xs ${getStatusBadgeColor(
-                                             cancellationDetails.studentStatus
+                                             cancellationDetails.studentStatus,
                                           )}`}
                                        >
                                           {cancellationDetails.studentStatus ===
                                           "ACCEPTED"
                                              ? "Đã Chấp Nhận"
                                              : cancellationDetails.studentStatus ===
-                                               "REJECTED"
-                                             ? "Đã Từ Chối"
-                                             : "Chờ Phản Hồi"}
+                                                 "REJECTED"
+                                               ? "Đã Từ Chối"
+                                               : "Chờ Phản Hồi"}
                                        </Badge>
                                        {cancellationDetails.studentReason && (
                                           <p className="text-xs text-slate-600 mt-2">
@@ -811,9 +811,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                           "ACCEPTED"
                                              ? "bg-green-50 border-green-200"
                                              : cancellationDetails.tutorStatus ===
-                                               "REJECTED"
-                                             ? "bg-red-50 border-red-200"
-                                             : "bg-yellow-50 border-yellow-200"
+                                                 "REJECTED"
+                                               ? "bg-red-50 border-red-200"
+                                               : "bg-yellow-50 border-yellow-200"
                                        }`}
                                     >
                                        <div className="flex items-center gap-2 mb-2">
@@ -832,16 +832,16 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                        </div>
                                        <Badge
                                           className={`text-xs ${getStatusBadgeColor(
-                                             cancellationDetails.tutorStatus
+                                             cancellationDetails.tutorStatus,
                                           )}`}
                                        >
                                           {cancellationDetails.tutorStatus ===
                                           "ACCEPTED"
                                              ? "Đã Chấp Nhận"
                                              : cancellationDetails.tutorStatus ===
-                                               "REJECTED"
-                                             ? "Đã Từ Chối"
-                                             : "Chờ Phản Hồi"}
+                                                 "REJECTED"
+                                               ? "Đã Từ Chối"
+                                               : "Chờ Phản Hồi"}
                                        </Badge>
                                        {cancellationDetails.tutorReason && (
                                           <p className="text-xs text-slate-600 mt-2">
@@ -898,9 +898,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                        <p className="text-sm text-slate-700">
                                           {format(
                                              new Date(
-                                                cancellationDetails.resolvedAt
+                                                cancellationDetails.resolvedAt,
                                              ),
-                                             "HH:mm dd/MM/yyyy"
+                                             "HH:mm dd/MM/yyyy",
                                           )}
                                        </p>
                                     </div>
