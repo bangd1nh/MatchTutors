@@ -67,7 +67,8 @@ const DoMCQ = () => {
    const handleSubmit = useCallback(() => {
       // KHÓA submit nếu đang submit hoặc đã hết giờ
       if (submitMCQ.isPending || isTimeOver) return;
-
+      timeUpCalledRef.current = true;
+      setIsTimeOver(true);
       const payload = getSubmitQuiz();
       submitMCQ.mutate(payload);
    }, [submitMCQ.isPending, isTimeOver, getSubmitQuiz, submitMCQ]);

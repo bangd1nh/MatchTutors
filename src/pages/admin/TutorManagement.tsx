@@ -10,7 +10,7 @@ import {
    useGetTutorMapping,
    AdminTutor 
 } from "@/hooks/useAdminTutors";
-import { Search, ShieldOff, Shield, MoreVertical, Clock, ChevronLeft, ChevronRight, UserCheck } from "lucide-react";
+import { Search, ShieldOff, Shield, MoreVertical, Clock, ChevronLeft, ChevronRight, UserCheck, Eye } from "lucide-react";
 import {
    Dialog,
    DialogContent,
@@ -19,6 +19,12 @@ import {
    DialogHeader,
    DialogTitle,
 } from "@/components/ui/dialog";
+import {
+   DropdownMenu,
+   DropdownMenuContent,
+   DropdownMenuItem,
+   DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -287,7 +293,7 @@ const TutorManagement = () => {
                                                 tutor.isBanned ? 'grayscale opacity-75' : 'hover:scale-105'
                                              }`}
                                              src={tutor.avatarUrl}
-                                             alt={tutor.name}
+                                             alt={tutor.name || tutor.email || "Gia sư"}
                                           />
                                           {tutor.isBanned && (
                                              <div className="absolute inset-0 bg-red-500 bg-opacity-20 rounded-xl"></div>
@@ -296,7 +302,7 @@ const TutorManagement = () => {
                                     ) : (
                                        <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center shadow-sm">
                                           <span className="text-lg font-semibold text-white">
-                                             {tutor.name.charAt(0).toUpperCase()}
+                                             {(tutor.name?.charAt(0) || tutor.email?.charAt(0) || "G").toUpperCase()}
                                           </span>
                                        </div>
                                     )}
@@ -304,7 +310,7 @@ const TutorManagement = () => {
                                  <div className="ml-4">
                                     <div className="flex items-center space-x-2">
                                        <div className="text-sm font-semibold text-gray-900">
-                                          {tutor.name}
+                                          {tutor.name || tutor.email || "Chưa có tên"}
                                        </div>
                                        {tutor.isBanned && (
                                           <span className="px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full bg-red-100 text-red-700 border border-red-200">
@@ -328,10 +334,10 @@ const TutorManagement = () => {
                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {tutor.address ? (
                                  <div>
-                                    <div className="font-medium">{tutor.address.city}</div>
-                                    {tutor.address.street && (
+                                    <div className="font-medium">{tutor.address.city || "Chưa cập nhật"}</div>
+                                    {tutor.address.street ? (
                                        <div className="text-xs text-gray-400">{tutor.address.street}</div>
-                                    )}
+                                    ) : null}
                                  </div>
                               ) : (
                                  <span className="italic text-gray-400">Chưa cập nhật</span>
@@ -475,6 +481,8 @@ const TutorManagement = () => {
                                     )}
                                  </Button>
 
+                                 <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
                                  <Button
                                     size="sm"
                                     variant="ghost"
@@ -483,6 +491,23 @@ const TutorManagement = () => {
                                  >
                                     <MoreVertical className="h-4 w-4" />
                                  </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                       <DropdownMenuItem
+                                          onClick={() => {
+                                             const tutorId = userIdToTutorId[tutor._id];
+                                             if (tutorId) {
+                                                navigate(`/admin/tutors/${tutorId}/full`);
+                                             }
+                                          }}
+                                          disabled={!hasTutorProfile(tutor)}
+                                          title={!hasTutorProfile(tutor) ? "Chưa có hồ sơ" : "Xem hồ sơ đầy đủ"}
+                                       >
+                                          <Eye className="h-4 w-4 mr-2" />
+                                          Xem hồ sơ đầy đủ
+                                       </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                 </DropdownMenu>
                               </div>
                            </td>
                         </tr>

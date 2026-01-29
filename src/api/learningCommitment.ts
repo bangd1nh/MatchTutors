@@ -25,6 +25,18 @@ export const learningCommitmentApi = {
       return response.data.data;
    },
 
+   initiateTopUp: async (
+      id: string,
+      additionalSessions: number,
+      amount: number
+   ): Promise<{ paymentLink: string }> => {
+      const response = await apiClient.post(`/learningCommitment/${id}/topup`, {
+         additionalSessions,
+         amount,
+      });
+      return response.data.data;
+   },
+
    getByUser: async (
       page: number = 1,
       limit: number = 10
@@ -51,18 +63,26 @@ export const learningCommitmentApi = {
       return response.data.data.commitments;
    },
 
-   requestCancellation: async (id: string, reason: string): Promise<any> => {
+   requestCancellation: async (
+      id: string,
+      reason: string,
+      linkUrl?: string
+   ): Promise<any> => {
       const response = await apiClient.post(
          `/learningCommitment/${id}/request-cancellation`,
-         { reason }
+         { reason, linkUrl }
       );
       return response.data.data;
    },
 
-   rejectCancellation: async (id: string, reason: string): Promise<any> => {
+   rejectCancellation: async (
+      id: string,
+      reason: string,
+      linkUrl?: string
+   ): Promise<any> => {
       const response = await apiClient.post(
          `/learningCommitment/${id}/reject-cancellation`,
-         { reason }
+         { reason, linkUrl }
       );
       return response.data.data;
    },

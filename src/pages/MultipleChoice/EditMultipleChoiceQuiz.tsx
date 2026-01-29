@@ -77,6 +77,8 @@ const EditMultipleChoiceQuiz = () => {
                timeLimitMinutes: quizInfo.settings?.timeLimitMinutes || null,
             },
             totalQuestions: quizInfo.totalQuestions,
+            subject: quizInfo.subject,
+            level: quizInfo.level,
          });
       }
    }, [quizInfo]);
@@ -146,6 +148,8 @@ const EditMultipleChoiceQuiz = () => {
             (originalQuestions?.length || 0) -
             (deletedQuestions?.length || 0) +
             (newQuestions?.length || 0),
+         subject: infoValues.subject,
+         level: infoValues.level,
       };
 
       updateMCQ.mutate(payload);

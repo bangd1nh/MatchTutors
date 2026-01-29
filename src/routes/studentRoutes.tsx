@@ -31,6 +31,7 @@ import ViewSAQHistoryList from "@/pages/ShortAnswer/ViewSAQHistoryList";
 import ChatPage from "@/pages/chat/chatPage";
 import StudentDashboardPage from "@/pages/Student/StudentDashboardPage";
 import { PayoutHistoryList } from "@/pages/paymentTutor/payoutHistory";
+import SessionByLearningCommitment from "@/components/learning-commitment/SessionByLearningCommitment";
 
 export const studentRoutes = {
    element: (
@@ -154,6 +155,22 @@ export const studentRoutes = {
       {
          path: "/student/learning-commitments",
          element: <LearningCommitmentsPage />,
+      },
+      {
+         path: "/learning-commitment/:commitmentId/sessions",
+         element: (
+            <IsCreatedProfileRoute>
+               <SessionByLearningCommitment />
+            </IsCreatedProfileRoute>
+         ),
+      },
+      {
+         path: "/student/learning-commitment/:commitmentId/sessions",
+         element: (
+            <IsCreatedProfileRoute>
+               <SessionByLearningCommitment />
+            </IsCreatedProfileRoute>
+         ),
       },
       {
          path: "/student/payment-history",

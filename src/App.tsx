@@ -6,12 +6,12 @@ import { routes } from "./routes";
 const router = createBrowserRouter(routes);
 
 function App() {
-    return (
-        <QueryProvider>
-            <ToastContainer />
-            <RouterProvider router={router} />
-        </QueryProvider>
-    );
+   return (
+      <QueryProvider>
+         <ToastContainer />
+         <RouterProvider router={router} />
+      </QueryProvider>
+   );
 }
 
 export default App;

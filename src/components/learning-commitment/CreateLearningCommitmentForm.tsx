@@ -32,15 +32,11 @@ const formSchema = z
    .object({
       teachingRequest: z.string().min(1, "Yêu cầu dạy học là bắt buộc"),
       totalSessions: z.number().min(1, "Tổng số buổi học ít nhất là 1"),
+      sessionsPerWeek: z.number().min(1, "Số buổi mỗi tuần phải lớn hơn 0"),
       startDate: z.string().min(1, "Ngày bắt đầu là bắt buộc"),
-      endDate: z.string().min(1, "Ngày kết thúc là bắt buộc"),
       totalAmount: z
          .number()
          .min(1000, "Tổng số tiền nạp vào phải lớn 1000 VND"),
-   })
-   .refine((data) => new Date(data.startDate) < new Date(data.endDate), {
-      message: "Ngày kết thúc phải sau ngày bắt đầu",
-      path: ["endDate"],
    })
    .refine((data) => new Date(data.startDate) > new Date(), {
       message: "Ngày bắt đầu phải sau ngày hôm nay",
@@ -61,8 +57,8 @@ export const CreateLearningCommitmentForm = ({ onSuccess }: Props) => {
       defaultValues: {
          teachingRequest: "",
          totalSessions: 1,
+         sessionsPerWeek: 1,
          startDate: "",
-         endDate: "",
          totalAmount: 0,
       },
    });
@@ -281,7 +277,7 @@ export const CreateLearningCommitmentForm = ({ onSuccess }: Props) => {
                                  />
                               </div>
 
-                              {/* Date Range Row */}
+                              {/* Date + sessionsPerWeek Row */}
                               <div className="grid grid-cols-2 gap-4">
                                  <FormField
                                     control={form.control}
@@ -305,17 +301,26 @@ export const CreateLearningCommitmentForm = ({ onSuccess }: Props) => {
 
                                  <FormField
                                     control={form.control}
-                                    name="endDate"
+                                    name="sessionsPerWeek"
                                     render={({ field }) => (
                                        <FormItem>
                                           <FormLabel className="text-sm font-semibold text-slate-900">
-                                             Ngày Kết Thúc
+                                             Buổi / Tuần
                                           </FormLabel>
                                           <FormControl>
                                              <Input
-                                                type="date"
+                                                type="number"
+                                                min="1"
+                                                placeholder="1"
                                                 className="border-slate-200 focus:border-blue-500 focus:ring-blue-500"
                                                 {...field}
+                                                onChange={(e) =>
+                                                   field.onChange(
+                                                      parseInt(
+                                                         e.target.value
+                                                      ) || 0
+                                                   )
+                                                }
                                              />
                                           </FormControl>
                                           <FormMessage />
@@ -414,26 +419,6 @@ export const CreateLearningCommitmentForm = ({ onSuccess }: Props) => {
                               </span>
                            </div>
                         </div>
-
-                        {/* Duration */}
-                        {form.watch("startDate") && form.watch("endDate") && (
-                           <div className="p-3 bg-white rounded-lg border border-slate-200 pt-4 border-t">
-                              <p className="text-xs text-slate-600 mb-1">
-                                 Thời Hạn
-                              </p>
-                              <p className="text-sm font-medium text-slate-900">
-                                 {new Date(
-                                    form.watch("startDate")
-                                 ).toLocaleDateString("vi-VN")}
-                              </p>
-                              <p className="text-sm text-slate-600">đến</p>
-                              <p className="text-sm font-medium text-slate-900">
-                                 {new Date(
-                                    form.watch("endDate")
-                                 ).toLocaleDateString("vi-VN")}
-                              </p>
-                           </div>
-                        )}
                      </CardContent>
                   </Card>
                </div>

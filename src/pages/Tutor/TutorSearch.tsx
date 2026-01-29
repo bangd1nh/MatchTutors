@@ -1,7 +1,11 @@
 import TutorFilterBar from "@/components/tutor/tutor-search/TutorFilterSidebar";
 import TutorListPage from "./TutorList";
 import { useState } from "react";
-import AISearch from "./AISearch";
+import { useTutorSuggestionList } from "../../hooks/useTutorListAndDetail";
+import AIrecommendation from "./AIrecommendation";
+import { TutorSuggestion } from "@/types/Tutor";
+import { useFetchStudentProfile } from "@/hooks/useStudentProfile";
+import { useUser } from "@/hooks/useUser";
 
 export type FiltersType = {
    searchQuery: string;
@@ -89,30 +93,25 @@ export default function TutorSearch() {
       setFilteredTutors([]);
    };
 
-   const handleAISearchResults = (results: any) => {
-      console.log("Received AI search results:", results);
-      setAiSearchResults(results);
-      setIsUsingAIResults(true);
+   const { isAuthenticated, user } = useUser();
 
-      // Handle different response formats
-      let tutorList: any[] = [];
+   // Chỉ gọi API khi là student đã đăng nhập (đã được xử lý trong hook)
+   const { 
+      data: suggestionData, 
+      isLoading: isSuggestionLoading,
+      isFetching: isSuggestionFetching 
+   } = useTutorSuggestionList();
+   const { data: studentProfile } = useFetchStudentProfile();
 
-      if (results && Array.isArray(results)) {
-         tutorList = results;
-      } else if (results?.data.results && Array.isArray(results.data.results)) {
-         // This is the correct property based on your console log
-         tutorList = results.data.results;
-      } else if (results?.data.tutors && Array.isArray(results.data.tutors)) {
-         tutorList = results.data.tutors;
-      } else if (results?.data && Array.isArray(results.data)) {
-         tutorList = results.data;
-      }
+   // Safely extract recommendations
+   const sData: TutorSuggestion[] = Array.isArray(
+      suggestionData?.data?.recommendedTutors,
+   )
+      ? (suggestionData.data.recommendedTutors as unknown as TutorSuggestion[])
+      : [];
 
-      console.log(tutorList);
-
-      setFilteredTutors(tutorList);
-      console.log("Processed AI tutors:", tutorList);
-   };
+   const hasProfile = !!studentProfile;
+   const isStudent = user?.role === "STUDENT";
 
    return (
       <div className="container mx-auto px-4 py-6">
@@ -128,14 +127,17 @@ export default function TutorSearch() {
             onFilterChange={handleFilterChange}
             onApplyFilters={handleApplyFilters}
             onClearFilters={handleClearFilters}
-            tutors={[]} // optional if not needed
+            tutors={[]}
          />
 
-         <AISearch
-            currentFilters={filters}
-            onFilterChange={handleFilterChange}
-            onApplyFilters={handleApplyFilters}
-            onAISearchResults={handleAISearchResults}
+         {/* Luôn hiển thị AI Recommendation, logic bên trong sẽ xử lý các trường hợp */}
+         <AIrecommendation
+            tutor={sData}
+            isLoading={(isSuggestionLoading || isSuggestionFetching) && isStudent && hasProfile}
+            hasProfile={hasProfile}
+            isAuthenticated={isAuthenticated}
+            isStudent={isStudent}
+            hasFetchedOnce={suggestionData !== undefined} // NEW: Đã có response
          />
 
          {/* Show AI search insights if available */}
@@ -167,7 +169,6 @@ export default function TutorSearch() {
             </div>
          )}
 
-         {/* Pass either AI results or regular filters */}
          <TutorListPage
             filters={isUsingAIResults ? null : appliedFilters}
             aiTutors={isUsingAIResults ? filteredTutors : null}

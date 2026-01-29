@@ -10,6 +10,13 @@ import {
   acceptTutor,
   rejectTutor,
   getTutorMapping,
+  getTutorFullDetails,
+  getTutorLearningCommitments,
+  getTutorSessions,
+  getTutorTeachingRequests,
+  getTutorViolationReports,
+  getTutorReviews,
+  getTutorStatistics,
   AdminTutor,
   BanHistory,
   TutorProfile,
@@ -30,6 +37,13 @@ export const adminTutorKeys = {
   detail: (id: string) => [...adminTutorKeys.all, "detail", id] as const,
   tutorById: (id: string) => [...adminTutorKeys.all, "tutor", id] as const,
   mapping: (params?: Record<string, any>) => [...adminTutorKeys.all, "mapping", params] as const,
+  fullDetails: (id: string) => [...adminTutorKeys.all, "fullDetails", id] as const,
+  commitments: (id: string, params?: Record<string, any>) => [...adminTutorKeys.all, "commitments", id, params] as const,
+  sessions: (id: string, params?: Record<string, any>) => [...adminTutorKeys.all, "sessions", id, params] as const,
+  teachingRequests: (id: string, params?: Record<string, any>) => [...adminTutorKeys.all, "teachingRequests", id, params] as const,
+  reports: (id: string, params?: Record<string, any>) => [...adminTutorKeys.all, "reports", id, params] as const,
+  reviews: (id: string, params?: Record<string, any>) => [...adminTutorKeys.all, "reviews", id, params] as const,
+  statistics: (id: string, params?: Record<string, any>) => [...adminTutorKeys.all, "statistics", id, params] as const,
 };
 
 /**
@@ -209,6 +223,132 @@ export const useGetTutorMapping = (params?: {
     queryKey: adminTutorKeys.mapping(params),
     queryFn: () => getTutorMapping(params),
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+/**
+ * Hook để lấy thông tin đầy đủ của gia sư
+ */
+export const useGetTutorFullDetails = (tutorId: string) => {
+  return useQuery({
+    queryKey: adminTutorKeys.fullDetails(tutorId),
+    queryFn: () => getTutorFullDetails(tutorId),
+    enabled: !!tutorId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+/**
+ * Hook để lấy danh sách learning commitments của gia sư
+ */
+export const useGetTutorLearningCommitments = (
+  tutorId: string,
+  params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+  }
+) => {
+  return useQuery({
+    queryKey: adminTutorKeys.commitments(tutorId, params),
+    queryFn: () => getTutorLearningCommitments(tutorId, params),
+    enabled: !!tutorId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+/**
+ * Hook để lấy danh sách sessions của gia sư
+ */
+export const useGetTutorSessions = (
+  tutorId: string,
+  params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+  }
+) => {
+  return useQuery({
+    queryKey: adminTutorKeys.sessions(tutorId, params),
+    queryFn: () => getTutorSessions(tutorId, params),
+    enabled: !!tutorId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+/**
+ * Hook để lấy danh sách teaching requests của gia sư
+ */
+export const useGetTutorTeachingRequests = (
+  tutorId: string,
+  params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+  }
+) => {
+  return useQuery({
+    queryKey: adminTutorKeys.teachingRequests(tutorId, params),
+    queryFn: () => getTutorTeachingRequests(tutorId, params),
+    enabled: !!tutorId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+/**
+ * Hook để lấy danh sách violation reports của gia sư
+ */
+export const useGetTutorViolationReports = (
+  tutorId: string,
+  params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+  }
+) => {
+  return useQuery({
+    queryKey: adminTutorKeys.reports(tutorId, params),
+    queryFn: () => getTutorViolationReports(tutorId, params),
+    enabled: !!tutorId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+/**
+ * Hook để lấy danh sách reviews của gia sư
+ */
+export const useGetTutorReviews = (
+  tutorId: string,
+  params?: {
+    page?: number;
+    limit?: number;
+    rating?: number;
+    type?: string;
+  }
+) => {
+  return useQuery({
+    queryKey: adminTutorKeys.reviews(tutorId, params),
+    queryFn: () => getTutorReviews(tutorId, params),
+    enabled: !!tutorId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+/**
+ * Hook để lấy thống kê của gia sư
+ */
+export const useGetTutorStatistics = (tutorId: string) => {
+  return useQuery({
+    queryKey: adminTutorKeys.statistics(tutorId),
+    queryFn: () => getTutorStatistics(tutorId),
+    enabled: !!tutorId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
 

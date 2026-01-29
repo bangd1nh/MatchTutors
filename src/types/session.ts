@@ -1,6 +1,7 @@
 import { LearningCommitment } from "@/types/learningCommitment";
 import { SessionStatus } from "@/enums/session.enum";
 import { IUser } from "@/types/user";
+import { BaseAPIResponse } from "./response";
 
 // Reminder used in sessions
 export interface Reminder {
@@ -99,4 +100,46 @@ export interface Session
    materials?: any[];
    quizIds?: any[];
    reminders?: Reminder[];
+}
+
+export interface BusySession extends BaseAPIResponse {
+   data: Array<{
+      _id: string;
+      startTime: Date;
+      endTime: Date;
+      status: string;
+      learningCommitmentId: string;
+      student: {
+         email: string;
+         name: string;
+         _id: string;
+         avatarUrl?: string;
+      };
+      tutor: {
+         email: string;
+         name: string;
+         _id: string;
+         avatarUrl?: string;
+      };
+   }>;
+}
+
+export interface BSession {
+   _id: string;
+   startTime: Date;
+   endTime: Date;
+   status: string;
+   learningCommitmentId: string;
+   student: {
+      email: string;
+      name: string;
+      _id: string;
+      avatarUrl?: string;
+   };
+   tutor: {
+      email: string;
+      name: string;
+      _id: string;
+      avatarUrl?: string;
+   };
 }

@@ -4,5 +4,6 @@ export * from "./TutorCertification";
 export * from "./TutorEducation";
 export * from "./TutorSubject";
 export * from "./TutorAvailability";
+export * from "./TutorTeachingSchedule";
 export * from "./RelatedTutors";
 export * from "./TutorContactCard";

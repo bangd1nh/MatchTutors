@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useChat } from "@/hooks/useChat";
 import { useChatStore } from "@/store/useChatStore";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search, X, Send } from "lucide-react";
+import { Search, X, Send, Image as ImageIcon, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 
@@ -26,6 +26,9 @@ export default function ChatPage() {
       sendMessage,
       sendingMessage,
       searchConversations,
+      currentUserId,
+      uploadImages,
+      uploadingImages,
    } = useChat();
 
    const { setActiveConversation } = useChatStore();
@@ -34,7 +37,10 @@ export default function ChatPage() {
    const [searchQuery, setSearchQuery] = useState("");
    const [isSearching, setIsSearching] = useState(false);
    const [hasCreatedConversation, setHasCreatedConversation] = useState(false);
+   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
    const messagesEndRef = useRef<HTMLDivElement>(null);
+   const fileInputRef = useRef<HTMLInputElement>(null);
 
    // Xử lý userId từ URL params
    const conversationIdParam = searchParams.get("conversationId");
@@ -94,12 +100,131 @@ export default function ChatPage() {
       ? searchResults?.data || []
       : conversations;
 
-   const handleSendMessage = (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!messageInput.trim() || sendingMessage) return;
+   // Sort conversations: unread (other user's lastMessage not read by current user) first,
+   // then by lastMessageAt desc.
+   const sortedConversations = useMemo(() => {
+      const isUnread = (conv: any) => {
+         const lm = conv?.lastMessage;
+         if (!lm) return false;
+         if (!currentUserId) return false;
+         const senderId = lm?.sender?._id || lm?.sender;
+         if (!senderId) return false;
+         if (String(senderId) === String(currentUserId)) return false; // own message
+         const readBy = Array.isArray(lm?.isReadBy)
+            ? lm.isReadBy.map(String)
+            : [];
+         return !readBy.includes(String(currentUserId));
+      };
 
-      sendMessage(messageInput);
-      setMessageInput("");
+      return (filteredConversations || []).slice().sort((a: any, b: any) => {
+         const aUnread = isUnread(a);
+         const bUnread = isUnread(b);
+         if (aUnread !== bUnread) return aUnread ? -1 : 1;
+         const aTime = a?.lastMessageAt
+            ? new Date(a.lastMessageAt).getTime()
+            : 0;
+         const bTime = b?.lastMessageAt
+            ? new Date(b.lastMessageAt).getTime()
+            : 0;
+         return bTime - aTime;
+      });
+   }, [filteredConversations, currentUserId]);
+
+   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
+
+      // Validate số lượng ảnh (max 5)
+      const currentCount = selectedImages.length;
+      const newCount = files.length;
+
+      if (currentCount + newCount > 5) {
+         alert("Chỉ được chọn tối đa 5 ảnh");
+         return;
+      }
+
+      // Validate file type và size
+      const allowedTypes = [
+         "image/jpeg",
+         "image/png",
+         "image/jpg",
+         "image/gif",
+         "image/webp",
+      ];
+      const maxSize = 5 * 1024 * 1024;
+
+      for (const file of files) {
+         if (!allowedTypes.includes(file.type)) {
+            alert("Chỉ chấp nhận file ảnh (JPEG, PNG, GIF, WebP)");
+            return;
+         }
+         if (file.size > maxSize) {
+            alert("Kích thước mỗi file tối đa là 5MB");
+            return;
+         }
+      }
+
+      // Add new files
+      const newSelectedImages = [...selectedImages, ...files];
+      setSelectedImages(newSelectedImages);
+
+      // Create previews
+      const newPreviews: string[] = [];
+      files.forEach((file) => {
+         const reader = new FileReader();
+         reader.onloadend = () => {
+            newPreviews.push(reader.result as string);
+            if (newPreviews.length === files.length) {
+               setImagePreviews([...imagePreviews, ...newPreviews]);
+            }
+         };
+         reader.readAsDataURL(file);
+      });
+   };
+
+   const handleRemoveImage = (index: number) => {
+      setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+      setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+   };
+
+   const handleRemoveAllImages = () => {
+      setSelectedImages([]);
+      setImagePreviews([]);
+      if (fileInputRef.current) {
+         fileInputRef.current.value = "";
+      }
+   };
+
+   const handleSendMessage = async (e: React.FormEvent) => {
+      e.preventDefault();
+
+      if (
+         (!messageInput.trim() && selectedImages.length === 0) ||
+         sendingMessage ||
+         uploadingImages
+      ) {
+         return;
+      }
+
+      try {
+         let imageUrls: string[] = [];
+
+         // Upload ảnh nếu có
+         if (selectedImages.length > 0) {
+            const result = await uploadImages(selectedImages);
+            imageUrls = result.data.imageUrls;
+         }
+
+         // Gửi message
+         sendMessage(messageInput, imageUrls);
+
+         // Reset form
+         setMessageInput("");
+         handleRemoveAllImages();
+      } catch (error) {
+         console.error("Error sending message:", error);
+         alert("Không thể gửi tin nhắn. Vui lòng thử lại.");
+      }
    };
 
    const handleSearchClick = () => {
@@ -121,12 +246,12 @@ export default function ChatPage() {
       }
    };
 
-   const formatMessageTime = (date: string) => {
-      return formatDistanceToNow(new Date(date), {
-         addSuffix: true,
-         locale: vi,
-      });
-   };
+   // const formatMessageTime = (date: string) => {
+   //    return formatDistanceToNow(new Date(date), {
+   //       addSuffix: true,
+   //       locale: vi,
+   //    });
+   // };
 
    if (loadingConversations) {
       return (
@@ -202,50 +327,83 @@ export default function ChatPage() {
                         : "Chưa có cuộc trò chuyện nào"}
                   </div>
                ) : (
-                  filteredConversations.map((conv: Conversation) => (
-                     <button
-                        key={conv._id}
-                        onClick={() => setActiveConversation(conv._id)}
-                        className={`w-full text-left p-4 border-b border-border flex gap-3 items-start transition-colors ${
-                           activeConversationId === conv._id
-                              ? "bg-primary/5"
-                              : "bg-card"
-                        } hover:bg-muted`}
-                     >
-                        <Avatar className="h-10 w-10 flex-shrink-0">
-                           <AvatarImage
-                              src={conv.otherUser.avatarUrl}
-                              alt={conv.otherUser.name}
-                           />
-                           <AvatarFallback>
-                              {conv.otherUser.name.charAt(0)}
-                           </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                           <div className="flex items-center justify-between gap-2">
-                              <p className="font-medium text-sm truncate">
-                                 {conv.otherUser.name}
-                              </p>
-                              {conv.lastMessage && (
-                                 <span className="text-xs text-muted-foreground">
-                                    {formatMessageTime(
-                                       conv.lastMessage.createdAt
+                  sortedConversations.map((conv: any) => {
+                     const lm = conv?.lastMessage;
+                     const isConvUnread =
+                        lm &&
+                        currentUserId &&
+                        String(lm?.sender?._id || lm?.sender) !==
+                           String(currentUserId) &&
+                        !(lm?.isReadBy || [])
+                           .map(String)
+                           .includes(String(currentUserId));
+
+                     return (
+                        <div
+                           key={conv._id}
+                           className={`flex items-center gap-3 p-3 hover:bg-accent/50 cursor-pointer ${
+                              isConvUnread ? "bg-accent/20" : ""
+                           }`}
+                           onClick={() => setActiveConversation(conv._id)}
+                        >
+                           <Avatar className="h-10 w-10 flex-shrink-0">
+                              <AvatarImage
+                                 src={conv.otherUser?.avatarUrl}
+                                 alt={
+                                    conv.otherUser?.name ||
+                                    conv.otherUser?.email
+                                 }
+                              />
+                              <AvatarFallback>
+                                 {(
+                                    conv.otherUser?.name ||
+                                    conv.otherUser?.email ||
+                                    "?"
+                                 )
+                                    .charAt(0)
+                                    .toUpperCase()}
+                              </AvatarFallback>
+                           </Avatar>
+
+                           <div className="flex-1">
+                              <div className="flex justify-between items-center">
+                                 <p
+                                    className={` ${
+                                       isConvUnread
+                                          ? "font-semibold"
+                                          : "font-medium"
+                                    }`}
+                                 >
+                                    {conv.otherUser?.name ||
+                                       conv.otherUser?.email}
+                                 </p>
+                                 <p className="text-xs text-muted-foreground">
+                                    {formatDistanceToNow(
+                                       new Date(
+                                          conv.lastMessageAt ||
+                                             conv.updatedAt ||
+                                             Date.now()
+                                       ),
+                                       {
+                                          addSuffix: true,
+                                          locale: vi,
+                                       }
                                     )}
-                                 </span>
-                              )}
-                           </div>
-                           <div className="flex items-center justify-between gap-3">
-                              <p className="text-xs text-muted-foreground truncate">
-                                 {conv.lastMessage
-                                    ? conv.lastMessage.content
-                                    : conv.otherUser.role === "TUTOR"
-                                    ? "Gia sư"
-                                    : "Học sinh"}
+                                 </p>
+                              </div>
+                              <p
+                                 className={`text-sm truncate ${
+                                    isConvUnread
+                                       ? "font-semibold"
+                                       : "text-muted-foreground"
+                                 }`}
+                              >
+                                 {conv.lastMessage?.content || ""}
                               </p>
                            </div>
                         </div>
-                     </button>
-                  ))
+                     );
+                  })
                )}
             </ScrollArea>
          </aside>
@@ -259,15 +417,26 @@ export default function ChatPage() {
                      <Avatar className="h-12 w-12">
                         <AvatarImage
                            src={activeConversation?.otherUser?.avatarUrl}
-                           alt={activeConversation?.otherUser?.name}
+                           alt={
+                              activeConversation?.otherUser?.name ||
+                              activeConversation?.otherUser?.email
+                           }
                         />
                         <AvatarFallback>
-                           {activeConversation?.otherUser?.name?.charAt(0)}
+                           {(
+                              activeConversation?.otherUser?.name ||
+                              activeConversation?.otherUser?.email ||
+                              "?"
+                           )
+                              .charAt(0)
+                              .toUpperCase()}
                         </AvatarFallback>
                      </Avatar>
                      <div>
                         <h2 className="text-base font-semibold text-foreground">
-                           {activeConversation?.otherUser?.name || "Chat"}
+                           {activeConversation?.otherUser?.name ||
+                              activeConversation?.otherUser?.email ||
+                              "Chat"}
                         </h2>
                         <p className="text-xs text-muted-foreground">
                            {activeConversation?.otherUser?.role === "TUTOR"
@@ -295,6 +464,21 @@ export default function ChatPage() {
                               msg.sender?._id !==
                               activeConversation?.otherUser?._id;
 
+                           const isSeen =
+                              isOwn &&
+                              Array.isArray(msg.isReadBy) &&
+                              msg.isReadBy
+                                 .map(String)
+                                 .includes(
+                                    String(activeConversation?.otherUser?._id)
+                                 );
+
+                           // Get all image URLs (backward compatible)
+                           const allImages = [
+                              ...(msg.imageUrls || []),
+                              ...(msg.imageUrl ? [msg.imageUrl] : []),
+                           ];
+
                            return (
                               <div
                                  key={msg._id}
@@ -306,10 +490,19 @@ export default function ChatPage() {
                                     <Avatar className="h-9 w-9 flex-shrink-0 mt-1">
                                        <AvatarImage
                                           src={msg.sender?.avatarUrl}
-                                          alt={msg.sender?.name}
+                                          alt={
+                                             msg.sender?.name ||
+                                             msg.sender?.email
+                                          }
                                        />
                                        <AvatarFallback>
-                                          {msg.sender?.name?.charAt(0)}
+                                          {(
+                                             msg.sender?.name ||
+                                             msg.sender?.email ||
+                                             "?"
+                                          )
+                                             .charAt(0)
+                                             .toUpperCase()}
                                        </AvatarFallback>
                                     </Avatar>
                                  )}
@@ -321,28 +514,93 @@ export default function ChatPage() {
                                           : "bg-card text-card-foreground rounded-bl-none border border-border"
                                     }`}
                                  >
-                                    <p className="text-sm leading-relaxed break-words">
-                                       {msg.content}
-                                    </p>
-                                    <p
-                                       className={`text-xs mt-2 ${
-                                          isOwn
-                                             ? "text-primary-foreground/70"
-                                             : "text-muted-foreground"
-                                       }`}
-                                    >
-                                       {formatMessageTime(msg.createdAt)}
-                                    </p>
+                                    {/* Hiển thị ảnh nếu có - Grid layout */}
+                                    {allImages.length > 0 && (
+                                       <div
+                                          className={`grid gap-2 mb-2 ${
+                                             allImages.length === 1
+                                                ? "grid-cols-1"
+                                                : allImages.length === 2
+                                                ? "grid-cols-2"
+                                                : allImages.length === 3
+                                                ? "grid-cols-3"
+                                                : "grid-cols-2"
+                                          }`}
+                                       >
+                                          {allImages.map((imgUrl, idx) => (
+                                             <div
+                                                key={idx}
+                                                className={`relative ${
+                                                   allImages.length === 1
+                                                      ? "max-w-sm"
+                                                      : ""
+                                                }`}
+                                             >
+                                                <img
+                                                   src={imgUrl}
+                                                   alt={`Image ${idx + 1}`}
+                                                   className="rounded-lg w-full h-32 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                                   onClick={() =>
+                                                      window.open(
+                                                         imgUrl,
+                                                         "_blank"
+                                                      )
+                                                   }
+                                                />
+                                             </div>
+                                          ))}
+                                       </div>
+                                    )}
+
+                                    {/* Hiển thị text nếu có */}
+                                    {msg.content && (
+                                       <p className="text-sm leading-relaxed break-words">
+                                          {msg.content}
+                                       </p>
+                                    )}
+
+                                    <div className="flex items-center gap-2">
+                                       <p
+                                          className={`text-xs mt-2 ${
+                                             isOwn
+                                                ? "text-primary-foreground/70"
+                                                : "text-muted-foreground"
+                                          }`}
+                                       >
+                                          {formatDistanceToNow(
+                                             new Date(msg.createdAt),
+                                             {
+                                                addSuffix: true,
+                                                locale: vi,
+                                             }
+                                          )}
+                                       </p>
+
+                                       {isOwn && isSeen && (
+                                          <span className="text-xs mt-2 text-muted-foreground italic">
+                                             Đã xem
+                                          </span>
+                                       )}
+                                    </div>
                                  </div>
 
                                  {isOwn && (
                                     <Avatar className="h-9 w-9 flex-shrink-0 mt-1">
                                        <AvatarImage
                                           src={msg.sender?.avatarUrl}
-                                          alt={msg.sender?.name}
+                                          alt={
+                                             msg.sender?.name ||
+                                             msg.sender?.email
+                                          }
                                        />
                                        <AvatarFallback>
-                                          {msg.sender?.name?.charAt(0)}
+                                          {(
+                                             msg.sender?.name ||
+                                             msg.sender?.email ||
+                                             "?"
+                                          )
+                                             .charAt(0)
+                                             .toUpperCase()}
                                        </AvatarFallback>
                                     </Avatar>
                                  )}
@@ -360,29 +618,120 @@ export default function ChatPage() {
                   </div>
 
                   {/* Input */}
-                  <form
-                     onSubmit={handleSendMessage}
-                     className="border-t border-border p-4 bg-card text-card-foreground flex items-center gap-3"
-                  >
-                     <Input
-                        type="text"
-                        value={messageInput}
-                        onChange={(e) => setMessageInput(e.target.value)}
-                        placeholder="Nhập tin nhắn..."
-                        className="flex-1 px-4 py-3 rounded-full bg-muted border border-border"
-                        disabled={sendingMessage}
-                     />
-                     <Button
-                        type="submit"
-                        disabled={sendingMessage || !messageInput.trim()}
-                        className="rounded-full"
+                  <div className="border-t border-border p-4 bg-card text-card-foreground">
+                     {/* Image Previews */}
+                     {imagePreviews.length > 0 && (
+                        <div className="mb-3 flex gap-2 flex-wrap">
+                           {imagePreviews.map((preview, index) => (
+                              <div
+                                 key={index}
+                                 className="relative inline-block group"
+                              >
+                                 <img
+                                    src={preview}
+                                    alt={`Preview ${index + 1}`}
+                                    className="h-20 w-20 object-cover rounded-lg border-2 border-border"
+                                 />
+                                 <button
+                                    type="button"
+                                    onClick={() => handleRemoveImage(index)}
+                                    className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 hover:bg-destructive/90 opacity-0 group-hover:opacity-100 transition-opacity"
+                                 >
+                                    <X className="h-3 w-3" />
+                                 </button>
+                              </div>
+                           ))}
+                           {imagePreviews.length > 1 && (
+                              <button
+                                 type="button"
+                                 onClick={handleRemoveAllImages}
+                                 className="h-20 w-20 flex items-center justify-center rounded-lg border-2 border-dashed border-destructive text-destructive hover:bg-destructive/10 transition-colors"
+                              >
+                                 <div className="text-center">
+                                    <X className="h-5 w-5 mx-auto mb-1" />
+                                    <span className="text-xs">Xóa tất cả</span>
+                                 </div>
+                              </button>
+                           )}
+                        </div>
+                     )}
+
+                     <form
+                        onSubmit={handleSendMessage}
+                        className="flex items-center gap-3"
                      >
-                        <Send className="h-4 w-4 mr-2" />
-                        <span className="text-sm">
-                           {sendingMessage ? "Đang gửi..." : "Gửi"}
-                        </span>
-                     </Button>
-                  </form>
+                        <input
+                           ref={fileInputRef}
+                           type="file"
+                           accept="image/*"
+                           multiple
+                           onChange={handleImageSelect}
+                           className="hidden"
+                        />
+
+                        <Button
+                           type="button"
+                           variant="outline"
+                           size="icon"
+                           onClick={() => fileInputRef.current?.click()}
+                           disabled={
+                              uploadingImages ||
+                              sendingMessage ||
+                              selectedImages.length >= 5
+                           }
+                           className="rounded-full"
+                           title={
+                              selectedImages.length >= 5
+                                 ? "Đã đạt giới hạn 5 ảnh"
+                                 : "Chọn ảnh"
+                           }
+                        >
+                           <ImageIcon className="h-5 w-5" />
+                        </Button>
+
+                        <Input
+                           type="text"
+                           value={messageInput}
+                           onChange={(e) => setMessageInput(e.target.value)}
+                           placeholder="Nhập tin nhắn..."
+                           className="flex-1 px-4 py-3 rounded-full bg-muted border border-border"
+                           disabled={sendingMessage || uploadingImages}
+                        />
+
+                        <Button
+                           type="submit"
+                           disabled={
+                              sendingMessage ||
+                              uploadingImages ||
+                              (!messageInput.trim() &&
+                                 selectedImages.length === 0)
+                           }
+                           className="rounded-full min-w-[100px]"
+                        >
+                           {uploadingImages || sendingMessage ? (
+                              <>
+                                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                 <span className="text-sm">
+                                    {uploadingImages
+                                       ? "Đang tải..."
+                                       : "Đang gửi..."}
+                                 </span>
+                              </>
+                           ) : (
+                              <>
+                                 <Send className="h-4 w-4 mr-2" />
+                                 <span className="text-sm">Gửi</span>
+                              </>
+                           )}
+                        </Button>
+                     </form>
+
+                     {selectedImages.length > 0 && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                           Đã chọn {selectedImages.length}/5 ảnh
+                        </p>
+                     )}
+                  </div>
                </>
             ) : (
                <div className="flex-1 flex items-center justify-center bg-background">

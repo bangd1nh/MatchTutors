@@ -20,7 +20,7 @@ export const CalendarEvent = ({ event }: EventProps<CalendarEventObject>) => {
 
    return (
       <div className="p-1 text-white text-xs leading-tight">
-         <p className="font-bold truncate">{event.title}</p>
+         <p className="font-bold text-xs truncate">{event.title}</p>
          <p className="truncate">{otherPartyName}</p>
          {session.isTrial && (
             <Badge

@@ -20,11 +20,23 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, AlertTriangle, X, XCircle, Link as LinkIcon, FileText, File, Download } from "lucide-react";
-import { ViolationReport, updateViolationReportStatus } from "@/api/violationReport";
+import {
+   Loader2,
+   AlertTriangle,
+   X,
+   XCircle,
+   Link as LinkIcon,
+   FileText,
+   File,
+   Download,
+} from "lucide-react";
+import {
+   ViolationReport,
+   updateViolationReportStatus,
+} from "@/api/violationReport";
 import { hideTutor, getTutorIdByUserId } from "@/api/adminTutors";
-import { 
-   ViolationStatusEnum, 
+import {
+   ViolationStatusEnum,
    VIOLATION_TYPE_LABELS_VI,
    VIOLATION_STATUS_LABELS_VI,
 } from "@/enums/violationReport.enum";
@@ -143,7 +155,9 @@ export const AdminReportDetailModal = ({
 
          const tutorId = await getTutorIdByUserId(reportedUserId);
          if (!tutorId) {
-            throw new Error("Không tìm thấy tutorId. Gia sư này có thể chưa có profile.");
+            throw new Error(
+               "Không tìm thấy tutorId. Gia sư này có thể chưa có profile."
+            );
          }
 
          // 2. Ẩn tutor
@@ -210,10 +224,12 @@ export const AdminReportDetailModal = ({
                   <span className="text-sm font-medium">Trạng thái:</span>
                   <Badge
                      className={
-                        STATUS_COLORS[report.status] || "bg-gray-100 text-gray-800"
+                        STATUS_COLORS[report.status] ||
+                        "bg-gray-100 text-gray-800"
                      }
                   >
-                     {VIOLATION_STATUS_LABELS_VI[report.status] || report.status}
+                     {VIOLATION_STATUS_LABELS_VI[report.status] ||
+                        report.status}
                   </Badge>
                </div>
 
@@ -224,10 +240,12 @@ export const AdminReportDetailModal = ({
                   <h3 className="font-semibold text-lg">Người báo cáo</h3>
                   <div className="bg-gray-50 p-4 rounded-lg space-y-1">
                      <p>
-                        <span className="font-medium">Tên:</span> {getReporterName()}
+                        <span className="font-medium">Tên:</span>{" "}
+                        {getReporterName()}
                      </p>
                      <p>
-                        <span className="font-medium">Email:</span> {getReporterEmail()}
+                        <span className="font-medium">Email:</span>{" "}
+                        {getReporterEmail()}
                      </p>
                   </div>
                </div>
@@ -237,10 +255,12 @@ export const AdminReportDetailModal = ({
                   <h3 className="font-semibold text-lg">Tutor bị report</h3>
                   <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                      <p>
-                        <span className="font-medium">Tên:</span> {getReportedUserName()}
+                        <span className="font-medium">Tên:</span>{" "}
+                        {getReportedUserName()}
                      </p>
                      <p>
-                        <span className="font-medium">Email:</span> {getReportedUserEmail()}
+                        <span className="font-medium">Email:</span>{" "}
+                        {getReportedUserEmail()}
                      </p>
                      {tutorId ? (
                         <div className="pt-2">
@@ -296,20 +316,36 @@ export const AdminReportDetailModal = ({
                            {report.evidenceFiles.map((url, index) => {
                               // Detect file type from URL
                               const getFileType = (fileUrl: string) => {
-                                 const extension = fileUrl.split('.').pop()?.toLowerCase() || '';
-                                 if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) {
-                                    return 'image';
-                                 } else if (extension === 'pdf') {
-                                    return 'pdf';
-                                 } else if (['doc', 'docx'].includes(extension)) {
-                                    return 'word';
+                                 const extension =
+                                    fileUrl.split(".").pop()?.toLowerCase() ||
+                                    "";
+                                 if (
+                                    [
+                                       "jpg",
+                                       "jpeg",
+                                       "png",
+                                       "gif",
+                                       "webp",
+                                       "svg",
+                                    ].includes(extension)
+                                 ) {
+                                    return "image";
+                                 } else if (extension === "pdf") {
+                                    return "pdf";
+                                 } else if (
+                                    ["doc", "docx"].includes(extension)
+                                 ) {
+                                    return "word";
                                  }
-                                 return 'file';
+                                 return "file";
                               };
 
                               const getFileName = (fileUrl: string) => {
-                                 const parts = fileUrl.split('/');
-                                 return parts[parts.length - 1] || `Evidence ${index + 1}`;
+                                 const parts = fileUrl.split("/");
+                                 return (
+                                    parts[parts.length - 1] ||
+                                    `Evidence ${index + 1}`
+                                 );
                               };
 
                               const fileType = getFileType(url);
@@ -320,7 +356,7 @@ export const AdminReportDetailModal = ({
                                     key={index}
                                     className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
                                  >
-                                    {fileType === 'image' ? (
+                                    {fileType === "image" ? (
                                        // Image preview
                                        <div className="relative group">
                                           <img
@@ -329,7 +365,9 @@ export const AdminReportDetailModal = ({
                                              className="w-full h-48 object-cover"
                                              onError={(e) => {
                                                 // Fallback nếu không load được ảnh
-                                                (e.target as HTMLImageElement).style.display = 'none';
+                                                (
+                                                   e.target as HTMLImageElement
+                                                ).style.display = "none";
                                              }}
                                           />
                                           <a
@@ -348,22 +386,27 @@ export const AdminReportDetailModal = ({
                                        <div className="p-4 bg-gray-50">
                                           <div className="flex items-center gap-3">
                                              <div className="flex-shrink-0">
-                                                {fileType === 'pdf' ? (
+                                                {fileType === "pdf" ? (
                                                    <FileText className="h-10 w-10 text-red-600" />
-                                                ) : fileType === 'word' ? (
+                                                ) : fileType === "word" ? (
                                                    <FileText className="h-10 w-10 text-blue-600" />
                                                 ) : (
                                                    <File className="h-10 w-10 text-gray-600" />
                                                 )}
                                              </div>
                                              <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium truncate" title={fileName}>
+                                                <p
+                                                   className="text-sm font-medium truncate"
+                                                   title={fileName}
+                                                >
                                                    {fileName}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">
-                                                   {fileType === 'pdf' ? 'Tài liệu PDF' : 
-                                                    fileType === 'word' ? 'Tài liệu Word' : 
-                                                    'Tệp'}
+                                                   {fileType === "pdf"
+                                                      ? "Tài liệu PDF"
+                                                      : fileType === "word"
+                                                      ? "Tài liệu Word"
+                                                      : "Tệp"}
                                                 </p>
                                              </div>
                                           </div>
@@ -378,7 +421,9 @@ export const AdminReportDetailModal = ({
                                           className="flex items-center justify-center gap-2 w-full px-3 py-2 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                                        >
                                           <Download className="h-4 w-4" />
-                                          {fileType === 'image' ? 'Xem ảnh' : 'Tải xuống'}
+                                          {fileType === "image"
+                                             ? "Xem ảnh"
+                                             : "Tải xuống"}
                                        </a>
                                     </div>
                                  </div>
@@ -391,32 +436,56 @@ export const AdminReportDetailModal = ({
                   {/* Related Teaching Request */}
                   {report.relatedTeachingRequestId && (
                      <div>
-                        <h3 className="font-semibold mb-2">Yêu cầu dạy học liên quan</h3>
+                        <h3 className="font-semibold mb-2">
+                           Yêu cầu dạy học liên quan
+                        </h3>
                         <div className="bg-blue-50 p-4 rounded-lg">
-                           {typeof report.relatedTeachingRequestId === "object" ? (
+                           {typeof report.relatedTeachingRequestId ===
+                           "object" ? (
                               <div className="space-y-2">
                                  <p>
-                                    <span className="font-medium">Môn học:</span>{" "}
-                                    {SUBJECT_LABELS_VI[report.relatedTeachingRequestId.subject] || report.relatedTeachingRequestId.subject}
+                                    <span className="font-medium">
+                                       Môn học:
+                                    </span>{" "}
+                                    {SUBJECT_LABELS_VI[
+                                       report.relatedTeachingRequestId.subject
+                                    ] ||
+                                       report.relatedTeachingRequestId.subject}
                                  </p>
                                  <p>
-                                    <span className="font-medium">Trình độ:</span>{" "}
-                                    {LEVEL_LABELS_VI[report.relatedTeachingRequestId.level] || report.relatedTeachingRequestId.level}
+                                    <span className="font-medium">
+                                       Trình độ:
+                                    </span>{" "}
+                                    {LEVEL_LABELS_VI[
+                                       report.relatedTeachingRequestId.level
+                                    ] || report.relatedTeachingRequestId.level}
                                  </p>
                                  <p>
-                                    <span className="font-medium">Trạng thái:</span>{" "}
+                                    <span className="font-medium">
+                                       Trạng thái:
+                                    </span>{" "}
                                     <Badge
                                        className={
-                                          report.relatedTeachingRequestId.status === TeachingRequestStatus.PENDING
+                                          report.relatedTeachingRequestId
+                                             .status ===
+                                          TeachingRequestStatus.PENDING
                                              ? "bg-yellow-100 text-yellow-800 border-yellow-200"
-                                             : report.relatedTeachingRequestId.status === TeachingRequestStatus.ACCEPTED
+                                             : report.relatedTeachingRequestId
+                                                  .status ===
+                                               TeachingRequestStatus.ACCEPTED
                                              ? "bg-green-100 text-green-800 border-green-200"
-                                             : report.relatedTeachingRequestId.status === TeachingRequestStatus.REJECTED
+                                             : report.relatedTeachingRequestId
+                                                  .status ===
+                                               TeachingRequestStatus.REJECTED
                                              ? "bg-red-100 text-red-800 border-red-200"
                                              : "bg-gray-100 text-gray-800"
                                        }
                                     >
-                                       {TEACHING_REQUEST_STATUS_LABELS_VI[report.relatedTeachingRequestId.status] || report.relatedTeachingRequestId.status}
+                                       {TEACHING_REQUEST_STATUS_LABELS_VI[
+                                          report.relatedTeachingRequestId.status
+                                       ] ||
+                                          report.relatedTeachingRequestId
+                                             .status}
                                     </Badge>
                                  </p>
                                  <Link
@@ -442,8 +511,12 @@ export const AdminReportDetailModal = ({
                      </p>
                      {report.updatedAt && (
                         <p>
-                           <span className="font-medium">Cập nhật lần cuối:</span>{" "}
-                           {moment(report.updatedAt).format("DD/MM/YYYY HH:mm:ss")}
+                           <span className="font-medium">
+                              Cập nhật lần cuối:
+                           </span>{" "}
+                           {moment(report.updatedAt).format(
+                              "DD/MM/YYYY HH:mm:ss"
+                           )}
                         </p>
                      )}
                   </div>
@@ -491,14 +564,21 @@ export const AdminReportDetailModal = ({
                      </Button>
                   </>
                )}
-               <Button variant="outline" onClick={onClose} disabled={isProcessing}>
+               <Button
+                  variant="outline"
+                  onClick={onClose}
+                  disabled={isProcessing}
+               >
                   Đóng
                </Button>
             </DialogFooter>
          </DialogContent>
 
          {/* Confirmation Dialog for Hide Tutor */}
-         <AlertDialog open={showHideTutorConfirm} onOpenChange={setShowHideTutorConfirm}>
+         <AlertDialog
+            open={showHideTutorConfirm}
+            onOpenChange={setShowHideTutorConfirm}
+         >
             <AlertDialogContent>
                <AlertDialogHeader>
                   <AlertDialogTitle className="flex items-center gap-2">
@@ -508,12 +588,15 @@ export const AdminReportDetailModal = ({
                   <AlertDialogDescription className="pt-2">
                      Bạn có chắc chắn muốn ẩn gia sư này? Hành động này sẽ:
                      <ul className="list-disc list-inside mt-2 space-y-1">
-                        <li>Hủy tất cả learning commitments đang hoạt động</li>
-                        <li>Hủy tất cả sessions chưa học</li>
-                        <li>Từ chối tất cả yêu cầu dạy học đang đợi phản hồi</li>
+                        <li>Hủy tất cả cam kết học tập đang hoạt động</li>
+                        <li>Hủy tất cả buổi học chưa học</li>
+                        <li>
+                           Từ chối tất cả yêu cầu dạy học đang đợi phản hồi
+                        </li>
                      </ul>
                      <br />
-                     Báo cáo sẽ được đánh dấu là đã xử lý và không được xử lý thêm.
+                     Báo cáo sẽ được đánh dấu là đã xử lý và không được xử lý
+                     thêm.
                   </AlertDialogDescription>
                </AlertDialogHeader>
                <AlertDialogFooter>
@@ -539,7 +622,10 @@ export const AdminReportDetailModal = ({
          </AlertDialog>
 
          {/* Confirmation Dialog for Reject Report */}
-         <AlertDialog open={showRejectConfirm} onOpenChange={setShowRejectConfirm}>
+         <AlertDialog
+            open={showRejectConfirm}
+            onOpenChange={setShowRejectConfirm}
+         >
             <AlertDialogContent>
                <AlertDialogHeader>
                   <AlertDialogTitle className="flex items-center gap-2">
@@ -550,7 +636,8 @@ export const AdminReportDetailModal = ({
                      Bạn có chắc chắn muốn từ chối báo cáo này?
                      <br />
                      <br />
-                     Báo cáo sẽ được đánh dấu là đã từ chối và không được xử lý thêm.
+                     Báo cáo sẽ được đánh dấu là đã từ chối và không được xử lý
+                     thêm.
                   </AlertDialogDescription>
                </AlertDialogHeader>
                <AlertDialogFooter>
@@ -577,4 +664,3 @@ export const AdminReportDetailModal = ({
       </Dialog>
    );
 };
-

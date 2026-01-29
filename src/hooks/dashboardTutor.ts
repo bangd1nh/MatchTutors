@@ -3,6 +3,7 @@ import {
    fetchDashboardOverview,
    fetchDashboardCharts,
    fetchDashboardPieData,
+   fetchSessionStats,
 } from "@/api/dashboardTutor";
 
 export const useFetchDashboardOverview = () => {
@@ -28,6 +29,15 @@ export const useFetchDashboardPieData = () => {
    return useQuery({
       queryKey: ["TUTOR_PIE_DATA"],
       queryFn: fetchDashboardPieData,
+      staleTime: 1000 * 60 * 2,
+      throwOnError: true,
+   });
+};
+
+export const useFetchSessionStats = (month?: number, year?: number) => {
+   return useQuery({
+      queryKey: ["TUTOR_SESSION_STATS", month, year],
+      queryFn: () => fetchSessionStats(month, year),
       staleTime: 1000 * 60 * 2,
       throwOnError: true,
    });

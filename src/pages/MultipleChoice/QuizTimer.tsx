@@ -37,7 +37,13 @@ const QuizTimer = ({
          timerIdRef.current = null;
       }
 
-      if (timeLimitMinutes <= 0 || isSubmitting) return;
+      if (isSubmitting) {
+         setTimeLeft(0);
+         clearInterval(timerIdRef.current!);
+         return;
+      }
+
+      if (timeLimitMinutes <= 0) return;
 
       timerIdRef.current = setInterval(() => {
          setTimeLeft((prev) => {

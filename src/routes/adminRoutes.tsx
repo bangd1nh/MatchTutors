@@ -5,10 +5,12 @@ import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
 import TutorManagement from "@/pages/admin/TutorManagement";
 import TutorProfilePage from "@/pages/admin/TutorProfilePage";
 import TutorProfileListPage from "@/pages/admin/TutorProfileListPage";
+import TutorFullProfilePage from "@/pages/admin/TutorFullProfilePage";
 import StudentManagement from "@/pages/admin/StudentManagement";
 import TeachingRequestManagement from "@/pages/admin/TeachingRequestManagement";
 import AdminLearningManagement from "@/pages/admin/AdminLearningManagement"; // Import new page
 import AdminLearningDetailPage from "@/pages/admin/AdminLearningDetailPage"; // Import new page
+import ReviewVisibilityRequests from "@/pages/admin/ReviewVisibilityRequests";
 
 import DisputeDetailPage from "@/pages/admin/DisputeDetailPage";
 import ProfilePage from "@/pages/Profilepage";
@@ -28,7 +30,9 @@ export const adminRoutes = {
       { path: "/admin/dashboard", element: <AdminDashboard /> },
       { path: "/admin/tutors", element: <TutorManagement /> },
       { path: "/admin/tutors/:tutorId", element: <TutorProfilePage /> },
+      { path: "/admin/tutors/:id/full", element: <TutorFullProfilePage /> },
       { path: "/admin/tutor-profile", element: <TutorProfileListPage /> },
+      { path: "/admin/review-visibility", element: <ReviewVisibilityRequests /> },
       { path: "/admin/students", element: <StudentManagement /> },
       {
          path: "/admin/teaching-requests",

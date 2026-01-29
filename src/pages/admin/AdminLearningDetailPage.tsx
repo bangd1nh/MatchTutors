@@ -408,6 +408,21 @@ const AdminLearningDetailPage = () => {
                            {displayDecision?.student?.reason ||
                               "Không cung cấp"}
                         </p>
+                        {(displayDecision?.student as any)?.linkUrl && (
+                           <p className="text-sm mt-1">
+                              Liên kết:{" "}
+                              <a
+                                 href={
+                                    (displayDecision?.student as any).linkUrl
+                                 }
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 className="text-sky-600 underline"
+                              >
+                                 {(displayDecision?.student as any).linkUrl}
+                              </a>
+                           </p>
+                        )}
                      </div>
                   </div>
                   <div>
@@ -427,6 +442,19 @@ const AdminLearningDetailPage = () => {
                            Lý do:{" "}
                            {displayDecision?.tutor?.reason || "Không cung cấp"}
                         </p>
+                        {(displayDecision?.tutor as any)?.linkUrl && (
+                           <p className="text-sm mt-1">
+                              Liên kết:{" "}
+                              <a
+                                 href={(displayDecision?.tutor as any).linkUrl}
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 className="text-rose-600 underline"
+                              >
+                                 {(displayDecision?.tutor as any).linkUrl}
+                              </a>
+                           </p>
+                        )}
                      </div>
                   </div>
                </div>
@@ -718,6 +746,32 @@ const AdminLearningDetailPage = () => {
                                  .status
                            )}
                         </p>
+                        {(
+                           historyLog.cancellationDecisionSnapshot
+                              .student as any
+                        )?.linkUrl && (
+                           <p>
+                              Liên kết học viên:{" "}
+                              <a
+                                 href={
+                                    (
+                                       historyLog.cancellationDecisionSnapshot
+                                          .student as any
+                                    ).linkUrl
+                                 }
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 className="text-sky-600 underline"
+                              >
+                                 {
+                                    (
+                                       historyLog.cancellationDecisionSnapshot
+                                          .student as any
+                                    ).linkUrl
+                                 }
+                              </a>
+                           </p>
+                        )}
                         <p>
                            Gia sư:{" "}
                            {getStatusLabel(
@@ -725,6 +779,30 @@ const AdminLearningDetailPage = () => {
                                  .status
                            )}
                         </p>
+                        {(historyLog.cancellationDecisionSnapshot.tutor as any)
+                           ?.linkUrl && (
+                           <p>
+                              Liên kết gia sư:{" "}
+                              <a
+                                 href={
+                                    (
+                                       historyLog.cancellationDecisionSnapshot
+                                          .tutor as any
+                                    ).linkUrl
+                                 }
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 className="text-rose-600 underline"
+                              >
+                                 {
+                                    (
+                                       historyLog.cancellationDecisionSnapshot
+                                          .tutor as any
+                                    ).linkUrl
+                                 }
+                              </a>
+                           </p>
+                        )}
                         <p>
                            Lý do:{" "}
                            {historyLog.cancellationDecisionSnapshot.reason ??

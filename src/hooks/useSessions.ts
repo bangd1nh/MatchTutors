@@ -9,10 +9,15 @@ import {
    confirmAttendance,
    cancelSession,
    rejectAttendance,
+   createBatchSessions,
+   busySession,
+   getSessionsByCommitment, // <-- added
+   confirmAttendanceFake, // <-- added
+   rejectAttendanceFake, // <-- added
 } from "@/api/sessions";
 
 import { useToast } from "@/hooks/useToast";
-import { UpsertSessionPayload } from "@/types/session";
+import { BusySession, UpsertSessionPayload } from "@/types/session";
 
 // Query key factory for sessions
 export const sessionKeys = {
@@ -44,6 +49,17 @@ export const useSessionDetail = (sessionId?: string) => {
       queryFn: () => getSessionById(sessionId!),
       enabled: !!sessionId,
       staleTime: 1000 * 60 * 5, // 5 minutes
+   });
+};
+
+// NEW: hook to fetch sessions by learning commitment id
+export const useSessionsByCommitment = (commitmentId?: string) => {
+   return useQuery({
+      queryKey: sessionKeys.list(`commitment-${commitmentId || "unknown"}`),
+      queryFn: () => getSessionsByCommitment(commitmentId!),
+      enabled: !!commitmentId,
+      staleTime: 1000 * 60 * 5,
+      select: (data) => data ?? [],
    });
 };
 
@@ -233,6 +249,82 @@ export const useCancelSession = () => {
             "error",
             error.response?.data?.message || "Hủy buổi học thất bại."
          );
+      },
+   });
+};
+
+export const useCreateBatchSessions = () => {
+   const queryClient = useQueryClient();
+   const toast = useToast();
+
+   return useMutation({
+      mutationFn: createBatchSessions,
+      onSuccess: (data) => {
+         queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+
+         const count = Array.isArray(data) ? data.length : 1;
+
+         toast("success", `Đã tạo thành công ${count} buổi học!`);
+      },
+      onError: (error: any) => {
+         console.error(" Mutation Error:", error);
+
+         const message =
+            error?.response?.data?.message || error?.message || "Tạo thất bại.";
+         toast("error", message);
+      },
+   });
+};
+
+export const useStudentBusySchedules = () => {
+   return useQuery<BusySession>({
+      queryKey: ["STUDENTBUSY"],
+      queryFn: busySession,
+   });
+};
+/**
+ * Hook để xác nhận điểm danh (fake) — dùng cho testing
+ */
+export const useConfirmAttendanceFake = () => {
+   const queryClient = useQueryClient();
+   const toast = useToast();
+
+   return useMutation({
+      mutationFn: (sessionId: string) => confirmAttendanceFake(sessionId),
+      onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+         toast("success", "Đã xác nhận điểm danh (Demo)!");
+      },
+      onError: (error: any) => {
+         toast(
+            "error",
+            error.response?.data?.message || "Xác nhận điểm danh thất bại."
+         );
+      },
+   });
+};
+
+/**
+ * Hook để từ chối điểm danh (fake) — dùng cho testing
+ */
+export const useRejectAttendanceFake = () => {
+   const queryClient = useQueryClient();
+   const toast = useToast();
+
+   return useMutation({
+      mutationFn: ({
+         sessionId,
+         payload,
+      }: {
+         sessionId: string;
+         payload?: { reason?: string; evidenceUrls?: string[] };
+      }) => rejectAttendanceFake(sessionId, payload),
+      onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+         toast("success", "Đã gửi báo vắng/khiếu nại (Demo)!");
+      },
+      onError: (error: any) => {
+         toast("error", error.response?.data?.message || "Thao tác thất bại.");
       },
    });
 };

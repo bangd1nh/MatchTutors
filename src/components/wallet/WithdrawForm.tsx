@@ -26,7 +26,7 @@ export const WithdrawForm: React.FC = () => {
       toBin: "970436",
       toAccountNumber: "",
       amount: "",
-      description: "Rút tiền từ MatchWork",
+      description: "Rút tiền từ tutormatch",
    });
 
    const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -83,8 +83,8 @@ export const WithdrawForm: React.FC = () => {
       if (result) {
          setSuccessMessage(
             `Rút tiền thành công! Số dư mới: ${result.newBalance.toLocaleString(
-               "vi-VN"
-            )} VNĐ`
+               "vi-VN",
+            )} VNĐ`,
          );
          setFormData({
             toBin: "970436",

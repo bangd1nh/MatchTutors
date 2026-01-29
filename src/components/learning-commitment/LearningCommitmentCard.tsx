@@ -4,7 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LearningCommitment } from "@/types/learningCommitment";
-import { useInitiatePayment } from "@/hooks/useLearningCommitment";
+import {
+   useInitiatePayment,
+   // useInitiateTopUp,
+} from "@/hooks/useLearningCommitment";
 import { useUser } from "@/hooks/useUser";
 import {
    useRequestCancellation,
@@ -19,6 +22,7 @@ import {
    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+// import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import {
    Calendar,
@@ -34,24 +38,32 @@ import {
    ChevronUp,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
    commitment: LearningCommitment;
 }
 
 export const LearningCommitmentCard = ({ commitment }: Props) => {
+   const navigate = useNavigate();
    const { user } = useUser();
    const { mutate: initiatePayment, isPending } = useInitiatePayment();
+   // const { mutate: initiateTopUp, isPending: isTopUpPending } =
+   //    useInitiateTopUp();
    const requestCancellation = useRequestCancellation();
    const rejectCancellation = useRejectCancellation();
    const rejectCommitment = useRejectLearningCommitment();
 
    const [reason, setReason] = useState("");
+   const [linkUrl, setLinkUrl] = useState("");
    const [dialogOpen, setDialogOpen] = useState(false);
    const [reasonDialogOpen, setReasonDialogOpen] = useState(false);
    const [expandedHistoryIndex, setExpandedHistoryIndex] = useState<
       number | null
    >(null);
+   // const [topUpDialogOpen, setTopUpDialogOpen] = useState(false);
+   // const [topUpSessions, setTopUpSessions] = useState<number>(1);
+   // const [topUpAmount, setTopUpAmount] = useState<number>(0);
 
    const getStatusColor = (status: string) => {
       // use semantic classes that adapt to dark mode via tokens
@@ -92,9 +104,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
    const studentObj: any = commitment.student;
    const isStudentOwner = Boolean(
       studentObj &&
-         (String(studentObj.userId?._id || studentObj.userId) ===
-            String(user?.id || user?._id) ||
-            String(studentObj._id) === String(user?.id || user?._id))
+      (String(studentObj.userId?._id || studentObj.userId) ===
+         String(user?.id || user?._id) ||
+         String(studentObj._id) === String(user?.id || user?._id)),
    );
 
    const isStudentRole = String(user?.role || "").toLowerCase() === "student";
@@ -123,6 +135,11 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
       commitment.status === "cancellation_pending" ||
       commitment.status === "cancelled" ||
       commitment.status === "admin_review";
+
+   // const canTopUp =
+   //    isStudentRole &&
+   //    isStudentOwner &&
+   //    ["active", "pending_agreement"].includes(commitment.status);
 
    const getCancellationDetails = () => {
       const decision = commitment.cancellationDecision;
@@ -219,18 +236,44 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
       100;
 
    const handleRequest = () => {
-      if (!reason.trim()) return;
-      requestCancellation.mutate({ id: commitment._id, reason });
+      if (!reason.trim() || !linkUrl.trim()) return;
+      requestCancellation.mutate({ id: commitment._id, reason, linkUrl });
       setDialogOpen(false);
       setReason("");
+      setLinkUrl("");
    };
 
    const handleReject = () => {
-      if (!reason.trim()) return;
-      rejectCancellation.mutate({ id: commitment._id, reason });
+      if (!reason.trim() || !linkUrl.trim()) return;
+      rejectCancellation.mutate({ id: commitment._id, reason, linkUrl });
       setDialogOpen(false);
       setReason("");
+      setLinkUrl("");
    };
+
+   // const handleTopUp = () => {
+   //    if (
+   //       !topUpSessions ||
+   //       topUpSessions <= 0 ||
+   //       !topUpAmount ||
+   //       topUpAmount <= 0
+   //    )
+   //       return;
+   //    initiateTopUp(
+   //       {
+   //          id: String(commitment._id),
+   //          additionalSessions: topUpSessions,
+   //          amount: topUpAmount,
+   //       },
+   //       {
+   //          onSuccess: () => {
+   //             setTopUpDialogOpen(false);
+   //             setTopUpSessions(1);
+   //             setTopUpAmount(0);
+   //          },
+   //       }
+   //    );
+   // };
 
    const hasMultipleCancellations =
       commitment.cancellationDecisionHistory &&
@@ -249,7 +292,11 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                      </h3>
                   </div>
                </div>
-               <Badge className={`flex-shrink-0 font-medium text-xs ${getStatusColor(commitment.status)}`}>
+               <Badge
+                  className={`flex-shrink-0 font-medium text-xs ${getStatusColor(
+                     commitment.status,
+                  )}`}
+               >
                   {getStatusLabel(commitment.status)}
                </Badge>
             </div>
@@ -292,14 +339,25 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                      </p>
                   </div>
                   <span className="text-xs font-semibold text-foreground">
-                     {commitment.completedSessions ?? 0}/{commitment.totalSessions ?? "-"}
+                     {commitment.completedSessions ?? 0}/
+                     {commitment.totalSessions ?? "-"}
                   </span>
                </div>
-               <Progress value={Math.min(progressPercent, 100)} className="h-2" />
+               <Progress
+                  value={Math.min(progressPercent, 100)}
+                  className="h-2"
+               />
+
+               {/* <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span className="text-sm">Buổi / tuần</span>
+                  <span className="text-lg font-semibold text-foreground">
+                     {commitment.sessionsPerWeek ?? "-"}
+                  </span>
+               </div> */}
             </div>
 
             {/* Dates */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
                <div className="flex items-start gap-2">
                   <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                   <div className="min-w-0">
@@ -309,19 +367,6 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                      <p className="text-sm font-medium text-foreground">
                         {commitment.startDate
                            ? format(new Date(commitment.startDate), "dd/MM/yy")
-                           : "-"}
-                     </p>
-                  </div>
-               </div>
-               <div className="flex items-start gap-2">
-                  <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <div className="min-w-0">
-                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        Kết Thúc
-                     </p>
-                     <p className="text-sm font-medium text-foreground">
-                        {commitment.endDate
-                           ? format(new Date(commitment.endDate), "dd/MM/yy")
                            : "-"}
                      </p>
                   </div>
@@ -346,7 +391,10 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                      Đã Thanh Toán
                   </span>
                   <span className="font-semibold text-blue-600 dark:text-blue-400">
-                     {(commitment.studentPaidAmount ?? 0).toLocaleString("vi-VN")} VND
+                     {(commitment.studentPaidAmount ?? 0).toLocaleString(
+                        "vi-VN",
+                     )}{" "}
+                     VND
                   </span>
                </div>
                {remainingAmount > 0 && (
@@ -363,15 +411,43 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
 
             {/* Action Buttons */}
             <div className="space-y-3 pt-2">
+               {/* NEW: View Sessions Button */}
+               {/* Role-aware navigation to sessions list */}
+               <Button
+                  onClick={() => {
+                     const base =
+                        String(user?.role || "").toUpperCase() === "TUTOR"
+                           ? "/tutor"
+                           : "/student";
+                     navigate(
+                        `${base}/learning-commitment/${commitment._id}/sessions`,
+                     );
+                  }}
+                  variant="outline"
+                  className="w-full border-border text-foreground hover:bg-accent"
+               >
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Xem Danh Sách Buổi Học ({commitment.totalSessions || 0})
+               </Button>
+
                {canViewReason && cancellationDetails && (
-                  <Dialog open={reasonDialogOpen} onOpenChange={setReasonDialogOpen}>
+                  <Dialog
+                     open={reasonDialogOpen}
+                     onOpenChange={setReasonDialogOpen}
+                  >
                      <DialogTrigger asChild>
-                        <Button variant="outline" className="w-full border-border text-foreground hover:bg-accent">
+                        <Button
+                           variant="outline"
+                           className="w-full border-border text-foreground hover:bg-accent"
+                        >
                            <Info className="w-4 h-4 mr-2 text-muted-foreground" />
                            Xem Chi Tiết Hủy
                            {hasMultipleCancellations && (
                               <span className="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold bg-destructive text-destructive-foreground rounded-full">
-                                 {commitment.cancellationDecisionHistory?.length}
+                                 {
+                                    commitment.cancellationDecisionHistory
+                                       ?.length
+                                 }
                               </span>
                            )}
                         </Button>
@@ -383,7 +459,11 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                               Chi Tiết Yêu Cầu Hủy Cam Kết
                               {hasMultipleCancellations && (
                                  <Badge variant="outline" className="ml-auto">
-                                    {commitment.cancellationDecisionHistory?.length} lần hủy
+                                    {
+                                       commitment.cancellationDecisionHistory
+                                          ?.length
+                                    }{" "}
+                                    lần hủy
                                  </Badge>
                               )}
                            </DialogTitle>
@@ -417,7 +497,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                    expandedHistoryIndex ===
                                                       index
                                                       ? null
-                                                      : index
+                                                      : index,
                                                 )
                                              }
                                              className="w-full px-4 py-3 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-150 flex items-center justify-between transition-colors"
@@ -434,9 +514,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                       {record.requestedAt
                                                          ? format(
                                                               new Date(
-                                                                 record.requestedAt
+                                                                 record.requestedAt,
                                                               ),
-                                                              "HH:mm dd/MM/yyyy"
+                                                              "HH:mm dd/MM/yyyy",
                                                            )
                                                          : "Không có thời gian"}
                                                    </p>
@@ -470,7 +550,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                    <p className="text-sm font-medium text-slate-900">
                                                       {getRequesterName(
                                                          record.requestedBy ||
-                                                            "unknown"
+                                                            "unknown",
                                                       )}
                                                    </p>
                                                 </div>
@@ -482,10 +562,10 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                       "ACCEPTED"
                                                          ? "bg-green-50 border-green-200"
                                                          : record.student
-                                                              .status ===
-                                                           "REJECTED"
-                                                         ? "bg-red-50 border-red-200"
-                                                         : "bg-yellow-50 border-yellow-200"
+                                                                .status ===
+                                                             "REJECTED"
+                                                           ? "bg-red-50 border-red-200"
+                                                           : "bg-yellow-50 border-yellow-200"
                                                    }`}
                                                 >
                                                    <div className="flex items-center gap-2 mb-2">
@@ -505,17 +585,17 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                    </div>
                                                    <Badge
                                                       className={`text-xs ${getStatusBadgeColor(
-                                                         record.student.status
+                                                         record.student.status,
                                                       )}`}
                                                    >
                                                       {record.student.status ===
                                                       "ACCEPTED"
                                                          ? "Đã Chấp Nhận"
                                                          : record.student
-                                                              .status ===
-                                                           "REJECTED"
-                                                         ? "Đã Từ Chối"
-                                                         : "Chờ Phản Hồi"}
+                                                                .status ===
+                                                             "REJECTED"
+                                                           ? "Đã Từ Chối"
+                                                           : "Chờ Phản Hồi"}
                                                    </Badge>
                                                    {record.student.reason && (
                                                       <p className="text-xs text-slate-600 mt-2">
@@ -534,10 +614,10 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                       "ACCEPTED"
                                                          ? "bg-green-50 border-green-200"
                                                          : record.tutor
-                                                              .status ===
-                                                           "REJECTED"
-                                                         ? "bg-red-50 border-red-200"
-                                                         : "bg-yellow-50 border-yellow-200"
+                                                                .status ===
+                                                             "REJECTED"
+                                                           ? "bg-red-50 border-red-200"
+                                                           : "bg-yellow-50 border-yellow-200"
                                                    }`}
                                                 >
                                                    <div className="flex items-center gap-2 mb-2">
@@ -557,17 +637,17 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                    </div>
                                                    <Badge
                                                       className={`text-xs ${getStatusBadgeColor(
-                                                         record.tutor.status
+                                                         record.tutor.status,
                                                       )}`}
                                                    >
                                                       {record.tutor.status ===
                                                       "ACCEPTED"
                                                          ? "Đã Chấp Nhận"
                                                          : record.tutor
-                                                              .status ===
-                                                           "REJECTED"
-                                                         ? "Đã Từ Chối"
-                                                         : "Chờ Phản Hồi"}
+                                                                .status ===
+                                                             "REJECTED"
+                                                           ? "Đã Từ Chối"
+                                                           : "Chờ Phản Hồi"}
                                                    </Badge>
                                                    {record.tutor.reason && (
                                                       <p className="text-xs text-slate-600 mt-2">
@@ -615,9 +695,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                                       {record.resolvedDate
                                                          ? format(
                                                               new Date(
-                                                                 record.resolvedDate
+                                                                 record.resolvedDate,
                                                               ),
-                                                              "HH:mm dd/MM/yyyy"
+                                                              "HH:mm dd/MM/yyyy",
                                                            )
                                                          : "Chưa xử lý"}
                                                    </p>
@@ -625,7 +705,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                              </div>
                                           )}
                                        </div>
-                                    )
+                                    ),
                                  )}
                               </div>
                            ) : (
@@ -654,7 +734,7 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                        </p>
                                        <p className="text-sm font-medium text-slate-900">
                                           {getRequesterName(
-                                             cancellationDetails.requestedBy
+                                             cancellationDetails.requestedBy,
                                           )}
                                        </p>
                                     </div>
@@ -667,9 +747,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                           <p className="text-sm text-slate-700">
                                              {format(
                                                 new Date(
-                                                   cancellationDetails.requestedAt
+                                                   cancellationDetails.requestedAt,
                                                 ),
-                                                "HH:mm dd/MM/yyyy"
+                                                "HH:mm dd/MM/yyyy",
                                              )}
                                           </p>
                                        </div>
@@ -685,9 +765,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                           "ACCEPTED"
                                              ? "bg-green-50 border-green-200"
                                              : cancellationDetails.studentStatus ===
-                                               "REJECTED"
-                                             ? "bg-red-50 border-red-200"
-                                             : "bg-yellow-50 border-yellow-200"
+                                                 "REJECTED"
+                                               ? "bg-red-50 border-red-200"
+                                               : "bg-yellow-50 border-yellow-200"
                                        }`}
                                     >
                                        <div className="flex items-center gap-2 mb-2">
@@ -706,16 +786,16 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                        </div>
                                        <Badge
                                           className={`text-xs ${getStatusBadgeColor(
-                                             cancellationDetails.studentStatus
+                                             cancellationDetails.studentStatus,
                                           )}`}
                                        >
                                           {cancellationDetails.studentStatus ===
                                           "ACCEPTED"
                                              ? "Đã Chấp Nhận"
                                              : cancellationDetails.studentStatus ===
-                                               "REJECTED"
-                                             ? "Đã Từ Chối"
-                                             : "Chờ Phản Hồi"}
+                                                 "REJECTED"
+                                               ? "Đã Từ Chối"
+                                               : "Chờ Phản Hồi"}
                                        </Badge>
                                        {cancellationDetails.studentReason && (
                                           <p className="text-xs text-slate-600 mt-2">
@@ -731,9 +811,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                           "ACCEPTED"
                                              ? "bg-green-50 border-green-200"
                                              : cancellationDetails.tutorStatus ===
-                                               "REJECTED"
-                                             ? "bg-red-50 border-red-200"
-                                             : "bg-yellow-50 border-yellow-200"
+                                                 "REJECTED"
+                                               ? "bg-red-50 border-red-200"
+                                               : "bg-yellow-50 border-yellow-200"
                                        }`}
                                     >
                                        <div className="flex items-center gap-2 mb-2">
@@ -752,16 +832,16 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                        </div>
                                        <Badge
                                           className={`text-xs ${getStatusBadgeColor(
-                                             cancellationDetails.tutorStatus
+                                             cancellationDetails.tutorStatus,
                                           )}`}
                                        >
                                           {cancellationDetails.tutorStatus ===
                                           "ACCEPTED"
                                              ? "Đã Chấp Nhận"
                                              : cancellationDetails.tutorStatus ===
-                                               "REJECTED"
-                                             ? "Đã Từ Chối"
-                                             : "Chờ Phản Hồi"}
+                                                 "REJECTED"
+                                               ? "Đã Từ Chối"
+                                               : "Chờ Phản Hồi"}
                                        </Badge>
                                        {cancellationDetails.tutorReason && (
                                           <p className="text-xs text-slate-600 mt-2">
@@ -818,9 +898,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                        <p className="text-sm text-slate-700">
                                           {format(
                                              new Date(
-                                                cancellationDetails.resolvedAt
+                                                cancellationDetails.resolvedAt,
                                              ),
-                                             "HH:mm dd/MM/yyyy"
+                                             "HH:mm dd/MM/yyyy",
                                           )}
                                        </p>
                                     </div>
@@ -828,7 +908,10 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                               </>
                            )}
 
-                           <Button onClick={() => setReasonDialogOpen(false)} className="w-full">
+                           <Button
+                              onClick={() => setReasonDialogOpen(false)}
+                              className="w-full"
+                           >
                               Đóng
                            </Button>
                         </div>
@@ -848,7 +931,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
 
                {canReject && (
                   <Button
-                     onClick={() => rejectCommitment.mutate(String(commitment._id))}
+                     onClick={() =>
+                        rejectCommitment.mutate(String(commitment._id))
+                     }
                      disabled={rejectCommitment.isPending}
                      variant="outline"
                      className="w-full text-destructive border-destructive/40 hover:bg-destructive/10"
@@ -860,7 +945,10 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                {canRequestCancel && (
                   <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                      <DialogTrigger asChild>
-                        <Button variant="outline" className="w-full text-destructive border-destructive/40 hover:bg-destructive/10">
+                        <Button
+                           variant="outline"
+                           className="w-full text-destructive border-destructive/40 hover:bg-destructive/10"
+                        >
                            Yêu Cầu Hủy
                         </Button>
                      </DialogTrigger>
@@ -879,9 +967,21 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                               className="resize-none"
                               rows={4}
                            />
+                           <div>
+                              <p className="text-xs font-medium text-muted-foreground mb-1">
+                                 Link (bắt buộc)
+                              </p>
+                              <input
+                                 type="url"
+                                 placeholder="https://..."
+                                 value={linkUrl}
+                                 onChange={(e) => setLinkUrl(e.target.value)}
+                                 className="w-full rounded-md border px-3 py-2 text-sm"
+                              />
+                           </div>
                            <Button
                               onClick={handleRequest}
-                              disabled={!reason.trim()}
+                              disabled={!reason.trim() || !linkUrl.trim()}
                               className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                            >
                               Gửi Yêu Cầu
@@ -894,14 +994,22 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                {canRespondCancel && (
                   <div className="flex gap-3">
                      <Button
-                        onClick={() => requestCancellation.mutate({ id: commitment._id, reason: "Accepted" })}
+                        onClick={() =>
+                           requestCancellation.mutate({
+                              id: commitment._id,
+                              reason: "Accepted",
+                           })
+                        }
                         className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium dark:bg-emerald-500 dark:hover:bg-emerald-600"
                      >
                         Chấp Nhận
                      </Button>
                      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                         <DialogTrigger asChild>
-                           <Button variant="outline" className="flex-1 text-destructive border-destructive/40 hover:bg-destructive/10">
+                           <Button
+                              variant="outline"
+                              className="flex-1 text-destructive border-destructive/40 hover:bg-destructive/10"
+                           >
                               Từ Chối
                            </Button>
                         </DialogTrigger>
@@ -910,7 +1018,9 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                               <DialogTitle>Từ Chối Hủy Cam Kết</DialogTitle>
                            </DialogHeader>
                            <div className="space-y-4">
-                              <p className="text-sm text-muted-foreground">Vui lòng cung cấp lý do từ chối:</p>
+                              <p className="text-sm text-muted-foreground">
+                                 Vui lòng cung cấp lý do từ chối:
+                              </p>
                               <Textarea
                                  placeholder="Nhập lý do từ chối..."
                                  value={reason}
@@ -918,9 +1028,21 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                                  className="resize-none"
                                  rows={4}
                               />
+                              <div>
+                                 <p className="text-xs font-medium text-muted-foreground mb-1">
+                                    Link (bắt buộc)
+                                 </p>
+                                 <input
+                                    type="url"
+                                    placeholder="https://..."
+                                    value={linkUrl}
+                                    onChange={(e) => setLinkUrl(e.target.value)}
+                                    className="w-full rounded-md border px-3 py-2 text-sm"
+                                 />
+                              </div>
                               <Button
                                  onClick={handleReject}
-                                 disabled={!reason.trim()}
+                                 disabled={!reason.trim() || !linkUrl.trim()}
                                  className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                               >
                                  Gửi Từ Chối
@@ -930,6 +1052,81 @@ export const LearningCommitmentCard = ({ commitment }: Props) => {
                      </Dialog>
                   </div>
                )}
+
+               {/* {canTopUp && (
+                  <Dialog
+                     open={topUpDialogOpen}
+                     onOpenChange={setTopUpDialogOpen}
+                  >
+                     <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full">
+                           Thêm Buổi
+                        </Button>
+                     </DialogTrigger>
+                     <DialogContent className="bg-popover text-popover-foreground">
+                        <DialogHeader>
+                           <DialogTitle> Thêm buổi học</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                           <div>
+                              <p className="text-xs font-medium text-muted-foreground mb-1">
+                                 Số buổi thêm
+                              </p>
+                              <Input
+                                 type="number"
+                                 min={1}
+                                 value={topUpSessions}
+                                 onChange={(e) =>
+                                    setTopUpSessions(
+                                       Math.max(
+                                          1,
+                                          parseInt(e.target.value || "1")
+                                       )
+                                    )
+                                 }
+                              />
+                           </div>
+                           <div>
+                              <p className="text-xs font-medium text-muted-foreground mb-1">
+                                 Số tiền (VND)
+                              </p>
+                              <Input
+                                 type="number"
+                                 min={0}
+                                 value={topUpAmount}
+                                 onChange={(e) =>
+                                    setTopUpAmount(
+                                       parseFloat(e.target.value || "0")
+                                    )
+                                 }
+                              />
+                           </div>
+
+                           <Button
+                              onClick={handleTopUp}
+                              disabled={
+                                 isTopUpPending ||
+                                 !topUpSessions ||
+                                 topUpSessions <= 0 ||
+                                 !topUpAmount ||
+                                 topUpAmount <= 0
+                              }
+                              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                           >
+                              {isTopUpPending
+                                 ? "Đang xử lý..."
+                                 : "Thanh toán Top-up"}
+                           </Button>
+                           <Button
+                              onClick={() => setTopUpDialogOpen(false)}
+                              className="w-full"
+                           >
+                              Đóng
+                           </Button>
+                        </div>
+                     </DialogContent>
+                  </Dialog>
+               )} */}
             </div>
          </CardContent>
       </Card>

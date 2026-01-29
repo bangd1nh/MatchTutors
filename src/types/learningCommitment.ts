@@ -133,8 +133,8 @@ export interface LearningCommitment {
       description: string;
    };
    totalSessions: number;
+   sessionsPerWeek?: number;
    startDate: string;
-   endDate: string;
    totalAmount: number;
    studentPaidAmount: number;
    status: LearningCommitmentStatus;
@@ -153,7 +153,8 @@ export interface CreateLearningCommitmentRequest {
    teachingRequest: string;
    totalSessions: number;
    startDate: string;
-   endDate: string;
+   // endDate removed: server computes endDate, do not send it from client
+   sessionsPerWeek: number;
    totalAmount: number;
    tutor?: string;
    student?: string;

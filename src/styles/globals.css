@@ -22,6 +22,11 @@
    }
 }
 
+.rbc-day-slot-disabled {
+   background-color: #eee; /* Light gray */
+   cursor: not-allowed;
+}
+
 :root {
    --background: 0 0% 100%;
    --foreground: 222.2 84% 4.9%;

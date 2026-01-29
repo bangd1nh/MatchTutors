@@ -38,10 +38,10 @@ export const CommitmentDetailsPage = () => {
                <strong>Start:</strong>{" "}
                {format(new Date(commitment.startDate), "MMM dd, yyyy")}
             </div>
-            <div>
+            {/* <div>
                <strong>End:</strong>{" "}
                {format(new Date(commitment.endDate), "MMM dd, yyyy")}
-            </div>
+            </div> */}
             <div>
                <strong>Total Amount:</strong>{" "}
                {commitment.totalAmount.toLocaleString("vi-VN")} VND

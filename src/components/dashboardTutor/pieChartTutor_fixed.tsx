@@ -95,8 +95,8 @@ const renderCustomLabelPosition = (props: any) => {
             dominantBaseline="middle"
             style={{
                fontSize: textSize,
-               fontWeight: 'bold',
-               textShadow: '0 0 3px white, 0 0 3px white, 0 0 3px white', // White outline for contrast
+               fontWeight: "bold",
+               textShadow: "0 0 3px white, 0 0 3px white, 0 0 3px white", // White outline for contrast
             }}
          >
             {`${status}: ${value}`}
@@ -116,8 +116,11 @@ export default function PieChartTutor(props: PieChartTutorProps) {
    } = props;
 
    // Translate statuses to Vietnamese
-   const translatedSessions = translatePieData(sessionsByStatus, 'session');
-   const translatedCommitments = translatePieData(learningCommitments, 'commitment');
+   const translatedSessions = translatePieData(sessionsByStatus, "session");
+   const translatedCommitments = translatePieData(
+      learningCommitments,
+      "commitment"
+   );
 
    return (
       <div className="space-y-6">
@@ -131,15 +134,25 @@ export default function PieChartTutor(props: PieChartTutorProps) {
                <div style={{ width: "100%", height: 400 }}>
                   <ResponsiveContainer>
                      <RechartsPieChart>
-                        <Tooltip 
-                           formatter={(value: number, _name: string, props: any) => {
-                              const total = translatedSessions.reduce((sum: number, item: any) => sum + item.value, 0);
-                              const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                              return [`${value} (${percentage}%)`, props.payload.status];
+                        <Tooltip
+                           formatter={(value: any, _name: any, props: any) => {
+                              const val = value ?? 0;
+                              const total = translatedSessions.reduce(
+                                 (sum: number, item: any) => sum + item.value,
+                                 0
+                              );
+                              const percentage =
+                                 total > 0
+                                    ? ((val / total) * 100).toFixed(1)
+                                    : 0;
+                              return [
+                                 `${val} (${percentage}%)`,
+                                 props.payload.status,
+                              ];
                            }}
-                           labelFormatter={() => ''}
+                           labelFormatter={() => ""}
                         />
-                        <Legend 
+                        <Legend
                            formatter={(value, entry: any, _index) => {
                               return entry.payload?.status || value;
                            }}
@@ -151,13 +164,13 @@ export default function PieChartTutor(props: PieChartTutorProps) {
                            labelLine={false}
                            label={renderCustomLabelPosition}
                            outerRadius={100}
-                           innerRadius={60}  // Creates a donut chart effect
-                           paddingAngle={5}  // Adds gap between segments
-                           cornerRadius={8}  // Rounds the corners of the segments
+                           innerRadius={60} // Creates a donut chart effect
+                           paddingAngle={5} // Adds gap between segments
+                           cornerRadius={8} // Rounds the corners of the segments
                            fill="#8884d8"
                            dataKey="value"
-                           stroke="#fff"     // Adds a white border around segments
-                           strokeWidth={1}   // Border width
+                           stroke="#fff" // Adds a white border around segments
+                           strokeWidth={1} // Border width
                         >
                            {translatedSessions.map((_entry, index) => (
                               <Cell
@@ -231,15 +244,25 @@ export default function PieChartTutor(props: PieChartTutorProps) {
                <div style={{ width: "100%", height: 400 }}>
                   <ResponsiveContainer>
                      <RechartsPieChart>
-                        <Tooltip 
-                           formatter={(value: number, _name: string, props: any) => {
-                              const total = translatedCommitments.reduce((sum: number, item: any) => sum + item.value, 0);
-                              const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                              return [`${value} (${percentage}%)`, props.payload.status];
+                        <Tooltip
+                           formatter={(value: any, _name: any, props: any) => {
+                              const val = value ?? 0;
+                              const total = translatedCommitments.reduce(
+                                 (sum: number, item: any) => sum + item.value,
+                                 0
+                              );
+                              const percentage =
+                                 total > 0
+                                    ? ((val / total) * 100).toFixed(1)
+                                    : 0;
+                              return [
+                                 `${val} (${percentage}%)`,
+                                 props.payload.status,
+                              ];
                            }}
-                           labelFormatter={() => ''}
+                           labelFormatter={() => ""}
                         />
-                        <Legend 
+                        <Legend
                            formatter={(value, entry: any, _index) => {
                               return entry.payload?.status || value;
                            }}
@@ -251,13 +274,13 @@ export default function PieChartTutor(props: PieChartTutorProps) {
                            labelLine={false}
                            label={renderCustomLabelPosition}
                            outerRadius={100}
-                           innerRadius={60}  // Creates a donut chart effect
-                           paddingAngle={5}  // Adds gap between segments
-                           cornerRadius={8}  // Rounds the corners of the segments
+                           innerRadius={60} // Creates a donut chart effect
+                           paddingAngle={5} // Adds gap between segments
+                           cornerRadius={8} // Rounds the corners of the segments
                            fill="#82ca9d"
                            dataKey="value"
-                           stroke="#fff"     // Adds a white border around segments
-                           strokeWidth={1}   // Border width
+                           stroke="#fff" // Adds a white border around segments
+                           strokeWidth={1} // Border width
                         >
                            {translatedCommitments.map((_entry, index) => (
                               <Cell

@@ -57,6 +57,14 @@ export interface TransactionUser {
 }
 
 /**
+ * Commitment info (trong commitment transactions)
+ */
+export interface TransactionCommitment {
+  commitmentId: string;
+  status: string;
+}
+
+/**
  * Transaction item trong danh sách
  */
 export interface AdminTransaction {
@@ -100,6 +108,31 @@ export interface AdminPackageTransactionsResponse {
   transactions: AdminTransaction[];
   pagination: PaginationInfo;
   totalAmount: number; // Tổng doanh thu từ packages
+}
+
+/**
+ * Commitment transaction item trong danh sách
+ */
+export interface AdminCommitmentTransaction {
+  id: string;
+  orderCode: number | string;
+  transactionId: string;
+  amount: number; // Tổng số tiền giao dịch
+  adminAmount: number; // Số tiền admin nhận được
+  user: TransactionUser | null; // Có thể null
+  commitment: TransactionCommitment;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Response từ API GET /api/admin/transactions/commitments
+ */
+export interface AdminCommitmentTransactionsResponse {
+  transactions: AdminCommitmentTransaction[];
+  pagination: PaginationInfo;
+  totalAmount: number; // Tổng doanh thu từ commitments
+  totalAdminAmount: number; // Tổng số tiền admin nhận được
 }
 
 /**
@@ -211,6 +244,44 @@ export const getAdminPackageTransactions = async (
         pages: data.totalPages || 1, // Alias cho tương thích
       },
       totalAmount: data.totalAmount || 0,
+    };
+  }
+  return responseData;
+};
+
+/**
+ * Lấy lịch sử giao dịch learning commitment
+ * GET /api/admin/transactions/commitments
+ */
+export const getAdminCommitmentTransactions = async (
+  params?: GetAdminTransactionsParams
+): Promise<AdminCommitmentTransactionsResponse> => {
+  const response = await apiClient.get("/admin/transactions/commitments", {
+    params: {
+      page: params?.page || 1,
+      limit: params?.limit || 20,
+      ...(params?.status && { status: params.status }),
+      ...(params?.userId && { userId: params.userId }),
+      ...(params?.startDate && { startDate: params.startDate }),
+      ...(params?.endDate && { endDate: params.endDate }),
+      ...(params?.search && { search: params.search }),
+    },
+  });
+  // Response structure: { status, message, code, data: { page, limit, total, totalPages, transactions, totalAmount, totalAdminAmount } }
+  const responseData = response.data;
+  if (responseData.data) {
+    const data = responseData.data;
+    return {
+      transactions: data.transactions || [],
+      pagination: {
+        page: data.page || params?.page || 1,
+        limit: data.limit || params?.limit || 20,
+        total: data.total || 0,
+        totalPages: data.totalPages || 1,
+        pages: data.totalPages || 1, // Alias cho tương thích
+      },
+      totalAmount: data.totalAmount || 0,
+      totalAdminAmount: data.totalAdminAmount || 0,
     };
   }
   return responseData;

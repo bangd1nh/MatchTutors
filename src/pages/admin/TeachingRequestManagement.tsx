@@ -103,6 +103,14 @@ const TeachingRequestManagement: React.FC = () => {
       request: AdminTeachingRequest;
    }) => {
       const conflict = getConflictType(request);
+      const studentUser = request.studentId?.userId || {};
+      const tutorUser = request.tutorId?.userId || {};
+      const studentName = studentUser.name || studentUser.email || "Chưa có tên";
+      const tutorName = tutorUser.name || tutorUser.email || "Chưa có tên";
+      const studentInitial = (studentUser.name?.charAt(0) || studentUser.email?.charAt(0) || "H").toUpperCase();
+      const tutorInitial = (tutorUser.name?.charAt(0) || tutorUser.email?.charAt(0) || "G").toUpperCase();
+      const subject = request.subject || "Chưa có môn";
+      const level = request.level || "Chưa có";
 
       return (
          <Card className="hover:shadow-md transition-shadow">
@@ -110,7 +118,7 @@ const TeachingRequestManagement: React.FC = () => {
                <div className="flex items-center justify-between">
                   <CardTitle className="text-lg flex items-center gap-2">
                      <BookOpenIcon className="h-5 w-5" />
-                     {request.subject} - Lớp {request.level}
+                     {subject} - Lớp {level}
                   </CardTitle>
                   <Badge className={conflict.color}>{conflict.type}</Badge>
                </div>
@@ -121,14 +129,14 @@ const TeachingRequestManagement: React.FC = () => {
                <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center gap-2">
                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={request.studentId.userId.avatarUrl} />
+                        <AvatarImage src={studentUser.avatarUrl} />
                         <AvatarFallback>
-                           {request.studentId.userId.name?.charAt(0)}
+                           {studentInitial}
                         </AvatarFallback>
                      </Avatar>
                      <div>
                         <p className="text-sm font-medium">
-                           {request.studentId.userId.name}
+                           {studentName}
                         </p>
                         <p className="text-xs text-gray-500">Học sinh</p>
                      </div>
@@ -136,14 +144,14 @@ const TeachingRequestManagement: React.FC = () => {
 
                   <div className="flex items-center gap-2">
                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={request.tutorId.userId.avatarUrl} />
+                        <AvatarImage src={tutorUser.avatarUrl} />
                         <AvatarFallback>
-                           {request.tutorId.userId.name?.charAt(0)}
+                           {tutorInitial}
                         </AvatarFallback>
                      </Avatar>
                      <div>
                         <p className="text-sm font-medium">
-                           {request.tutorId.userId.name}
+                           {tutorName}
                         </p>
                         <p className="text-xs text-gray-500">Gia sư</p>
                      </div>
@@ -200,6 +208,14 @@ const TeachingRequestManagement: React.FC = () => {
       request: AdminTeachingRequest;
    }) => {
       const resolvedInfo = getResolvedInfo(request);
+      const studentUser = request.studentId?.userId || {};
+      const tutorUser = request.tutorId?.userId || {};
+      const studentName = studentUser.name || studentUser.email || "Chưa có tên";
+      const tutorName = tutorUser.name || tutorUser.email || "Chưa có tên";
+      const studentInitial = (studentUser.name?.charAt(0) || studentUser.email?.charAt(0) || "H").toUpperCase();
+      const tutorInitial = (tutorUser.name?.charAt(0) || tutorUser.email?.charAt(0) || "G").toUpperCase();
+      const subject = request.subject || "Chưa có môn";
+      const level = request.level || "Chưa có";
       // const conflict = getConflictType(request);
 
       return (
@@ -208,7 +224,7 @@ const TeachingRequestManagement: React.FC = () => {
                <div className="flex items-center justify-between">
                   <CardTitle className="text-lg flex items-center gap-2">
                      <BookOpenIcon className="h-5 w-5" />
-                     {request.subject} - Lớp {request.level}
+                     {subject} - Lớp {level}
                   </CardTitle>
                   <div className="flex gap-2">
                      <Badge className="bg-green-100 text-green-800">
@@ -224,14 +240,14 @@ const TeachingRequestManagement: React.FC = () => {
                <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center gap-2">
                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={request.studentId.userId.avatarUrl} />
+                        <AvatarImage src={studentUser.avatarUrl} />
                         <AvatarFallback>
-                           {request.studentId.userId.name?.charAt(0)}
+                           {studentInitial}
                         </AvatarFallback>
                      </Avatar>
                      <div>
                         <p className="text-sm font-medium">
-                           {request.studentId.userId.name}
+                           {studentName}
                         </p>
                         <p className="text-xs text-gray-500">Học sinh</p>
                      </div>
@@ -239,14 +255,14 @@ const TeachingRequestManagement: React.FC = () => {
 
                   <div className="flex items-center gap-2">
                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={request.tutorId.userId.avatarUrl} />
+                        <AvatarImage src={tutorUser.avatarUrl} />
                         <AvatarFallback>
-                           {request.tutorId.userId.name?.charAt(0)}
+                           {tutorInitial}
                         </AvatarFallback>
                      </Avatar>
                      <div>
                         <p className="text-sm font-medium">
-                           {request.tutorId.userId.name}
+                           {tutorName}
                         </p>
                         <p className="text-xs text-gray-500">Gia sư</p>
                      </div>

@@ -106,7 +106,7 @@ export const tutorSidebarConfig: SidebarSection[] = [
          },
          {
             to: "/tutor/createShortAnswerQuiz",
-            label: "Tạo Short Answer",
+            label: "Tạo Tự luận",
             icon: <BookPlus className="h-4 w-4" />,
          },
          {
@@ -121,7 +121,7 @@ export const tutorSidebarConfig: SidebarSection[] = [
          },
          {
             to: "/tutor/ShortAnswerList",
-            label: "Xem Short Answer",
+            label: "Xem Tự luận",
             icon: <BookCopy className="h-4 w-4" />,
          },
          {

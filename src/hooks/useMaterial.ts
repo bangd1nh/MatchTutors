@@ -1,8 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getMaterials, uploadMaterial, deleteMaterial } from "@/api/material";
+import {
+   getMaterials,
+   uploadMaterial,
+   deleteMaterial,
+   getMaterialsByFilters,
+} from "@/api/material";
 import { useToast } from "./useToast";
 
-export const useMaterial = (page = 1, limit = 10) => {
+export interface MaterialFilters {
+   subjects?: string[];
+   levels?: string[];
+}
+
+export const useMaterial = (
+   page = 1,
+   limit = 10,
+   filters?: MaterialFilters
+) => {
    const queryClient = useQueryClient();
    const toast = useToast();
 
@@ -11,8 +25,15 @@ export const useMaterial = (page = 1, limit = 10) => {
       isLoading: isLoadingMaterials,
       refetch,
    } = useQuery({
-      queryKey: ["materials", page, limit],
-      queryFn: () => getMaterials(page, limit),
+      queryKey: ["materials", page, limit, filters],
+      queryFn: () => {
+         // Nếu có filter, dùng getMaterialsByFilters
+         if (filters?.subjects?.length || filters?.levels?.length) {
+            return getMaterialsByFilters(page, limit, filters);
+         }
+         // Nếu không có filter, dùng getMaterials
+         return getMaterials(page, limit);
+      },
    });
 
    const materials = paginatedData?.items || [];

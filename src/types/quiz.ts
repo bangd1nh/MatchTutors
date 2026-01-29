@@ -1,6 +1,8 @@
 import { QuestionTypeEnum, QuizModeEnum } from "@/enums/quiz.enum";
 import { IQuizQuestion } from "./quizQuestion";
 import { BaseAPIResponse } from "./response";
+import { Subject } from "@/enums/subject.enum";
+import { Level } from "@/enums/level.enum";
 
 export type QuizInfoValues = {
    title: string;
@@ -13,6 +15,8 @@ export type QuizInfoValues = {
    };
    tags: string[];
    totalQuestions?: number;
+   subject?: Subject;
+   level?: Level;
 };
 
 export type FlashcardQuestion = {
@@ -70,6 +74,8 @@ export interface IQuizBody {
    createdAt?: Date;
    updatedAt?: Date;
    questionArr: IQuizQuestion[];
+   subject?: Subject;
+   level?: Level;
 }
 
 export interface IQuizInfo {
@@ -87,6 +93,8 @@ export interface IQuizInfo {
    totalQuestions: number;
    createdAt: Date;
    updatedAt: Date;
+   subject?: Subject;
+   level?: Level;
 }
 
 export interface IQUizUpdate {
@@ -104,6 +112,8 @@ export interface IQUizUpdate {
    newQuestionArr: IQuizQuestion[];
    deleteQuestionArr: { _id: string }[];
    editQuestionArr: IQuizQuestion[];
+   subject?: Subject;
+   level?: Level;
 }
 
 export interface MCQResponse extends BaseAPIResponse {
@@ -138,6 +148,8 @@ export interface updateIMCQBody {
    newMultipleChoiceQuizQuestionsArr?: IQuizQuestion[];
    deleteMultipleChoiceQuizQuestionsArr?: { _id: string }[];
    editMultipleChoiceQuizQuestionsArr?: IQuizQuestion[];
+   subject?: Subject;
+   level?: Level;
 }
 
 export type ShortAnswerQuestions = {
@@ -167,6 +179,8 @@ export interface updateIShortAnswerBody {
    newShortAnswerQuizQuestionsArr?: ShortAnswerQuestions[];
    deleteShortAnswerQuizQuestionsArr?: { _id: string }[];
    editShortAnswerQuizQuestionsArr?: ShortAnswerQuestions[];
+   subject?: Subject;
+   level?: Level;
 }
 
 export interface ISessionAssignedQuizzesResponse extends BaseAPIResponse {

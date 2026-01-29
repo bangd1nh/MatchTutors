@@ -1,19 +1,20 @@
 import { useLearningCommitments } from "@/hooks/useLearningCommitment";
 import { LearningCommitmentCard } from "@/components/learning-commitment/LearningCommitmentCard";
-import { Button } from "@/components/ui/button";
-import { Plus, BookOpen } from "lucide-react";
-import { Link } from "react-router-dom";
+// import { Button } from "@/components/ui/button";
+// import { Plus, BookOpen } from "lucide-react";
+// import { Link } from "react-router-dom";
+
+import { BookOpen } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 import { useState } from "react";
 import { Pagination } from "@/components/common/Pagination";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { TutorCommitmentActions } from "@/components/learning-commitment/TutorCommitmentActions";
+// import { TutorCommitmentActions } from "@/components/learning-commitment/TutorCommitmentActions";
 
 type CommitmentStatus =
    | "all"
-   | "pending_agreement"
    | "active"
    | "completed"
    | "cancelled"
@@ -24,10 +25,13 @@ type CommitmentStatus =
 const STATUS_TABS: { label: string; value: CommitmentStatus; color: string }[] =
    [
       { label: "Tất Cả", value: "all", color: "slate" },
-      { label: "Chờ Xác Nhận", value: "pending_agreement", color: "amber" },
       { label: "Đang Hoạt Động", value: "active", color: "emerald" },
       { label: "Hoàn Thành", value: "completed", color: "blue" },
-      { label: "Chờ Phê Duyệt", value: "cancellation_pending", color: "orange" },
+      {
+         label: "Chờ Phê Duyệt",
+         value: "cancellation_pending",
+         color: "orange",
+      },
       { label: "Kiểm Duyệt", value: "admin_review", color: "purple" },
       { label: "Đã Hủy", value: "cancelled", color: "red" },
       { label: "Đã Từ Chối", value: "rejected", color: "red" },
@@ -45,19 +49,23 @@ export const LearningCommitmentsPage = () => {
       error,
    } = useLearningCommitments(page, 9);
 
-   const commitments = paginatedData?.items;
+   // Lọc bỏ pending_agreement
+   const commitments = paginatedData?.items?.filter(
+      (commitment) => commitment.status !== "pending_agreement"
+   );
+
    const totalPages = paginatedData?.pages ?? 1;
 
    const filteredCommitments =
       activeTab === "all"
          ? commitments
-         : commitments?.filter((commitment) => commitment.status === activeTab) ?? [];
+         : commitments?.filter(
+              (commitment) => commitment.status === activeTab
+           ) ?? [];
 
    const getTabColor = (color: string, isActive: boolean) => {
-      const baseActive =
-         "border-current shadow-md";
-      const baseInactive =
-         "border-transparent";
+      const baseActive = "border-current shadow-md";
+      const baseInactive = "border-transparent";
       const map: Record<string, { active: string; inactive: string }> = {
          amber: {
             active:
@@ -103,7 +111,11 @@ export const LearningCommitmentsPage = () => {
          },
       };
       const c = map[color] || map.slate;
-      return `${isActive ? `${c.active} ${baseActive}` : `${c.inactive} ${baseInactive}`}`;
+      return `${
+         isActive
+            ? `${c.active} ${baseActive}`
+            : `${c.inactive} ${baseInactive}`
+      }`;
    };
 
    if (isLoading) {
@@ -121,8 +133,12 @@ export const LearningCommitmentsPage = () => {
       return (
          <div className="min-h-screen flex items-center justify-center bg-background">
             <div className="text-center">
-               <p className="text-destructive font-medium text-lg">Lỗi tải dữ liệu</p>
-               <p className="text-muted-foreground mt-2">Vui lòng thử lại sau</p>
+               <p className="text-destructive font-medium text-lg">
+                  Lỗi tải dữ liệu
+               </p>
+               <p className="text-muted-foreground mt-2">
+                  Vui lòng thử lại sau
+               </p>
             </div>
          </div>
       );
@@ -150,7 +166,7 @@ export const LearningCommitmentsPage = () => {
                      </p>
                   </div>
 
-                  {isTutor && <TutorCommitmentActions />}
+                  {/* {isTutor && <TutorCommitmentActions />} */}
                </div>
             </div>
          </Card>
@@ -158,13 +174,18 @@ export const LearningCommitmentsPage = () => {
          {/* Main */}
          <div className="container mx-auto px-4 py-8">
             {/* Tabs using UI Tabs */}
-            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as CommitmentStatus)} className="w-full">
+            <Tabs
+               value={activeTab}
+               onValueChange={(v) => setActiveTab(v as CommitmentStatus)}
+               className="w-full"
+            >
                <TabsList className="w-full justify-start overflow-x-auto h-12">
                   {STATUS_TABS.map((tab) => {
                      const count =
                         tab.value === "all"
                            ? commitments?.length ?? 0
-                           : commitments?.filter((c) => c.status === tab.value).length ?? 0;
+                           : commitments?.filter((c) => c.status === tab.value)
+                                .length ?? 0;
                      const isActive = activeTab === tab.value;
 
                      return (
@@ -197,7 +218,10 @@ export const LearningCommitmentsPage = () => {
                <ScrollArea className="mt-6">
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 auto-rows-max">
                      {filteredCommitments.map((commitment) => (
-                        <LearningCommitmentCard key={commitment._id} commitment={commitment} />
+                        <LearningCommitmentCard
+                           key={commitment._id}
+                           commitment={commitment}
+                        />
                      ))}
                   </div>
                </ScrollArea>
@@ -210,22 +234,27 @@ export const LearningCommitmentsPage = () => {
                      <p className="text-foreground text-lg font-medium mb-2">
                         {activeTab === "all"
                            ? "Không có cam kết nào"
-                           : `Không có cam kết ${STATUS_TABS.find((t) => t.value === activeTab)?.label.toLowerCase()}`}
+                           : `Không có cam kết ${STATUS_TABS.find(
+                                (t) => t.value === activeTab
+                             )?.label.toLowerCase()}`}
                      </p>
                      <p className="text-muted-foreground text-sm mb-6">
                         {activeTab === "all"
                            ? "Bắt đầu bằng cách tạo cam kết học tập mới"
                            : "Thử chọn một trạng thái khác"}
                      </p>
-                     {/* Nút này cũng nên được xử lý bên trong component con nếu cần */}
-                     {isTutor && activeTab === "all" && (
-                        <Link to="/tutor/commitments/create" className="inline-block">
+                     {/* Nút tạo cam kết - đã comment */}
+                     {/* {isTutor && activeTab === "all" && (
+                        <Link
+                           to="/tutor/commitments/create"
+                           className="inline-block"
+                        >
                            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
                               <Plus className="w-4 h-4 mr-2" />
                               Tạo Cam Kết Đầu Tiên
                            </Button>
                         </Link>
-                     )}
+                     )} */}
                   </div>
                </Card>
             )}
@@ -233,7 +262,11 @@ export const LearningCommitmentsPage = () => {
             {/* Pagination */}
             {totalPages > 0 && (
                <div className="flex justify-center mt-12">
-                  <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+                  <Pagination
+                     currentPage={page}
+                     totalPages={totalPages}
+                     onPageChange={setPage}
+                  />
                </div>
             )}
          </div>

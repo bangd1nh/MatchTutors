@@ -28,12 +28,17 @@ import {
   ChevronRight,
   Loader2,
   Filter,
+  Download,
 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   useAdminPackageTransactions,
+  useAdminCommitmentTransactions,
   useAdminRevenue,
 } from "@/hooks/useAdminWallet";
-import type { TransactionStatus } from "@/api/adminWallet";
+import type { TransactionStatus, AdminCommitmentTransaction } from "@/api/adminWallet";
+import { exportCommitmentTransactionsToExcel } from "@/utils/exportExcel";
+import { getAdminCommitmentTransactions } from "@/api/adminWallet";
 
 // Constants
 const ITEMS_PER_PAGE = 20;
@@ -88,21 +93,29 @@ const getTransactionStatusColor = (status: TransactionStatus): string => {
 
 export default function AdminWalletManagement() {
   // State
+  const [activeTab, setActiveTab] = useState<"packages" | "commitments">("packages");
+  const [packagePage, setPackagePage] = useState(1);
+  const [commitmentPage, setCommitmentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filters, setFilters] = useState<{
-    page: number;
     status?: TransactionStatus;
     startDate?: string;
     endDate?: string;
-  }>({
-    page: 1,
-  });
+  }>({});
 
   // API calls
   const { data: revenueData, isLoading: isLoadingRevenue } = useAdminRevenue();
-  const { data: transactionsData, isLoading: isLoadingTransactions } = useAdminPackageTransactions({
-    page: filters.page,
+  const { data: packageTransactionsData, isLoading: isLoadingPackageTransactions } = useAdminPackageTransactions({
+    page: packagePage,
+    limit: ITEMS_PER_PAGE,
+    status: filters.status,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    search: debouncedSearch || undefined,
+  });
+  const { data: commitmentTransactionsData, isLoading: isLoadingCommitmentTransactions } = useAdminCommitmentTransactions({
+    page: commitmentPage,
     limit: ITEMS_PER_PAGE,
     status: filters.status,
     startDate: filters.startDate,
@@ -121,32 +134,122 @@ export default function AdminWalletManagement() {
 
   // Reset page when filters change
   useEffect(() => {
-    setFilters((prev) => ({ ...prev, page: 1 }));
+    setPackagePage(1);
+    setCommitmentPage(1);
   }, [filters.status, filters.startDate, filters.endDate, debouncedSearch]);
 
   // Handlers
-  const handlePageChange = useCallback((page: number) => {
-    setFilters((prev) => ({ ...prev, page }));
+  const handlePackagePageChange = useCallback((page: number) => {
+    setPackagePage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const handleClearFilters = useCallback(() => {
-    setFilters({ page: 1 });
-    setSearchTerm("");
+  const handleCommitmentPageChange = useCallback((page: number) => {
+    setCommitmentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  const handleTabChange = useCallback((value: string) => {
+    setActiveTab(value as "packages" | "commitments");
+    // Không reset page khi chuyển tab để giữ nguyên vị trí
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    setFilters({});
+    setSearchTerm("");
+    setPackagePage(1);
+    setCommitmentPage(1);
+  }, []);
+
+  // Export Excel - Export tất cả dữ liệu từ tất cả các trang
+  const handleExportExcel = useCallback(async () => {
+    try {
+      // Fetch trang đầu tiên để biết tổng số trang
+      const firstPageResponse = await getAdminCommitmentTransactions({
+        page: 1,
+        limit: ITEMS_PER_PAGE,
+        status: filters.status,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        search: debouncedSearch || undefined,
+      });
+
+      if (!firstPageResponse.transactions || firstPageResponse.transactions.length === 0) {
+        // Nếu không có dữ liệu, thử export trang hiện tại
+        if (commitmentTransactionsData?.transactions && commitmentTransactionsData.transactions.length > 0) {
+          exportCommitmentTransactionsToExcel(
+            commitmentTransactionsData.transactions,
+            commitmentTransactionsData.totalAmount
+          );
+        }
+        return;
+      }
+
+      const totalPages = firstPageResponse.pagination.totalPages || 1;
+      let allTransactions = [...firstPageResponse.transactions];
+
+      // Fetch các trang còn lại
+      if (totalPages > 1) {
+        const fetchPromises = [];
+        for (let page = 2; page <= totalPages; page++) {
+          fetchPromises.push(
+            getAdminCommitmentTransactions({
+              page,
+              limit: ITEMS_PER_PAGE,
+              status: filters.status,
+              startDate: filters.startDate,
+              endDate: filters.endDate,
+              search: debouncedSearch || undefined,
+            })
+          );
+        }
+
+        // Fetch tất cả các trang song song
+        const remainingPagesResponses = await Promise.all(fetchPromises);
+        
+        // Gộp tất cả transactions lại
+        remainingPagesResponses.forEach((response) => {
+          if (response.transactions && response.transactions.length > 0) {
+            allTransactions = [...allTransactions, ...response.transactions];
+          }
+        });
+      }
+
+      // Export tất cả dữ liệu
+      exportCommitmentTransactionsToExcel(
+        allTransactions,
+        firstPageResponse.totalAmount
+      );
+    } catch (error) {
+      console.error('Error exporting Excel:', error);
+      // Fallback: export trang hiện tại nếu fetch tất cả thất bại
+      if (commitmentTransactionsData?.transactions && commitmentTransactionsData.transactions.length > 0) {
+        exportCommitmentTransactionsToExcel(
+          commitmentTransactionsData.transactions,
+          commitmentTransactionsData.totalAmount
+        );
+      }
+    }
+  }, [filters, debouncedSearch, commitmentTransactionsData]);
+
   // Computed values
-  const transactions = transactionsData?.transactions || [];
-  const pagination = transactionsData?.pagination || {
+  const packageTransactions = packageTransactionsData?.transactions || [];
+  const commitmentTransactions = commitmentTransactionsData?.transactions || [];
+  
+  const packagePagination = packageTransactionsData?.pagination || {
     page: 1,
     limit: ITEMS_PER_PAGE,
     total: 0,
     totalPages: 1,
     pages: 1,
   };
-  
-  // Sử dụng totalPages hoặc pages
-  const totalPages = pagination.totalPages || pagination.pages || 1;
+  const commitmentPagination = commitmentTransactionsData?.pagination || {
+    page: 1,
+    limit: ITEMS_PER_PAGE,
+    total: 0,
+    totalPages: 1,
+    pages: 1,
+  };
   
   // Calculate learning commitment revenue from revenue data
   // Doanh thu từ cam kết học tập = Tổng doanh thu - Doanh thu gói dịch vụ
@@ -247,12 +350,12 @@ export default function AdminWalletManagement() {
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {isLoadingTransactions ? (
+            {isLoadingPackageTransactions || isLoadingCommitmentTransactions ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <>
                 <div className="text-2xl font-bold">
-                  {pagination.total}
+                  {(packagePagination.total || 0) + (commitmentPagination.total || 0)}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   Tất cả loại giao dịch
@@ -355,140 +458,315 @@ export default function AdminWalletManagement() {
           <CardTitle>Lịch sử giao dịch</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoadingTransactions ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : transactions.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              Không có giao dịch nào
-            </div>
-          ) : (
-            <>
-              <div className="rounded-md border overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Mã đơn/Giao dịch</TableHead>
-                      <TableHead>Loại</TableHead>
-                      <TableHead>Người dùng</TableHead>
-                      <TableHead>Tổng tiền</TableHead>
-                      <TableHead>Admin nhận</TableHead>
-                      <TableHead>Trạng thái</TableHead>
-                      <TableHead>Ngày tạo</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {transactions.map((transaction) => (
-                      <TableRow key={transaction.id}>
-                        <TableCell>
-                          <div className="space-y-1">
-                            {transaction.orderCode && (
-                              <div className="font-medium">{transaction.orderCode}</div>
-                            )}
-                            {transaction.transactionId && (
-                              <div className="text-xs text-muted-foreground">
-                                {transaction.transactionId}
-                              </div>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">
-                            Gói dịch vụ
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">
-                              {transaction.user?.name || "N/A"}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {transaction.user?.email || "N/A"}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {formatCurrency(transaction.amount)}
-                        </TableCell>
-                        <TableCell className="font-semibold text-green-600">
-                          {formatCurrency(transaction.adminAmount)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getTransactionStatusColor(transaction.status)}>
-                            {getTransactionStatusLabel(transaction.status)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {formatDate(transaction.createdAt)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+          <Tabs value={activeTab} onValueChange={handleTabChange}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="packages">
+                <Package className="h-4 w-4 mr-2" />
+                Gói dịch vụ
+              </TabsTrigger>
+              <TabsTrigger value="commitments">
+                <BookOpen className="h-4 w-4 mr-2" />
+                Cam kết học tập
+              </TabsTrigger>
+            </TabsList>
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between mt-4">
-                  <div className="text-sm text-muted-foreground">
-                    Hiển thị {((pagination.page - 1) * pagination.limit) + 1} -{" "}
-                    {Math.min(pagination.page * pagination.limit, pagination.total)} trong tổng số{" "}
-                    {pagination.total} giao dịch
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(pagination.page - 1)}
-                      disabled={pagination.page === 1}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                      Trước
-                    </Button>
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        const page = i + 1;
-                        return (
-                          <Button
-                            key={page}
-                            variant={pagination.page === page ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => handlePageChange(page)}
-                            className="w-8 h-8 p-0"
-                          >
-                            {page}
-                          </Button>
-                        );
-                      })}
-                      {totalPages > 5 && (
-                        <>
-                          <span className="text-muted-foreground">...</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePageChange(totalPages)}
-                            className="w-8 h-8 p-0"
-                          >
-                            {totalPages}
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(pagination.page + 1)}
-                      disabled={pagination.page === totalPages}
-                    >
-                      Sau
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
+            <TabsContent value="packages">
+              {isLoadingPackageTransactions ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                 </div>
+              ) : packageTransactions.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  Không có giao dịch nào
+                </div>
+              ) : (
+                <>
+                  <div className="rounded-md border overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Mã đơn/Giao dịch</TableHead>
+                          <TableHead>Loại</TableHead>
+                          <TableHead>Người dùng</TableHead>
+                          <TableHead>Tổng tiền</TableHead>
+                          <TableHead>Admin nhận</TableHead>
+                          <TableHead>Trạng thái</TableHead>
+                          <TableHead>Ngày tạo</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {packageTransactions.map((transaction) => (
+                          <TableRow key={transaction.id}>
+                            <TableCell>
+                              <div className="space-y-1">
+                                {transaction.orderCode && (
+                                  <div className="font-medium">{transaction.orderCode}</div>
+                                )}
+                                {transaction.transactionId && (
+                                  <div className="text-xs text-muted-foreground">
+                                    {transaction.transactionId}
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">
+                                Gói dịch vụ
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div>
+                                <div className="font-medium">
+                                  {transaction.user?.name || "N/A"}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {transaction.user?.email || "N/A"}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              {formatCurrency(transaction.amount)}
+                            </TableCell>
+                            <TableCell className="font-semibold text-green-600">
+                              {formatCurrency(transaction.adminAmount)}
+                            </TableCell>
+                            <TableCell>
+                              <Badge className={getTransactionStatusColor(transaction.status)}>
+                                {getTransactionStatusLabel(transaction.status)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {formatDate(transaction.createdAt)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  {packagePagination.totalPages > 1 && (
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="text-sm text-muted-foreground">
+                        Hiển thị {((packagePagination.page - 1) * packagePagination.limit) + 1} -{" "}
+                        {Math.min(packagePagination.page * packagePagination.limit, packagePagination.total)} trong tổng số{" "}
+                        {packagePagination.total} giao dịch
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePackagePageChange(packagePagination.page - 1)}
+                          disabled={packagePagination.page === 1}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                          Trước
+                        </Button>
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: Math.min(5, packagePagination.totalPages) }, (_, i) => {
+                            const page = i + 1;
+                            return (
+                              <Button
+                                key={page}
+                                variant={packagePagination.page === page ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => handlePackagePageChange(page)}
+                                className="w-8 h-8 p-0"
+                              >
+                                {page}
+                              </Button>
+                            );
+                          })}
+                          {packagePagination.totalPages > 5 && (
+                            <>
+                              <span className="text-muted-foreground">...</span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handlePackagePageChange(packagePagination.totalPages)}
+                                className="w-8 h-8 p-0"
+                              >
+                                {packagePagination.totalPages}
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePackagePageChange(packagePagination.page + 1)}
+                          disabled={packagePagination.page === packagePagination.totalPages}
+                        >
+                          Sau
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
-            </>
-          )}
+            </TabsContent>
+
+            <TabsContent value="commitments">
+              {isLoadingCommitmentTransactions ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : commitmentTransactions.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  Không có giao dịch nào
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between items-center mb-4">
+                    {commitmentTransactionsData?.totalAmount !== undefined && (
+                      <div className="p-4 bg-muted rounded-lg flex-1 mr-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium">Tổng doanh thu:</span>
+                          <span className="text-lg font-bold">{formatCurrency(commitmentTransactionsData.totalAmount)}</span>
+                        </div>
+                      </div>
+                    )}
+                    <Button
+                      onClick={handleExportExcel}
+                      disabled={isLoadingCommitmentTransactions || commitmentTransactions.length === 0}
+                      variant="outline"
+                      className="flex-shrink-0"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Xuất Excel
+                    </Button>
+                  </div>
+                  <div className="rounded-md border overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Mã đơn/Giao dịch</TableHead>
+                          <TableHead>Loại</TableHead>
+                          <TableHead>Người dùng</TableHead>
+                          <TableHead>Mã cam kết</TableHead>
+                          <TableHead>Tổng tiền</TableHead>
+                          <TableHead>Ngày tạo</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {commitmentTransactions.map((transaction: AdminCommitmentTransaction) => (
+                          <TableRow key={transaction.id}>
+                            <TableCell>
+                              <div className="space-y-1">
+                                {transaction.orderCode && (
+                                  <div className="font-medium">{transaction.orderCode}</div>
+                                )}
+                                {transaction.transactionId && (
+                                  <div className="text-xs text-muted-foreground">
+                                    {transaction.transactionId}
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">
+                                <BookOpen className="h-3 w-3 mr-1" />
+                                Cam kết học tập
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div>
+                                <div className="font-medium">
+                                  {transaction.user?.name || "N/A"}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {transaction.user?.email || "N/A"}
+                                </div>
+                                {transaction.user?.phone && (
+                                  <div className="text-xs text-muted-foreground">
+                                    {transaction.user.phone}
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-sm font-mono">
+                                {transaction.commitment?.commitmentId || "N/A"}
+                              </div>
+                              {transaction.commitment?.status && (
+                                <Badge variant="outline" className="mt-1 text-xs">
+                                  {transaction.commitment.status}
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              {formatCurrency(transaction.amount)}
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {formatDate(transaction.createdAt)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  {commitmentPagination.totalPages > 1 && (
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="text-sm text-muted-foreground">
+                        Hiển thị {((commitmentPagination.page - 1) * commitmentPagination.limit) + 1} -{" "}
+                        {Math.min(commitmentPagination.page * commitmentPagination.limit, commitmentPagination.total)} trong tổng số{" "}
+                        {commitmentPagination.total} giao dịch
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleCommitmentPageChange(commitmentPagination.page - 1)}
+                          disabled={commitmentPagination.page === 1}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                          Trước
+                        </Button>
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: Math.min(5, commitmentPagination.totalPages) }, (_, i) => {
+                            const page = i + 1;
+                            return (
+                              <Button
+                                key={page}
+                                variant={commitmentPagination.page === page ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => handleCommitmentPageChange(page)}
+                                className="w-8 h-8 p-0"
+                              >
+                                {page}
+                              </Button>
+                            );
+                          })}
+                          {commitmentPagination.totalPages > 5 && (
+                            <>
+                              <span className="text-muted-foreground">...</span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleCommitmentPageChange(commitmentPagination.totalPages)}
+                                className="w-8 h-8 p-0"
+                              >
+                                {commitmentPagination.totalPages}
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleCommitmentPageChange(commitmentPagination.page + 1)}
+                          disabled={commitmentPagination.page === commitmentPagination.totalPages}
+                        >
+                          Sau
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </TabsContent>
+          </Tabs>
+
         </CardContent>
       </Card>
     </div>

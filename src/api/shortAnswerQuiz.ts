@@ -15,8 +15,16 @@ export const createShortAnswerQuiz = async (
     return response.data;
 };
 
-export const fetchShortAnswerQuiz = async (): Promise<IQuizResponse> => {
-    const response = await apiClient.get("/quiz/short-answer/tutor");
+export const fetchShortAnswerQuiz = async (
+    subject?: string,
+    level?: string
+): Promise<IQuizResponse> => {
+    const params: any = {};
+    if (subject) params.subject = subject;
+    if (level) params.level = level;
+    const response = await apiClient.get("/quiz/short-answer/tutor", {
+        params,
+    });
     return response.data;
 };
 

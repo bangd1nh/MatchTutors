@@ -17,6 +17,7 @@ import {
   MailIcon,
   AwardIcon,
   UserIcon,
+  FlagIcon,
 } from 'lucide-react'
 import { 
   useGetTutorById,
@@ -55,6 +56,7 @@ const TutorProfilePage: React.FC = () => {
   const tutorProfile = tutorResponse?.data?.tutor
   const hasProfile = tutorResponse?.data?.hasProfile || false
   const userInfo = tutorProfile?.userId
+  const isReported = (tutorProfile as any)?.hasBeenReported
 
   const handleAction = (action: 'approve' | 'reject' | 'ban' | 'unban') => {
     setShowConfirmation({
@@ -372,6 +374,12 @@ const TutorProfilePage: React.FC = () => {
                       🔒 Đã khóa
                 </span>
               )}
+              {isReported && (
+                    <span className="px-3 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800 border border-orange-200 inline-flex items-center gap-1">
+                      <FlagIcon className="h-3 w-3" />
+                      Đã báo cáo
+                    </span>
+                  )}
             </h1>
           </div>
             </div>

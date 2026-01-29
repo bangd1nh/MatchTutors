@@ -39,6 +39,7 @@ import DashboardTutorPage from "@/pages/dashboardTutor/dashboardTutorPage";
 import ViewSAQHistory from "@/pages/ShortAnswer/ViewSAQHistory";
 import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
 import { PayoutHistoryList } from "@/pages/paymentTutor/payoutHistory";
+import SessionByLearningCommitment from "@/components/learning-commitment/SessionByLearningCommitment";
 
 export const tutorRoutes = {
    element: (
@@ -58,6 +59,10 @@ export const tutorRoutes = {
       {
          path: "/tutor/wallet",
          element: <WalletManagement />,
+      },
+      {
+         path: "/tutor/payout-history",
+         element: <PayoutHistoryList />,
       },
       { path: "/tutor/profile", element: <ProfilePage /> },
       { path: "/tutor/create-profile", element: <TutorProfilePage /> },
@@ -107,6 +112,23 @@ export const tutorRoutes = {
          element: (
             <ProtectedTutorProfileRoute requireApproval={true}>
                <LearningCommitmentsPage />
+            </ProtectedTutorProfileRoute>
+         ),
+      },
+      {
+         path: "/learning-commitment/:commitmentId/sessions",
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <SessionByLearningCommitment />
+            </ProtectedTutorProfileRoute>
+         ),
+      },
+      // Role-prefixed route for tutor (explicit path)
+      {
+         path: "/tutor/learning-commitment/:commitmentId/sessions",
+         element: (
+            <ProtectedTutorProfileRoute requireApproval={true}>
+               <SessionByLearningCommitment />
             </ProtectedTutorProfileRoute>
          ),
       },
@@ -302,14 +324,6 @@ export const tutorRoutes = {
          element: (
             <ProtectedTutorProfileRoute requireApproval={true}>
                <ChatPage />
-            </ProtectedTutorProfileRoute>
-         ),
-      },
-      {
-         path: "/tutor/payout-history",
-         element: (
-            <ProtectedTutorProfileRoute requireApproval={true}>
-               <PayoutHistoryList />
             </ProtectedTutorProfileRoute>
          ),
       },

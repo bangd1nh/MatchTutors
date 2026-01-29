@@ -60,7 +60,7 @@ export function RatingSummary({ stats }: RatingSummaryProps) {
                             {renderStars(averageRating)}
                         </div>
                         <div className="mt-2 text-sm text-muted-foreground">
-                            {totalReviews.toLocaleString()} reviews
+                            {totalReviews.toLocaleString()} Đánh giá
                         </div>
                     </div>
 

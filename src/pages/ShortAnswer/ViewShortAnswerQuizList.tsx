@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useShortAnswerQuiz } from "@/hooks/useSAQ";
+
 import { IQuizInfo } from "@/types/quiz";
 import {
    Calendar,
@@ -15,11 +15,33 @@ import {
    Tag,
    Users,
    Plus,
+   Search,
+   X,
 } from "lucide-react";
 import DeleteShortAnswerQuizModal from "./DeleteShortAnswerQuizModal";
+import {
+   getQuestionTypeLabelVi,
+   getQuizModeLabelVi,
+} from "@/utils/quizTypeDisplay";
+import {
+   Select,
+   SelectTrigger,
+   SelectValue,
+   SelectContent,
+   SelectItem,
+} from "@/components/ui/select";
+import { SUBJECT_VALUES, SUBJECT_LABELS_VI } from "@/enums/subject.enum";
+import { LEVEL_VALUES, LEVEL_LABELS_VI } from "@/enums/level.enum";
+import { useQuery } from "@tanstack/react-query";
+import { fetchShortAnswerQuiz } from "@/api/shortAnswerQuiz";
+import { useTutorProfile } from "@/hooks/useTutorProfile";
 
 const ViewShortAnswerQuizList: React.FC = () => {
-   const { fetchList } = useShortAnswerQuiz();
+   const { tutorProfile } = useTutorProfile();
+   const [selectedSubject, setSelectedSubject] = useState<string>("");
+   const [selectedLevel, setSelectedLevel] = useState<string>("");
+   const [activeSubject, setActiveSubject] = useState<string | undefined>(undefined);
+   const [activeLevel, setActiveLevel] = useState<string | undefined>(undefined);
    const navigate = useNavigate();
    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
    const [selectedQuiz, setSelectedQuiz] = useState<{
@@ -27,10 +49,39 @@ const ViewShortAnswerQuizList: React.FC = () => {
       title: string;
    } | null>(null);
 
+   const fetchList = useQuery({
+      queryKey: ["TUTOR_SHORT_ANSWER_QUIZS", activeSubject, activeLevel],
+      queryFn: () =>
+         fetchShortAnswerQuiz(
+            activeSubject,
+            activeLevel
+         ),
+   });
+
    const isLoading = fetchList.isLoading;
    const isError = fetchList.isError;
    const data = fetchList.data;
    const quizzes: IQuizInfo[] = Array.isArray(data?.data) ? data!.data : [];
+
+   // Filter subjects and levels based on tutor's profile
+   const availableSubjects = tutorProfile?.subjects
+      ? SUBJECT_VALUES.filter((s) => tutorProfile.subjects?.includes(s))
+      : [];
+   const availableLevels = tutorProfile?.levels
+      ? LEVEL_VALUES.filter((l) => tutorProfile.levels?.includes(l))
+      : [];
+
+   const handleSearch = () => {
+      setActiveSubject(selectedSubject === "ALL" || selectedSubject === "" ? undefined : selectedSubject);
+      setActiveLevel(selectedLevel === "ALL" || selectedLevel === "" ? undefined : selectedLevel);
+   };
+
+   const handleClearFilters = () => {
+      setSelectedSubject("");
+      setSelectedLevel("");
+      setActiveSubject(undefined);
+      setActiveLevel(undefined);
+   };
 
    const handleDeleteClick = (quizId: string, quizTitle: string) => {
       setSelectedQuiz({ id: quizId, title: quizTitle });
@@ -67,26 +118,8 @@ const ViewShortAnswerQuizList: React.FC = () => {
       );
    }
 
-   if (!quizzes.length) {
-      return (
-         <div className="min-h-[400px] flex flex-col items-center justify-center">
-            <FileText className="h-20 w-20 text-muted-foreground mb-6" />
-            <div className="text-xl text-muted-foreground mb-2">
-               Chưa có short answer quiz nào
-            </div>
-            <div className="text-sm text-muted-foreground mb-4">
-               Tạo quiz đầu tiên của bạn
-            </div>
-            <Button
-               onClick={() => navigate("/tutor/createShortAnswerQuiz")}
-               className="px-6"
-            >
-               <Plus className="h-4 w-4 mr-2" />
-               Tạo Quiz mới
-            </Button>
-         </div>
-      );
-   }
+   const hasActiveFilters = activeSubject || activeLevel;
+   const showEmptyState = !quizzes.length && !isLoading && !isError;
 
    return (
       <>
@@ -94,13 +127,117 @@ const ViewShortAnswerQuizList: React.FC = () => {
             {/* Header */}
             <div className="mb-8">
                <h1 className="text-3xl font-bold text-foreground mb-2">
-                  Danh sách Short Answer Quiz
+                  Danh sách bài tập tự luận
                </h1>
                <p className="text-muted-foreground">
                   Quản lý và xem các bộ quiz tự luận của bạn
                </p>
             </div>
 
+            {/* Search Filters */}
+            <div className="mb-6 p-4 bg-secondary/20 rounded-lg">
+               <div className="flex items-center gap-4 flex-wrap">
+                  <div className="flex items-center gap-2">
+                     <Search className="h-4 w-4 text-muted-foreground" />
+                     <span className="text-sm font-medium">Tìm kiếm:</span>
+                  </div>
+                  <div className="flex-1 min-w-[200px]">
+                     <Select
+                        value={selectedSubject || undefined}
+                        onValueChange={(value) =>
+                           setSelectedSubject(value === "ALL" ? "" : value)
+                        }
+                     >
+                        <SelectTrigger>
+                           <SelectValue placeholder="Chọn môn học" />
+                        </SelectTrigger>
+                        <SelectContent>
+                           <SelectItem value="ALL">Tất cả môn học</SelectItem>
+                           {availableSubjects.map((subject) => (
+                              <SelectItem key={subject} value={subject}>
+                                 {SUBJECT_LABELS_VI[subject] || subject}
+                              </SelectItem>
+                           ))}
+                        </SelectContent>
+                     </Select>
+                  </div>
+                  <div className="flex-1 min-w-[200px]">
+                     <Select
+                        value={selectedLevel || undefined}
+                        onValueChange={(value) =>
+                           setSelectedLevel(value === "ALL" ? "" : value)
+                        }
+                     >
+                        <SelectTrigger>
+                           <SelectValue placeholder="Chọn cấp độ" />
+                        </SelectTrigger>
+                        <SelectContent>
+                           <SelectItem value="ALL">Tất cả cấp độ</SelectItem>
+                           {availableLevels.map((level) => (
+                              <SelectItem key={level} value={level}>
+                                 {LEVEL_LABELS_VI[level] || level}
+                              </SelectItem>
+                           ))}
+                        </SelectContent>
+                     </Select>
+                  </div>
+                  <Button
+                     onClick={handleSearch}
+                     className="gap-2"
+                  >
+                     <Search className="h-4 w-4" />
+                     Tìm kiếm
+                  </Button>
+                  {(activeSubject || activeLevel) && (
+                     <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleClearFilters}
+                        className="gap-2"
+                     >
+                        <X className="h-4 w-4" />
+                        Xóa bộ lọc
+                     </Button>
+                  )}
+               </div>
+            </div>
+
+            {showEmptyState && hasActiveFilters ? (
+               <div className="min-h-[400px] flex flex-col items-center justify-center">
+                  <FileText className="h-20 w-20 text-muted-foreground mb-6" />
+                  <div className="text-xl text-muted-foreground mb-2">
+                     Không tìm thấy bài tập tự luận nào
+                  </div>
+                  <div className="text-sm text-muted-foreground mb-4">
+                     Không có bài tập tự luận nào phù hợp với bộ lọc đã chọn
+                  </div>
+                  <Button
+                     variant="outline"
+                     onClick={handleClearFilters}
+                     className="gap-2"
+                  >
+                     <X className="h-4 w-4" />
+                     Xóa bộ lọc
+                  </Button>
+               </div>
+            ) : showEmptyState ? (
+               <div className="min-h-[400px] flex flex-col items-center justify-center">
+                  <FileText className="h-20 w-20 text-muted-foreground mb-6" />
+                  <div className="text-xl text-muted-foreground mb-2">
+                     Chưa có short answer quiz nào
+                  </div>
+                  <div className="text-sm text-muted-foreground mb-4">
+                     Tạo quiz đầu tiên của bạn
+                  </div>
+                  <Button
+                     onClick={() => navigate("/tutor/createShortAnswerQuiz")}
+                     className="px-6"
+                  >
+                     <Plus className="h-4 w-4 mr-2" />
+                     Tạo Quiz mới
+                  </Button>
+               </div>
+            ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                {quizzes.map((q: IQuizInfo) => (
                   <Card
@@ -123,14 +260,24 @@ const ViewShortAnswerQuizList: React.FC = () => {
                                  variant="default"
                                  className="bg-green-500/10 text-green-600 border-green-500/20 font-medium"
                               >
-                                 {String(q.quizType ?? "SHORT_ANSWER")}
+                                 {getQuestionTypeLabelVi(q.quizType)}
                               </Badge>
                               <Badge
                                  variant="secondary"
                                  className="bg-secondary/50"
                               >
-                                 {String(q.quizMode ?? "STUDY")}
+                                 {getQuizModeLabelVi(q.quizMode)}
                               </Badge>
+                              {q.subject && (
+                                 <Badge variant="outline" className="text-xs">
+                                    {SUBJECT_LABELS_VI[q.subject] || q.subject}
+                                 </Badge>
+                              )}
+                              {q.level && (
+                                 <Badge variant="outline" className="text-xs">
+                                    {LEVEL_LABELS_VI[q.level] || q.level}
+                                 </Badge>
+                              )}
                            </div>
                         </div>
                      </CardHeader>
@@ -273,6 +420,7 @@ const ViewShortAnswerQuizList: React.FC = () => {
                   </Card>
                ))}
             </div>
+            )}
          </div>
 
          {/* Delete Modal */}

@@ -15,6 +15,7 @@ import {
    AlertCircle,
    AlertTriangle,
    Wallet,
+   EyeOff,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -55,6 +56,11 @@ const urgentItems: SidebarItem[] = [
       to: "/admin/learning",
       label: "Tranh chấp học tập",
       icon: <Users className="h-5 w-5" />,
+   },
+   {
+      to: "/admin/review-visibility",
+      label: "Yêu cầu ẩn đánh giá",
+      icon: <EyeOff className="h-5 w-5" />,
    },
 ];
 
@@ -113,12 +119,24 @@ const AdminSidebarItems: React.FC<{
       if (exact) {
          return location.pathname === path;
       }
-      // Special case: /admin/tutors/:tutorId should match /admin/tutor-profile, not /admin/tutors
-      if (path === "/admin/tutors" && location.pathname.startsWith("/admin/tutors/") && location.pathname !== "/admin/tutors") {
-         return false;
+      // Ưu tiên đúng mục cho các route gia sư:
+      // - /admin/tutors            -> sáng mục "Tài khoản Gia sư"
+      // - /admin/tutors/:id/full   -> sáng mục "Tài khoản Gia sư"
+      // - /admin/tutors/:id        -> sáng mục "Hồ sơ Gia sư"
+      if (path === "/admin/tutors") {
+         return (
+            location.pathname === "/admin/tutors" ||
+            location.pathname.includes("/admin/tutors/") && location.pathname.includes("/full")
+         );
       }
-      if (path === "/admin/tutor-profile" && location.pathname.startsWith("/admin/tutors/") && location.pathname !== "/admin/tutors") {
-         return true;
+      if (path === "/admin/review-visibility") {
+         return location.pathname.startsWith("/admin/review-visibility");
+      }
+      if (path === "/admin/tutor-profile") {
+         return (
+            location.pathname.startsWith("/admin/tutor-profile") ||
+            (location.pathname.startsWith("/admin/tutors/") && !location.pathname.includes("/full"))
+         );
       }
       return location.pathname.startsWith(path);
    };

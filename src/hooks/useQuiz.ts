@@ -19,9 +19,16 @@ import { useAsignMCQStore } from "@/store/useAsignMCQStore";
 
 export const useCreateQuiz = () => {
    const addToast = useToast();
+   const queryClient = useQueryClient();
    return useMutation({
       mutationFn: createFlashCardQuiz,
-      onSuccess: (response) => addToast("success", response.message),
+      onSuccess: (response) => {
+         addToast("success", response.message);
+         // Invalidate all flashcard queries to refetch the list
+         queryClient.invalidateQueries({
+            queryKey: ["TUTORFLASHCARDQUIZS"],
+         });
+      },
       onError: (error: any) =>
          addToast(
             "error",
@@ -30,10 +37,10 @@ export const useCreateQuiz = () => {
    });
 };
 
-export const useFetchQuizByTutor = () => {
+export const useFetchQuizByTutor = (subject?: string, level?: string) => {
    return useQuery<IQuizResponse>({
-      queryKey: ["TUTORFLASHCARDQUIZS"],
-      queryFn: fetchFlashCardQuiz,
+      queryKey: ["TUTORFLASHCARDQUIZS", subject, level],
+      queryFn: () => fetchFlashCardQuiz(subject, level),
    });
 };
 

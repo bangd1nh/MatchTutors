@@ -16,7 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   User,
-  Award
+  Award,
+  Flag
 } from 'lucide-react'
 import { 
   useAcceptTutor,
@@ -41,7 +42,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 const ITEMS_PER_PAGE = 12
 const SEARCH_DEBOUNCE_MS = 300
 
-type TabType = 'all' | 'approved' | 'pending'
+type TabType = 'all' | 'approved' | 'pending' | 'reported'
 
 // Helper functions
 const getApprovalStatusColor = (isApproved: boolean) => {
@@ -61,6 +62,9 @@ const getSubjectDisplayName = (subject: string) => {
 const getLevelDisplayName = (level: string) => {
   return LEVEL_LABELS_VI[level] || level
 }
+
+const isReported = (tutorItem: any) =>
+  tutorItem?.tutor?.hasBeenReported || (tutorItem as any)?.reportInfo?.hasBeenReported
 
 const TutorProfileListPage: React.FC = () => {
   const navigate = useNavigate()
@@ -126,21 +130,26 @@ const TutorProfileListPage: React.FC = () => {
       case 'approved':
         return tutors.filter(t => t.tutor?.isApproved)
       case 'pending':
-        return tutors.filter(t => !t.tutor?.isApproved)
+        // Exclude reported tutors from pending list
+        return tutors.filter(t => !t.tutor?.isApproved && !isReported(t))
+      case 'reported':
+        return tutors.filter((t) => isReported(t))
       default:
         return tutors
     }
   }, [tutorMappingData, activeTab, debouncedSearch])
 
   // Memoized counts
-  const { totalTutors, approvedCount, pendingCount } = useMemo(() => {
+  const { totalTutors, approvedCount, pendingCount, reportedCount } = useMemo(() => {
     const all = tutorMappingData?.data?.tutors || []
     // Only count tutors who have created profiles
     const tutorsWithProfiles = all.filter(t => t.hasProfile && t.tutor)
     return {
       totalTutors: tutorsWithProfiles.length,
       approvedCount: tutorsWithProfiles.filter(t => t.tutor?.isApproved).length,
-      pendingCount: tutorsWithProfiles.filter(t => !t.tutor?.isApproved).length,
+      // Pending excludes reported tutors
+      pendingCount: tutorsWithProfiles.filter(t => !t.tutor?.isApproved && !isReported(t)).length,
+      reportedCount: tutorsWithProfiles.filter((t) => isReported(t)).length,
     }
   }, [tutorMappingData])
 
@@ -327,6 +336,14 @@ const TutorProfileListPage: React.FC = () => {
                 <Clock className="h-4 w-4" />
                 Chờ duyệt ({pendingCount})
               </Button>
+              <Button
+                variant={activeTab === 'reported' ? 'default' : 'outline'}
+                onClick={() => setActiveTab('reported')}
+                className="flex items-center gap-2"
+              >
+                <Flag className="h-4 w-4" />
+                Đã báo cáo ({reportedCount})
+              </Button>
             </div>
           </div>
         </div>
@@ -349,6 +366,7 @@ const TutorProfileListPage: React.FC = () => {
               const tutor = tutorItem.user
               const tutorProfile = tutorItem.tutor
               const isApproved = tutorProfile?.isApproved || false
+              const reported = isReported(tutorItem)
               
               return (
                 <Card key={tutorItem.userId} className="hover:shadow-lg transition-shadow duration-200">
@@ -368,9 +386,16 @@ const TutorProfileListPage: React.FC = () => {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-lg truncate max-w-[220px]" title={tutor.name}>
-                            {tutor.name}
-                          </h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-gray-900 text-lg truncate max-w-[220px]" title={tutor.name}>
+                              {tutor.name}
+                            </h3>
+                            {tutor.isBanned && (
+                              <span className="px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full bg-red-100 text-red-700 border border-red-200">
+                                Đã khóa
+                              </span>
+                            )}
+                          </div>
                           <div className="flex items-center text-yellow-500">
                             <Star className="h-4 w-4 fill-current" />
                             <span className="ml-1 text-sm font-medium text-gray-900">
@@ -382,11 +407,21 @@ const TutorProfileListPage: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      <Badge 
-                        className={`text-xs font-medium ${getApprovalStatusColor(isApproved)}`}
-                      >
-                        {getApprovalStatusText(isApproved)}
-                      </Badge>
+                      <div className="flex flex-col items-end gap-1">
+                        {!reported && (
+                          <Badge 
+                            className={`text-xs font-medium ${getApprovalStatusColor(isApproved)}`}
+                          >
+                            {getApprovalStatusText(isApproved)}
+                          </Badge>
+                        )}
+                        {reported && (
+                          <Badge className="text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200 flex items-center gap-1">
+                            <Flag className="h-3 w-3" />
+                            Đã báo cáo
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </CardHeader>
                   
@@ -411,11 +446,11 @@ const TutorProfileListPage: React.FC = () => {
                         {tutorProfile.subjects && tutorProfile.subjects.length > 0 && (
                           <div>
                             <p className="text-xs font-semibold text-gray-700 mb-1">Môn dạy</p>
-                            <div className="flex flex-wrap gap-1">
+                            <div className="flex items-center gap-1 overflow-x-auto whitespace-nowrap">
                               {tutorProfile.subjects.slice(0, 3).map((subject: string, index: number) => (
                                 <span
                                   key={index}
-                                  className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded border border-blue-200"
+                                  className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded border border-blue-200 inline-flex"
                                 >
                                   {getSubjectDisplayName(subject)}
                                 </span>
@@ -432,11 +467,11 @@ const TutorProfileListPage: React.FC = () => {
                         {tutorProfile.levels && tutorProfile.levels.length > 0 && (
                           <div>
                             <p className="text-xs font-semibold text-gray-700 mb-1">Cấp độ</p>
-                            <div className="flex flex-wrap gap-1">
+                            <div className="flex items-center gap-1 overflow-x-auto whitespace-nowrap">
                               {tutorProfile.levels.slice(0, 2).map((level: string, index: number) => (
                                 <span
                                   key={index}
-                                  className="px-2 py-1 text-xs bg-purple-50 text-purple-700 rounded border border-purple-200"
+                                  className="px-2 py-1 text-xs bg-purple-50 text-purple-700 rounded border border-purple-200 inline-flex"
                                 >
                                   {getLevelDisplayName(level)}
                                 </span>
@@ -453,7 +488,7 @@ const TutorProfileListPage: React.FC = () => {
                         {tutorProfile.hourlyRate && (
                           <div className="flex items-center text-gray-600">
                             <Award className="h-4 w-4 mr-2" />
-                            <span className="text-sm font-medium">
+                          <span className="text-sm font-medium whitespace-nowrap">
                               {(tutorProfile.hourlyRate / 1000).toFixed(0)}k VNĐ/giờ
                             </span>
                           </div>
@@ -467,7 +502,7 @@ const TutorProfileListPage: React.FC = () => {
                       <Button
                         size="sm"
                         onClick={() => handleViewTutor(tutorItem)}
-                        className="w-full"
+                        className="w-full h-9"
                         variant="outline"
                       >
                         <Eye className="h-4 w-4 mr-1" />
@@ -483,7 +518,7 @@ const TutorProfileListPage: React.FC = () => {
                               size="sm"
                               onClick={() => handleAcceptTutor(tutorItem)}
                               disabled={acceptTutorMutation.isPending}
-                              className="bg-green-600 hover:bg-green-700 text-white"
+                              className="bg-green-600 hover:bg-green-700 text-white h-9"
                             >
                               <CheckCircle className="h-4 w-4 mr-1" />
                               {acceptTutorMutation.isPending ? 'Đang duyệt...' : 'Duyệt'}
@@ -495,6 +530,7 @@ const TutorProfileListPage: React.FC = () => {
                               variant="destructive"
                               onClick={() => handleRejectTutor(tutorItem)}
                               disabled={rejectTutorMutation.isPending}
+                              className="h-9"
                             >
                               <XCircle className="h-4 w-4 mr-1" />
                               Từ chối
@@ -506,7 +542,7 @@ const TutorProfileListPage: React.FC = () => {
                             size="sm"
                             onClick={() => handleUnapproveTutor(tutorItem)}
                             disabled={rejectTutorMutation.isPending}
-                            className="bg-yellow-600 hover:bg-yellow-700 text-white w-full"
+                            className="bg-yellow-600 hover:bg-yellow-700 text-white w-full h-9"
                           >
                             <XCircle className="h-4 w-4 mr-1" />
                             {rejectTutorMutation.isPending ? 'Đang hủy duyệt...' : 'Hủy duyệt'}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
    Dialog,
    DialogContent,
@@ -13,6 +13,7 @@ import { getMaterials } from "@/api/material";
 import { useSessionMaterials } from "@/hooks/useSessionMaterials";
 import { useSessionMaterialsStore } from "@/store/useSessionMaterialsStore";
 import { useToast } from "@/hooks/useToast";
+import { Input } from "@/components/ui/input";
 
 interface MaterialListModalProps {
    isOpen: boolean;
@@ -26,6 +27,7 @@ export default function MaterialListModal({
    sessionId,
 }: MaterialListModalProps) {
    const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
+   const [searchTerm, setSearchTerm] = useState("");
    const toast = useToast();
    const { addMaterial: addMaterialToStore } = useSessionMaterialsStore();
 
@@ -37,6 +39,23 @@ export default function MaterialListModal({
 
    // Normalize query result to always be an array for consistent usage (find/map/length)
    const availableMaterials = Array.isArray(data) ? data : data?.items ?? [];
+
+   const filteredMaterials = useMemo(() => {
+      if (!searchTerm) return availableMaterials;
+      const lower = searchTerm.toLowerCase();
+      return availableMaterials.filter((m: any) => {
+         const title = (m.title || "").toLowerCase();
+         const desc = (m.description || "").toLowerCase();
+         const tags = Array.isArray(m.tags)
+            ? m.tags.join(" ").toLowerCase()
+            : "";
+         return (
+            title.includes(lower) ||
+            desc.includes(lower) ||
+            tags.includes(lower)
+         );
+      });
+   }, [availableMaterials, searchTerm]);
 
    const { addMaterial, isAddingMaterial } = useSessionMaterials(sessionId);
 
@@ -81,19 +100,35 @@ export default function MaterialListModal({
                <DialogTitle>Chọn tài liệu để gắn vào buổi học</DialogTitle>
             </DialogHeader>
 
+            {/* Search Input */}
+            <div className="mb-3">
+               <Input
+                  placeholder="Tìm kiếm theo tên, mô tả hoặc tag..."
+                  value={searchTerm}
+                  onChange={(e) =>
+                     setSearchTerm((e.target as HTMLInputElement).value)
+                  }
+                  className="w-full"
+               />
+            </div>
+
             {isLoading ? (
                <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   <p className="ml-4">Đang tải danh sách tài liệu...</p>
                </div>
-            ) : availableMaterials.length === 0 ? (
+            ) : filteredMaterials.length === 0 ? (
                <div className="text-center py-8 text-muted-foreground">
                   <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Bạn chưa có tài liệu nào.</p>
+                  <p>
+                     {searchTerm
+                        ? "Không tìm thấy tài liệu nào phù hợp."
+                        : "Bạn chưa có tài liệu nào."}
+                  </p>
                </div>
             ) : (
                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-4">
-                  {availableMaterials.map((material: any) => (
+                  {filteredMaterials.map((material: any) => (
                      <div
                         key={material._id}
                         className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
